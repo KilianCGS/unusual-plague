@@ -21,11 +21,11 @@ body {
 }
 
 body {
-  min-height: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   color: var(--foreground);
-  background: var(--background);
+  background: #0a0a0a;
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -46,4 +46,60 @@ a {
   html {
     color-scheme: dark;
   }
+}
+
+/* Title Screen Styles */
+main.title-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+}
+
+.title-container {
+  text-align: center;
+  max-width: 600px;
+  padding: 2rem;
+}
+
+.title {
+  font-size: 3.5rem;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  color: #d4af37;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #b0b0b0;
+  margin-bottom: 2.5rem;
+  font-style: italic;
+  letter-spacing: 0.05em;
+}
+
+.begin-button {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  background-color: transparent;
+  border: 2px solid #d4af37;
+  color: #d4af37;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.3s ease;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.begin-button:hover {
+  background-color: #d4af37;
+  color: #0a0a0a;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.begin-button:active {
+  transform: scale(0.98);
 }

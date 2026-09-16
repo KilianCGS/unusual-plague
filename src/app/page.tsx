@@ -1,8 +1,11 @@
 export default function Home() {
   return (
-    <main>
-      <h1>Unusual Plague</h1>
-      <p>Something strange is coming.</p>
+    <main className="title-screen">
+      <div className="title-container">
+        <h1 className="title">UNUSUAL PLAGUE</h1>
+        <p className="subtitle">Something strange is coming.</p>
+        <button className="begin-button">Begin</button>
+      </div>
     </main>
   );
 }
