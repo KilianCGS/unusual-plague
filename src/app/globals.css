@@ -58,9 +58,38 @@ main.title-screen {
 }
 
 .title-container {
+  position: relative;
   text-align: center;
   max-width: 600px;
   padding: 2rem;
+}
+
+.language-selector {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.language-button {
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  background: rgba(212, 175, 55, 0.08);
+  color: #d4af37;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.language-button.is-active {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.2);
+}
+
+.language-button:hover {
+  background: rgba(212, 175, 55, 0.16);
 }
 
 .title {
@@ -102,4 +131,45 @@ main.title-screen {
 
 .begin-button:active {
   transform: scale(0.98);
+}
+
+.secondary-title-button {
+  display: block;
+  margin: 1rem auto 0;
+}
+
+.about-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: rgba(10, 10, 10, 0.78);
+}
+
+.about-panel {
+  width: min(100%, 640px);
+  border: 2px solid #d4af37;
+  background: #111111;
+  padding: 2rem;
+  text-align: left;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.about-panel-title {
+  margin-bottom: 1.25rem;
+  color: #d4af37;
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+}
+
+.about-panel p {
+  margin-bottom: 1rem;
+  color: #d8d8d8;
+  line-height: 1.65;
+}
+
+.about-panel-close {
+  margin-top: 0.5rem;
 }
