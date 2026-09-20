@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import styles from "./page.module.css";
 
@@ -267,12 +266,12 @@ export default function ProtagonistDevPage() {
               top: player.y,
             }}
           >
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={currentSpriteSrc}
               alt={`Protagonist ${player.isWalking ? "walk" : "idle"} ${player.direction} sprite`}
               width={SPRITE_SIZE}
               height={SPRITE_SIZE}
-              priority
               className={styles.playerSprite}
             />
           </div>
