@@ -136,6 +136,34 @@ export const DEV_SCENES: DevScene[] = [
     logicalUnitsPerAssetPixel: 1,
     zoomMultiplier: 602 / 270,
   },
+  {
+    id: "bakery-street",
+    label: "Calle Panadería",
+    // Unmodified copy of art/references/bakery-street-v1.png (448x600).
+    backgroundSrc: "/game/areas/bakery-street/bakery-street-background.png",
+    assetWidth: 448,
+    assetHeight: 600,
+    // Provisional: top of the street, just below the entrance from the plaza.
+    initialAssetX: 224,
+    initialAssetY: 60,
+  },
+  {
+    id: "bakery-interior",
+    label: "Interior Panadería",
+    // Lossless 1:1 crop (x 45..433, y 13..254, no resize, no padding) of
+    // art/references/bakery-interior-v2.png, which had a white margin around the
+    // room. Interior: 1 unit per asset pixel; zoomMultiplier 602 / 270 keeps the
+    // same zoom (and Doctor size) as the 480x270 interiors. The whole 389x242
+    // room fits the frame, so the camera stays fixed.
+    backgroundSrc: "/game/areas/bakery-interior/bakery-interior-background.png",
+    assetWidth: 389,
+    assetHeight: 242,
+    // Provisional: on the floor above the bottom threshold.
+    initialAssetX: 195,
+    initialAssetY: 157,
+    logicalUnitsPerAssetPixel: 1,
+    zoomMultiplier: 602 / 270,
+  },
 ];
 
 export function getSceneWorld(scene: DevScene) {

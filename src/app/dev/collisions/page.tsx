@@ -59,6 +59,16 @@ const EDITOR_SCENES: {
     idPrefix: "tavern-interior",
     exportPrefix: "tavernInterior",
   },
+  {
+    sceneId: "bakery-street",
+    idPrefix: "bakery-street",
+    exportPrefix: "bakeryStreet",
+  },
+  {
+    sceneId: "bakery-interior",
+    idPrefix: "bakery-interior",
+    exportPrefix: "bakeryInterior",
+  },
 ];
 type EditorSceneConfig = (typeof EDITOR_SCENES)[number];
 const PANEL_WIDTH = 380;

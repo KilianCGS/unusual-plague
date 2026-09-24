@@ -8,6 +8,16 @@ import {
   apothecaryStreetSpawns,
   apothecaryStreetTransitions,
 } from "../apothecary-street/apothecaryStreetGeometry";
+import {
+  bakeryInteriorColliders,
+  bakeryInteriorSpawns,
+  bakeryInteriorTransitions,
+} from "../bakery-interior/bakeryInteriorGeometry";
+import {
+  bakeryStreetColliders,
+  bakeryStreetSpawns,
+  bakeryStreetTransitions,
+} from "../bakery-street/bakeryStreetGeometry";
 import type { LogicalRect, SceneCollider } from "../collision";
 import {
   forestColliders,
@@ -39,14 +49,14 @@ import { DEV_SCENES, type DevScene } from "../../app/dev/scene/scenes";
 // semantic names live here: exits are `to-<scene>`, arrivals `from-<scene>`.
 //
 //   Botica interior <-> Calle Botica <-> Plaza <-> Calle Taberna <-> Afueras <-> Bosque
+//                                         Plaza <-> Calle Panaderia <-> Panaderia interior
 //
 // Geometry zones that are deliberately NOT listed as exits stay inactive (a
 // zone that is not an exit does nothing):
 //   plaza-transition-2  (left, future Smithy/Mine)
-//   plaza-transition-4  (bottom, future Bakery street / Church)
 //   tavern-street-transition-3  (Tavern door, future Tavern interior)
 // Their reserved spawns are not registered as arrivals either:
-//   plaza-spawn-3, plaza-spawn-4, tavern-street-spawn-3.
+//   plaza-spawn-3, tavern-street-spawn-3.
 
 export type SceneId =
   | "apothecary-interior"
@@ -54,7 +64,9 @@ export type SceneId =
   | "plaza"
   | "tavern-street"
   | "outskirts"
-  | "forest";
+  | "forest"
+  | "bakery-street"
+  | "bakery-interior";
 
 export type SpawnPoint = { x: number; y: number; direction: Direction };
 
@@ -177,10 +189,18 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
         targetScene: "tavern-street",
         targetSpawn: "from-plaza",
       },
+      {
+        // South: to Calle Panaderia.
+        name: "to-bakery-street",
+        zone: pick(plazaTransitions, "plaza-transition-4"),
+        targetScene: "bakery-street",
+        targetSpawn: "from-plaza",
+      },
     ],
     arrivals: {
       "from-tavern-street": spawnAt(plazaSpawns, "plaza-spawn-1"),
       "from-apothecary-street": spawnAt(plazaSpawns, "plaza-spawn-2"),
+      "from-bakery-street": spawnAt(plazaSpawns, "plaza-spawn-4"),
     },
   },
   "tavern-street": {
@@ -250,6 +270,58 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
     ],
     arrivals: {
       "from-outskirts": spawnAt(forestSpawns, "forest-spawn-1"),
+    },
+  },
+  "bakery-street": {
+    id: "bakery-street",
+    kind: "exterior",
+    visual: visualOf("bakery-street"),
+    colliders: bakeryStreetColliders,
+    exits: [
+      {
+        // North end: back to Plaza.
+        name: "to-plaza",
+        zone: pick(bakeryStreetTransitions, "bakery-street-transition-2"),
+        targetScene: "plaza",
+        targetSpawn: "from-bakery-street",
+      },
+      {
+        // The Bakery door.
+        name: "to-bakery-interior",
+        zone: pick(bakeryStreetTransitions, "bakery-street-transition-1"),
+        targetScene: "bakery-interior",
+        targetSpawn: "from-bakery-street",
+      },
+    ],
+    arrivals: {
+      "from-plaza": spawnAt(bakeryStreetSpawns, "bakery-street-spawn-1"),
+      "from-bakery-interior": spawnAt(
+        bakeryStreetSpawns,
+        "bakery-street-spawn-2",
+      ),
+    },
+  },
+  // The Bakery interior is a 389x242 asset-backed scene, so it uses the same
+  // asset-driven renderer as the exteriors (`kind: "exterior"`); the Botica
+  // interior scene is hard-wired to its own 480x270 room.
+  "bakery-interior": {
+    id: "bakery-interior",
+    kind: "exterior",
+    visual: visualOf("bakery-interior"),
+    colliders: bakeryInteriorColliders,
+    exits: [
+      {
+        name: "to-bakery-street",
+        zone: pick(bakeryInteriorTransitions, "bakery-interior-transition-1"),
+        targetScene: "bakery-street",
+        targetSpawn: "from-bakery-interior",
+      },
+    ],
+    arrivals: {
+      "from-bakery-street": spawnAt(
+        bakeryInteriorSpawns,
+        "bakery-interior-spawn-1",
+      ),
     },
   },
 };
