@@ -1,0 +1,303 @@
+.page {
+  display: flex;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(87, 67, 44, 0.16), transparent 55%),
+    #090909;
+  color: #d8cdb8;
+  font: 12px/1.45 var(--font-geist-mono, monospace);
+}
+
+.canvasArea {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  min-width: 0;
+}
+
+/* Sized to the scaled world; the layer inside is in logical units. */
+.viewport {
+  position: relative;
+  flex: 0 0 auto;
+  width: calc(var(--world-width) * var(--scale));
+  height: calc(var(--world-height) * var(--scale));
+  outline: 2px solid #3f3427;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  background: #050505;
+}
+
+.layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--world-width);
+  height: var(--world-height);
+  overflow: hidden;
+  transform-origin: top left;
+  transform: scale(var(--scale));
+  background-color: #120f0d;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  image-rendering: pixelated;
+  cursor: crosshair;
+  user-select: none;
+  touch-action: none;
+}
+
+.collider,
+.transition,
+.preview {
+  position: absolute;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+/* COLLIDER: red */
+.collider {
+  border: 1px solid #ff5c5c;
+  background: rgba(255, 92, 92, 0.28);
+}
+
+/* TRANSITION: yellow */
+.transition {
+  border: 1px solid #ffd60a;
+  background: rgba(255, 214, 10, 0.26);
+}
+
+/* Any selected rectangle: thick white border, stronger fill. */
+.itemSelected {
+  border: 2px solid #ffffff;
+  background-color: rgba(255, 255, 255, 0.22);
+}
+
+.preview {
+  border: 1px dashed #ffffff;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* SPAWN: blue. The wrapper sits exactly on the logical (x, y) feet point. */
+.spawn {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.spawnFeet {
+  position: absolute;
+  box-sizing: border-box;
+  border: 1px solid #4da3ff;
+  background: rgba(77, 163, 255, 0.22);
+}
+
+.spawnDot {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  box-sizing: border-box;
+  border: 2px solid #4da3ff;
+  border-radius: 50%;
+  background: rgba(9, 9, 9, 0.6);
+}
+
+.spawnDirection {
+  position: absolute;
+  left: 0;
+  top: -1px;
+  width: 20px;
+  height: 2px;
+  background: #4da3ff;
+  transform-origin: left center;
+}
+
+.spawnSelected .spawnDot {
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.spawnSelected .spawnFeet {
+  border: 2px solid #ffffff;
+}
+
+.spawnSelected .spawnDirection {
+  background: #ffffff;
+}
+
+.panel {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100vh;
+  padding: 12px;
+  overflow-y: auto;
+  background: rgba(9, 9, 9, 0.85);
+  border-left: 1px solid #3f3427;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hint {
+  color: #a89a82;
+}
+
+.scenes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.sceneButton {
+  padding: 5px 6px;
+  font: inherit;
+  font-size: 11px;
+  color: inherit;
+  background: rgba(9, 9, 9, 0.7);
+  border: 1px solid #3f3427;
+  cursor: pointer;
+}
+
+.sceneButtonActive {
+  color: #090909;
+  background: #d8cdb8;
+  border-color: #d8cdb8;
+}
+
+.modes {
+  display: flex;
+  gap: 6px;
+}
+
+.modeButton {
+  flex: 1 1 0;
+  padding: 6px 4px;
+  font: inherit;
+  font-size: 11px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid;
+  cursor: pointer;
+}
+
+.modeButtonActive {
+  background: rgba(216, 205, 184, 0.18);
+  font-weight: 700;
+}
+
+.directionPicker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.directionPicker select {
+  font: inherit;
+  color: inherit;
+  background: #090909;
+  border: 1px solid #3f3427;
+  padding: 2px 6px;
+}
+
+.hud {
+  padding: 6px 8px;
+  border: 1px solid #3f3427;
+  background: rgba(9, 9, 9, 0.7);
+}
+
+.listSection {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.listTitle {
+  font-size: 12px;
+  font-weight: 600;
+  padding-left: 6px;
+  border-left: 3px solid;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 16vh;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  border: 1px solid #3f3427;
+}
+
+.rowSelected {
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.rowSelect,
+.rowDelete,
+.copyButton {
+  font: inherit;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.rowSelect {
+  flex: 1 1 auto;
+  padding: 4px 8px;
+  text-align: left;
+}
+
+.rowDelete {
+  padding: 4px 10px;
+  border-left: 1px solid #3f3427;
+}
+
+.exportBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 auto;
+  min-height: 220px;
+}
+
+.exportHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.copyButton {
+  padding: 3px 10px;
+  border: 1px solid #d8cdb8;
+}
+
+.exportText {
+  flex: 1 1 auto;
+  min-height: 200px;
+  padding: 6px 8px;
+  font: 11px/1.4 var(--font-geist-mono, monospace);
+  color: #d8cdb8;
+  background: rgba(9, 9, 9, 0.7);
+  border: 1px solid #3f3427;
+  resize: none;
+  white-space: pre;
+}
+
+.copyStatus {
+  min-height: 1.4em;
+  color: #a89a82;
+}

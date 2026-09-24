@@ -1,0 +1,36 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top, rgba(87, 67, 44, 0.16), transparent 55%),
+    #090909;
+}
+
+.viewport {
+  position: relative;
+  flex: 0 0 auto;
+  width: calc(480px * var(--scene-scale));
+  height: calc(270px * var(--scene-scale));
+  border: 2px solid #3f3427;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  background: #050505;
+}
+
+.logicalScene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 480px;
+  height: 270px;
+  overflow: hidden;
+  transform-origin: top left;
+  transform: scale(var(--scene-scale));
+  background-color: #120f0d;
+  background-image: url("/game/areas/apothecary/apothecary-background.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}

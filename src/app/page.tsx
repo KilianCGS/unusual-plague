@@ -1,19 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { GameWorld } from "../game/world/GameWorld";
+import { IntroScreen } from "../game/intro/IntroScreen";
+import { introScreenCopy } from "../game/i18n/introScreen";
 import { titleScreenCopy } from "../game/i18n/titleScreen";
 import type { Language } from "../game/i18n/types";
 
-const BEGIN_FADE_DURATION_MS = 1000;
+const FADE_DURATION_MS = 1000;
 
-type BeginPhase = "idle" | "fading" | "black";
+type GamePhase = "title" | "intro" | "apothecary";
+type FadePhase = "idle" | "out" | "in";
 
 export default function Home() {
+  const [gamePhase, setGamePhase] = useState<GamePhase>("title");
   const [isAboutPanelOpen, setIsAboutPanelOpen] = useState(false);
   const [language, setLanguage] = useState<Language>("es");
-  const [beginPhase, setBeginPhase] = useState<BeginPhase>("idle");
+  const [fadePhase, setFadePhase] = useState<FadePhase>("idle");
+  const [queuedPhase, setQueuedPhase] = useState<GamePhase | null>(null);
   const copy = titleScreenCopy[language];
-  const isInteractionLocked = beginPhase !== "idle";
+  const introCopy = introScreenCopy[language];
+  const isInteractionLocked = fadePhase !== "idle";
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -38,34 +45,91 @@ export default function Home() {
   }, [isAboutPanelOpen]);
 
   useEffect(() => {
-    if (beginPhase !== "fading") {
+    if (fadePhase === "out") {
+      const timeoutId = window.setTimeout(() => {
+        if (!queuedPhase) {
+          setFadePhase("idle");
+          return;
+        }
+
+        setGamePhase(queuedPhase);
+        setQueuedPhase(null);
+        setFadePhase("in");
+      }, FADE_DURATION_MS);
+
+      return () => {
+        window.clearTimeout(timeoutId);
+      };
+    }
+
+    if (fadePhase !== "in") {
       return;
     }
 
     const timeoutId = window.setTimeout(() => {
-      setBeginPhase("black");
-    }, BEGIN_FADE_DURATION_MS);
+      setFadePhase("idle");
+    }, FADE_DURATION_MS);
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [beginPhase]);
+  }, [fadePhase, queuedPhase]);
 
-  const handleBegin = () => {
+  const transitionToPhase = (nextPhase: GamePhase) => {
     if (isInteractionLocked) {
       return;
     }
 
-    setBeginPhase("fading");
+    setQueuedPhase(nextPhase);
+    setFadePhase("out");
+  };
+
+  const handleBegin = () => {
+    transitionToPhase("intro");
   };
 
   const handleAboutBackdropClick = () => {
     setIsAboutPanelOpen(false);
   };
 
+  if (gamePhase === "intro") {
+    return (
+      <>
+        <IntroScreen
+          lines={introCopy.blocks}
+          onComplete={() => transitionToPhase("apothecary")}
+        />
+        <div
+          className="title-screen-fade"
+          style={{
+            opacity: fadePhase === "out" ? 1 : 0,
+            pointerEvents: fadePhase === "idle" ? "none" : "auto",
+            transitionDuration: `${FADE_DURATION_MS}ms`,
+          }}
+        />
+      </>
+    );
+  }
+
+  if (gamePhase === "apothecary") {
+    return (
+      <>
+        <GameWorld />
+        <div
+          className="title-screen-fade"
+          style={{
+            opacity: fadePhase === "out" ? 1 : 0,
+            pointerEvents: fadePhase === "idle" ? "none" : "auto",
+            transitionDuration: `${FADE_DURATION_MS}ms`,
+          }}
+        />
+      </>
+    );
+  }
+
   return (
     <main
-      className={`title-screen${beginPhase === "fading" ? " is-fading" : ""}${beginPhase === "black" ? " is-black" : ""}`}
+      className="title-screen"
     >
       <div className="title-container">
         <div
@@ -75,18 +139,34 @@ export default function Home() {
           <button
             className={`language-button${language === "es" ? " is-active" : ""}`}
             type="button"
+            aria-label="Español"
             disabled={isInteractionLocked}
             onClick={() => setLanguage("es")}
           >
-            🇪🇸 ES
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="language-flag"
+              src="/game/ui/languages/es.png"
+              alt=""
+              width="24"
+              height="18"
+            />
           </button>
           <button
             className={`language-button${language === "en" ? " is-active" : ""}`}
             type="button"
+            aria-label="English"
             disabled={isInteractionLocked}
             onClick={() => setLanguage("en")}
           >
-            🇬🇧 EN
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="language-flag"
+              src="/game/ui/languages/en.png"
+              alt=""
+              width="24"
+              height="18"
+            />
           </button>
         </div>
         <h1 className="title">{copy.title}</h1>
@@ -139,7 +219,9 @@ export default function Home() {
       <div
         className="title-screen-fade"
         style={{
-          transitionDuration: `${BEGIN_FADE_DURATION_MS}ms`,
+          opacity: fadePhase === "out" ? 1 : 0,
+          pointerEvents: fadePhase === "idle" ? "none" : "auto",
+          transitionDuration: `${FADE_DURATION_MS}ms`,
         }}
       />
     </main>

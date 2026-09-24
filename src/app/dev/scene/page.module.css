@@ -1,0 +1,83 @@
+.page {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top, rgba(87, 67, 44, 0.16), transparent 55%),
+    #090909;
+}
+
+.hud {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  padding: 6px 8px;
+  font: 11px/1.4 var(--font-geist-mono, monospace);
+  color: #d8cdb8;
+  background: rgba(9, 9, 9, 0.7);
+  border: 1px solid #3f3427;
+  pointer-events: none;
+}
+
+.sceneSelector {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+}
+
+.sceneButton {
+  padding: 6px 10px;
+  font: 11px/1.4 var(--font-geist-mono, monospace);
+  color: #d8cdb8;
+  background: rgba(9, 9, 9, 0.7);
+  border: 1px solid #3f3427;
+  cursor: pointer;
+}
+
+.sceneButtonActive {
+  color: #090909;
+  background: #d8cdb8;
+  border-color: #d8cdb8;
+}
+
+/* The viewport is the camera frame: it clips the world to the visible area.
+   The outline is drawn outside the frame so it does not reduce it. */
+.viewport {
+  position: relative;
+  flex: 0 0 auto;
+  overflow: hidden;
+  width: calc(var(--frame-width) * var(--scene-scale));
+  height: calc(var(--frame-height) * var(--scene-scale));
+  outline: 2px solid #3f3427;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  background: #050505;
+}
+
+.logicalScene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--world-width);
+  height: var(--world-height);
+  overflow: hidden;
+  transform-origin: top left;
+  /* --camera-x/-y are whole screen pixels; the translate is applied after the
+     scale, so it is not multiplied by the zoom. */
+  transform: translate(
+      calc(var(--camera-x) * -1px),
+      calc(var(--camera-y) * -1px)
+    )
+    scale(var(--scene-scale));
+  background-color: #120f0d;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  image-rendering: pixelated;
+}
