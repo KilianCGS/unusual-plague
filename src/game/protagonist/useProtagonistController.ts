@@ -47,14 +47,14 @@ type ProtagonistControllerOptions = {
 };
 
 const DEFAULT_SPRITE_SIZE = 96;
-const DEFAULT_PLAYER_SPEED = 120;
+const DEFAULT_PLAYER_SPEED = 160;
 const DEFAULT_WALK_FRAME_DURATION = 120;
 const EMPTY_COLLIDERS: SceneCollider[] = [];
 
 export const PROTAGONIST_FEET_HITBOX: AnchorHitbox = {
-  offsetX: -12,
+  offsetX: -6,
   offsetY: -19,
-  width: 24,
+  width: 12,
   height: 12,
 };
 

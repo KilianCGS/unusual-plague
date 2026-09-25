@@ -31,6 +31,9 @@ export type DevScene = {
   logicalUnitsPerAssetPixel?: number;
   // Multiplies the shared zoom (1 = same apparent size as Calle Taberna).
   zoomMultiplier?: number;
+  // Purely visual size of the protagonist sprite (default 1). Scales the image
+  // around its feet anchor; position, hitbox and physics are unaffected.
+  protagonistScale?: number;
   // Colliders in world units, fed to useProtagonistController as-is.
   colliders?: SceneCollider[];
 };
@@ -161,6 +164,133 @@ export const DEV_SCENES: DevScene[] = [
     // Provisional: on the floor above the bottom threshold.
     initialAssetX: 195,
     initialAssetY: 157,
+    logicalUnitsPerAssetPixel: 1,
+    zoomMultiplier: 602 / 270,
+  },
+  {
+    id: "smithy-street",
+    label: "Calle Herrería",
+    // Unmodified copy of art/references/smithy-street-v3.png (602x360):
+    // manually finished by hand from smithy-street-v2.png (well removed,
+    // right side cropped, forge glow retouched). Approved as final.
+    backgroundSrc: "/game/areas/smithy-street/smithy-street-background.png",
+    assetWidth: 602,
+    assetHeight: 360,
+    // Provisional: near the right (east) edge, the way to the Plaza.
+    initialAssetX: 550,
+    initialAssetY: 180,
+  },
+  {
+    id: "smithy-interior",
+    label: "Interior Herrería",
+    // Unmodified copy of art/references/smithy-interior-v2-approved.png
+    // (833x581): smithy-interior-v1.png (416x304) manually finished by hand,
+    // fixing the two white background patches at the bottom threshold.
+    // Approved as final; 833x581 is the logical world the geometry was
+    // painted against, so it stays exactly as-is.
+    //
+    // zoomMultiplier 1 (not 602/270 like the other interiors): this world is
+    // much bigger than theirs (833x581 vs ~270-480 tall), and 602/270 would
+    // zoom the camera in as if it were the same size, showing only a small
+    // cropped slice at a time. computeFrame(world, REFERENCE_VIEWPORT,
+    // zoomMultiplier) = min(world, referenceViewport / zoomMultiplier), so
+    // zoomMultiplier 1 gives frame = min(833,1161) x min(581,602) = 833x581:
+    // the whole room, no scrolling. This does NOT change the Doctor's size
+    // relative to the furniture (that ratio is fixed by the asset's own
+    // logical pixels vs the sprite's fixed 96-unit size, and camera/zoom
+    // scales both together) - only how much of the room the camera shows and
+    // how large everything appears together on screen.
+    backgroundSrc: "/game/areas/smithy-interior/smithy-interior-background.png",
+    assetWidth: 833,
+    assetHeight: 581,
+    // Provisional: on the floor just above the bottom threshold.
+    initialAssetX: 417,
+    initialAssetY: 497,
+    logicalUnitsPerAssetPixel: 1,
+    zoomMultiplier: 1,
+    protagonistScale: 1.5,
+  },
+  {
+    id: "mountain-path",
+    label: "Camino de Montaña",
+    // Unmodified copy of art/references/mountain-path-v1.png (688x384).
+    backgroundSrc: "/game/areas/mountain-path/mountain-path-background.png",
+    assetWidth: 688,
+    assetHeight: 384,
+    // Provisional: near the right edge, the way to Calle Herrería.
+    initialAssetX: 640,
+    initialAssetY: 200,
+  },
+  {
+    id: "mine-interior",
+    label: "Interior Mina",
+    // Unmodified copy of art/references/mine-interior-v3.png (632x420):
+    // worked mining zone left, natural cave right, central open area above
+    // the bottom exit. The rock reaches all four canvas edges/corners,
+    // unlike v1/v2. Approved as the definitive Mina Principal. v4 (an
+    // inpaint of v3's right side) and v1/v2 are discarded iterations only.
+    backgroundSrc: "/game/areas/mine-interior/mine-interior-background.png",
+    assetWidth: 632,
+    assetHeight: 420,
+    // Provisional: on the floor just above the bottom exit.
+    initialAssetX: 316,
+    initialAssetY: 380,
+    logicalUnitsPerAssetPixel: 1,
+    zoomMultiplier: 602 / 270,
+  },
+  {
+    id: "mine-natural-cave",
+    label: "Cámara Natural",
+    // Unmodified copy of art/references/mine-natural-cave-v3.png (693x550): a
+    // separate, independent asset (not an edit of mine-interior), a small
+    // hidden natural chamber reached from the Mina's right side. Only entrance
+    // is a gap in the LEFT wall; top, right and bottom are fully closed rock.
+    // v3 is v1's composition (approved) with a material-aware recolor toward
+    // the Mina Principal's palette, then manually cropped/finished by hand.
+    // Approved as final; 693x550 is the logical world the geometry was
+    // painted against, so it stays exactly as-is.
+    //
+    // zoomMultiplier 1, same reasoning as smithy-interior: this world is much
+    // bigger than the other interiors', so the shared 602/270 multiplier
+    // cropped the camera in tight. zoomMultiplier 1 gives frame =
+    // min(693,1161) x min(550,602) = 693x550: the whole chamber, no
+    // scrolling, without touching the Doctor/furniture proportion (fixed by
+    // the asset's own logical pixels, unaffected by zoom).
+    backgroundSrc: "/game/areas/mine-natural-cave/mine-natural-cave-background.png",
+    assetWidth: 693,
+    assetHeight: 550,
+    // Provisional: on the floor just inside the left entrance.
+    initialAssetX: 50,
+    initialAssetY: 300,
+    logicalUnitsPerAssetPixel: 1,
+    zoomMultiplier: 1,
+    protagonistScale: 1.5,
+  },
+  {
+    id: "apothecary-interior",
+    label: "Botica (interior)",
+    // The Apothecary interior itself, added here only so /dev/scene and
+    // /dev/collisions can display and edit its already-persisted geometry
+    // (apothecaryInteriorGeometry.ts). Real gameplay
+    // does NOT use this entry: ApothecaryScene.tsx is hard-wired to its own
+    // fixed 480x270 room (see ApothecaryScene.module.css) and is rendered
+    // directly, not through DEV_SCENES/ExteriorScene. This entry mirrors
+    // those exact same logical dimensions (480x270, 1 unit per pixel) so
+    // colliders/transitions/spawns painted here line up with the real scene.
+    //
+    // CAVEAT: the background PNG is 1586x992 and CSS renders it with
+    // `background-size: cover` into the 480x270 box, so this editor preview
+    // is not a byte-exact crop of the real view (parts of the tall/wide
+    // source image get cropped by `cover` in ways this simple <img>-style
+    // background can't reproduce exactly). The geometry numbers themselves
+    // are unaffected: they're defined in the same 480x270 logical space as
+    // actual gameplay.
+    backgroundSrc: "/game/areas/apothecary/apothecary-background.png",
+    assetWidth: 480,
+    assetHeight: 270,
+    // Provisional: matches the existing start position.
+    initialAssetX: 240,
+    initialAssetY: 220,
     logicalUnitsPerAssetPixel: 1,
     zoomMultiplier: 602 / 270,
   },

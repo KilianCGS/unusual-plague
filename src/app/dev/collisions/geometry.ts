@@ -62,7 +62,7 @@ function formatBlock(declaration: string, rows: string[]) {
 }
 
 // TypeScript source ready to paste into scene files (colliders keep the same
-// shape as src/game/apothecary/apothecaryColliders.ts). The three data sets are
+// shape as src/game/collision.ts's SceneCollider). The three data sets are
 // separated and commented. Ids are readable and follow the list order:
 // `${prefix}-1`, `${prefix}-transition-1`, `${prefix}-spawn-1`, ...
 export function formatSceneExport(

@@ -28,5 +28,5 @@ export const bakeryInteriorSpawns: {
   y: number;
   direction: Direction;
 }[] = [
-  { id: "bakery-interior-spawn-1", x: 200, y: 178, direction: "south" },
+  { id: "bakery-interior-spawn-1", x: 200, y: 178, direction: "north" },
 ];

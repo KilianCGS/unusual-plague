@@ -4,6 +4,32 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 
 import {
+  apothecaryInteriorColliders,
+  apothecaryInteriorSpawns,
+  apothecaryInteriorTransitions,
+} from "../../../game/apothecary/apothecaryInteriorGeometry";
+import type { LogicalRect, SceneCollider } from "../../../game/collision";
+import {
+  doctorRoomColliders,
+  doctorRoomSpawns,
+  doctorRoomTransitions,
+} from "../../../game/doctor-room/doctorRoomGeometry";
+import {
+  mineInteriorColliders,
+  mineInteriorSpawns,
+  mineInteriorTransitions,
+} from "../../../game/mine-interior/mineInteriorGeometry";
+import {
+  mineNaturalCaveColliders,
+  mineNaturalCaveSpawns,
+  mineNaturalCaveTransitions,
+} from "../../../game/mine-natural-cave/mineNaturalCaveGeometry";
+import {
+  mountainPathColliders,
+  mountainPathSpawns,
+  mountainPathTransitions,
+} from "../../../game/mountain-path/mountainPathGeometry";
+import {
   plazaColliders,
   plazaSpawns,
   plazaTransitions,
@@ -12,6 +38,16 @@ import {
   PROTAGONIST_FEET_HITBOX,
   type Direction,
 } from "../../../game/protagonist/useProtagonistController";
+import {
+  smithyInteriorColliders,
+  smithyInteriorSpawns,
+  smithyInteriorTransitions,
+} from "../../../game/smithy-interior/smithyInteriorGeometry";
+import {
+  smithyStreetColliders,
+  smithyStreetSpawns,
+  smithyStreetTransitions,
+} from "../../../game/smithy-street/smithyStreetGeometry";
 import { DEV_SCENES, getSceneWorld, type DevScene } from "../scene/scenes";
 import {
   clientToWorld,
@@ -33,6 +69,14 @@ const EDITOR_SCENES: {
   exportPrefix: string;
 }[] = [
   { sceneId: "plaza", idPrefix: "plaza", exportPrefix: "plaza" },
+  {
+    // The Apothecary's own room, not the street. Its ids/export keep the
+    // "apothecary-interior" prefix already used by its geometry file
+    // (apothecaryInteriorGeometry.ts).
+    sceneId: "apothecary-interior",
+    idPrefix: "apothecary-interior",
+    exportPrefix: "apothecaryInterior",
+  },
   {
     sceneId: "apothecary-street",
     idPrefix: "apothecary-street",
@@ -68,6 +112,31 @@ const EDITOR_SCENES: {
     sceneId: "bakery-interior",
     idPrefix: "bakery-interior",
     exportPrefix: "bakeryInterior",
+  },
+  {
+    sceneId: "smithy-street",
+    idPrefix: "smithy-street",
+    exportPrefix: "smithyStreet",
+  },
+  {
+    sceneId: "smithy-interior",
+    idPrefix: "smithy-interior",
+    exportPrefix: "smithyInterior",
+  },
+  {
+    sceneId: "mountain-path",
+    idPrefix: "mountain-path",
+    exportPrefix: "mountainPath",
+  },
+  {
+    sceneId: "mine-interior",
+    idPrefix: "mine-interior",
+    exportPrefix: "mineInterior",
+  },
+  {
+    sceneId: "mine-natural-cave",
+    idPrefix: "mine-natural-cave",
+    exportPrefix: "mineNaturalCave",
   },
 ];
 type EditorSceneConfig = (typeof EDITOR_SCENES)[number];
@@ -114,26 +183,79 @@ function newEditorId(kind: Kind) {
   return `${kind}-${editorIdCounter}`;
 }
 
-// Plaza starts loaded from its source of truth in code (src/game/plaza); the
-// other scenes start empty.
+// Scenes whose geometry is already painted and persisted to a *Geometry.ts
+// file: the editor preloads it instead of starting empty. Other scenes still
+// start empty until their geometry is painted and handed over for a file.
+const PERSISTED_GEOMETRY: Record<
+  string,
+  {
+    colliders: SceneCollider[];
+    transitions: (LogicalRect & { id: string })[];
+    spawns: { id: string; x: number; y: number; direction: Direction }[];
+  }
+> = {
+  plaza: {
+    colliders: plazaColliders,
+    transitions: plazaTransitions,
+    spawns: plazaSpawns,
+  },
+  "apothecary-interior": {
+    colliders: apothecaryInteriorColliders,
+    transitions: apothecaryInteriorTransitions,
+    spawns: apothecaryInteriorSpawns,
+  },
+  "doctor-room": {
+    colliders: doctorRoomColliders,
+    transitions: doctorRoomTransitions,
+    spawns: doctorRoomSpawns,
+  },
+  "smithy-street": {
+    colliders: smithyStreetColliders,
+    transitions: smithyStreetTransitions,
+    spawns: smithyStreetSpawns,
+  },
+  "smithy-interior": {
+    colliders: smithyInteriorColliders,
+    transitions: smithyInteriorTransitions,
+    spawns: smithyInteriorSpawns,
+  },
+  "mountain-path": {
+    colliders: mountainPathColliders,
+    transitions: mountainPathTransitions,
+    spawns: mountainPathSpawns,
+  },
+  "mine-interior": {
+    colliders: mineInteriorColliders,
+    transitions: mineInteriorTransitions,
+    spawns: mineInteriorSpawns,
+  },
+  "mine-natural-cave": {
+    colliders: mineNaturalCaveColliders,
+    transitions: mineNaturalCaveTransitions,
+    spawns: mineNaturalCaveSpawns,
+  },
+};
+
 function createInitialData(sceneId: string): SceneData {
-  if (sceneId === "plaza") {
+  const persisted = PERSISTED_GEOMETRY[sceneId];
+
+  if (persisted) {
     return {
-      colliders: plazaColliders.map((item) => ({
+      colliders: persisted.colliders.map((item) => ({
         editorId: newEditorId("collider"),
         x: item.x,
         y: item.y,
         width: item.width,
         height: item.height,
       })),
-      transitions: plazaTransitions.map((item) => ({
+      transitions: persisted.transitions.map((item) => ({
         editorId: newEditorId("transition"),
         x: item.x,
         y: item.y,
         width: item.width,
         height: item.height,
       })),
-      spawns: plazaSpawns.map((item) => ({
+      spawns: persisted.spawns.map((item) => ({
         editorId: newEditorId("spawn"),
         x: item.x,
         y: item.y,

@@ -24,7 +24,7 @@ import {
 const SPRITE_SIZE = 96;
 // Same value as the controller default; passed explicitly so the HUD can
 // report the crossing time.
-const PLAYER_SPEED = 120;
+const PLAYER_SPEED = 160;
 const SCENE_PADDING = 48;
 const MAX_SCENE_SCALE = 4;
 // The sprite is anchored at its feet; aim the camera at the middle of the
@@ -153,6 +153,7 @@ function ScenePlayground({ scene }: { scene: DevScene }) {
             spriteSize={spriteSize}
             direction={player.direction}
             isWalking={player.isWalking}
+            scale={scene.protagonistScale}
           />
           {showCollisionDebug
             ? scene.colliders?.map((collider) => (

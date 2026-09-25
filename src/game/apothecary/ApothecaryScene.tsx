@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { apothecaryInteriorColliders } from "./apothecaryInteriorGeometry";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
-import { apothecaryColliders } from "./apothecaryColliders";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
 import type { DirectionInputHandle } from "../protagonist/useDirectionInput";
 import {
@@ -68,7 +68,7 @@ export function ApothecaryScene({
       initialY: spawn.y,
       initialDirection: spawn.direction,
       spriteSize: SPRITE_SIZE,
-      sceneColliders: apothecaryColliders,
+      sceneColliders: apothecaryInteriorColliders,
       input,
       inputEnabled: isPlaying,
     });
@@ -113,7 +113,7 @@ export function ApothecaryScene({
             />
             {SHOW_COLLISION_DEBUG ? (
               <>
-                {apothecaryColliders.map((collider) => (
+                {apothecaryInteriorColliders.map((collider) => (
                   <div
                     key={collider.id}
                     style={{

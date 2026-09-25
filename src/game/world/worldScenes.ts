@@ -1,5 +1,5 @@
-import { apothecaryColliders } from "../apothecary/apothecaryColliders";
 import {
+  apothecaryInteriorColliders,
   apothecaryInteriorSpawns,
   apothecaryInteriorTransitions,
 } from "../apothecary/apothecaryInteriorGeometry";
@@ -20,10 +20,30 @@ import {
 } from "../bakery-street/bakeryStreetGeometry";
 import type { LogicalRect, SceneCollider } from "../collision";
 import {
+  doctorRoomColliders,
+  doctorRoomSpawns,
+  doctorRoomTransitions,
+} from "../doctor-room/doctorRoomGeometry";
+import {
   forestColliders,
   forestSpawns,
   forestTransitions,
 } from "../forest/forestGeometry";
+import {
+  mineInteriorColliders,
+  mineInteriorSpawns,
+  mineInteriorTransitions,
+} from "../mine-interior/mineInteriorGeometry";
+import {
+  mineNaturalCaveColliders,
+  mineNaturalCaveSpawns,
+  mineNaturalCaveTransitions,
+} from "../mine-natural-cave/mineNaturalCaveGeometry";
+import {
+  mountainPathColliders,
+  mountainPathSpawns,
+  mountainPathTransitions,
+} from "../mountain-path/mountainPathGeometry";
 import {
   outskirtsColliders,
   outskirtsSpawns,
@@ -35,6 +55,16 @@ import {
   plazaTransitions,
 } from "../plaza/plazaGeometry";
 import type { Direction } from "../protagonist/useProtagonistController";
+import {
+  smithyInteriorColliders,
+  smithyInteriorSpawns,
+  smithyInteriorTransitions,
+} from "../smithy-interior/smithyInteriorGeometry";
+import {
+  smithyStreetColliders,
+  smithyStreetSpawns,
+  smithyStreetTransitions,
+} from "../smithy-street/smithyStreetGeometry";
 import {
   tavernStreetColliders,
   tavernStreetSpawns,
@@ -48,15 +78,18 @@ import { DEV_SCENES, type DevScene } from "../../app/dev/scene/scenes";
 // World map (V1). Raw geometry ids stay untouched in the geometry files; the
 // semantic names live here: exits are `to-<scene>`, arrivals `from-<scene>`.
 //
-//   Botica interior <-> Calle Botica <-> Plaza <-> Calle Taberna <-> Afueras <-> Bosque
-//                                         Plaza <-> Calle Panaderia <-> Panaderia interior
+//   Doctor Room <-> Botica interior <-> Calle Botica <-> Plaza <-> Calle Taberna <-> Afueras <-> Bosque
+//                                                         Plaza <-> Calle Panaderia <-> Panaderia interior
+//                                                         Plaza <-> Calle Herreria <-> Herreria interior
+//                                                                    Calle Herreria <-> Mountain Path <-> Mina Principal <-> Camara Natural
 //
 // Geometry zones that are deliberately NOT listed as exits stay inactive (a
 // zone that is not an exit does nothing):
-//   plaza-transition-2  (left, future Smithy/Mine)
 //   tavern-street-transition-3  (Tavern door, future Tavern interior)
 // Their reserved spawns are not registered as arrivals either:
-//   plaza-spawn-3, tavern-street-spawn-3.
+//   tavern-street-spawn-3.
+// doctor-room-spawn-1 is deliberately never used as an arrival either: it is
+// reserved for a future chapter-start / narrative wake, not a walk-in spawn.
 
 export type SceneId =
   | "apothecary-interior"
@@ -66,7 +99,13 @@ export type SceneId =
   | "outskirts"
   | "forest"
   | "bakery-street"
-  | "bakery-interior";
+  | "bakery-interior"
+  | "smithy-street"
+  | "smithy-interior"
+  | "mountain-path"
+  | "mine-interior"
+  | "mine-natural-cave"
+  | "doctor-room";
 
 export type SpawnPoint = { x: number; y: number; direction: Direction };
 
@@ -120,24 +159,67 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
   "apothecary-interior": {
     id: "apothecary-interior",
     kind: "interior",
-    colliders: apothecaryColliders,
+    colliders: apothecaryInteriorColliders,
     exits: [
       {
-        name: "to-apothecary-street",
+        // The door/gap on the right side: to the Doctor's Room.
+        name: "to-doctor-room",
         zone: pick(
           apothecaryInteriorTransitions,
           "apothecary-interior-transition-1",
+        ),
+        targetScene: "doctor-room",
+        targetSpawn: "from-apothecary-interior",
+      },
+      {
+        // The bottom exit: to Calle Botica.
+        name: "to-apothecary-street",
+        zone: pick(
+          apothecaryInteriorTransitions,
+          "apothecary-interior-transition-2",
         ),
         targetScene: "apothecary-street",
         targetSpawn: "from-apothecary-interior",
       },
     ],
     arrivals: {
-      start: spawnAt(apothecaryInteriorSpawns, "apothecary-interior-start"),
+      // The game's boot position. The previous painted geometry had a
+      // dedicated "apothecary-interior-start" spawn; the new persisted
+      // geometry (repainted from scratch) no longer has one, so this keeps
+      // the exact same coordinates as a literal instead of a lookup.
+      start: { x: 240, y: 220, direction: "south" },
       "from-apothecary-street": spawnAt(
+        apothecaryInteriorSpawns,
+        "apothecary-interior-spawn-2",
+      ),
+      "from-doctor-room": spawnAt(
         apothecaryInteriorSpawns,
         "apothecary-interior-spawn-1",
       ),
+    },
+  },
+  "doctor-room": {
+    id: "doctor-room",
+    kind: "exterior",
+    visual: visualOf("doctor-room"),
+    colliders: doctorRoomColliders,
+    exits: [
+      {
+        name: "to-apothecary-interior",
+        zone: pick(doctorRoomTransitions, "doctor-room-transition-1"),
+        targetScene: "apothecary-interior",
+        targetSpawn: "from-doctor-room",
+      },
+    ],
+    arrivals: {
+      // Physical arrival from the Botica, facing into the room.
+      "from-apothecary-interior": spawnAt(
+        doctorRoomSpawns,
+        "doctor-room-spawn-2",
+      ),
+      // doctor-room-spawn-1 is intentionally NOT registered as an arrival
+      // here: it is reserved for a future chapter-start / narrative wake,
+      // not a walk-in transition.
     },
   },
   "apothecary-street": {
@@ -196,11 +278,19 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
         targetScene: "bakery-street",
         targetSpawn: "from-plaza",
       },
+      {
+        // West: to Calle Herreria.
+        name: "to-smithy-street",
+        zone: pick(plazaTransitions, "plaza-transition-2"),
+        targetScene: "smithy-street",
+        targetSpawn: "from-plaza",
+      },
     ],
     arrivals: {
       "from-tavern-street": spawnAt(plazaSpawns, "plaza-spawn-1"),
       "from-apothecary-street": spawnAt(plazaSpawns, "plaza-spawn-2"),
       "from-bakery-street": spawnAt(plazaSpawns, "plaza-spawn-4"),
+      "from-smithy-street": spawnAt(plazaSpawns, "plaza-spawn-3"),
     },
   },
   "tavern-street": {
@@ -321,6 +411,142 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
       "from-bakery-street": spawnAt(
         bakeryInteriorSpawns,
         "bakery-interior-spawn-1",
+      ),
+    },
+  },
+  "smithy-street": {
+    id: "smithy-street",
+    kind: "exterior",
+    visual: visualOf("smithy-street"),
+    colliders: smithyStreetColliders,
+    exits: [
+      {
+        // The Smithy door.
+        name: "to-smithy-interior",
+        zone: pick(smithyStreetTransitions, "smithy-street-transition-1"),
+        targetScene: "smithy-interior",
+        targetSpawn: "from-smithy-street",
+      },
+      {
+        // East end: back to Plaza.
+        name: "to-plaza",
+        zone: pick(smithyStreetTransitions, "smithy-street-transition-2"),
+        targetScene: "plaza",
+        targetSpawn: "from-smithy-street",
+      },
+      {
+        // West end: to the Mountain Path.
+        name: "to-mountain-path",
+        zone: pick(smithyStreetTransitions, "smithy-street-transition-3"),
+        targetScene: "mountain-path",
+        targetSpawn: "from-smithy-street",
+      },
+    ],
+    arrivals: {
+      "from-plaza": spawnAt(smithyStreetSpawns, "smithy-street-spawn-1"),
+      "from-mountain-path": spawnAt(smithyStreetSpawns, "smithy-street-spawn-2"),
+      "from-smithy-interior": spawnAt(
+        smithyStreetSpawns,
+        "smithy-street-spawn-3",
+      ),
+    },
+  },
+  // Asset-driven scene like bakery-interior (not the hard-wired Botica room).
+  "smithy-interior": {
+    id: "smithy-interior",
+    kind: "exterior",
+    visual: visualOf("smithy-interior"),
+    colliders: smithyInteriorColliders,
+    exits: [
+      {
+        name: "to-smithy-street",
+        zone: pick(smithyInteriorTransitions, "smithy-interior-transition-1"),
+        targetScene: "smithy-street",
+        targetSpawn: "from-smithy-interior",
+      },
+    ],
+    arrivals: {
+      "from-smithy-street": spawnAt(
+        smithyInteriorSpawns,
+        "smithy-interior-spawn-1",
+      ),
+    },
+  },
+  "mountain-path": {
+    id: "mountain-path",
+    kind: "exterior",
+    visual: visualOf("mountain-path"),
+    colliders: mountainPathColliders,
+    exits: [
+      {
+        // East end: back to Calle Herreria.
+        name: "to-smithy-street",
+        zone: pick(mountainPathTransitions, "mountain-path-transition-1"),
+        targetScene: "smithy-street",
+        targetSpawn: "from-mountain-path",
+      },
+      {
+        // West end: the mine entrance.
+        name: "to-mine-interior",
+        zone: pick(mountainPathTransitions, "mountain-path-transition-2"),
+        targetScene: "mine-interior",
+        targetSpawn: "from-mountain-path",
+      },
+    ],
+    arrivals: {
+      "from-smithy-street": spawnAt(mountainPathSpawns, "mountain-path-spawn-1"),
+      "from-mine-interior": spawnAt(mountainPathSpawns, "mountain-path-spawn-2"),
+    },
+  },
+  "mine-interior": {
+    id: "mine-interior",
+    kind: "exterior",
+    visual: visualOf("mine-interior"),
+    colliders: mineInteriorColliders,
+    exits: [
+      {
+        // South exit: back to the Mountain Path.
+        name: "to-mountain-path",
+        zone: pick(mineInteriorTransitions, "mine-interior-transition-1"),
+        targetScene: "mountain-path",
+        targetSpawn: "from-mine-interior",
+      },
+      {
+        // Passage on the natural-cave side, to the Camara Natural.
+        name: "to-mine-natural-cave",
+        zone: pick(mineInteriorTransitions, "mine-interior-transition-2"),
+        targetScene: "mine-natural-cave",
+        targetSpawn: "from-mine-interior",
+      },
+    ],
+    arrivals: {
+      "from-mountain-path": spawnAt(mineInteriorSpawns, "mine-interior-spawn-2"),
+      "from-mine-natural-cave": spawnAt(
+        mineInteriorSpawns,
+        "mine-interior-spawn-1",
+      ),
+    },
+  },
+  "mine-natural-cave": {
+    id: "mine-natural-cave",
+    kind: "exterior",
+    visual: visualOf("mine-natural-cave"),
+    colliders: mineNaturalCaveColliders,
+    exits: [
+      {
+        name: "to-mine-interior",
+        zone: pick(
+          mineNaturalCaveTransitions,
+          "mine-natural-cave-transition-1",
+        ),
+        targetScene: "mine-interior",
+        targetSpawn: "from-mine-natural-cave",
+      },
+    ],
+    arrivals: {
+      "from-mine-interior": spawnAt(
+        mineNaturalCaveSpawns,
+        "mine-natural-cave-spawn-1",
       ),
     },
   },

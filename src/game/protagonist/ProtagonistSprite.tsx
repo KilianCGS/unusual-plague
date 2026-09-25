@@ -9,6 +9,9 @@ type ProtagonistSpriteProps = {
   spriteSize: number;
   direction: Direction;
   isWalking: boolean;
+  // Visual only. Scales around the bottom-center of the image, which is the
+  // feet anchor, so the feet never move.
+  scale?: number;
 };
 
 export function ProtagonistSprite({
@@ -18,6 +21,7 @@ export function ProtagonistSprite({
   spriteSize,
   direction,
   isWalking,
+  scale = 1,
 }: ProtagonistSpriteProps) {
   const anchorStyle: CSSProperties = {
     position: "absolute",
@@ -34,6 +38,9 @@ export function ProtagonistSprite({
     width: spriteSize,
     height: spriteSize,
     imageRendering: "pixelated",
+    ...(scale === 1
+      ? null
+      : { transform: `scale(${scale})`, transformOrigin: "50% 100%" }),
   };
 
   return (

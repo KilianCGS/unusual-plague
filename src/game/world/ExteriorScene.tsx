@@ -122,6 +122,7 @@ export function ExteriorScene({
             spriteSize={spriteSize}
             direction={player.direction}
             isWalking={player.isWalking}
+            scale={scene.visual.protagonistScale}
           />
           {SHOW_COLLISION_DEBUG ? (
             <>
