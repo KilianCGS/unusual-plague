@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 // The camera stays where it is for now (camera.ts is not moved yet), so the
 // game reuses the tested /dev/scene behaviour as-is.
@@ -11,6 +11,12 @@ import {
 } from "../../app/dev/scene/camera";
 import { getSceneWorld, REFERENCE_VIEWPORT } from "../../app/dev/scene/scenes";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
+import { InteractionPrompt } from "../interactions/InteractionPrompt";
+import { getSceneInteractionZones } from "../interactions/sceneInteractions";
+import { useInteraction } from "../interactions/useInteraction";
+import { getNpcColliders } from "../npcs/sceneNpc";
+import { getSceneNpcs } from "../npcs/sceneNpcs";
+import { SceneNpcSprite } from "../npcs/SceneNpcSprite";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
 import type { DirectionInputHandle } from "../protagonist/useDirectionInput";
 import { useProtagonistController } from "../protagonist/useProtagonistController";
@@ -24,6 +30,8 @@ const MAX_SCENE_SCALE = 4;
 // The sprite is anchored at its feet; aim the camera at the middle of the
 // sprite image so the character sits near the center of the frame.
 const CAMERA_FOCUS_OFFSET_Y = -SPRITE_SIZE / 2;
+// Debug overlays sit above every entity (entities are stacked by feet Y).
+const DEBUG_OVERLAY_Z_INDEX = 100000;
 
 function getZoom(zoomMultiplier: number) {
   if (typeof window === "undefined") {
@@ -47,17 +55,27 @@ export function ExteriorScene({
   input,
   isPlaying,
   onExit,
+  onInteract,
 }: {
   scene: ExteriorWorldScene;
   spawn: SpawnPoint;
   input: DirectionInputHandle;
   isPlaying: boolean;
   onExit: (exitName: string) => void;
+  onInteract: (interactionId: string) => void;
 }) {
   const zoomMultiplier = scene.visual.zoomMultiplier ?? 1;
   const world = getSceneWorld(scene.visual);
   const frame = computeFrame(world, REFERENCE_VIEWPORT, zoomMultiplier);
   const [zoom, setZoom] = useState(() => getZoom(zoomMultiplier));
+  // Static geometry plus the colliders of the NPCs currently in this scene.
+  // The static array is never mutated.
+  const npcs = getSceneNpcs(scene.id);
+  const npcColliders = useMemo(() => getNpcColliders(npcs), [npcs]);
+  const blockingColliders = useMemo(
+    () => [...scene.colliders, ...npcColliders],
+    [scene.colliders, npcColliders],
+  );
   const { player, playerFeetHitbox, currentSpriteSrc, spriteSize } =
     useProtagonistController({
       sceneWidth: world.width,
@@ -66,10 +84,19 @@ export function ExteriorScene({
       initialY: spawn.y,
       initialDirection: spawn.direction,
       spriteSize: SPRITE_SIZE,
-      sceneColliders: scene.colliders,
+      sceneColliders: blockingColliders,
       input,
       inputEnabled: isPlaying,
     });
+
+  const interactionZones = getSceneInteractionZones(scene.id);
+  const availableInteraction = useInteraction({
+    zones: interactionZones,
+    feetHitbox: playerFeetHitbox,
+    facing: player.direction,
+    enabled: isPlaying,
+    onInteract,
+  });
 
   useTransitionTrigger({
     feetHitbox: playerFeetHitbox,
@@ -115,6 +142,9 @@ export function ExteriorScene({
           className={styles.logicalScene}
           style={{ backgroundImage: `url("${scene.visual.backgroundSrc}")` }}
         >
+          {npcs.map((npc) => (
+            <SceneNpcSprite key={npc.id} npc={npc} />
+          ))}
           <ProtagonistSprite
             x={player.x}
             y={player.y}
@@ -123,9 +153,17 @@ export function ExteriorScene({
             direction={player.direction}
             isWalking={player.isWalking}
             scale={scene.visual.protagonistScale}
+            zIndex={Math.round(player.y)}
           />
           {SHOW_COLLISION_DEBUG ? (
-            <>
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                zIndex: DEBUG_OVERLAY_Z_INDEX,
+                pointerEvents: "none",
+              }}
+            >
               {scene.colliders.map((collider) => (
                 <div
                   key={collider.id}
@@ -138,6 +176,38 @@ export function ExteriorScene({
                     boxSizing: "border-box",
                     border: "1px solid #ff5c5c",
                     background: "rgba(255, 92, 92, 0.28)",
+                    pointerEvents: "none",
+                  }}
+                />
+              ))}
+              {npcColliders.map((collider) => (
+                <div
+                  key={collider.id}
+                  style={{
+                    position: "absolute",
+                    left: collider.x,
+                    top: collider.y,
+                    width: collider.width,
+                    height: collider.height,
+                    boxSizing: "border-box",
+                    border: "1px solid #ff9f1c",
+                    background: "rgba(255, 159, 28, 0.35)",
+                    pointerEvents: "none",
+                  }}
+                />
+              ))}
+              {interactionZones.map((zone) => (
+                <div
+                  key={zone.id}
+                  style={{
+                    position: "absolute",
+                    left: zone.x,
+                    top: zone.y,
+                    width: zone.width,
+                    height: zone.height,
+                    boxSizing: "border-box",
+                    border: "1px solid #3ddc84",
+                    background: "rgba(61, 220, 132, 0.26)",
                     pointerEvents: "none",
                   }}
                 />
@@ -171,9 +241,20 @@ export function ExteriorScene({
                   pointerEvents: "none",
                 }}
               />
-            </>
+            </div>
           ) : null}
         </div>
+        {availableInteraction ? (
+          <InteractionPrompt
+            feetX={player.x}
+            feetY={player.y}
+            spriteSize={spriteSize}
+            spriteScale={scene.visual.protagonistScale ?? 1}
+            zoom={zoom}
+            cameraOffsetX={camera.offsetX}
+            cameraOffsetY={camera.offsetY}
+          />
+        ) : null}
       </div>
     </main>
   );

@@ -9,6 +9,7 @@ import {
   apothecaryInteriorTransitions,
 } from "../../../game/apothecary/apothecaryInteriorGeometry";
 import type { LogicalRect, SceneCollider } from "../../../game/collision";
+import { getSceneInteractionZones } from "../../../game/interactions/sceneInteractions";
 import {
   doctorRoomColliders,
   doctorRoomSpawns,
@@ -155,22 +156,29 @@ const DIRECTION_ANGLE: Record<Direction, number> = {
   north: 270,
 };
 
-type Kind = "collider" | "transition" | "spawn";
+type Kind = "collider" | "transition" | "spawn" | "interaction";
 
 const KINDS: { kind: Kind; label: string; color: string }[] = [
   { kind: "collider", label: "🔴 COLLIDER", color: "#ff5c5c" },
   { kind: "transition", label: "🟡 TRANSITION", color: "#ffd60a" },
   { kind: "spawn", label: "🔵 SPAWN", color: "#4da3ff" },
+  { kind: "interaction", label: "🟢 INTERACTION", color: "#3ddc84" },
 ];
 
 // `editorId` is stable while editing and never reused (one counter for all
 // scenes); the exported ids are derived from each list's order at export time.
 type EditorRect = Rect & { editorId: string };
 type EditorSpawn = Point & { editorId: string; direction: Direction };
+// interactionId names WHAT is interacted with; null facing = any facing.
+type EditorInteraction = EditorRect & {
+  interactionId: string;
+  requiredDirection: Direction | null;
+};
 type SceneData = {
   colliders: EditorRect[];
   transitions: EditorRect[];
   spawns: EditorSpawn[];
+  interactions: EditorInteraction[];
 };
 type Drag = { start: Point; current: Point };
 type Selection = { kind: Kind; editorId: string };
@@ -238,6 +246,18 @@ const PERSISTED_GEOMETRY: Record<
 
 function createInitialData(sceneId: string): SceneData {
   const persisted = PERSISTED_GEOMETRY[sceneId];
+  // Persisted interaction zones come from the same registry the game reads.
+  const interactions: EditorInteraction[] = getSceneInteractionZones(
+    sceneId,
+  ).map((item) => ({
+    editorId: newEditorId("interaction"),
+    x: item.x,
+    y: item.y,
+    width: item.width,
+    height: item.height,
+    interactionId: item.interactionId,
+    requiredDirection: item.requiredDirection ?? null,
+  }));
 
   if (persisted) {
     return {
@@ -261,10 +281,11 @@ function createInitialData(sceneId: string): SceneData {
         y: item.y,
         direction: item.direction,
       })),
+      interactions,
     };
   }
 
-  return { colliders: [], transitions: [], spawns: [] };
+  return { colliders: [], transitions: [], spawns: [], interactions };
 }
 
 function isTypingTarget(target: EventTarget | null) {
@@ -359,7 +380,7 @@ function SceneGeometryEditor({
   const [drag, setDrag] = useState<Drag | null>(null);
   const [cursor, setCursor] = useState<Point | null>(null);
   const [copyStatus, setCopyStatus] = useState("");
-  const { colliders, transitions, spawns } = data;
+  const { colliders, transitions, spawns, interactions } = data;
 
   // Functional updaters over this scene's data (immutable: spread / filter).
   const setColliders = (update: (previous: EditorRect[]) => EditorRect[]) =>
@@ -377,6 +398,23 @@ function SceneGeometryEditor({
       ...previous,
       spawns: update(previous.spawns),
     }));
+
+  const setInteractions = (
+    update: (previous: EditorInteraction[]) => EditorInteraction[],
+  ) =>
+    onDataChange((previous) => ({
+      ...previous,
+      interactions: update(previous.interactions),
+    }));
+  const updateInteraction = (
+    editorId: string,
+    patch: Partial<Omit<EditorInteraction, "editorId">>,
+  ) =>
+    setInteractions((previous) =>
+      previous.map((item) =>
+        item.editorId === editorId ? { ...item, ...patch } : item,
+      ),
+    );
 
   useEffect(() => {
     const updateScale = () => {
@@ -419,6 +457,10 @@ function SceneGeometryEditor({
             : previous.transitions,
         spawns:
           kind === "spawn" ? previous.spawns.filter(keep) : previous.spawns,
+        interactions:
+          kind === "interaction"
+            ? previous.interactions.filter(keep)
+            : previous.interactions,
       }));
       setSelection((current) =>
         current?.kind === kind && current.editorId === editorId
@@ -525,6 +567,19 @@ function SceneGeometryEditor({
       return;
     }
 
+    if (mode === "interaction") {
+      const newInteraction: EditorInteraction = {
+        editorId: newEditorId("interaction"),
+        ...rect,
+        interactionId: "",
+        requiredDirection: null,
+      };
+
+      setInteractions((previous) => [...previous, newInteraction]);
+      setSelection({ kind: "interaction", editorId: newInteraction.editorId });
+      return;
+    }
+
     const newRect: EditorRect = { editorId: newEditorId(mode), ...rect };
 
     if (mode === "collider") {
@@ -545,12 +600,13 @@ function SceneGeometryEditor({
     drag && mode !== "spawn" ? normalizeRect(drag.start, drag.current) : null;
   const modeColor = KINDS.find((entry) => entry.kind === mode)?.color;
   const exportText = formatSceneExport(
-    { colliders, transitions, spawns },
+    { colliders, transitions, spawns, interactions },
     config.idPrefix,
     {
       colliders: `${config.exportPrefix}Colliders`,
       transitions: `${config.exportPrefix}Transitions`,
       spawns: `${config.exportPrefix}Spawns`,
+      interactions: `${config.exportPrefix}Interactions`,
     },
   );
 
@@ -562,6 +618,11 @@ function SceneGeometryEditor({
       setCopyStatus("Copy failed: select the text manually");
     }
   }
+
+  const selectedInteraction =
+    selection?.kind === "interaction"
+      ? interactions.find((item) => item.editorId === selection.editorId)
+      : undefined;
 
   const isSelected = (kind: Kind, editorId: string) =>
     selection?.kind === kind && selection.editorId === editorId;
@@ -612,6 +673,22 @@ function SceneGeometryEditor({
                   isSelected("transition", item.editorId)
                     ? `${styles.transition} ${styles.itemSelected}`
                     : styles.transition
+                }
+                style={{
+                  left: item.x,
+                  top: item.y,
+                  width: item.width,
+                  height: item.height,
+                }}
+              />
+            ))}
+            {interactions.map((item) => (
+              <div
+                key={item.editorId}
+                className={
+                  isSelected("interaction", item.editorId)
+                    ? `${styles.interaction} ${styles.itemSelected}`
+                    : styles.interaction
                 }
                 style={{
                   left: item.x,
@@ -745,7 +822,7 @@ function SceneGeometryEditor({
           </div>
           <div>
             colliders {colliders.length} · transitions {transitions.length} ·
-            spawns {spawns.length}
+            spawns {spawns.length} · interactions {interactions.length}
           </div>
         </div>
         <ListSection
@@ -784,6 +861,75 @@ function SceneGeometryEditor({
           onSelect={(kind, editorId) => setSelection({ kind, editorId })}
           onDelete={removeItem}
         />
+        <ListSection
+          title="Interactions"
+          kind="interaction"
+          color="#3ddc84"
+          rows={interactions.map((item, index) => ({
+            editorId: item.editorId,
+            label: `${config.idPrefix}-interaction-${index + 1} · (${item.x}, ${item.y}) ${item.width}×${item.height} · ${item.interactionId || "(no interactionId)"} · ${item.requiredDirection ?? "any"}`,
+          }))}
+          selection={selection}
+          onSelect={(kind, editorId) => setSelection({ kind, editorId })}
+          onDelete={removeItem}
+        />
+        {selectedInteraction ? (
+          <div className={styles.form}>
+            <div className={styles.formTitle}>Selected interaction</div>
+            {(["x", "y", "width", "height"] as const).map((key) => (
+              <label key={key} className={styles.formRow}>
+                {key}
+                <input
+                  type="number"
+                  value={selectedInteraction[key]}
+                  onChange={(event) => {
+                    const value = Math.round(Number(event.target.value));
+
+                    if (Number.isFinite(value)) {
+                      updateInteraction(selectedInteraction.editorId, {
+                        [key]: value,
+                      });
+                    }
+                  }}
+                />
+              </label>
+            ))}
+            <label className={styles.formRow}>
+              interactionId
+              <input
+                type="text"
+                value={selectedInteraction.interactionId}
+                spellCheck={false}
+                onChange={(event) =>
+                  updateInteraction(selectedInteraction.editorId, {
+                    interactionId: event.target.value,
+                  })
+                }
+              />
+            </label>
+            <label className={styles.formRow}>
+              requiredDirection
+              <select
+                value={selectedInteraction.requiredDirection ?? ""}
+                onChange={(event) =>
+                  updateInteraction(selectedInteraction.editorId, {
+                    requiredDirection:
+                      event.target.value === ""
+                        ? null
+                        : (event.target.value as Direction),
+                  })
+                }
+              >
+                <option value="">any</option>
+                {DIRECTIONS.map((direction) => (
+                  <option key={direction} value={direction}>
+                    {direction}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        ) : null}
         <div className={styles.exportBox}>
           <div className={styles.exportHeader}>
             <span>Export (TypeScript)</span>

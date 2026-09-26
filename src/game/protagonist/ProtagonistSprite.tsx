@@ -12,6 +12,8 @@ type ProtagonistSpriteProps = {
   // Visual only. Scales around the bottom-center of the image, which is the
   // feet anchor, so the feet never move.
   scale?: number;
+  // Stacking order among scene entities; scenes pass the feet Y to sort them.
+  zIndex?: number;
 };
 
 export function ProtagonistSprite({
@@ -22,6 +24,7 @@ export function ProtagonistSprite({
   direction,
   isWalking,
   scale = 1,
+  zIndex,
 }: ProtagonistSpriteProps) {
   const anchorStyle: CSSProperties = {
     position: "absolute",
@@ -29,6 +32,7 @@ export function ProtagonistSprite({
     height: 0,
     left: x,
     top: y,
+    zIndex,
   };
 
   const imageStyle: CSSProperties = {

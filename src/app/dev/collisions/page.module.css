@@ -49,6 +49,7 @@
 
 .collider,
 .transition,
+.interaction,
 .preview {
   position: absolute;
   box-sizing: border-box;
@@ -65,6 +66,12 @@
 .transition {
   border: 1px solid #ffd60a;
   background: rgba(255, 214, 10, 0.26);
+}
+
+/* INTERACTION: green */
+.interaction {
+  border: 1px solid #3ddc84;
+  background: rgba(61, 220, 132, 0.26);
 }
 
 /* Any selected rectangle: thick white border, stronger fill. */
@@ -200,6 +207,38 @@
 }
 
 .directionPicker select {
+  font: inherit;
+  color: inherit;
+  background: #090909;
+  border: 1px solid #3f3427;
+  padding: 2px 6px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 1px solid #3ddc84;
+  background: rgba(9, 9, 9, 0.7);
+}
+
+.formTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: #3ddc84;
+}
+
+.formRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.formRow input,
+.formRow select {
+  width: 60%;
   font: inherit;
   color: inherit;
   background: #090909;

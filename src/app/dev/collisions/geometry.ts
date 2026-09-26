@@ -65,18 +65,37 @@ function formatBlock(declaration: string, rows: string[]) {
 // shape as src/game/collision.ts's SceneCollider). The three data sets are
 // separated and commented. Ids are readable and follow the list order:
 // `${prefix}-1`, `${prefix}-transition-1`, `${prefix}-spawn-1`, ...
+export type InteractionExport = Rect & {
+  interactionId: string;
+  // null = any facing (the field is left out of the export).
+  requiredDirection: string | null;
+};
+
+// Interactions are only exported when the scene has some, so scenes without
+// them keep exactly the same export as before.
 export function formatSceneExport(
   data: {
     colliders: Rect[];
     transitions: Rect[];
     spawns: SpawnPoint[];
+    interactions?: InteractionExport[];
   },
   prefix: string,
-  names: { colliders: string; transitions: string; spawns: string },
+  names: {
+    colliders: string;
+    transitions: string;
+    spawns: string;
+    interactions?: string;
+  },
 ) {
+  const interactionRows = data.interactions ?? [];
   const imports =
     'import type { LogicalRect, SceneCollider } from "../collision";\n' +
-    'import type { Direction } from "../protagonist/useProtagonistController";\n\n';
+    'import type { Direction } from "../protagonist/useProtagonistController";\n' +
+    (interactionRows.length > 0
+      ? 'import type { InteractionZone } from "../interactions/interactionZone";\n'
+      : "") +
+    "\n";
 
   const rect = (id: string, r: Rect) =>
     `  { id: "${id}", x: ${r.x}, y: ${r.y}, width: ${r.width}, height: ${r.height} },`;
@@ -105,5 +124,19 @@ export function formatSceneExport(
       ),
     );
 
-  return `${imports}${colliders}\n${transitions}\n${spawns}`;
+  const interactions =
+    interactionRows.length === 0
+      ? ""
+      : "\n// INTERACTIONS (green): where and from which facing the player can\n" +
+        "// interact. interactionId names WHAT is interacted with; resolving it\n" +
+        "// lives elsewhere. Several zones may share one interactionId.\n" +
+        formatBlock(
+          `export const ${names.interactions ?? "interactions"}: InteractionZone[]`,
+          interactionRows.map(
+            (z, i) =>
+              `  { id: "${prefix}-interaction-${i + 1}", x: ${z.x}, y: ${z.y}, width: ${z.width}, height: ${z.height}, interactionId: ${JSON.stringify(z.interactionId)}${z.requiredDirection === null ? "" : `, requiredDirection: "${z.requiredDirection}"`} },`,
+          ),
+        );
+
+  return `${imports}${colliders}\n${transitions}\n${spawns}${interactions}`;
 }

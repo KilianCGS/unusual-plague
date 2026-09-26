@@ -1,7 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { InteractionPrompt } from "../../../game/interactions/InteractionPrompt";
+import { getSceneInteractionZones } from "../../../game/interactions/sceneInteractions";
+import { useInteraction } from "../../../game/interactions/useInteraction";
+import { getNpcColliders } from "../../../game/npcs/sceneNpc";
+import { getSceneNpcs } from "../../../game/npcs/sceneNpcs";
+import { SceneNpcSprite } from "../../../game/npcs/SceneNpcSprite";
 import {
   PROTAGONIST_FEET_HITBOX,
   useProtagonistController,
@@ -34,6 +40,8 @@ const SHOW_FEET_HITBOX_DEBUG = false;
 // TEMPORARY while validating hand-painted colliders: red collider overlay and
 // cyan feet hitbox, only in scenes that define colliders.
 const SHOW_COLLISION_DEBUG = true;
+// Overlays sit above every entity (entities are stacked by feet Y).
+const DEBUG_OVERLAY_Z_INDEX = 100000;
 
 function getSceneZoom(scene: DevScene) {
   if (typeof window === "undefined") {
@@ -59,6 +67,16 @@ function ScenePlayground({ scene }: { scene: DevScene }) {
     scene.zoomMultiplier ?? 1,
   );
   const [zoom, setZoom] = useState(1);
+  const npcs = getSceneNpcs(scene.id);
+  const interactionZones = getSceneInteractionZones(scene.id);
+  const npcColliders = useMemo(() => getNpcColliders(npcs), [npcs]);
+  const blockingColliders = useMemo(
+    () =>
+      npcColliders.length === 0
+        ? scene.colliders
+        : [...(scene.colliders ?? []), ...npcColliders],
+    [scene.colliders, npcColliders],
+  );
   const { player, playerFeetHitbox, currentSpriteSrc, spriteSize } =
     useProtagonistController({
       sceneWidth: world.width,
@@ -68,10 +86,28 @@ function ScenePlayground({ scene }: { scene: DevScene }) {
       spriteSize: SPRITE_SIZE,
       playerSpeed: PLAYER_SPEED,
       // Undefined falls back to the controller's empty default.
-      sceneColliders: scene.colliders,
+      sceneColliders: blockingColliders,
     });
   const showCollisionDebug =
     SHOW_COLLISION_DEBUG && scene.colliders !== undefined;
+  // Same interaction system as the real game (same hook, same zone registry),
+  // so what is seen here matches gameplay. The result is only a provisional
+  // readout.
+  const [interactionLog, setInteractionLog] = useState<{
+    interactionId: string;
+    count: number;
+  } | null>(null);
+  const availableInteraction = useInteraction({
+    zones: interactionZones,
+    feetHitbox: playerFeetHitbox,
+    facing: player.direction,
+    enabled: true,
+    onInteract: (interactionId) =>
+      setInteractionLog((current) => ({
+        interactionId,
+        count: (current?.count ?? 0) + 1,
+      })),
+  });
 
   useEffect(() => {
     const updateZoom = () => {
@@ -97,6 +133,27 @@ function ScenePlayground({ scene }: { scene: DevScene }) {
 
   return (
     <>
+      {interactionLog ? (
+        <div
+          data-interaction-log={interactionLog.interactionId}
+          data-interaction-count={interactionLog.count}
+          style={{
+            position: "fixed",
+            top: 12,
+            left: "50%",
+            transform: "translateX(-50%)",
+            padding: "4px 12px",
+            font: "600 14px/1 monospace",
+            color: "#f4ead5",
+            background: "rgba(9, 9, 9, 0.82)",
+            border: "1px solid #3ddc84",
+            pointerEvents: "none",
+            zIndex: 5,
+          }}
+        >
+          Interaction: {interactionLog.interactionId} (#{interactionLog.count})
+        </div>
+      ) : null}
       <div className={styles.hud}>
         <div>/dev/scene · {scene.label} · camera test (experimental)</div>
         <div>
@@ -146,6 +203,9 @@ function ScenePlayground({ scene }: { scene: DevScene }) {
           className={styles.logicalScene}
           style={{ backgroundImage: `url("${scene.backgroundSrc}")` }}
         >
+          {npcs.map((npc) => (
+            <SceneNpcSprite key={npc.id} npc={npc} />
+          ))}
           <ProtagonistSprite
             x={player.x}
             y={player.y}
@@ -154,41 +214,98 @@ function ScenePlayground({ scene }: { scene: DevScene }) {
             direction={player.direction}
             isWalking={player.isWalking}
             scale={scene.protagonistScale}
+            zIndex={Math.round(player.y)}
           />
-          {showCollisionDebug
-            ? scene.colliders?.map((collider) => (
-                <div
-                  key={collider.id}
-                  style={{
-                    position: "absolute",
-                    left: collider.x,
-                    top: collider.y,
-                    width: collider.width,
-                    height: collider.height,
-                    boxSizing: "border-box",
-                    border: "1px solid #ff5c5c",
-                    background: "rgba(255, 92, 92, 0.28)",
-                    pointerEvents: "none",
-                  }}
-                />
-              ))
-            : null}
           {SHOW_FEET_HITBOX_DEBUG || showCollisionDebug ? (
             <div
               style={{
                 position: "absolute",
-                left: playerFeetHitbox.x,
-                top: playerFeetHitbox.y,
-                width: playerFeetHitbox.width,
-                height: playerFeetHitbox.height,
-                boxSizing: "border-box",
-                border: "1px solid #4de7ff",
-                background: "rgba(77, 231, 255, 0.3)",
+                inset: 0,
+                zIndex: DEBUG_OVERLAY_Z_INDEX,
                 pointerEvents: "none",
               }}
-            />
+            >
+              {showCollisionDebug
+                ? scene.colliders?.map((collider) => (
+                    <div
+                      key={collider.id}
+                      style={{
+                        position: "absolute",
+                        left: collider.x,
+                        top: collider.y,
+                        width: collider.width,
+                        height: collider.height,
+                        boxSizing: "border-box",
+                        border: "1px solid #ff5c5c",
+                        background: "rgba(255, 92, 92, 0.28)",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  ))
+                : null}
+              {showCollisionDebug
+                ? npcColliders.map((collider) => (
+                    <div
+                      key={collider.id}
+                      style={{
+                        position: "absolute",
+                        left: collider.x,
+                        top: collider.y,
+                        width: collider.width,
+                        height: collider.height,
+                        boxSizing: "border-box",
+                        border: "1px solid #ff9f1c",
+                        background: "rgba(255, 159, 28, 0.35)",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  ))
+                : null}
+              {showCollisionDebug
+                ? interactionZones.map((zone) => (
+                    <div
+                      key={zone.id}
+                      style={{
+                        position: "absolute",
+                        left: zone.x,
+                        top: zone.y,
+                        width: zone.width,
+                        height: zone.height,
+                        boxSizing: "border-box",
+                        border: "1px solid #3ddc84",
+                        background: "rgba(61, 220, 132, 0.26)",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  ))
+                : null}
+              <div
+                style={{
+                  position: "absolute",
+                  left: playerFeetHitbox.x,
+                  top: playerFeetHitbox.y,
+                  width: playerFeetHitbox.width,
+                  height: playerFeetHitbox.height,
+                  boxSizing: "border-box",
+                  border: "1px solid #4de7ff",
+                  background: "rgba(77, 231, 255, 0.3)",
+                  pointerEvents: "none",
+                }}
+              />
+            </div>
           ) : null}
         </div>
+        {availableInteraction ? (
+          <InteractionPrompt
+            feetX={player.x}
+            feetY={player.y}
+            spriteSize={spriteSize}
+            spriteScale={scene.protagonistScale ?? 1}
+            zoom={zoom}
+            cameraOffsetX={camera.offsetX}
+            cameraOffsetY={camera.offsetY}
+          />
+        ) : null}
       </div>
     </>
   );
