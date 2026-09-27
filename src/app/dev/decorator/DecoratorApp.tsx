@@ -52,6 +52,12 @@ const SPRITE_SIZE = 96;
 const OVERLAY_Z_INDEX = 100000;
 const DIRECTIONS: Direction[] = ["north", "south", "east", "west"];
 const DEFAULT_ZONE_MARGIN = 18;
+// Editor-only visual zoom (inspection aid): multiplies the CSS size of the
+// whole map layer on top of the existing fit-to-window `scale`. It never
+// touches world units, so pointer-to-world conversion (which reads the
+// layer's real rendered box) stays correct at any value, and the exported
+// composition is identical regardless of which one is selected.
+const VIEW_ZOOM_LEVELS = [1, 2, 3, 4] as const;
 
 // Only scenes drawn by the asset-driven renderer (kind "exterior") can be
 // composed here. Botica's interior uses its own hardwired renderer.
@@ -138,6 +144,10 @@ function Workspace({
   const layerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ id: string; dx: number; dy: number } | null>(null);
   const [scale, setScale] = useState(1);
+  const [viewZoom, setViewZoom] = useState<(typeof VIEW_ZOOM_LEVELS)[number]>(
+    1,
+  );
+  const displayScale = scale * viewZoom;
   const [armedAssetId, setArmedAssetId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showColliders, setShowColliders] = useState(true);
@@ -680,6 +690,24 @@ function Workspace({
               ))}
             </select>
           </label>
+          <span className={styles.row} role="group" aria-label="View zoom">
+            View zoom:
+            {VIEW_ZOOM_LEVELS.map((level) => (
+              <button
+                key={level}
+                type="button"
+                className={
+                  level === viewZoom
+                    ? `${styles.button} ${styles.assetActive}`
+                    : styles.button
+                }
+                aria-pressed={level === viewZoom}
+                onClick={() => setViewZoom(level)}
+              >
+                {level}x
+              </button>
+            ))}
+          </span>
           <label>
             <input
               type="checkbox"
@@ -724,6 +752,7 @@ function Workspace({
           </span>
           <span className={styles.hint} data-testid="hud">
             world {world.width}×{world.height} · scale {scale.toFixed(2)}× ·
+            view {viewZoom}x ({displayScale.toFixed(2)}×) ·
             cursor {cursor ? `(${cursor.x}, ${cursor.y})` : "—"} · Doctor (
             {Math.round(player.x)}, {Math.round(player.y)}) {player.direction} ·
             interaction:{" "}
@@ -738,7 +767,7 @@ function Workspace({
             style={{
               ["--world-width" as string]: `${world.width}px`,
               ["--world-height" as string]: `${world.height}px`,
-              ["--scale" as string]: scale,
+              ["--scale" as string]: displayScale,
             }}
           >
             <div

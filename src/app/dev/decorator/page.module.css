@@ -46,11 +46,15 @@
 .canvasArea {
   flex: 1 1 auto;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* "safe" keeps the map centered while it fits (view zoom 1x, same as
+     before); once it outgrows the container it falls back to start-aligned
+     instead of clipping the overflow a centered flex item can't be scrolled
+     to. */
+  align-items: safe center;
+  justify-content: safe center;
   padding: 12px;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .viewport {
