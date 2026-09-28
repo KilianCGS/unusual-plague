@@ -115,22 +115,25 @@ export const DECOR_ASSETS: DecorAsset[] = [
     label: "Blacksmith",
     category: "people",
     sprite: {
-      // Clearly visible hammering loop (the trade justifies real motion,
-      // unlike the near-static farmer/villager idles).
+      // Upper body only (no legs), like baker/bartender: meant to stand
+      // behind the forge/anvil work surface. Frames are a lossless top crop
+      // (96x96 -> 96x64) of the original approved full-body hammering loop,
+      // not a regeneration - same face, clothes, colors, hammer, motion.
       frames: [0, 1, 2, 3].map((i) => `/game/npcs/blacksmith/idle/${i}.png`),
       frameWidth: 96,
-      frameHeight: 96,
+      frameHeight: 64,
       fps: 6,
       loop: true,
     },
     anchor: { x: 0.5, y: 1 },
     defaultScale: 1,
-    // Body-only silhouette (x33-66 y12-80 of the 96x96 frame): deliberately
-    // excludes the raised hammer/arm reaching further left (down to x21 in
-    // some frames), so the swing never becomes a giant invisible wall. The
-    // hammer itself is part of this character, not a separate asset - the
-    // anvil/forge is not: it stays scenery (map) or a future ambient asset.
-    defaultCollider: { offsetX: -15, offsetY: -84, width: 34, height: 69 },
+    // Body-only silhouette (x33-66 y12-64 of the 96x64 frame): same x-range
+    // as the original full-body collider (the torso didn't move when the
+    // legs were cropped away), deliberately excludes the raised hammer/arm
+    // reaching further left (down to x21 in some frames). The hammer itself
+    // is part of this character, not a separate asset - the anvil/forge is
+    // not: it stays scenery (map) or a future ambient asset.
+    defaultCollider: { offsetX: -15, offsetY: -52, width: 34, height: 52 },
   },
   {
     id: "baker",
@@ -276,6 +279,250 @@ export const DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
     // Visible silhouette x19-71 y9-55 of the 96x64 frame.
     defaultCollider: { offsetX: -29, offsetY: -55, width: 53, height: 47 },
+  },
+  // Fourth population batch (PixelLab, style-matched to villager-pilot /
+  // dog). Miner is a full-body worker reusable in Mountain Path / Mine
+  // Interior; chicken and sheep are small ambient farm animals, in-place
+  // idle only, like cat and dog.
+  {
+    id: "miner",
+    label: "Miner",
+    category: "people",
+    sprite: {
+      // Pick-swinging loop: rest -> raise -> strike -> recover. Feet stay
+      // planted at y80 in every frame; only the torso/arms/pickaxe move.
+      frames: [0, 1, 2, 3].map((i) => `/game/npcs/miner/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Body-only silhouette (x32-56 y15-80 of the 96x96 frame): deliberately
+    // excludes the pickaxe's swing, which reaches much further left/right in
+    // different frames (down to x19 / up to x79) - same principle as
+    // blacksmith's hammer. The pickaxe is part of this character, not a
+    // separate asset; the rock/wall/minecart stay scenery.
+    defaultCollider: { offsetX: -16, offsetY: -81, width: 25, height: 66 },
+  },
+  {
+    id: "chicken",
+    label: "Chicken",
+    category: "animals",
+    sprite: {
+      // Single subtle head-tilt/peck loop, feet stationary.
+      frames: [0, 1, 2, 3].map((i) => `/game/npcs/chicken/idle/${i}.png`),
+      frameWidth: 64,
+      frameHeight: 64,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Resting-pose silhouette (frame 0) x14-44 y16-48 of the 64x64 frame,
+    // deliberately smaller than cat (32x37) / dog (32x36) - a chicken should
+    // not block the Doctor like a person or even like the approved pets.
+    defaultCollider: { offsetX: -18, offsetY: -48, width: 31, height: 33 },
+  },
+  {
+    id: "sheep",
+    label: "Sheep",
+    category: "animals",
+    sprite: {
+      // Very discreet loop: subtle breathing / head turn, feet stationary.
+      frames: [0, 1, 2, 3].map((i) => `/game/npcs/sheep/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 64,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Resting-pose silhouette (frame 0) x28-65 y20-53 of the 96x64 frame -
+    // clearly bigger than cat/dog/chicken, still clearly smaller than a
+    // human. Not wrapped around every wisp of wool, just the stable body.
+    defaultCollider: { offsetX: -20, offsetY: -44, width: 38, height: 34 },
+  },
+  // Fifth population batch (PixelLab, style-matched to villager-pilot; no
+  // style_image reused for any of these three - after the sheep/dog identity
+  // mix-up in batch 4, kept purely to description-driven prompts here).
+  // villager-sitting is deliberately drawn without any bench/chair/stool (a
+  // person "sitting on an invisible surface"): Kilian places it on top of
+  // real furniture instances via Decorator. fisherman and woodcutter are
+  // person + tool only, no environment (river/tree) baked in.
+  {
+    id: "villager-sitting",
+    label: "Villager (sitting)",
+    category: "people",
+    sprite: {
+      // Very subtle seated idle: breathing / tiny head movement, legs and
+      // feet never move. Frame 3 carries a faint (near-invisible, alpha
+      // barely above zero) generation ghosting artifact near the head; it
+      // does not affect the collider (based on the clean frame 0) and is
+      // not visible in normal play.
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/villager-sitting/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Resting-pose silhouette (frame 0) x32-58 y33-78 of the 96x96 frame:
+    // deliberately SHORTER than a standing human (44 vs 66) because the body
+    // is compact/seated - this is not the opaque bbox of a standing pose,
+    // it reflects the real folded-up silhouette. No bench is drawn or
+    // implied in the collider; Kilian aligns it with real furniture
+    // manually in Decorator.
+    defaultCollider: { offsetX: -16, offsetY: -63, width: 27, height: 46 },
+  },
+  {
+    id: "fisherman",
+    label: "Fisherman",
+    category: "people",
+    sprite: {
+      // Very calm "already fishing" idle: breathing / tiny rod sway, same
+      // silhouette bounding box in all 4 frames (feet and rod tip never
+      // move enough to change it), verified to actually cycle (frames are
+      // not byte-identical).
+      frames: [0, 1, 2, 3].map((i) => `/game/npcs/fisherman/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Body-only silhouette (x19-45 y15-80 of the 96x96 frame): deliberately
+    // excludes the fishing rod and line, which reach all the way to x77 -
+    // same principle as miner's pickaxe. The rod/line are part of this
+    // character, not a separate asset; the river/water is not.
+    defaultCollider: { offsetX: -29, offsetY: -81, width: 27, height: 66 },
+  },
+  {
+    id: "woodcutter",
+    label: "Woodcutter",
+    category: "people",
+    sprite: {
+      // Clearly visible chopping loop (real physical work, unlike the
+      // near-static sitting/fishing idles), feet planted at y80 throughout.
+      frames: [0, 1, 2, 3].map((i) => `/game/npcs/woodcutter/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Body-only silhouette (x29-53 y15-80 of the 96x96 frame): deliberately
+    // excludes the axe's swing arc, which reaches out to x75 in some frames
+    // - same principle as miner/blacksmith. The axe is part of this
+    // character, not a separate asset; the tree/log/stump are not.
+    defaultCollider: { offsetX: -19, offsetY: -81, width: 25, height: 66 },
+  },
+  // Sixth population batch: five generic ambient villagers (no profession, no
+  // tools, no narrative role - just people who live here). Generated purely
+  // from descriptive prompts, no style_image reused from an existing NPC, to
+  // avoid the identity/silhouette overfitting seen when a small animal was
+  // used as a style reference in an earlier batch. Idle is intentionally
+  // near-static ("breathing"): first/last-frame pinned, feet never move a
+  // single pixel across any frame in any of the five.
+  {
+    id: "villager-man-01",
+    label: "Villager man (1)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/villager-man-01/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Resting-pose silhouette (frame 0) x31-58 y17-82 of the 96x96 frame.
+    defaultCollider: { offsetX: -17, offsetY: -79, width: 28, height: 66 },
+  },
+  {
+    id: "villager-man-02",
+    label: "Villager man (2)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/villager-man-02/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Resting-pose silhouette (frame 0) x28-59 y16-83 of the 96x96 frame.
+    defaultCollider: { offsetX: -20, offsetY: -80, width: 32, height: 68 },
+  },
+  {
+    id: "villager-woman-01",
+    label: "Villager woman (1)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/villager-woman-01/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Resting-pose silhouette (frame 0) x33-56 y17-81 of the 96x96 frame.
+    defaultCollider: { offsetX: -15, offsetY: -79, width: 24, height: 65 },
+  },
+  {
+    id: "villager-woman-02",
+    label: "Villager woman (2)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/villager-woman-02/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Resting-pose silhouette (frame 0) x28-59 y17-80 of the 96x96 frame.
+    defaultCollider: { offsetX: -20, offsetY: -79, width: 32, height: 64 },
+  },
+  {
+    id: "villager-child-01",
+    label: "Villager child (1)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/villager-child-01/idle/${i}.png`,
+      ),
+      frameWidth: 72,
+      frameHeight: 84,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Resting-pose silhouette (frame 0) x19-52 y18-73 of the 72x84 frame -
+    // genuinely smaller base art (regenerated once: the first attempt came
+    // out too tall, 60px vs child-wooden-sword's approved 51px; this version
+    // is 56px, in line with the approved child scale), not scaled down via
+    // defaultScale.
+    defaultCollider: { offsetX: -17, offsetY: -66, width: 34, height: 56 },
   },
   {
     // The protagonist's real walk cycle, used only to test animated in-place

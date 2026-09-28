@@ -16,10 +16,9 @@ import {
 import {
   WORLD_SCENES,
   type ExteriorWorldScene,
-  type SceneId,
 } from "../../../game/world/worldScenes";
 import { clientToWorld } from "../collisions/geometry";
-import { getSceneWorld } from "../scene/scenes";
+import { DEV_SCENES, getSceneWorld } from "../scene/scenes";
 import {
   CHAPTER_IDS,
   clearStoredInstances,
@@ -59,11 +58,55 @@ const DEFAULT_ZONE_MARGIN = 18;
 // composition is identical regardless of which one is selected.
 const VIEW_ZOOM_LEVELS = [1, 2, 3, 4] as const;
 
+// "Size" (below) is a completely different thing from the view zoom above:
+// it edits `DecorInstance.scale`, the instance's real physical size in the
+// composition (part of the export / localStorage data). The sprite and
+// collider scaling math already exists (getSpriteBox, getInstanceCollider);
+// this is only the comfortable +/- / direct-entry / reset UI for it.
+const INSTANCE_SCALE_MIN = 0.5;
+const INSTANCE_SCALE_MAX = 2;
+const INSTANCE_SCALE_BUTTON_STEP = 0.1;
+
+function clampInstanceScale(value: number) {
+  return Math.min(
+    INSTANCE_SCALE_MAX,
+    Math.max(INSTANCE_SCALE_MIN, Math.round(value * 100) / 100),
+  );
+}
+
+// A scene this editor can open: the same shape as a WORLD_SCENES exterior,
+// but `id` is widened to plain string so authoring-only scenes (below) can be
+// added without touching WORLD_SCENES / SceneId.
+type DecoratorScene = Omit<ExteriorWorldScene, "id"> & { id: string };
+
 // Only scenes drawn by the asset-driven renderer (kind "exterior") can be
 // composed here. Botica's interior uses its own hardwired renderer.
-const SCENES = Object.values(WORLD_SCENES).filter(
+const WIRED_SCENES: DecoratorScene[] = Object.values(WORLD_SCENES).filter(
   (scene): scene is ExteriorWorldScene => scene.kind === "exterior",
 );
+
+// Tavern Interior is not wired into WORLD_SCENES yet (no exits/arrivals/
+// colliders - it is not navigable in the real game), but its background is
+// an approved asset-driven visual like any other interior, so it can still
+// be opened here for decoration only. No static colliders of its own: the
+// only blocking in this scene comes from the instances placed on it.
+const TAVERN_INTERIOR_VISUAL = DEV_SCENES.find(
+  (candidate) => candidate.id === "tavern-interior",
+);
+const AUTHORING_ONLY_SCENES: DecoratorScene[] = TAVERN_INTERIOR_VISUAL
+  ? [
+      {
+        id: "tavern-interior",
+        kind: "exterior",
+        visual: TAVERN_INTERIOR_VISUAL,
+        colliders: [],
+        exits: [],
+        arrivals: {},
+      },
+    ]
+  : [];
+
+const SCENES: DecoratorScene[] = [...WIRED_SCENES, ...AUTHORING_ONLY_SCENES];
 
 function isTypingTarget(target: EventTarget | null) {
   return (
@@ -120,7 +163,7 @@ function NumberField({
 }
 
 type WorkspaceProps = {
-  scene: ExteriorWorldScene;
+  scene: DecoratorScene;
   chapterId: string;
   instances: DecorInstance[];
   setInstances: (update: (previous: DecorInstance[]) => DecorInstance[]) => void;
@@ -154,6 +197,10 @@ function Workspace({
   const [doctorOn, setDoctorOn] = useState(true);
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
   const [copyStatus, setCopyStatus] = useState("");
+  // Free-typed text of the Size input while focused, same pattern as
+  // NumberField (shows raw text mid-edit, re-derives from the instance once
+  // blurred).
+  const [scaleText, setScaleText] = useState<string | null>(null);
   const [duplicateTarget, setDuplicateTarget] = useState(
     CHAPTER_IDS.find((id) => id !== chapterId) ?? CHAPTER_IDS[0],
   );
@@ -519,15 +566,78 @@ function Workspace({
               value={selected.y}
               onCommit={(value) => updateInstance(selected.instanceId, { y: value })}
             />
-            <NumberField
-              label="scale"
-              value={selected.scale}
-              min={0.1}
-              step={0.05}
-              onCommit={(value) =>
-                updateInstance(selected.instanceId, { scale: value })
-              }
-            />
+            <div className={styles.field}>
+              Size
+              <span className={styles.row}>
+                <button
+                  type="button"
+                  className={styles.button}
+                  disabled={selected.scale <= INSTANCE_SCALE_MIN}
+                  onClick={() => {
+                    updateInstance(selected.instanceId, {
+                      scale: clampInstanceScale(
+                        selected.scale - INSTANCE_SCALE_BUTTON_STEP,
+                      ),
+                    });
+                    setScaleText(null);
+                  }}
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  style={{ width: 64, textAlign: "center" }}
+                  min={INSTANCE_SCALE_MIN}
+                  max={INSTANCE_SCALE_MAX}
+                  step={0.01}
+                  value={scaleText ?? selected.scale.toFixed(2)}
+                  onFocus={() => setScaleText(selected.scale.toFixed(2))}
+                  onBlur={() => setScaleText(null)}
+                  onChange={(event) => {
+                    setScaleText(event.target.value);
+
+                    const next = Number(event.target.value);
+
+                    if (
+                      event.target.value !== "" &&
+                      Number.isFinite(next) &&
+                      next > 0
+                    ) {
+                      updateInstance(selected.instanceId, {
+                        scale: clampInstanceScale(next),
+                      });
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  className={styles.button}
+                  disabled={selected.scale >= INSTANCE_SCALE_MAX}
+                  onClick={() => {
+                    updateInstance(selected.instanceId, {
+                      scale: clampInstanceScale(
+                        selected.scale + INSTANCE_SCALE_BUTTON_STEP,
+                      ),
+                    });
+                    setScaleText(null);
+                  }}
+                >
+                  +
+                </button>
+              </span>
+            </div>
+            <button
+              type="button"
+              className={styles.button}
+              onClick={() => {
+                updateInstance(selected.instanceId, {
+                  scale: selectedAsset.defaultScale ?? 1,
+                });
+                setScaleText(null);
+              }}
+            >
+              Reset size
+            </button>
             <NumberField
               label="zOffset"
               value={selected.zOffset}
@@ -996,7 +1106,7 @@ export default function DecoratorApp() {
       chapterId={chapterId}
       instances={instances}
       setInstances={setInstances}
-      onSceneChange={(next) => openComposition(next as SceneId, chapterId)}
+      onSceneChange={(next) => openComposition(next, chapterId)}
       onChapterChange={(next) => openComposition(sceneId, next)}
       onDuplicate={duplicateTo}
       onClear={clearCurrent}
