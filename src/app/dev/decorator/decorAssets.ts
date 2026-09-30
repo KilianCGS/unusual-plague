@@ -344,6 +344,31 @@ export const DECOR_ASSETS: DecorAsset[] = [
     // human. Not wrapped around every wisp of wool, just the stable body.
     defaultCollider: { offsetX: -20, offsetY: -44, width: 38, height: 34 },
   },
+  // Seventh population batch (PixelLab, text-only prompt, no style_image so
+  // sheep/dog anatomy cannot leak in). Cow is a single lateral view facing
+  // EAST as generated; use flipX for west. In-place idle only, it never walks.
+  {
+    id: "cow",
+    label: "Cow",
+    category: "animals",
+    sprite: {
+      // Very discreet loop: breathing, tiny head nod, ear twitch, tail sway.
+      // Rows y>=45 (hooves and lower legs) are pixel-identical in every frame.
+      // Cropped to 88x54 so the bottom-center anchor sits 3px under the hooves.
+      frames: [0, 1, 2, 3].map((i) => `/game/npcs/cow/idle/${i}.png`),
+      frameWidth: 88,
+      frameHeight: 54,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Stable body (frame 0) x18-62 y15-50 of the 88x54 frame: torso, neck base
+    // and legs down to the hooves. Deliberately excludes the hanging tail
+    // (x<18, swings further out), the head/ears/muzzle (x>62, y9-27 while
+    // nodding). 45x36 vs sheep 38x34: clearly bigger, not a wall.
+    defaultCollider: { offsetX: -26, offsetY: -39, width: 45, height: 36 },
+  },
   // Fifth population batch (PixelLab, style-matched to villager-pilot; no
   // style_image reused for any of these three - after the sheep/dog identity
   // mix-up in batch 4, kept purely to description-driven prompts here).
