@@ -294,6 +294,34 @@ export const DEV_SCENES: DevScene[] = [
     logicalUnitsPerAssetPixel: 1,
     zoomMultiplier: 602 / 270,
   },
+  {
+    id: "farm",
+    label: "Granja (Farm)",
+    // Unmodified copy of art/references/farm-v1-color-match.png (678x384):
+    // farm-v1.png color-matched to Outskirts' palette (deterministic, every
+    // pixel/alpha/position unchanged). Standard exterior scale; no geometry
+    // painted yet and not connected to the world.
+    backgroundSrc: "/game/areas/farm/farm-background.png",
+    assetWidth: 678,
+    assetHeight: 384,
+    // Provisional: on the dirt road along the bottom of the map.
+    initialAssetX: 450,
+    initialAssetY: 352,
+  },
+  {
+    id: "mill-farmland",
+    label: "Tierras del Molino",
+    // Unmodified copy of art/references/mill-plantation-v2.png (777x384), the
+    // version manually edited by hand after generation (river on the left,
+    // added fences/borders). Standard exterior scale; no geometry painted yet
+    // and not connected to the world.
+    backgroundSrc: "/game/areas/mill-farmland/mill-farmland-background.png",
+    assetWidth: 777,
+    assetHeight: 384,
+    // Provisional: on the main dirt path between the mill and the fields.
+    initialAssetX: 430,
+    initialAssetY: 260,
+  },
 ];
 
 export function getSceneWorld(scene: DevScene) {

@@ -16,10 +16,20 @@ import {
   doctorRoomTransitions,
 } from "../../../game/doctor-room/doctorRoomGeometry";
 import {
+  farmColliders,
+  farmSpawns,
+  farmTransitions,
+} from "../../../game/farm/farmGeometry";
+import {
   mineInteriorColliders,
   mineInteriorSpawns,
   mineInteriorTransitions,
 } from "../../../game/mine-interior/mineInteriorGeometry";
+import {
+  millFarmlandColliders,
+  millFarmlandSpawns,
+  millFarmlandTransitions,
+} from "../../../game/mill-farmland/millFarmlandGeometry";
 import {
   mineNaturalCaveColliders,
   mineNaturalCaveSpawns,
@@ -30,6 +40,11 @@ import {
   mountainPathSpawns,
   mountainPathTransitions,
 } from "../../../game/mountain-path/mountainPathGeometry";
+import {
+  outskirtsColliders,
+  outskirtsSpawns,
+  outskirtsTransitions,
+} from "../../../game/outskirts/outskirtsGeometry";
 import {
   plazaColliders,
   plazaSpawns,
@@ -139,6 +154,12 @@ const EDITOR_SCENES: {
     idPrefix: "mine-natural-cave",
     exportPrefix: "mineNaturalCave",
   },
+  { sceneId: "farm", idPrefix: "farm", exportPrefix: "farm" },
+  {
+    sceneId: "mill-farmland",
+    idPrefix: "mill-farmland",
+    exportPrefix: "millFarmland",
+  },
 ];
 type EditorSceneConfig = (typeof EDITOR_SCENES)[number];
 const PANEL_WIDTH = 380;
@@ -241,6 +262,21 @@ const PERSISTED_GEOMETRY: Record<
     colliders: mineNaturalCaveColliders,
     transitions: mineNaturalCaveTransitions,
     spawns: mineNaturalCaveSpawns,
+  },
+  "outskirts-brook-provisional": {
+    colliders: outskirtsColliders,
+    transitions: outskirtsTransitions,
+    spawns: outskirtsSpawns,
+  },
+  farm: {
+    colliders: farmColliders,
+    transitions: farmTransitions,
+    spawns: farmSpawns,
+  },
+  "mill-farmland": {
+    colliders: millFarmlandColliders,
+    transitions: millFarmlandTransitions,
+    spawns: millFarmlandSpawns,
   },
 };
 

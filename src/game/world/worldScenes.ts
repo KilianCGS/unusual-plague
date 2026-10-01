@@ -25,10 +25,20 @@ import {
   doctorRoomTransitions,
 } from "../doctor-room/doctorRoomGeometry";
 import {
+  farmColliders,
+  farmSpawns,
+  farmTransitions,
+} from "../farm/farmGeometry";
+import {
   forestColliders,
   forestSpawns,
   forestTransitions,
 } from "../forest/forestGeometry";
+import {
+  millFarmlandColliders,
+  millFarmlandSpawns,
+  millFarmlandTransitions,
+} from "../mill-farmland/millFarmlandGeometry";
 import {
   mineInteriorColliders,
   mineInteriorSpawns,
@@ -82,12 +92,14 @@ import { DEV_SCENES, type DevScene } from "../../app/dev/scene/scenes";
 //                                                         Plaza <-> Calle Panaderia <-> Panaderia interior
 //                                                         Plaza <-> Calle Herreria <-> Herreria interior
 //                                                                    Calle Herreria <-> Mountain Path <-> Mina Principal <-> Camara Natural
+//   Afueras <-> Farm <-> Tierras del Molino (Mill Farmland)
 //
 // Geometry zones that are deliberately NOT listed as exits stay inactive (a
 // zone that is not an exit does nothing):
 //   tavern-street-transition-3  (Tavern door, future Tavern interior)
+//   mill-farmland-transition-1  (Barn door, future Barn interior)
 // Their reserved spawns are not registered as arrivals either:
-//   tavern-street-spawn-3.
+//   tavern-street-spawn-3, mill-farmland-spawn-2 (future barn exit).
 // doctor-room-spawn-1 is deliberately never used as an arrival either: it is
 // reserved for a future chapter-start / narrative wake, not a walk-in spawn.
 
@@ -98,6 +110,8 @@ export type SceneId =
   | "tavern-street"
   | "outskirts"
   | "forest"
+  | "farm"
+  | "mill-farmland"
   | "bakery-street"
   | "bakery-interior"
   | "smithy-street"
@@ -326,23 +340,31 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
     colliders: outskirtsColliders,
     exits: [
       {
-        // Right end: to the Forest.
+        // Right edge: to the Forest.
         name: "to-forest",
         zone: pick(outskirtsTransitions, "outskirts-transition-1"),
         targetScene: "forest",
         targetSpawn: "from-outskirts",
       },
       {
-        // Left end: back to Calle Taberna.
-        name: "to-tavern-street",
+        // North edge: to Farm.
+        name: "to-farm",
         zone: pick(outskirtsTransitions, "outskirts-transition-2"),
+        targetScene: "farm",
+        targetSpawn: "from-outskirts",
+      },
+      {
+        // Left edge: back to Calle Taberna.
+        name: "to-tavern-street",
+        zone: pick(outskirtsTransitions, "outskirts-transition-3"),
         targetScene: "tavern-street",
         targetSpawn: "from-outskirts",
       },
     ],
     arrivals: {
-      "from-tavern-street": spawnAt(outskirtsSpawns, "outskirts-spawn-1"),
-      "from-forest": spawnAt(outskirtsSpawns, "outskirts-spawn-2"),
+      "from-farm": spawnAt(outskirtsSpawns, "outskirts-spawn-1"),
+      "from-tavern-street": spawnAt(outskirtsSpawns, "outskirts-spawn-2"),
+      "from-forest": spawnAt(outskirtsSpawns, "outskirts-spawn-3"),
     },
   },
   forest: {
@@ -360,6 +382,50 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
     ],
     arrivals: {
       "from-outskirts": spawnAt(forestSpawns, "forest-spawn-1"),
+    },
+  },
+  farm: {
+    id: "farm",
+    kind: "exterior",
+    visual: visualOf("farm"),
+    colliders: farmColliders,
+    exits: [
+      {
+        // Right end: to Tierras del Molino.
+        name: "to-mill-farmland",
+        zone: pick(farmTransitions, "farm-transition-1"),
+        targetScene: "mill-farmland",
+        targetSpawn: "from-farm",
+      },
+      {
+        // Bottom edge: back to Afueras (its north edge).
+        name: "to-outskirts",
+        zone: pick(farmTransitions, "farm-transition-2"),
+        targetScene: "outskirts",
+        targetSpawn: "from-farm",
+      },
+    ],
+    arrivals: {
+      "from-mill-farmland": spawnAt(farmSpawns, "farm-spawn-1"),
+      "from-outskirts": spawnAt(farmSpawns, "farm-spawn-2"),
+    },
+  },
+  "mill-farmland": {
+    id: "mill-farmland",
+    kind: "exterior",
+    visual: visualOf("mill-farmland"),
+    colliders: millFarmlandColliders,
+    exits: [
+      {
+        // Left end: back to Farm.
+        name: "to-farm",
+        zone: pick(millFarmlandTransitions, "mill-farmland-transition-2"),
+        targetScene: "farm",
+        targetSpawn: "from-mill-farmland",
+      },
+    ],
+    arrivals: {
+      "from-farm": spawnAt(millFarmlandSpawns, "mill-farmland-spawn-1"),
     },
   },
   "bakery-street": {
