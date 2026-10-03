@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
 
 // The camera stays where it is for now (camera.ts is not moved yet), so the
 // game reuses the tested /dev/scene behaviour as-is.
@@ -32,6 +33,20 @@ const MAX_SCENE_SCALE = 4;
 const CAMERA_FOCUS_OFFSET_Y = -SPRITE_SIZE / 2;
 // Debug overlays sit above every entity (entities are stacked by feet Y).
 const DEBUG_OVERLAY_Z_INDEX = 100000;
+// Transparent rows above the head in the 96 px character frames (same value
+// InteractionPrompt uses). Sprite-art dependent.
+const SPEAKER_TOP_PADDING = 14;
+
+// What a screen-space overlay (dialogue bubble...) needs to anchor itself to
+// the characters of this scene. Positions are in screen pixels INSIDE the
+// camera frame, like InteractionPrompt.
+export type SceneOverlayContext = {
+  frameWidth: number;
+  frameHeight: number;
+  // Point just above a speaker's head: "doctor" or a scene NPC id. Null when
+  // that speaker is not in this scene.
+  getSpeakerAnchor: (speakerId: string) => { x: number; y: number } | null;
+};
 
 function getZoom(zoomMultiplier: number) {
   if (typeof window === "undefined") {
@@ -56,6 +71,7 @@ export function ExteriorScene({
   isPlaying,
   onExit,
   onInteract,
+  renderOverlay,
 }: {
   scene: ExteriorWorldScene;
   spawn: SpawnPoint;
@@ -63,6 +79,8 @@ export function ExteriorScene({
   isPlaying: boolean;
   onExit: (exitName: string) => void;
   onInteract: (interactionId: string) => void;
+  // Optional screen-space layer drawn above the camera frame content.
+  renderOverlay?: (context: SceneOverlayContext) => ReactNode;
 }) {
   const zoomMultiplier = scene.visual.zoomMultiplier ?? 1;
   const world = getSceneWorld(scene.visual);
@@ -123,6 +141,35 @@ export function ExteriorScene({
     frame,
     zoom,
   );
+
+  const getSpeakerAnchor = (speakerId: string) => {
+    let feetX: number;
+    let headTopY: number;
+
+    if (speakerId === "doctor") {
+      feetX = player.x;
+      headTopY =
+        player.y -
+        (spriteSize - SPEAKER_TOP_PADDING) *
+          (scene.visual.protagonistScale ?? 1);
+    } else {
+      const npc = npcs.find((candidate) => candidate.id === speakerId);
+
+      if (!npc) {
+        return null;
+      }
+
+      feetX = npc.position.x;
+      headTopY =
+        npc.position.y -
+        (npc.visual.frameSize - SPEAKER_TOP_PADDING) * (npc.visual.scale ?? 1);
+    }
+
+    return {
+      x: Math.round(feetX * zoom - camera.offsetX),
+      y: Math.round(headTopY * zoom - camera.offsetY),
+    };
+  };
 
   return (
     <main className={styles.page}>
@@ -255,6 +302,11 @@ export function ExteriorScene({
             cameraOffsetY={camera.offsetY}
           />
         ) : null}
+        {renderOverlay?.({
+          frameWidth: frame.width * zoom,
+          frameHeight: frame.height * zoom,
+          getSpeakerAnchor,
+        })}
       </div>
     </main>
   );

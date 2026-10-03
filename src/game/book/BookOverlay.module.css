@@ -1,0 +1,286 @@
+/* Screen-space Compendium. Everything inside .stage is laid out in BOOK pixels
+   (688 x 406) and scaled as one block, so art and UI keep their proportions.
+   --book-top is where the book art starts inside the stage (the tabs sit
+   above it). */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* the world stays visible behind, slightly darkened */
+  background: rgba(0, 0, 0, 0.58);
+  font-family: var(--ui-font);
+}
+
+.frame {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  image-rendering: pixelated;
+}
+
+.spread {
+  position: absolute;
+  inset: 0;
+}
+
+.layer {
+  position: absolute;
+  display: block;
+  image-rendering: pixelated;
+  user-select: none;
+  pointer-events: none;
+}
+
+.note {
+  position: absolute;
+  margin: 0;
+  color: #2b1a14;
+  font-weight: 700;
+  line-height: 1.25;
+  pointer-events: none;
+}
+
+/* ---- tabs: light paper separators, centered as a group over the book ------ */
+.tabs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The button is the dark outline (stepped corners); .tabFace is the cream
+   paper inset by 2px with its own stepped corners. No radius, no gradient,
+   no soft shadow. */
+.tab {
+  position: absolute;
+  top: 4px;
+  height: 22px;
+  padding: 2px 2px 0;
+  font-family: var(--ui-font);
+  border: 0;
+  border-radius: 0;
+  background: #2b1a14;
+  clip-path: polygon(
+    0 4px,
+    2px 4px,
+    2px 2px,
+    4px 2px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% 100%,
+    0 100%
+  );
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.tabFace {
+  display: block;
+  height: 100%;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 17px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #1c1009;
+  background: #d8c89e;
+  clip-path: polygon(
+    0 2px,
+    2px 2px,
+    2px 0,
+    calc(100% - 2px) 0,
+    calc(100% - 2px) 2px,
+    100% 2px,
+    100% 100%,
+    0 100%
+  );
+}
+
+.tab:hover .tabFace {
+  background: #e6d8b0;
+}
+
+/* Active tab: lighter paper, taller, and joined to the book. */
+.tabActive,
+.tabActive:hover {
+  top: 0;
+  height: 28px;
+}
+
+.tabActive .tabFace,
+.tabActive:hover .tabFace {
+  line-height: 22px;
+  background: #f4e9c8;
+}
+
+/* ---- page turning: big pixel arrows OUTSIDE the book, either side --------- */
+.arrow {
+  position: absolute;
+  top: calc(var(--book-top) + (var(--book-height) - 72px) / 2);
+  width: 52px;
+  height: 72px;
+  padding: 2px;
+  border: 0;
+  border-radius: 0;
+  background: #2b1a14;
+  clip-path: polygon(
+    0 4px,
+    2px 4px,
+    2px 2px,
+    4px 2px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 2px),
+    2px calc(100% - 2px),
+    2px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+  cursor: pointer;
+}
+
+.arrowPrevious {
+  left: -80px;
+}
+
+.arrowNext {
+  right: -80px;
+}
+
+.arrowFace {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #d8c89e;
+  clip-path: polygon(
+    0 2px,
+    2px 2px,
+    2px 0,
+    calc(100% - 2px) 0,
+    calc(100% - 2px) 2px,
+    100% 2px,
+    100% calc(100% - 2px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 2px) 100%,
+    2px 100%,
+    2px calc(100% - 2px),
+    0 calc(100% - 2px)
+  );
+}
+
+.arrow:hover .arrowFace {
+  background: #e6d8b0;
+}
+
+.glyphLeft,
+.glyphRight {
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 32px;
+  margin-top: -16px;
+  background: #1c1009;
+}
+
+.glyphLeft {
+  left: 50%;
+  margin-left: -11px;
+  clip-path: polygon(100% 0, 100% 100%, 0 50%);
+}
+
+.glyphRight {
+  left: 50%;
+  margin-left: -11px;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+/* ---- cover (CSS-built: there is no cover art yet) ------------------------- */
+.cover {
+  position: absolute;
+  left: 172px;
+  top: var(--book-top);
+  width: 344px;
+  height: var(--book-height);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  font-family: var(--ui-font);
+  color: #d9c8a0;
+  background: #4a1f1f;
+  border: 0;
+  border-radius: 0;
+  /* stepped dark outline + inner stitched border, no soft shadows */
+  box-shadow:
+    0 0 0 2px #1c0d0a,
+    inset 0 0 0 4px #2b1a14,
+    inset 0 0 0 6px #7a3b2c;
+  cursor: pointer;
+}
+
+.coverFrame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 24px;
+  background: #5a2626;
+  box-shadow:
+    0 0 0 2px #2b1a14,
+    0 0 0 4px #8a6a4a;
+}
+
+.coverTitle {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #e9dbb9;
+}
+
+.coverRule {
+  width: 120px;
+  height: 2px;
+  background: #8a6a4a;
+}
+
+.coverSubtitle {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  color: #c9b48a;
+}
+
+.coverHint {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: #a58a62;
+}
+
+.cover:hover .coverHint {
+  color: #e9dbb9;
+}

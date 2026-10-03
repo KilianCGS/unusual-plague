@@ -1,0 +1,128 @@
+/* Pixel parchment bubble: hard 2px dark border, stepped (not rounded) corners,
+   flat cream paper, no soft shadows. Colours come from the book paper. */
+.bubble {
+  position: absolute;
+  z-index: 20;
+  width: 280px;
+  max-width: calc(100% - 16px);
+  pointer-events: none;
+  font-family: var(--ui-font);
+  /* the outer layer is the dark border; .paper is inset by 2px */
+  background: #2b1a14;
+  padding: 2px;
+  clip-path: polygon(
+    0 6px,
+    2px 6px,
+    2px 4px,
+    4px 4px,
+    4px 2px,
+    6px 2px,
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 2px,
+    calc(100% - 4px) 2px,
+    calc(100% - 4px) 4px,
+    calc(100% - 2px) 4px,
+    calc(100% - 2px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 2px) calc(100% - 6px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 6px) calc(100% - 2px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 2px),
+    4px calc(100% - 2px),
+    4px calc(100% - 4px),
+    2px calc(100% - 4px),
+    2px calc(100% - 6px),
+    0 calc(100% - 6px)
+  );
+}
+
+.paper {
+  position: relative;
+  padding: 8px 12px 10px;
+  background: #e9dbb9;
+  color: #1c1009;
+  clip-path: polygon(
+    0 4px,
+    2px 4px,
+    2px 2px,
+    4px 2px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 2px),
+    2px calc(100% - 2px),
+    2px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+}
+
+.text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.3;
+  font-weight: 700;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* Not-yet-typed text keeps the layout but stays invisible. */
+.rest {
+  visibility: hidden;
+}
+
+/* Small "continue" marker once the line is fully shown. */
+.more {
+  position: absolute;
+  right: 8px;
+  bottom: 5px;
+  width: 8px;
+  height: 6px;
+  background: #2b1a14;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  animation: blink 0.9s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Tail: a dark triangle with a cream triangle over it (pixel look), pointing
+   down at the speaker. Horizontal position is set by the component. */
+.tail {
+  position: absolute;
+  top: 100%;
+  left: var(--tail-left);
+  width: 12px;
+  height: 12px;
+  margin-top: -2px;
+  background: #2b1a14;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.tail::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0;
+  width: 8px;
+  height: 7px;
+  background: #e9dbb9;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}

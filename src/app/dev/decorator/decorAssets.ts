@@ -567,6 +567,64 @@ export const DECOR_ASSETS: DecorAsset[] = [
     anchor: { x: 0.5, y: 1 },
     defaultCollider: { ...PROTAGONIST_FEET_HITBOX },
   },
+  // Chapter I patients (PixelLab, see art/patients/chapter-1). Visual review
+  // assets only: no collider yet, not placed in any composition. Each is a
+  // 4-frame breathing loop at 2 fps. The anchor is the visual base of the
+  // drawing (bottom of the union silhouette over the 4 frames, horizontal
+  // centre of that silhouette), not the frame bottom, so dragging sits it on
+  // the floor.
+  {
+    // Bed included in the sprite.
+    id: "bakers-husband-sick",
+    label: "Baker's Husband - Sick (in bed)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/bakers-husband-sick/idle/${i}.png`,
+      ),
+      frameWidth: 128,
+      frameHeight: 80,
+      fps: 2,
+      loop: true,
+    },
+    // Union silhouette x12-118 y14-72 of the 128x80 frame.
+    anchor: { x: 0.512, y: 0.912 },
+    defaultScale: 1,
+  },
+  {
+    id: "tavern-patient-sick",
+    label: "Tavern Patient - Sick (on the floor)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/tavern-patient-sick/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 64,
+      fps: 2,
+      loop: true,
+    },
+    // Union silhouette x2-82 y8-54 of the 96x64 frame.
+    anchor: { x: 0.443, y: 0.859 },
+    defaultScale: 1,
+  },
+  {
+    id: "injured-miner",
+    label: "Miner - Injured (sitting)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/injured-miner/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 2,
+      loop: true,
+    },
+    // Union silhouette x3-90 y12-83 of the 96x96 frame.
+    anchor: { x: 0.49, y: 0.875 },
+    defaultScale: 1,
+  },
 ];
 
 export const DECOR_CATEGORY_ORDER: DecorCategory[] = [
