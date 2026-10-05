@@ -1,3 +1,13 @@
+/* Patrick Hand (SIL OFL 1.1), self-hosted in /public/fonts/patrick-hand with
+   its license. It is the Compendium's handwritten page font. */
+@font-face {
+  font-family: "Patrick Hand";
+  src: url("/fonts/patrick-hand/PatrickHand-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
 /* Screen-space Compendium. Everything inside .stage is laid out in BOOK pixels
    (688 x 406) and scaled as one block, so art and UI keep their proportions.
    --book-top is where the book art starts inside the stage (the tabs sit
@@ -12,6 +22,8 @@
   /* the world stays visible behind, slightly darkened */
   background: rgba(0, 0, 0, 0.58);
   font-family: var(--ui-font);
+  --book-font:
+    "Patrick Hand", "Segoe Print", "Bradley Hand", "Comic Sans MS", cursive;
 }
 
 .frame {
@@ -40,13 +52,40 @@
   pointer-events: none;
 }
 
-.note {
+/* ---- page text (Dolencias, placeholders): Patrick Hand ------------------- */
+.text {
   position: absolute;
   margin: 0;
-  color: #2b1a14;
-  font-weight: 700;
-  line-height: 1.25;
+  color: #1c1009;
+  font-family: var(--book-font);
+  font-weight: 400;
   pointer-events: none;
+}
+
+.name {
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.heading {
+  font-size: 20px;
+  line-height: 1.1;
+  letter-spacing: 0.1em;
+}
+
+.body {
+  font-size: 16px;
+  line-height: 19px;
+}
+
+.note {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+/* Preparations named inside a text. */
+.emphasis {
+  font-style: italic;
 }
 
 /* ---- tabs: light paper separators, centered as a group over the book ------ */

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import type { CSSProperties } from "react";
 
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
 import {
@@ -162,21 +161,28 @@ function SpreadView({ spread }: { spread: BookSpread }) {
           }}
         />
       ))}
-      {spread.notes?.map((note) => {
-        const style: CSSProperties = {
-          left: note.x,
-          top: BOOK_TOP + note.y,
-          width: note.width,
-          fontSize: note.size ?? 10,
-          textAlign: note.align ?? "left",
-        };
-
-        return (
-          <p key={note.text} className={styles.note} style={style}>
-            {note.text}
-          </p>
-        );
-      })}
+      {spread.texts?.map((block) => (
+        <p
+          key={block.id}
+          className={`${styles.text} ${styles[block.role]}`}
+          style={{
+            left: block.x,
+            top: BOOK_TOP + block.y,
+            width: block.width,
+            textAlign: block.align ?? "left",
+          }}
+        >
+          {block.content.map((fragment, index) =>
+            typeof fragment === "string" ? (
+              fragment
+            ) : (
+              <em key={index} className={styles.emphasis}>
+                {fragment.emphasis}
+              </em>
+            ),
+          )}
+        </p>
+      ))}
     </div>
   );
 }

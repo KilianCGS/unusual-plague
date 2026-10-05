@@ -1,12 +1,14 @@
 // Content of the Medical Compendium as DATA. The component only renders this.
 //
 // Coordinates are in BOOK-IMAGE pixels (the open book art is 688x384).
-// A spread is drawn as stacked image layers; a finished spread painted by hand
-// is just ONE full-size layer (that is how the Ingredientes spreads work, and
-// how the Dolencias spreads will be replaced once Kilian paints them: swap the
-// `layers` of that spread for a single full image, nothing else changes).
-// The image is the visual source of truth: `notes` is only for placeholder
-// text that is not part of any art yet.
+// A spread is drawn as stacked image layers plus optional text blocks. A
+// finished spread painted by hand is just ONE full-size layer (that is how the
+// Ingredientes spreads work). The image is the visual source of truth: text
+// blocks only exist where a section writes its pages in code (Dolencias, the
+// placeholders), and never duplicate text that an image already contains.
+
+import { AILMENTS, type Ailment } from "./ailments";
+import type { BookTextBlock } from "./bookText";
 
 export const BOOK_WIDTH = 688;
 export const BOOK_HEIGHT = 384;
@@ -21,20 +23,10 @@ export type BookLayer = {
   height: number;
 };
 
-export type BookNote = {
-  x: number;
-  y: number;
-  width: number;
-  text: string;
-  align?: "left" | "center";
-  // Font size in book pixels.
-  size?: number;
-};
-
 export type BookSpread = {
   id: string;
   layers: BookLayer[];
-  notes?: BookNote[];
+  texts?: BookTextBlock[];
 };
 
 export type BookSectionId =
@@ -78,43 +70,100 @@ function placeholderSpread(
   return {
     id,
     layers: [PLAIN_BASE_LAYER],
-    notes: [
+    texts: [
       {
+        id: `${id}-title`,
+        role: "name",
         x: LEFT_PAGE_CENTER_X - 110,
         y: 60,
         width: 220,
-        text: title,
         align: "center",
-        size: 18,
+        content: [title],
       },
       {
+        id: `${id}-note`,
+        role: "note",
         x: LEFT_PAGE_CENTER_X - 110,
         y: 96,
         width: 220,
-        text: note,
         align: "center",
-        size: 9,
+        content: [note],
       },
     ],
   };
 }
 
-// An ailment spread = the book with the Dolencias right-page ornaments + the
-// hand-drawn illustration on the left page (the ailment name will go under
-// it). No text is drawn: the right page keeps the ruled lines reserved for
-// SÍNTOMAS / TRATAMIENTO once those pages are painted.
-// (x, y) = where the 176x176 illustration canvas sits on the book image.
-function ailmentSpread(
-  id: string,
-  file: string,
-  x: number,
-  y: number,
-): BookSpread {
+// DOLENCIAS layout (specific to this section, not a template for the others):
+//   left page  -> the illustration and, under it, the ailment's name;
+//   right page -> SÍNTOMAS, its text, the book's own ruled line, TRATAMIENTO,
+//                 its text. The ornaments of the right page are part of
+//                 AILMENT_BASE_LAYER (they sit at y 23-39 and y 192, between
+//                 x 375 and 609), so the text column follows them.
+const AILMENT_NAME_Y = 224;
+const RIGHT_COLUMN_X = 375;
+const RIGHT_COLUMN_WIDTH = 234;
+const SYMPTOMS_HEADING_Y = 46;
+const SYMPTOMS_BODY_Y = 68;
+const TREATMENT_HEADING_Y = 200;
+const TREATMENT_BODY_Y = 222;
+
+function ailmentSpread(ailment: Ailment): BookSpread {
+  const { id, name, illustration } = ailment;
+
   return {
-    id,
+    id: `ailment-${id}`,
     layers: [
       AILMENT_BASE_LAYER,
-      { src: `${UI_DIR}/ailments/${file}.png`, x, y, width: 176, height: 176 },
+      {
+        src: `${UI_DIR}/ailments/${illustration.file}.png`,
+        x: illustration.x,
+        y: illustration.y,
+        width: 176,
+        height: 176,
+      },
+    ],
+    texts: [
+      {
+        id: `${id}-name`,
+        role: "name",
+        x: LEFT_PAGE_CENTER_X - 120,
+        y: AILMENT_NAME_Y,
+        width: 240,
+        align: "center",
+        content: [name],
+      },
+      {
+        id: `${id}-symptoms-heading`,
+        role: "heading",
+        x: RIGHT_COLUMN_X,
+        y: SYMPTOMS_HEADING_Y,
+        width: RIGHT_COLUMN_WIDTH,
+        content: ["SÍNTOMAS"],
+      },
+      {
+        id: `${id}-symptoms`,
+        role: "body",
+        x: RIGHT_COLUMN_X,
+        y: SYMPTOMS_BODY_Y,
+        width: RIGHT_COLUMN_WIDTH,
+        content: ailment.symptoms,
+      },
+      {
+        id: `${id}-treatment-heading`,
+        role: "heading",
+        x: RIGHT_COLUMN_X,
+        y: TREATMENT_HEADING_Y,
+        width: RIGHT_COLUMN_WIDTH,
+        content: ["TRATAMIENTO"],
+      },
+      {
+        id: `${id}-treatment`,
+        role: "body",
+        x: RIGHT_COLUMN_X,
+        y: TREATMENT_BODY_Y,
+        width: RIGHT_COLUMN_WIDTH,
+        content: ailment.treatment,
+      },
     ],
   };
 }
@@ -125,7 +174,7 @@ function fullSpread(id: string, file: string): BookSpread {
     id,
     layers: [
       {
-        src: `${UI_DIR}/ingredients/${file}.png`,
+        src: `${UI_DIR}/resources/${file}.png`,
         x: 0,
         y: 0,
         width: BOOK_WIDTH,
@@ -150,23 +199,16 @@ export const BOOK_SECTIONS: BookSection[] = [
   {
     id: "ailments",
     label: "DOLENCIAS",
-    spreads: [
-      ailmentSpread("ailment-fever", "fever", 102, 39),
-      ailmentSpread("ailment-stomach", "stomach", 108, 30),
-      ailmentSpread("ailment-infected-wound", "infected-wound", 100, 24),
-      ailmentSpread("ailment-chest-cough", "chest-cough", 112, 23),
-      ailmentSpread("ailment-scurvy", "scurvy", 107, 20),
-      ailmentSpread("ailment-exhaustion", "exhaustion", 117, 15),
-    ],
+    spreads: AILMENTS.map(ailmentSpread),
   },
   {
     id: "ingredients",
     label: "INGREDIENTES",
     spreads: [
-      fullSpread("ingredients-1", "ingredients-spread-1"),
-      fullSpread("ingredients-2", "ingredients-spread-2"),
-      fullSpread("ingredients-3", "ingredients-spread-3"),
-      fullSpread("ingredients-4", "ingredients-spread-4"),
+      fullSpread("ingredients-1", "resources-spread-1-v1"),
+      fullSpread("ingredients-2", "resources-spread-2-v1"),
+      fullSpread("ingredients-3", "resources-spread-3-v1"),
+      fullSpread("ingredients-4", "resources-spread-4-v1"),
     ],
   },
   {
