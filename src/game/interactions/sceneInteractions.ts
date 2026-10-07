@@ -1,13 +1,10 @@
-import { plazaInteractions } from "../plaza/plazaInteractions";
 import type { InteractionZone } from "./interactionZone";
 
-// Interaction zones per scene, keyed by the same scene ids as DEV_SCENES /
-// WORLD_SCENES. Painted in /dev/collisions and persisted to a per-scene file,
-// like the rest of the geometry, but kept apart from it: they are triggers,
-// not colliders.
-const SCENE_INTERACTIONS: Record<string, InteractionZone[]> = {
-  plaza: plazaInteractions,
-};
+// Interaction zones painted per scene in /dev/collisions (keyed by the same
+// scene ids as DEV_SCENES / WORLD_SCENES), kept apart from the colliders.
+// Empty for now: Chapter 1's interactions come from its decor instances
+// (src/game/compositions/chapter-1.interactions.ts).
+const SCENE_INTERACTIONS: Record<string, InteractionZone[]> = {};
 
 const NO_INTERACTIONS: InteractionZone[] = [];
 

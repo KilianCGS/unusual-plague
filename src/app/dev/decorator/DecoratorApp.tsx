@@ -18,13 +18,15 @@ import {
   type ExteriorWorldScene,
 } from "../../../game/world/worldScenes";
 import { clientToWorld } from "../collisions/geometry";
-import { DEV_SCENES, getSceneWorld } from "../scene/scenes";
+import { getSceneWorld } from "../scene/scenes";
 import {
   CHAPTER_IDS,
   clearStoredInstances,
   cloneInstances,
   compositionKey,
+  formatChapter,
   formatComposition,
+  loadStoredChapter,
   loadInstances,
   nextInstanceId,
   saveInstances,
@@ -34,9 +36,14 @@ import {
   DECOR_CATEGORY_ORDER,
   getDecorAsset,
   getInstanceCollider,
-} from "./decorAssets";
-import type { DecorInstance } from "./decorTypes";
-import { DecorSprite, getSpriteBox } from "./DecorSprite";
+} from "../../../game/decor/decorAssets";
+import type { DecorInstance } from "../../../game/decor/decorTypes";
+import { DecorSprite, getSpriteBox } from "../../../game/decor/DecorSprite";
+import {
+  getInstanceInteractionZone,
+  withInteractions,
+} from "../../../game/decor/decorRuntime";
+import { getChapterInteractions } from "../../../game/compositions";
 import styles from "./page.module.css";
 import { useEditorDirectionInput } from "./useEditorDirectionInput";
 
@@ -85,28 +92,32 @@ const WIRED_SCENES: DecoratorScene[] = Object.values(WORLD_SCENES).filter(
   (scene): scene is ExteriorWorldScene => scene.kind === "exterior",
 );
 
-// Tavern Interior is not wired into WORLD_SCENES yet (no exits/arrivals/
-// colliders - it is not navigable in the real game), but its background is
-// an approved asset-driven visual like any other interior, so it can still
-// be opened here for decoration only. No static colliders of its own: the
-// only blocking in this scene comes from the instances placed on it.
-const TAVERN_INTERIOR_VISUAL = DEV_SCENES.find(
-  (candidate) => candidate.id === "tavern-interior",
-);
-const AUTHORING_ONLY_SCENES: DecoratorScene[] = TAVERN_INTERIOR_VISUAL
-  ? [
-      {
-        id: "tavern-interior",
-        kind: "exterior",
-        visual: TAVERN_INTERIOR_VISUAL,
-        colliders: [],
-        exits: [],
-        arrivals: {},
-      },
-    ]
-  : [];
+// Provisional 600x600 neutral grey stage (no art asset: the background is a
+// data URI) to check the sick baker's husband in his bed next to the baker and
+// the Doctor. It is NOT the final bedroom and has no geometry.
+const NARRATIVE_PREVIEW_SCENE: DecoratorScene = {
+  id: "narrative-preview",
+  kind: "exterior",
+  visual: {
+    id: "narrative-preview",
+    label: "Narrative preview (grey)",
+    backgroundSrc:
+      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='600'><rect width='600' height='600' fill='%236f6f6f'/></svg>",
+    assetWidth: 600,
+    assetHeight: 600,
+    initialAssetX: 430,
+    initialAssetY: 440,
+    logicalUnitsPerAssetPixel: 1,
+  },
+  colliders: [],
+  exits: [],
+  arrivals: {},
+};
 
-const SCENES: DecoratorScene[] = [...WIRED_SCENES, ...AUTHORING_ONLY_SCENES];
+const SCENES: DecoratorScene[] = [
+  ...WIRED_SCENES,
+  NARRATIVE_PREVIEW_SCENE,
+];
 
 function isTypingTarget(target: EventTarget | null) {
   return (
@@ -166,7 +177,9 @@ type WorkspaceProps = {
   scene: DecoratorScene;
   chapterId: string;
   instances: DecorInstance[];
-  setInstances: (update: (previous: DecorInstance[]) => DecorInstance[]) => void;
+  setInstances: (
+    update: (previous: DecorInstance[]) => DecorInstance[],
+  ) => void;
   onSceneChange: (sceneId: string) => void;
   onChapterChange: (chapterId: string) => void;
   onDuplicate: (targetChapterId: string) => void;
@@ -187,9 +200,8 @@ function Workspace({
   const layerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ id: string; dx: number; dy: number } | null>(null);
   const [scale, setScale] = useState(1);
-  const [viewZoom, setViewZoom] = useState<(typeof VIEW_ZOOM_LEVELS)[number]>(
-    1,
-  );
+  const [viewZoom, setViewZoom] =
+    useState<(typeof VIEW_ZOOM_LEVELS)[number]>(1);
   const displayScale = scale * viewZoom;
   const [armedAssetId, setArmedAssetId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -239,24 +251,14 @@ function Workspace({
 
   // Interaction zones of the instances in world coordinates (they follow the
   // instance), only to preview WHERE the Doctor could interact.
+  // The chapter's interaction table (repo data, keyed by instanceId) is
+  // previewed too, so the zones the game will use are visible here.
   const worldZones = useMemo<InteractionZone[]>(
     () =>
-      instances.flatMap((instance) =>
-        instance.interaction
-          ? [
-              {
-                id: `${instance.instanceId}-zone`,
-                x: instance.x + instance.interaction.zone.offsetX,
-                y: instance.y + instance.interaction.zone.offsetY,
-                width: instance.interaction.zone.width,
-                height: instance.interaction.zone.height,
-                interactionId: instance.interaction.interactionId,
-                requiredDirection: instance.interaction.requiredDirection,
-              },
-            ]
-          : [],
+      withInteractions(instances, getChapterInteractions(chapterId)).flatMap(
+        (instance) => getInstanceInteractionZone(instance) ?? [],
       ),
-    [instances],
+    [instances, chapterId],
   );
   const available = doctorOn
     ? findAvailableInteraction(worldZones, playerFeetHitbox, player.direction)
@@ -425,6 +427,30 @@ function Workspace({
     instances,
   });
 
+  const [chapterExportText, setChapterExportText] = useState("");
+
+  // Every scene saved for this chapter, as the file the game reads
+  // (src/game/compositions/<chapter>.ts). Read from this browser's storage.
+  async function copyChapter() {
+    const compositions = loadStoredChapter(chapterId);
+    const text = formatChapter(chapterId, compositions);
+    const total = compositions.reduce(
+      (sum, composition) => sum + composition.instances.length,
+      0,
+    );
+
+    setChapterExportText(text);
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyStatus(
+        `Chapter copied: ${compositions.length} scenes, ${total} instances`,
+      );
+    } catch {
+      setCopyStatus("Copy failed: select the chapter text manually");
+    }
+  }
+
   async function copyExport() {
     try {
       await navigator.clipboard.writeText(exportText);
@@ -498,8 +524,8 @@ function Workspace({
       <aside className={styles.panel} style={{ width: PANEL_WIDTH }}>
         <h1 className={styles.title}>/dev/decorator</h1>
         <p className={styles.hint}>
-          DEV-ONLY. Pick an asset, click the map to place it, drag to move.
-          Esc cancels. Delete removes the selected instance.
+          DEV-ONLY. Pick an asset, click the map to place it, drag to move. Esc
+          cancels. Delete removes the selected instance.
         </p>
 
         <h2 className={styles.sectionTitle}>Library</h2>
@@ -551,7 +577,8 @@ function Workspace({
         {selected && selectedAsset ? (
           <>
             <div className={styles.field}>
-              instanceId <b data-testid="sel-instance-id">{selected.instanceId}</b>
+              instanceId{" "}
+              <b data-testid="sel-instance-id">{selected.instanceId}</b>
             </div>
             <div className={styles.field}>
               assetId <b>{selected.assetId}</b>
@@ -559,12 +586,16 @@ function Workspace({
             <NumberField
               label="x"
               value={selected.x}
-              onCommit={(value) => updateInstance(selected.instanceId, { x: value })}
+              onCommit={(value) =>
+                updateInstance(selected.instanceId, { x: value })
+              }
             />
             <NumberField
               label="y"
               value={selected.y}
-              onCommit={(value) => updateInstance(selected.instanceId, { y: value })}
+              onCommit={(value) =>
+                updateInstance(selected.instanceId, { y: value })
+              }
             />
             <div className={styles.field}>
               Size
@@ -658,8 +689,7 @@ function Workspace({
               />
             </label>
             <label className={styles.field}>
-              collider{" "}
-              {selectedAsset.defaultCollider ? "" : "(asset has none)"}
+              collider {selectedAsset.defaultCollider ? "" : "(asset has none)"}
               <input
                 type="checkbox"
                 checked={selected.colliderEnabled}
@@ -763,6 +793,9 @@ function Workspace({
         <button type="button" className={styles.button} onClick={copyExport}>
           COPY COMPOSITION
         </button>
+        <button type="button" className={styles.button} onClick={copyChapter}>
+          COPY CHAPTER ({chapterId})
+        </button>
         <textarea
           className={styles.exportText}
           readOnly
@@ -770,6 +803,14 @@ function Workspace({
           spellCheck={false}
         />
         <div className={styles.hint}>{copyStatus}</div>
+        {chapterExportText ? (
+          <textarea
+            className={styles.exportText}
+            readOnly
+            value={chapterExportText}
+            spellCheck={false}
+          />
+        ) : null}
       </aside>
 
       <div className={styles.main}>
@@ -862,8 +903,8 @@ function Workspace({
           </span>
           <span className={styles.hint} data-testid="hud">
             world {world.width}×{world.height} · scale {scale.toFixed(2)}× ·
-            view {viewZoom}x ({displayScale.toFixed(2)}×) ·
-            cursor {cursor ? `(${cursor.x}, ${cursor.y})` : "—"} · Doctor (
+            view {viewZoom}x ({displayScale.toFixed(2)}×) · cursor{" "}
+            {cursor ? `(${cursor.x}, ${cursor.y})` : "—"} · Doctor (
             {Math.round(player.x)}, {Math.round(player.y)}) {player.direction} ·
             interaction:{" "}
             <b data-testid="doctor-interaction">
@@ -884,7 +925,9 @@ function Workspace({
               ref={layerRef}
               data-testid="layer"
               className={`${styles.layer} ${armedAssetId ? styles.placing : ""}`}
-              style={{ backgroundImage: `url("${scene.visual.backgroundSrc}")` }}
+              style={{
+                backgroundImage: `url("${scene.visual.backgroundSrc}")`,
+              }}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
               onPointerUp={handlePointerUp}
@@ -967,14 +1010,19 @@ function Workspace({
                     )}
                     {instances.map((instance) => {
                       const asset = getDecorAsset(instance.assetId);
-                      const active = asset && getInstanceCollider(instance, asset);
+                      const active =
+                        asset && getInstanceCollider(instance, asset);
                       const inactive =
                         asset && !active
                           ? getInstanceCollider(instance, asset, true)
                           : null;
 
                       return active
-                        ? overlayBox(`ic-${instance.instanceId}`, active, "#ff9f1c")
+                        ? overlayBox(
+                            `ic-${instance.instanceId}`,
+                            active,
+                            "#ff9f1c",
+                          )
                         : inactive
                           ? overlayBox(
                               `ic-${instance.instanceId}`,
@@ -987,11 +1035,7 @@ function Workspace({
                     {worldZones.map((zone) =>
                       overlayBox(zone.id, zone, "#3ddc84"),
                     )}
-                    {overlayBox(
-                      "doctor-hitbox",
-                      playerFeetHitbox,
-                      "#4de7ff",
-                    )}
+                    {overlayBox("doctor-hitbox", playerFeetHitbox, "#4de7ff")}
                   </>
                 ) : null}
               </div>

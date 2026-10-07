@@ -71,6 +71,7 @@ export const SCENE_TO_MAP_LOCATION: Record<SceneId, MapLocationId> = {
   "apothecary-street": "pharmacy",
   plaza: "plaza",
   "tavern-street": "tavern",
+  "tavern-interior": "tavern",
   outskirts: "river",
   forest: "forest",
   farm: "farm",

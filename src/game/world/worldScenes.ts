@@ -76,6 +76,11 @@ import {
   smithyStreetTransitions,
 } from "../smithy-street/smithyStreetGeometry";
 import {
+  tavernInteriorColliders,
+  tavernInteriorSpawns,
+  tavernInteriorTransitions,
+} from "../tavern-interior/tavernInteriorGeometry";
+import {
   tavernStreetColliders,
   tavernStreetSpawns,
   tavernStreetTransitions,
@@ -89,6 +94,7 @@ import { DEV_SCENES, type DevScene } from "../../app/dev/scene/scenes";
 // semantic names live here: exits are `to-<scene>`, arrivals `from-<scene>`.
 //
 //   Doctor Room <-> Botica interior <-> Calle Botica <-> Plaza <-> Calle Taberna <-> Afueras <-> Bosque
+//                                                         Calle Taberna <-> Taberna interior
 //                                                         Plaza <-> Calle Panaderia <-> Panaderia interior
 //                                                         Plaza <-> Calle Herreria <-> Herreria interior
 //                                                                    Calle Herreria <-> Mountain Path <-> Mina Principal <-> Camara Natural
@@ -96,10 +102,9 @@ import { DEV_SCENES, type DevScene } from "../../app/dev/scene/scenes";
 //
 // Geometry zones that are deliberately NOT listed as exits stay inactive (a
 // zone that is not an exit does nothing):
-//   tavern-street-transition-3  (Tavern door, future Tavern interior)
 //   mill-farmland-transition-1  (Barn door, future Barn interior)
 // Their reserved spawns are not registered as arrivals either:
-//   tavern-street-spawn-3, mill-farmland-spawn-2 (future barn exit).
+//   mill-farmland-spawn-2 (future barn exit).
 // doctor-room-spawn-1 is deliberately never used as an arrival either: it is
 // reserved for a future chapter-start / narrative wake, not a walk-in spawn.
 
@@ -108,6 +113,7 @@ export type SceneId =
   | "apothecary-street"
   | "plaza"
   | "tavern-street"
+  | "tavern-interior"
   | "outskirts"
   | "forest"
   | "farm"
@@ -327,10 +333,43 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
         targetScene: "outskirts",
         targetSpawn: "from-tavern-street",
       },
+      {
+        // The Tavern door.
+        name: "to-tavern-interior",
+        zone: pick(tavernStreetTransitions, "tavern-street-transition-3"),
+        targetScene: "tavern-interior",
+        targetSpawn: "from-tavern-street",
+      },
     ],
     arrivals: {
       "from-outskirts": spawnAt(tavernStreetSpawns, "tavern-street-spawn-1"),
       "from-plaza": spawnAt(tavernStreetSpawns, "tavern-street-spawn-2"),
+      "from-tavern-interior": spawnAt(
+        tavernStreetSpawns,
+        "tavern-street-spawn-3",
+      ),
+    },
+  },
+  // Asset-driven interior like bakery-interior / smithy-interior.
+  "tavern-interior": {
+    id: "tavern-interior",
+    kind: "exterior",
+    visual: visualOf("tavern-interior"),
+    colliders: tavernInteriorColliders,
+    exits: [
+      {
+        // The south doorway: back to Calle Taberna.
+        name: "to-tavern-street",
+        zone: pick(tavernInteriorTransitions, "tavern-interior-transition-1"),
+        targetScene: "tavern-street",
+        targetSpawn: "from-tavern-interior",
+      },
+    ],
+    arrivals: {
+      "from-tavern-street": spawnAt(
+        tavernInteriorSpawns,
+        "tavern-interior-spawn-1",
+      ),
     },
   },
   outskirts: {

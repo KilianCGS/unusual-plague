@@ -11,7 +11,10 @@ import {
   computeZoom,
 } from "../../app/dev/scene/camera";
 import { getSceneWorld, REFERENCE_VIEWPORT } from "../../app/dev/scene/scenes";
+import { getChapterInteractions, getComposition } from "../compositions";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
+import { DecorSprite } from "../decor/DecorSprite";
+import { resolveDecorInstances } from "../decor/decorRuntime";
 import { InteractionPrompt } from "../interactions/InteractionPrompt";
 import { getSceneInteractionZones } from "../interactions/sceneInteractions";
 import { useInteraction } from "../interactions/useInteraction";
@@ -43,8 +46,8 @@ const SPEAKER_TOP_PADDING = 14;
 export type SceneOverlayContext = {
   frameWidth: number;
   frameHeight: number;
-  // Point just above a speaker's head: "doctor" or a scene NPC id. Null when
-  // that speaker is not in this scene.
+  // Point just above a speaker's head: "doctor", a decor instanceId or a scene
+  // NPC id. Null when that speaker is not in this scene.
   getSpeakerAnchor: (speakerId: string) => { x: number; y: number } | null;
 };
 
@@ -66,6 +69,7 @@ function getZoom(zoomMultiplier: number) {
 
 export function ExteriorScene({
   scene,
+  chapterId,
   spawn,
   input,
   isPlaying,
@@ -74,11 +78,18 @@ export function ExteriorScene({
   renderOverlay,
 }: {
   scene: ExteriorWorldScene;
+  // Selects which versioned composition (src/game/compositions) populates the
+  // scene. Without it (dev pages) the scene has no decor instances.
+  chapterId?: string;
   spawn: SpawnPoint;
   input: DirectionInputHandle;
   isPlaying: boolean;
   onExit: (exitName: string) => void;
-  onInteract: (interactionId: string) => void;
+  // `instanceId` is set when the interaction belongs to a decor instance.
+  onInteract: (
+    interactionId: string,
+    source: { instanceId?: string },
+  ) => void;
   // Optional screen-space layer drawn above the camera frame content.
   renderOverlay?: (context: SceneOverlayContext) => ReactNode;
 }) {
@@ -90,9 +101,19 @@ export function ExteriorScene({
   // The static array is never mutated.
   const npcs = getSceneNpcs(scene.id);
   const npcColliders = useMemo(() => getNpcColliders(npcs), [npcs]);
+  // Decor instances placed in the Decorator and versioned for this chapter:
+  // sprites, colliders (colliderEnabled) and interaction zones.
+  const decor = useMemo(
+    () =>
+      resolveDecorInstances(
+        (chapterId && getComposition(scene.id, chapterId)?.instances) || [],
+        chapterId ? getChapterInteractions(chapterId) : {},
+      ),
+    [scene.id, chapterId],
+  );
   const blockingColliders = useMemo(
-    () => [...scene.colliders, ...npcColliders],
-    [scene.colliders, npcColliders],
+    () => [...scene.colliders, ...npcColliders, ...decor.colliders],
+    [scene.colliders, npcColliders, decor.colliders],
   );
   const { player, playerFeetHitbox, currentSpriteSrc, spriteSize } =
     useProtagonistController({
@@ -107,13 +128,20 @@ export function ExteriorScene({
       inputEnabled: isPlaying,
     });
 
-  const interactionZones = getSceneInteractionZones(scene.id);
+  const sceneZones = getSceneInteractionZones(scene.id);
+  const interactionZones = useMemo(
+    () => [...sceneZones, ...decor.zones],
+    [sceneZones, decor.zones],
+  );
   const availableInteraction = useInteraction({
     zones: interactionZones,
     feetHitbox: playerFeetHitbox,
     facing: player.direction,
     enabled: isPlaying,
-    onInteract,
+    onInteract: (interactionId, zone) =>
+      onInteract(interactionId, {
+        instanceId: decor.zoneInstanceIds.get(zone.id),
+      }),
   });
 
   useTransitionTrigger({
@@ -143,6 +171,9 @@ export function ExteriorScene({
   );
 
   const getSpeakerAnchor = (speakerId: string) => {
+    const decorSpeaker = decor.sprites.find(
+      ({ instance }) => instance.instanceId === speakerId,
+    );
     let feetX: number;
     let headTopY: number;
 
@@ -152,6 +183,17 @@ export function ExteriorScene({
         player.y -
         (spriteSize - SPEAKER_TOP_PADDING) *
           (scene.visual.protagonistScale ?? 1);
+    } else if (decorSpeaker) {
+      // A decor instance: its anchor is where it stands, so a moved or
+      // rescaled instance carries its bubble with it. The head is the top of
+      // the asset's body collider (its sprite frame has unknown padding).
+      const { asset, instance } = decorSpeaker;
+      const bodyHeight = asset.defaultCollider
+        ? -asset.defaultCollider.offsetY
+        : asset.sprite.frameHeight * asset.anchor.y;
+
+      feetX = instance.x;
+      headTopY = instance.y - bodyHeight * instance.scale;
     } else {
       const npc = npcs.find((candidate) => candidate.id === speakerId);
 
@@ -189,6 +231,13 @@ export function ExteriorScene({
           className={styles.logicalScene}
           style={{ backgroundImage: `url("${scene.visual.backgroundSrc}")` }}
         >
+          {decor.sprites.map(({ asset, instance }) => (
+            <DecorSprite
+              key={instance.instanceId}
+              asset={asset}
+              instance={instance}
+            />
+          ))}
           {npcs.map((npc) => (
             <SceneNpcSprite key={npc.id} npc={npc} />
           ))}
@@ -239,6 +288,22 @@ export function ExteriorScene({
                     boxSizing: "border-box",
                     border: "1px solid #ff9f1c",
                     background: "rgba(255, 159, 28, 0.35)",
+                    pointerEvents: "none",
+                  }}
+                />
+              ))}
+              {decor.colliders.map((collider) => (
+                <div
+                  key={collider.id}
+                  style={{
+                    position: "absolute",
+                    left: collider.x,
+                    top: collider.y,
+                    width: collider.width,
+                    height: collider.height,
+                    boxSizing: "border-box",
+                    border: "1px solid #c77dff",
+                    background: "rgba(199, 125, 255, 0.35)",
                     pointerEvents: "none",
                   }}
                 />

@@ -14,7 +14,7 @@ const sharp = require("sharp");
 
 // Transpile decorAssets.ts; its only runtime import (the protagonist hook) is
 // stubbed, the collision import is type-only.
-const src = fs.readFileSync(path.join(root, "src/app/dev/decorator/decorAssets.ts"), "utf8");
+const src = fs.readFileSync(path.join(root, "src/game/decor/decorAssets.ts"), "utf8");
 const js = ts.transpileModule(src, { compilerOptions: { module: "commonjs", target: "es2022" } }).outputText;
 const mod = new Module("decorAssets");
 mod.paths = Module._nodeModulePaths(root);

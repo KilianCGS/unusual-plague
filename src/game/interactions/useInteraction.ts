@@ -29,7 +29,9 @@ export function useInteraction({
   facing: Direction;
   // False while a fade / scene change is running: nothing is available.
   enabled: boolean;
-  onInteract: (interactionId: string) => void;
+  // The zone is passed along so the owner can tell WHICH of several zones with
+  // the same interactionId (or which instance) was used.
+  onInteract: (interactionId: string, zone: InteractionZone) => void;
 }) {
   const available = enabled
     ? findAvailableInteraction(zones, feetHitbox, facing)
@@ -58,7 +60,7 @@ export function useInteraction({
       const current = availableRef.current;
 
       if (current) {
-        onInteractRef.current(current.interactionId);
+        onInteractRef.current(current.interactionId, current);
       }
     }
 

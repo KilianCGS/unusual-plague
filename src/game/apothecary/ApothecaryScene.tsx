@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 
 import { apothecaryInteriorColliders } from "./apothecaryInteriorGeometry";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
@@ -14,11 +15,15 @@ import {
   useTransitionTrigger,
   type TransitionExit,
 } from "../world/useTransitionTrigger";
+import type { SceneOverlayContext } from "../world/ExteriorScene";
 import styles from "./ApothecaryScene.module.css";
 
 const SCENE_WIDTH = 480;
 const SCENE_HEIGHT = 270;
 const SPRITE_SIZE = 96;
+// Transparent rows above the head in the 96 px character frames (same value
+// ExteriorScene uses for its speaker anchors).
+const SPEAKER_TOP_PADDING = 14;
 const SCENE_PADDING = 48;
 const MAX_SCENE_SCALE = 4;
 const DEFAULT_SPAWN: { x: number; y: number; direction: Direction } = {
@@ -52,12 +57,15 @@ export function ApothecaryScene({
   isPlaying = true,
   exits = NO_EXITS,
   onExit,
+  renderOverlay,
 }: {
   spawn?: { x: number; y: number; direction: Direction };
   input?: DirectionInputHandle;
   isPlaying?: boolean;
   exits?: TransitionExit[];
   onExit?: (exitName: string) => void;
+  // Optional screen-space layer (dialogue bubble) above the scene.
+  renderOverlay?: (context: SceneOverlayContext) => ReactNode;
 }) {
   const [sceneScale, setSceneScale] = useState(1);
   const { player, playerFeetHitbox, currentSpriteSrc, spriteSize } =
@@ -92,6 +100,18 @@ export function ApothecaryScene({
       window.removeEventListener("resize", updateSceneScale);
     };
   }, []);
+
+  // Only the Doctor lives in this room; the scene is not scrolled, so his
+  // anchor is just his head point scaled to screen pixels.
+  const getSpeakerAnchor = (speakerId: string) =>
+    speakerId === "doctor"
+      ? {
+          x: Math.round(player.x * sceneScale),
+          y: Math.round(
+            (player.y - (spriteSize - SPEAKER_TOP_PADDING)) * sceneScale,
+          ),
+        }
+      : null;
 
   return (
     <main className={styles.page}>
@@ -161,6 +181,11 @@ export function ApothecaryScene({
               </>
             ) : null}
           </div>
+          {renderOverlay?.({
+            frameWidth: SCENE_WIDTH * sceneScale,
+            frameHeight: SCENE_HEIGHT * sceneScale,
+            getSpeakerAnchor,
+          })}
         </div>
       </section>
     </main>

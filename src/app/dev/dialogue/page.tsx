@@ -3,10 +3,12 @@
 import { useEffect } from "react";
 
 import { DialogueBubble } from "../../../game/dialogue/DialogueBubble";
+import { DOCTOR_SPEAKER } from "../../../game/dialogue/dialogueTypes";
 import { SAMPLE_CONVERSATION } from "../../../game/dialogue/sampleConversation";
 import { useDialogue } from "../../../game/dialogue/useDialogue";
 import { useDirectionInput } from "../../../game/protagonist/useDirectionInput";
 import { useIsClient } from "../../../game/ui/useIsClient";
+import { INITIAL_CHAPTER_ID } from "../../../game/world/currentChapter";
 import { ExteriorScene } from "../../../game/world/ExteriorScene";
 import { WORLD_SCENES } from "../../../game/world/worldScenes";
 import type {
@@ -15,12 +17,12 @@ import type {
 } from "../../../game/world/worldScenes";
 import styles from "./page.module.css";
 
-// Dialogue V1 preview. It reuses the REAL Plaza scene, the real Doctor and the
-// pilot villager that already lives there, with the same camera as the game.
-// The Doctor starts next to the villager; he can walk until the conversation
+// Dialogue V1 preview. It reuses the REAL Plaza scene (with Chapter 1's
+// population), the real Doctor and the merchant of that composition, with the
+// same camera as the game. The Doctor starts just north of the merchant; he can walk until the conversation
 // starts, and is blocked while it is open (isPlaying = false).
 const PLAZA = WORLD_SCENES.plaza as ExteriorWorldScene;
-const SPAWN: SpawnPoint = { x: 640, y: 352, direction: "east" };
+const SPAWN: SpawnPoint = { x: 486, y: 480, direction: "south" };
 
 export default function DialoguePreviewPage() {
   const input = useDirectionInput();
@@ -45,6 +47,7 @@ export default function DialoguePreviewPage() {
       {isClient ? (
         <ExteriorScene
           scene={PLAZA}
+          chapterId={INITIAL_CHAPTER_ID}
           spawn={SPAWN}
           input={input}
           isPlaying={!dialogue.active}
@@ -66,6 +69,7 @@ export default function DialoguePreviewPage() {
                 visibleText={dialogue.visibleText}
                 fullText={dialogue.fullText}
                 isComplete={dialogue.isComplete}
+                isDoctor={dialogue.line.speaker === DOCTOR_SPEAKER}
               />
             ) : null;
           }}

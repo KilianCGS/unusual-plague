@@ -1,5 +1,5 @@
-import { getDecorAsset } from "./decorAssets";
-import type { DecorComposition, DecorInstance } from "./decorTypes";
+import { getDecorAsset } from "../../../game/decor/decorAssets";
+import type { DecorComposition, DecorInstance } from "../../../game/decor/decorTypes";
 
 // Neutral, easy-to-rename ids. Compositions are independent: none inherits
 // from another.
@@ -59,10 +59,15 @@ export function loadInstances(
   try {
     const text = window.localStorage.getItem(storageKey(sceneId, chapterId));
 
-    return text ? sanitizeInstances(JSON.parse(text)) : [];
+    if (text !== null) {
+      return sanitizeInstances(JSON.parse(text));
+    }
   } catch {
-    return [];
+    // Fall through to the default below.
   }
+
+  // Nothing stored: the composition starts empty.
+  return [];
 }
 
 export function saveInstances(
@@ -129,10 +134,10 @@ function camelize(text: string) {
     .join("");
 }
 
-// Deterministic TypeScript: fixed key order, instances in list order,
-// integers for positions and zones, two decimals at most for scale.
-export function formatComposition(composition: DecorComposition) {
-  const clean = {
+// Fixed key order, integers for positions and zones, two decimals at most for
+// scale. Every DecorInstance field is kept.
+function cleanComposition(composition: DecorComposition) {
+  return {
     sceneId: composition.sceneId,
     chapterId: composition.chapterId,
     instances: composition.instances.map((instance) => ({
@@ -162,13 +167,76 @@ export function formatComposition(composition: DecorComposition) {
         : {}),
     })),
   };
+}
+
+// Deterministic TypeScript: fixed key order, instances in list order.
+export function formatComposition(composition: DecorComposition) {
+  const clean = cleanComposition(composition);
   const name = camelize(`${composition.sceneId}-${composition.chapterId}`);
 
   return (
     `// Decorator composition: scene "${composition.sceneId}", chapter "${composition.chapterId}".\n` +
     "// x / y are WORLD logical units of the instance anchor (bottom-center by\n" +
     "// default). interaction.zone is relative to that anchor. Shape:\n" +
-    "// DecorComposition in src/app/dev/decorator/decorTypes.ts.\n" +
+    "// DecorComposition in src/game/decor/decorTypes.ts.\n" +
     `export const ${name}Composition = ${JSON.stringify(clean, null, 2)};\n`
+  );
+}
+
+// Every scene with instances SAVED in this browser for the chapter, sorted by
+// scene id. Reads only what the Decorator stored (never seeds or defaults), so
+// the export is exactly what was authored.
+export function loadStoredChapter(chapterId: string): DecorComposition[] {
+  const prefix = `${STORAGE_PREFIX}:`;
+  const suffix = `:${chapterId}`;
+  const sceneIds: string[] = [];
+
+  try {
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+      const key = window.localStorage.key(index);
+
+      if (key?.startsWith(prefix) && key.endsWith(suffix)) {
+        sceneIds.push(key.slice(prefix.length, key.length - suffix.length));
+      }
+    }
+  } catch {
+    return [];
+  }
+
+  return sceneIds
+    .sort()
+    .map((sceneId) => {
+      let instances: DecorInstance[] = [];
+
+      try {
+        instances = sanitizeInstances(
+          JSON.parse(
+            window.localStorage.getItem(storageKey(sceneId, chapterId)) ??
+              "[]",
+          ),
+        );
+      } catch {
+        // Unreadable entry: treated as empty.
+      }
+
+      return { sceneId, chapterId, instances };
+    })
+    .filter((composition) => composition.instances.length > 0);
+}
+
+// The whole chapter as the file src/game/compositions/<chapterId>.ts.
+export function formatChapter(
+  chapterId: string,
+  compositions: DecorComposition[],
+) {
+  const name = `${camelize(chapterId)}Compositions`;
+  const clean = compositions.map(cleanComposition);
+
+  return (
+    `// Exported from /dev/decorator (COPY CHAPTER): chapter "${chapterId}".\n` +
+    `// Save as src/game/compositions/${chapterId}.ts. x / y are WORLD logical\n` +
+    "// units of the instance anchor; interaction.zone is relative to it.\n" +
+    'import type { DecorComposition } from "../decor/decorTypes";\n\n' +
+    `export const ${name}: DecorComposition[] = ${JSON.stringify(clean, null, 2)};\n`
   );
 }

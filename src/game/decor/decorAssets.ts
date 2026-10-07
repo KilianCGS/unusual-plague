@@ -1,5 +1,5 @@
-import type { SceneCollider } from "../../../game/collision";
-import { PROTAGONIST_FEET_HITBOX } from "../../../game/protagonist/useProtagonistController";
+import type { SceneCollider } from "../collision";
+import { PROTAGONIST_FEET_HITBOX } from "../protagonist/useProtagonistController";
 import type { DecorAsset, DecorCategory, DecorInstance } from "./decorTypes";
 
 // Asset library V1. Only REAL assets that already exist in the project; new

@@ -31,6 +31,7 @@ export function DialogueBubble({
   visibleText,
   fullText,
   isComplete,
+  isDoctor = false,
 }: {
   anchorX: number;
   anchorY: number;
@@ -39,6 +40,8 @@ export function DialogueBubble({
   visibleText: string;
   fullText: string;
   isComplete: boolean;
+  // The Doctor's lines sit on a grey parchment instead of the beige one.
+  isDoctor?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
@@ -76,7 +79,12 @@ export function DialogueBubble({
   };
 
   return (
-    <div ref={ref} className={styles.bubble} style={style} data-dialogue-bubble>
+    <div
+      ref={ref}
+      className={`${styles.bubble}${isDoctor ? ` ${styles.doctor}` : ""}`}
+      style={style}
+      data-dialogue-bubble
+    >
       <div className={styles.paper}>
         <p className={styles.text}>
           <span>{visibleText}</span>

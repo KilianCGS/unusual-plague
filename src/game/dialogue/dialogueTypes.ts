@@ -18,3 +18,7 @@ export type Conversation = {
   id: string;
   lines: DialogueLine[];
 };
+
+// The speaker id of the Doctor in every conversation. The bubble uses it (and
+// only it) to tell his lines apart from everybody else's.
+export const DOCTOR_SPEAKER = "doctor";

@@ -126,3 +126,13 @@
   background: #e9dbb9;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
 }
+
+/* The Doctor's bubble: the same piece with a desaturated grey parchment
+   instead of the beige one (body and tail), text and border unchanged. */
+.doctor .paper {
+  background: #d0cbbe;
+}
+
+.doctor .tail::after {
+  background: #d0cbbe;
+}

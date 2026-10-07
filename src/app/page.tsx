@@ -114,7 +114,7 @@ export default function Home() {
   if (gamePhase === "apothecary") {
     return (
       <>
-        <GameWorld />
+        <GameWorld language={language} />
         <div
           className="title-screen-fade"
           style={{

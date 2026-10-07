@@ -1,7 +1,8 @@
-import type { AnchorHitbox } from "../../../game/collision";
-import type { Direction } from "../../../game/protagonist/useProtagonistController";
+import type { AnchorHitbox } from "../collision";
+import type { Direction } from "../protagonist/useProtagonistController";
 
-// DEV-ONLY scene composition model, kept apart on purpose:
+// Scene composition model, SHARED by the Decorator authoring tool and the
+// game runtime (src/game/compositions):
 //   DecorAsset        reusable definition (sprite, anchor, default collider)
 //   DecorInstance     one placement of an asset in one scene + chapter
 //   DecorComposition  the instances of ONE scene + chapter (independent, no
