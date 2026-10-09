@@ -1,0 +1,281 @@
+/* Crafting: the same family as Inventory / Map / Book (dimmed world, dark
+   stepped border, parchment panel), but interactive (it takes clicks). */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  font-family: var(--ui-font);
+  color: #2b1a14;
+}
+
+.border {
+  padding: 4px;
+  background: #2b1a14;
+  max-height: calc(100vh - 16px);
+  clip-path: polygon(
+    0 8px,
+    4px 8px,
+    4px 4px,
+    8px 4px,
+    8px 0,
+    calc(100% - 8px) 0,
+    calc(100% - 8px) 4px,
+    calc(100% - 4px) 4px,
+    calc(100% - 4px) 8px,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 8px) calc(100% - 4px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    8px calc(100% - 4px),
+    4px calc(100% - 4px),
+    4px calc(100% - 8px),
+    0 calc(100% - 8px)
+  );
+}
+
+.paper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 24px 20px;
+  background: #e9dbb9;
+  clip-path: polygon(
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+}
+
+/* While the success modal is up, the panel below does not take clicks. */
+.inert {
+  pointer-events: none;
+}
+
+.title,
+.heading {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.title {
+  font-size: 18px;
+}
+
+.heading {
+  font-size: 13px;
+}
+
+.close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font: 700 18px/1 var(--ui-font);
+  color: #2b1a14;
+  background: #d9c9a3;
+  border: 2px solid #2b1a14;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: #f1e6c8;
+}
+
+.selection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selectionCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plus {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.cell,
+.slot {
+  position: relative;
+  box-sizing: border-box;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  padding: 3px 4px;
+  overflow: hidden;
+  font: 700 clamp(7px, 1.05vmin, 9px) / 1.1 var(--ui-font);
+  text-align: left;
+  vertical-align: top;
+  color: #2b1a14;
+  background: #c9b88f;
+  border: 3px solid #2b1a14;
+  border-right-color: #8a6a4a;
+  border-bottom-color: #8a6a4a;
+  overflow-wrap: break-word;
+}
+
+.cell,
+.slot,
+.combine {
+  --cell-size: clamp(44px, 10vmin, 84px);
+}
+
+/* Filled slots and inventory items are clickable. */
+.cell:not(:disabled),
+.slot:not(:disabled) {
+  cursor: pointer;
+  background: #d9c9a3;
+}
+
+.cell:not(:disabled):hover,
+.slot:not(:disabled):hover {
+  background: #f1e6c8;
+}
+
+.cell:disabled,
+.slot:disabled {
+  cursor: default;
+}
+
+.combine {
+  min-width: 140px;
+  padding: 6px 18px 8px;
+  font: 700 15px/1 var(--ui-font);
+  letter-spacing: 0.12em;
+  color: #2b1a14;
+  background: #d9c9a3;
+  border: 3px solid #2b1a14;
+  border-bottom-width: 5px;
+  cursor: pointer;
+}
+
+.combine:hover:not(:disabled) {
+  background: #f1e6c8;
+}
+
+.combine:disabled {
+  color: #8a7a60;
+  background: #cdbf9d;
+  border-color: #8a6a4a;
+  cursor: default;
+}
+
+.message {
+  margin: 0;
+  min-height: 1.3em;
+  max-width: 360px;
+  font-size: 13px;
+  line-height: 1.3;
+  font-weight: 700;
+  text-align: center;
+}
+
+.divider {
+  width: 100%;
+  margin: 2px 0;
+  border: 0;
+  border-top: 2px solid #8a6a4a;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), var(--cell-size));
+  gap: 6px;
+  --cell-size: clamp(44px, 10vmin, 84px);
+}
+
+.name {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  right: 4px;
+}
+
+.quantity {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  font-size: clamp(10px, 1.9vmin, 15px);
+}
+
+/* Success modal, on top of the panel. */
+.modalBackdrop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.modalBorder {
+  padding: 4px;
+  background: #2b1a14;
+  clip-path: polygon(
+    0 8px,
+    4px 8px,
+    4px 4px,
+    8px 4px,
+    8px 0,
+    calc(100% - 8px) 0,
+    calc(100% - 8px) 4px,
+    calc(100% - 4px) 4px,
+    calc(100% - 4px) 8px,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 8px) calc(100% - 4px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    8px calc(100% - 4px),
+    4px calc(100% - 4px),
+    4px calc(100% - 8px),
+    0 calc(100% - 8px)
+  );
+}
+
+.modal {
+  position: relative;
+  min-width: 260px;
+  padding: 22px 34px 24px;
+  text-align: center;
+  background: #e9dbb9;
+}
+
+.createdHeading {
+  margin: 0 0 8px;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+
+.createdName {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}

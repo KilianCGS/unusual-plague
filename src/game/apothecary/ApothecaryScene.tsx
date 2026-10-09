@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
+import { InteractionPrompt } from "../interactions/InteractionPrompt";
+import { getSceneInteractionZones } from "../interactions/sceneInteractions";
+import { useInteraction } from "../interactions/useInteraction";
 import { apothecaryInteriorColliders } from "./apothecaryInteriorGeometry";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
+import { usePlayerMoved } from "../protagonist/usePlayerMoved";
 import type { DirectionInputHandle } from "../protagonist/useDirectionInput";
 import {
   useProtagonistController,
@@ -19,7 +23,7 @@ import type { SceneOverlayContext } from "../world/ExteriorScene";
 import styles from "./ApothecaryScene.module.css";
 
 const SCENE_WIDTH = 480;
-const SCENE_HEIGHT = 270;
+const SCENE_HEIGHT = 277;
 const SPRITE_SIZE = 96;
 // Transparent rows above the head in the 96 px character frames (same value
 // ExteriorScene uses for its speaker anchors).
@@ -58,6 +62,9 @@ export function ApothecaryScene({
   exits = NO_EXITS,
   onExit,
   renderOverlay,
+  onPlayerMoved,
+  onInteract,
+  onInteractionAvailable,
 }: {
   spawn?: { x: number; y: number; direction: Direction };
   input?: DirectionInputHandle;
@@ -66,6 +73,12 @@ export function ApothecaryScene({
   onExit?: (exitName: string) => void;
   // Optional screen-space layer (dialogue bubble) above the scene.
   renderOverlay?: (context: SceneOverlayContext) => ReactNode;
+  // Reports (never drives) that the Doctor really changed position.
+  onPlayerMoved?: () => void;
+  // The room has interaction zones (the crafting table); the owner decides
+  // what an interactionId does.
+  onInteract?: (interactionId: string, source: { instanceId?: string }) => void;
+  onInteractionAvailable?: (available: boolean) => void;
 }) {
   const [sceneScale, setSceneScale] = useState(1);
   const { player, playerFeetHitbox, currentSpriteSrc, spriteSize } =
@@ -80,6 +93,28 @@ export function ApothecaryScene({
       input,
       inputEnabled: isPlaying,
     });
+
+  usePlayerMoved(player.x, player.y, onPlayerMoved);
+
+  const availableInteraction = useInteraction({
+    zones: getSceneInteractionZones("apothecary-interior"),
+    feetHitbox: playerFeetHitbox,
+    facing: player.direction,
+    enabled: isPlaying,
+    onInteract: (interactionId) => onInteract?.(interactionId, {}),
+  });
+  const isInteractionAvailable = availableInteraction !== null;
+  const onInteractionAvailableRef = useRef(onInteractionAvailable);
+
+  useEffect(() => {
+    onInteractionAvailableRef.current = onInteractionAvailable;
+  });
+
+  useEffect(() => {
+    onInteractionAvailableRef.current?.(isInteractionAvailable);
+
+    return () => onInteractionAvailableRef.current?.(false);
+  }, [isInteractionAvailable]);
 
   useTransitionTrigger({
     feetHitbox: playerFeetHitbox,
@@ -181,6 +216,17 @@ export function ApothecaryScene({
               </>
             ) : null}
           </div>
+          {availableInteraction ? (
+            <InteractionPrompt
+              feetX={player.x}
+              feetY={player.y}
+              spriteSize={spriteSize}
+              spriteScale={1}
+              zoom={sceneScale}
+              cameraOffsetX={0}
+              cameraOffsetY={0}
+            />
+          ) : null}
           {renderOverlay?.({
             frameWidth: SCENE_WIDTH * sceneScale,
             frameHeight: SCENE_HEIGHT * sceneScale,

@@ -269,29 +269,20 @@ export const DEV_SCENES: DevScene[] = [
   {
     id: "apothecary-interior",
     label: "Botica (interior)",
-    // The Apothecary interior itself, added here only so /dev/scene and
-    // /dev/collisions can display and edit its already-persisted geometry
-    // (apothecaryInteriorGeometry.ts). Real gameplay
-    // does NOT use this entry: ApothecaryScene.tsx is hard-wired to its own
-    // fixed 480x270 room (see ApothecaryScene.module.css) and is rendered
-    // directly, not through DEV_SCENES/ExteriorScene. This entry mirrors
-    // those exact same logical dimensions (480x270, 1 unit per pixel) so
-    // colliders/transitions/spawns painted here line up with the real scene.
-    //
-    // CAVEAT: the background PNG is 1586x992 and CSS renders it with
-    // `background-size: cover` into the 480x270 box, so this editor preview
-    // is not a byte-exact crop of the real view (parts of the tall/wide
-    // source image get cropped by `cover` in ways this simple <img>-style
-    // background can't reproduce exactly). The geometry numbers themselves
-    // are unaffected: they're defined in the same 480x270 logical space as
-    // actual gameplay.
+    // Unmodified copy of art/references/apothecary-interior-v2.png
+    // (1652x952), the Botica's current art. The scene keeps the width of its
+    // 480-unit room, so one asset pixel is 480/1652 units and the logical
+    // world is 480x277 (952 * 480/1652 = 276.6); the image is drawn into it
+    // at 100% x 100% (a 0.15% vertical stretch, not a crop). The hard-wired
+    // ApothecaryScene uses the same 480x277 box. The previous art was
+    // 1586x992 squeezed with `cover` into 480x270.
     backgroundSrc: "/game/areas/apothecary/apothecary-background.png",
-    assetWidth: 480,
-    assetHeight: 270,
-    // Provisional: matches the existing start position.
-    initialAssetX: 240,
-    initialAssetY: 220,
-    logicalUnitsPerAssetPixel: 1,
+    assetWidth: 1652,
+    assetHeight: 952,
+    // The game's start position (the "start" arrival of the Botica).
+    initialAssetX: 826,
+    initialAssetY: 757,
+    logicalUnitsPerAssetPixel: 480 / 1652,
     zoomMultiplier: 602 / 270,
   },
   {

@@ -13,7 +13,7 @@
   position: relative;
   flex: 0 0 auto;
   width: calc(480px * var(--scene-scale));
-  height: calc(270px * var(--scene-scale));
+  height: calc(277px * var(--scene-scale));
   border: 2px solid #3f3427;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
   background: #050505;
@@ -24,7 +24,7 @@
   top: 0;
   left: 0;
   width: 480px;
-  height: 270px;
+  height: 277px;
   overflow: hidden;
   transform-origin: top left;
   transform: scale(var(--scene-scale));
@@ -32,5 +32,5 @@
   background-image: url("/game/areas/apothecary/apothecary-background.png");
   background-position: center;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: 100% 100%;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
 // The camera stays where it is for now (camera.ts is not moved yet), so the
@@ -11,6 +11,7 @@ import {
   computeZoom,
 } from "../../app/dev/scene/camera";
 import { getSceneWorld, REFERENCE_VIEWPORT } from "../../app/dev/scene/scenes";
+import type { CollectedInstanceIds } from "../collectibles/collectibles";
 import { getChapterInteractions, getComposition } from "../compositions";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { DecorSprite } from "../decor/DecorSprite";
@@ -23,6 +24,7 @@ import { getSceneNpcs } from "../npcs/sceneNpcs";
 import { SceneNpcSprite } from "../npcs/SceneNpcSprite";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
 import type { DirectionInputHandle } from "../protagonist/useDirectionInput";
+import { usePlayerMoved } from "../protagonist/usePlayerMoved";
 import { useProtagonistController } from "../protagonist/useProtagonistController";
 import styles from "./ExteriorScene.module.css";
 import { useTransitionTrigger } from "./useTransitionTrigger";
@@ -76,6 +78,9 @@ export function ExteriorScene({
   onExit,
   onInteract,
   renderOverlay,
+  onPlayerMoved,
+  onInteractionAvailable,
+  collectedInstanceIds,
 }: {
   scene: ExteriorWorldScene;
   // Selects which versioned composition (src/game/compositions) populates the
@@ -85,13 +90,21 @@ export function ExteriorScene({
   input: DirectionInputHandle;
   isPlaying: boolean;
   onExit: (exitName: string) => void;
-  // `instanceId` is set when the interaction belongs to a decor instance.
+  // `instanceId` is set when the interaction belongs to a decor instance, and
+  // `itemId` when that instance is a collectible.
   onInteract: (
     interactionId: string,
-    source: { instanceId?: string },
+    source: { instanceId?: string; itemId?: string },
   ) => void;
   // Optional screen-space layer drawn above the camera frame content.
   renderOverlay?: (context: SceneOverlayContext) => ReactNode;
+  // Reports (never drives): the Doctor really changed position / an
+  // interaction became available or stopped being available.
+  onPlayerMoved?: () => void;
+  onInteractionAvailable?: (available: boolean) => void;
+  // Collectibles already picked up this session; they are not drawn, do not
+  // block and give no prompt.
+  collectedInstanceIds?: CollectedInstanceIds;
 }) {
   const zoomMultiplier = scene.visual.zoomMultiplier ?? 1;
   const world = getSceneWorld(scene.visual);
@@ -108,8 +121,9 @@ export function ExteriorScene({
       resolveDecorInstances(
         (chapterId && getComposition(scene.id, chapterId)?.instances) || [],
         chapterId ? getChapterInteractions(chapterId) : {},
+        collectedInstanceIds,
       ),
-    [scene.id, chapterId],
+    [scene.id, chapterId, collectedInstanceIds],
   );
   const blockingColliders = useMemo(
     () => [...scene.colliders, ...npcColliders, ...decor.colliders],
@@ -141,8 +155,26 @@ export function ExteriorScene({
     onInteract: (interactionId, zone) =>
       onInteract(interactionId, {
         instanceId: decor.zoneInstanceIds.get(zone.id),
+        itemId: decor.zoneItemIds.get(zone.id),
       }),
   });
+
+  usePlayerMoved(player.x, player.y, onPlayerMoved);
+
+  // Tell the owner whether the [E] prompt is showing (and clear it when this
+  // scene goes away).
+  const isInteractionAvailable = availableInteraction !== null;
+  const onInteractionAvailableRef = useRef(onInteractionAvailable);
+
+  useEffect(() => {
+    onInteractionAvailableRef.current = onInteractionAvailable;
+  });
+
+  useEffect(() => {
+    onInteractionAvailableRef.current?.(isInteractionAvailable);
+
+    return () => onInteractionAvailableRef.current?.(false);
+  }, [isInteractionAvailable]);
 
   useTransitionTrigger({
     feetHitbox: playerFeetHitbox,

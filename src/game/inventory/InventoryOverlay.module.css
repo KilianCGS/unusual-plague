@@ -1,0 +1,117 @@
+/* Same family as the Map/Book overlays: dimmed world, dark stepped border,
+   parchment panel. Not interactive. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  font-family: var(--ui-font);
+  pointer-events: none;
+}
+
+.border {
+  padding: 4px;
+  background: #2b1a14;
+  clip-path: polygon(
+    0 8px,
+    4px 8px,
+    4px 4px,
+    8px 4px,
+    8px 0,
+    calc(100% - 8px) 0,
+    calc(100% - 8px) 4px,
+    calc(100% - 4px) 4px,
+    calc(100% - 4px) 8px,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 8px) calc(100% - 4px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    8px calc(100% - 4px),
+    4px calc(100% - 4px),
+    4px calc(100% - 8px),
+    0 calc(100% - 8px)
+  );
+}
+
+.paper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px 22px;
+  background: #e9dbb9;
+  color: #2b1a14;
+  clip-path: polygon(
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+
+/* 4 columns x 3 rows; the slot size follows the viewport so it fits small
+   windows without scrolling. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), var(--slot-size));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  --slot-size: clamp(40px, 9vmin, 76px);
+}
+
+/* An empty slot: an inset square, darker than the paper, with a light bottom
+   edge so it reads as a recess. */
+.slot {
+  position: relative;
+  overflow: hidden;
+  width: var(--slot-size);
+  height: var(--slot-size);
+  box-sizing: border-box;
+  background: #c9b88f;
+  border: 3px solid #2b1a14;
+  border-right-color: #8a6a4a;
+  border-bottom-color: #8a6a4a;
+}
+
+/* An occupied slot (no item art yet): name on top, quantity bottom-right. */
+.name {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  right: 4px;
+  font-size: clamp(8px, 1.3vmin, 11px);
+  line-height: 1.1;
+  font-weight: 700;
+  overflow-wrap: break-word;
+}
+
+.quantity {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  font-size: clamp(10px, 1.9vmin, 15px);
+  font-weight: 700;
+}

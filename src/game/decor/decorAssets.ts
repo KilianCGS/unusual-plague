@@ -4,6 +4,19 @@ import type { DecorAsset, DecorCategory, DecorInstance } from "./decorTypes";
 
 // Asset library V1. Only REAL assets that already exist in the project; new
 // assets (animals, ambient, resources...) get registered here when they exist.
+// DEV placeholder for the first collectible: a flat green leaf inside a magenta
+// frame, drawn as an inline SVG so no art file is invented. It is clearly NOT
+// final art and is meant to be replaced by the real herb sprite.
+const DEV_HERB_SVG = [
+  "<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' shape-rendering='crispEdges'>",
+  "<rect x='0.5' y='0.5' width='31' height='31' fill='none' stroke='#ff00ff'/>",
+  "<rect x='14' y='18' width='4' height='11' fill='#3b5a2a'/>",
+  "<rect x='9' y='9' width='14' height='10' fill='#5f9e43'/>",
+  "<rect x='12' y='6' width='8' height='4' fill='#7ec25a'/>",
+  "<rect x='15' y='9' width='2' height='10' fill='#3b5a2a'/>",
+  "</svg>",
+].join("");
+
 export const DECOR_ASSETS: DecorAsset[] = [
   {
     // The approved pilot villager, static.
@@ -624,6 +637,23 @@ export const DECOR_ASSETS: DecorAsset[] = [
     // Union silhouette x3-90 y12-83 of the 96x96 frame.
     anchor: { x: 0.49, y: 0.875 },
     defaultScale: 1,
+  },
+  // FIRST WORLD COLLECTIBLE (DEV placeholder art). Placing it makes a Medicinal
+  // herb that the Doctor can pick up with E.
+  {
+    id: "medicinal-herb-dev",
+    label: "Medicinal herb (DEV placeholder)",
+    category: "resources",
+    sprite: {
+      frames: [`data:image/svg+xml;utf8,${encodeURIComponent(DEV_HERB_SVG)}`],
+      frameWidth: 32,
+      frameHeight: 32,
+      fps: 0,
+      loop: false,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    collectibleItemId: "medicinal-herb",
   },
 ];
 

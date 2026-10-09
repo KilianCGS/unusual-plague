@@ -1,0 +1,81 @@
+/* Contextual help: low on the screen, small, pointer-transparent. Hard 2px
+   border with stepped corners (same family as the dialogue bubble), flat dark
+   fill, no gradients or soft shadows. */
+.hint {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  z-index: 30;
+  width: min(520px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  padding: 2px;
+  font-family: var(--ui-font);
+  pointer-events: none;
+  background: #8a6a4a;
+  clip-path: polygon(
+    0 6px,
+    2px 6px,
+    2px 4px,
+    4px 4px,
+    4px 2px,
+    6px 2px,
+    6px 0,
+    calc(100% - 6px) 0,
+    calc(100% - 6px) 2px,
+    calc(100% - 4px) 2px,
+    calc(100% - 4px) 4px,
+    calc(100% - 2px) 4px,
+    calc(100% - 2px) 6px,
+    100% 6px,
+    100% calc(100% - 6px),
+    calc(100% - 2px) calc(100% - 6px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 6px) calc(100% - 2px),
+    calc(100% - 6px) 100%,
+    6px 100%,
+    6px calc(100% - 2px),
+    4px calc(100% - 2px),
+    4px calc(100% - 4px),
+    2px calc(100% - 4px),
+    2px calc(100% - 6px),
+    0 calc(100% - 6px)
+  );
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 14px 10px;
+  background: rgba(24, 15, 10, 0.92);
+  color: #f4ead5;
+}
+
+.title {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.body {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  color: #d9c9a3;
+}
+
+/* The key to press, drawn as a small keycap. */
+.key {
+  display: inline-block;
+  margin: 0 3px;
+  padding: 0 6px 2px;
+  font: inherit;
+  font-weight: 700;
+  color: #2b1a14;
+  background: #e9dbb9;
+  border: 2px solid #2b1a14;
+  border-bottom-width: 4px;
+}

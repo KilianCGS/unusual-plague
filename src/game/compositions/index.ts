@@ -1,5 +1,6 @@
 import type { DecorComposition, DecorInteraction } from "../decor/decorTypes";
 import { chapter1Compositions } from "./chapter-1";
+import { chapter1CollectibleTestCompositions } from "./chapter-1.collectibles";
 import { chapter1Interactions } from "./chapter-1.interactions";
 
 // VERSIONED scene populations, one file per chapter, each produced by
@@ -8,14 +9,29 @@ import { chapter1Interactions } from "./chapter-1.interactions";
 //
 // To add a chapter: save its export as chapter-N.ts here, import it and add it
 // to the list below.
-const ALL_COMPOSITIONS: DecorComposition[] = [...chapter1Compositions];
+const ALL_COMPOSITIONS: DecorComposition[] = [
+  ...chapter1Compositions,
+  // DEV test placement of the first collectible (see the file).
+  ...chapter1CollectibleTestCompositions,
+];
 
-const BY_SCENE_AND_CHAPTER = new Map(
-  ALL_COMPOSITIONS.map((composition) => [
-    `${composition.sceneId}::${composition.chapterId}`,
-    composition,
-  ]),
-);
+// A scene + chapter can be listed more than once; their instances are merged.
+const BY_SCENE_AND_CHAPTER = new Map<string, DecorComposition>();
+
+for (const composition of ALL_COMPOSITIONS) {
+  const key = `${composition.sceneId}::${composition.chapterId}`;
+  const existing = BY_SCENE_AND_CHAPTER.get(key);
+
+  BY_SCENE_AND_CHAPTER.set(
+    key,
+    existing
+      ? {
+          ...existing,
+          instances: [...existing.instances, ...composition.instances],
+        }
+      : composition,
+  );
+}
 
 // The population of one scene in one chapter, or undefined when that scene has
 // none in that chapter (the scene is then simply empty of decor instances).

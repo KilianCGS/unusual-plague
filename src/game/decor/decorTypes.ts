@@ -37,6 +37,9 @@ export type DecorAsset = {
   defaultScale?: number;
   // Blocking area relative to the anchor, in unscaled logical units.
   defaultCollider?: AnchorHitbox;
+  // Set on assets that are WORLD COLLECTIBLES: every instance of this asset can
+  // be picked up with E and gives this item (an id of src/game/items).
+  collectibleItemId?: string;
 };
 
 export type DecorInteraction = {

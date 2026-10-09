@@ -184,10 +184,10 @@ test("washerwoman and injured miner conversations", () => {
   assert.equal(m.lines[2].text, "Hold on. I'll be back soon with something to treat it.");
 });
 
-test("chapter 1 opening monologue: three Doctor lines, ES and EN", () => {
+test("chapter 1 opening monologue: seven Doctor lines, ES and EN", () => {
   for (const lang of ["es", "en"]) {
     const intro = resolveChapterIntro("chapter-1", lang);
-    assert.equal(intro.lines.length, 3);
+    assert.equal(intro.lines.length, 7);
     assert.ok(intro.lines.every((l) => l.speaker === "doctor" && l.text.trim()));
   }
   assert.equal(resolveChapterIntro("chapter-1", "en").lines[0].text, "Another morning.");
