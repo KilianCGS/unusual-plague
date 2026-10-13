@@ -1,4 +1,5 @@
 import { apothecaryInteriorInteractions } from "../apothecary/apothecaryInteriorGeometry";
+import { outskirtsInteractions } from "../outskirts/outskirtsInteractions";
 import type { InteractionZone } from "./interactionZone";
 
 // Interaction zones painted per scene in /dev/collisions (keyed by the same
@@ -7,6 +8,7 @@ import type { InteractionZone } from "./interactionZone";
 // (src/game/compositions/chapter-1.interactions.ts).
 const SCENE_INTERACTIONS: Record<string, InteractionZone[]> = {
   "apothecary-interior": apothecaryInteriorInteractions,
+  outskirts: outskirtsInteractions,
 };
 
 const NO_INTERACTIONS: InteractionZone[] = [];

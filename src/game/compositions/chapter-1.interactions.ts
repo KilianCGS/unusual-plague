@@ -12,19 +12,25 @@ import type { DecorInteraction } from "../decor/decorTypes";
 //   - an `interaction` set in the Decorator on an instance wins over the entry
 //     here (see decorRuntime.withInteractions).
 // Instances without an entry are NOT interactable (cow, chickens, merchant
-// cart and table) or still pending (the baker).
+// cart and table).
 //
 // Zones: the instance's scaled collider (or silhouette when it has none)
 // grown by 16 units on every side, reaching at least 16 units in front (south)
 // of the anchor, because scene geometry often ends right at an NPC's feet and
 // the Doctor could not get any closer. The bartender reaches 48, over the bar
-// counter. The blacksmith reaches 112: the anvil (scene collider, 106 deep)
+// counter. The baker works behind her kneading table (a scene collider), so
+// her zone reaches 75 units east, to the floor where the Doctor can stand. The
+// blacksmith reaches 112: the anvil (scene collider, 106 deep)
 // sits right under him, so the Doctor coming in from the door can only stand
 // south of it. No requiredDirection: any facing.
 export const chapter1Interactions: Record<string, DecorInteraction> = {
   "apothecary-street-woman-sweeping-01": {
     interactionId: "chapter1.apothecaryStreet.sweepingWoman",
     zone: { offsetX: -43, offsetY: -97, width: 74, height: 113 },
+  },
+  "bakery-interior-baker-01": {
+    interactionId: "chapter1.bakery.baker",
+    zone: { offsetX: -36, offsetY: -77, width: 118, height: 93 },
   },
   "bakery-street-villager-man-02-01": {
     interactionId: "chapter1.bakeryStreet.villager",

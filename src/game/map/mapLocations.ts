@@ -78,6 +78,8 @@ export const SCENE_TO_MAP_LOCATION: Record<SceneId, MapLocationId> = {
   "mill-farmland": "mill",
   "bakery-street": "bakery",
   "bakery-interior": "bakery",
+  // Narrative scene: shown as part of the bakery, with no place of its own.
+  "bakers-bedroom": "bakery",
   "smithy-street": "smithy",
   "smithy-interior": "smithy",
   "mountain-path": "mountain",

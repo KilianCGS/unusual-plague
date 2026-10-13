@@ -17,21 +17,36 @@ export type ItemId =
   | "medicinal-paste"
   | "disinfected-bandage"
   | "mushroom-soup"
-  | "medicinal-ointment";
+  | "medicinal-ointment"
+  | "medicinal-infusion"
+  | "cold-cloth"
+  | "empty-flask";
 
 export type ItemDefinition = {
   id: ItemId;
   name: Record<Language, string>;
+  // What the Doctor says to himself when he needs this item and does not have
+  // enough of it: a natural pointer to where it can be found. Only for items
+  // that are gathered; prepared items do not need one.
+  sourceHint?: Record<Language, string>;
 };
 
 export const ITEMS: Record<ItemId, ItemDefinition> = {
   "medicinal-herb": {
     id: "medicinal-herb",
     name: { es: "Hierba medicinal", en: "Medicinal herb" },
+    sourceHint: {
+      es: "Hace tiempo que no recojo hierbas medicinales. Encontraré algunas en el bosque.",
+      en: "It has been a while since I gathered medicinal herbs. I should find some in the forest.",
+    },
   },
   cloth: {
     id: "cloth",
     name: { es: "Tela", en: "Cloth" },
+    sourceHint: {
+      es: "Necesitaré tela limpia. Quizá el mercader tenga.",
+      en: "I will need clean cloth. Perhaps the merchant has some.",
+    },
   },
   alcohol: {
     id: "alcohol",
@@ -40,6 +55,10 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
   water: {
     id: "water",
     name: { es: "Agua", en: "Water" },
+    sourceHint: {
+      es: "Debería recoger algo de agua del río.",
+      en: "I should fetch some water from the river.",
+    },
   },
   salt: {
     id: "salt",
@@ -72,6 +91,19 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
   "medicinal-ointment": {
     id: "medicinal-ointment",
     name: { es: "Ungüento medicinal", en: "Medicinal ointment" },
+  },
+  "medicinal-infusion": {
+    id: "medicinal-infusion",
+    name: { es: "Infusión medicinal", en: "Medicinal infusion" },
+  },
+  "cold-cloth": {
+    id: "cold-cloth",
+    name: { es: "Paño frío", en: "Cold compress" },
+  },
+  // The Doctor's own flask: a normal physical item with no special logic yet.
+  "empty-flask": {
+    id: "empty-flask",
+    name: { es: "Frasco vacío", en: "Empty flask" },
   },
 };
 

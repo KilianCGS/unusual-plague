@@ -7,7 +7,13 @@
 // blocks only exist where a section writes its pages in code (Dolencias, the
 // placeholders), and never duplicate text that an image already contains.
 
+import { bookCopy } from "../i18n/book";
 import { AILMENTS, type Ailment } from "./ailments";
+import {
+  buildPatientSpreads,
+  buildPreparationSpreads,
+  type BookContext,
+} from "./dynamicPages";
 import type { BookTextBlock } from "./bookText";
 
 export const BOOK_WIDTH = 688;
@@ -40,7 +46,7 @@ export type BookSection = {
 
 // The physical open book, shared by every section: plain paper pages, nothing
 // printed inside. Sections that do not paint their own pages start from this.
-const PLAIN_BASE_LAYER: BookLayer = {
+export const PLAIN_BASE_LAYER: BookLayer = {
   src: `${UI_DIR}/book-base-plain.png`,
   x: 0,
   y: 0,
@@ -223,3 +229,26 @@ export const BOOK_SECTIONS: BookSection[] = [
     ],
   },
 ];
+
+// The sections of the book for the current game state. DOLENCIAS and
+// INGREDIENTES are fixed content; PACIENTES and PREPARADOS are built from the
+// patient cases, the inventory and the known recipes (see dynamicPages.ts).
+export function buildBookSections(context: BookContext): BookSection[] {
+  const tabs = bookCopy[context.language].tabs;
+  const [, ailments, ingredients] = BOOK_SECTIONS;
+
+  return [
+    {
+      id: "patients",
+      label: tabs.patients,
+      spreads: buildPatientSpreads(context),
+    },
+    { ...ailments, label: tabs.ailments },
+    { ...ingredients, label: tabs.ingredients },
+    {
+      id: "preparations",
+      label: tabs.preparations,
+      spreads: buildPreparationSpreads(context),
+    },
+  ];
+}

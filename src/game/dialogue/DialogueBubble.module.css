@@ -127,6 +127,21 @@
   clip-path: polygon(0 0, 100% 0, 50% 100%);
 }
 
+/* Bubble under its speaker: the tail moves to the top edge and points up. */
+.below .tail {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: -2px;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.below .tail::after {
+  top: auto;
+  bottom: 0;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
 /* The Doctor's bubble: the same piece with a desaturated grey parchment
    instead of the beige one (body and tail), text and border unchanged. */
 .doctor .paper {

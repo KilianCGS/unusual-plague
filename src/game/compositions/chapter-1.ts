@@ -21,6 +21,42 @@ export const chapter1Compositions: DecorComposition[] = [
     ]
   },
   {
+    "sceneId": "bakers-bedroom",
+    "chapterId": "chapter-1",
+    "instances": [
+      {
+        "instanceId": "bakers-bedroom-bakers-husband-sick-01",
+        "assetId": "bakers-husband-sick",
+        "x": 156,
+        "y": 160,
+        "scale": 0.97,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "bakers-bedroom-doctor-narrative-01",
+        "assetId": "doctor-narrative",
+        "x": 182,
+        "y": 150,
+        "scale": 0.95,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "bakers-bedroom-baker-standing-01",
+        "assetId": "baker-standing",
+        "x": 149,
+        "y": 155,
+        "scale": 1.14,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      }
+    ]
+  },
+  {
     "sceneId": "bakery-interior",
     "chapterId": "chapter-1",
     "instances": [

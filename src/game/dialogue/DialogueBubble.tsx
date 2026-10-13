@@ -26,6 +26,7 @@ function clamp(value: number, min: number, max: number) {
 export function DialogueBubble({
   anchorX,
   anchorY,
+  placement = "above",
   frameWidth,
   frameHeight,
   visibleText,
@@ -35,6 +36,8 @@ export function DialogueBubble({
 }: {
   anchorX: number;
   anchorY: number;
+  // "below": the bubble hangs under the anchor, tail on top.
+  placement?: "above" | "below";
   frameWidth: number;
   frameHeight: number;
   visibleText: string;
@@ -60,7 +63,9 @@ export function DialogueBubble({
     Math.max(EDGE_MARGIN, frameWidth - size.width - EDGE_MARGIN),
   );
   const top = clamp(
-    anchorY - GAP_PX - TAIL_SIZE - size.height,
+    placement === "below"
+      ? anchorY + GAP_PX + TAIL_SIZE
+      : anchorY - GAP_PX - TAIL_SIZE - size.height,
     EDGE_MARGIN,
     Math.max(EDGE_MARGIN, frameHeight - size.height - EDGE_MARGIN),
   );
@@ -81,7 +86,7 @@ export function DialogueBubble({
   return (
     <div
       ref={ref}
-      className={`${styles.bubble}${isDoctor ? ` ${styles.doctor}` : ""}`}
+      className={`${styles.bubble}${isDoctor ? ` ${styles.doctor}` : ""}${placement === "below" ? ` ${styles.below}` : ""}`}
       style={style}
       data-dialogue-bubble
     >

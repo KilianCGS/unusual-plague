@@ -3,12 +3,14 @@
 import { useState } from "react";
 
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
+import { bookCopy } from "../i18n/book";
 import {
   BOOK_HEIGHT,
-  BOOK_SECTIONS,
   BOOK_WIDTH,
+  buildBookSections,
   type BookSpread,
 } from "./bookPages";
+import type { BookContext } from "./dynamicPages";
 import styles from "./BookOverlay.module.css";
 import { useFitScale } from "./useFitScale";
 
@@ -25,8 +27,9 @@ const VIEWPORT_FRACTION = 0.64;
 
 const TAB_WIDTH = 112;
 const TAB_GAP = 8;
-const TAB_GROUP_WIDTH =
-  BOOK_SECTIONS.length * TAB_WIDTH + (BOOK_SECTIONS.length - 1) * TAB_GAP;
+// The book always has four tabs (PACIENTES, DOLENCIAS, INGREDIENTES, PREPARADOS).
+const TAB_COUNT = 4;
+const TAB_GROUP_WIDTH = TAB_COUNT * TAB_WIDTH + (TAB_COUNT - 1) * TAB_GAP;
 // Centered as a group over the book (not stretched across it).
 const TABS_LEFT = (BOOK_WIDTH - TAB_GROUP_WIDTH) / 2;
 
@@ -35,13 +38,28 @@ const TABS_LEFT = (BOOK_WIDTH - TAB_GROUP_WIDTH) / 2;
 // remember its page). It lays out a fixed 688x406 stage in book pixels and
 // scales that whole stage, so nothing inside depends on the viewport and
 // nothing deforms. The page-turn arrows sit OUTSIDE the book art, beside it.
-export function BookOverlay() {
+// What the PACIENTES / PREPARADOS pages need to draw themselves. Without it
+// (the /dev/book preview) the book shows the empty state in Spanish.
+const EMPTY_CONTEXT: BookContext = {
+  language: "es",
+  patients: {},
+  inventory: { capacity: 0, slots: [] },
+  knownRecipeIds: new Set(),
+};
+
+export function BookOverlay({
+  context = EMPTY_CONTEXT,
+}: {
+  context?: BookContext;
+}) {
+  const copy = bookCopy[context.language];
+  const sections = buildBookSections(context);
   const scale = useFitScale(BOOK_WIDTH, STAGE_HEIGHT, VIEWPORT_FRACTION);
   const [isOpen, setIsOpen] = useState(false);
   const [sectionIndex, setSectionIndex] = useState(0);
   const [spreadIndex, setSpreadIndex] = useState(0);
 
-  const section = BOOK_SECTIONS[sectionIndex];
+  const section = sections[sectionIndex];
   const spread = section.spreads[spreadIndex];
   const hasPrevious = spreadIndex > 0;
   const hasNext = spreadIndex < section.spreads.length - 1;
@@ -78,7 +96,7 @@ export function BookOverlay() {
                 <button
                   type="button"
                   className={`${styles.arrow} ${styles.arrowPrevious}`}
-                  aria-label="Página anterior"
+                  aria-label={copy.previousLabel}
                   onClick={() => setSpreadIndex(spreadIndex - 1)}
                 >
                   <span className={styles.arrowFace}>
@@ -90,7 +108,7 @@ export function BookOverlay() {
                 <button
                   type="button"
                   className={`${styles.arrow} ${styles.arrowNext}`}
-                  aria-label="Página siguiente"
+                  aria-label={copy.nextLabel}
                   onClick={() => setSpreadIndex(spreadIndex + 1)}
                 >
                   <span className={styles.arrowFace}>
@@ -99,7 +117,7 @@ export function BookOverlay() {
                 </button>
               ) : null}
               <div className={styles.tabs} role="tablist">
-                {BOOK_SECTIONS.map((candidate, index) => (
+                {sections.map((candidate, index) => (
                   <button
                     key={candidate.id}
                     type="button"
@@ -126,14 +144,16 @@ export function BookOverlay() {
               type="button"
               className={styles.cover}
               onClick={() => setIsOpen(true)}
-              aria-label="Abrir el Compendio"
+              aria-label={copy.openLabel}
             >
               <span className={styles.coverFrame}>
-                <span className={styles.coverTitle}>COMPENDIO</span>
+                <span className={styles.coverTitle}>{copy.coverTitle}</span>
                 <span className={styles.coverRule} />
-                <span className={styles.coverSubtitle}>MÉDICO</span>
+                <span className={styles.coverSubtitle}>
+                  {copy.coverSubtitle}
+                </span>
               </span>
-              <span className={styles.coverHint}>Clic para abrir</span>
+              <span className={styles.coverHint}>{copy.coverHint}</span>
             </button>
           )}
         </div>

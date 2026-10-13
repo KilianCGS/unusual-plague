@@ -120,6 +120,7 @@ export type SceneId =
   | "mill-farmland"
   | "bakery-street"
   | "bakery-interior"
+  | "bakers-bedroom"
   | "smithy-street"
   | "smithy-interior"
   | "mountain-path"
@@ -148,6 +149,10 @@ type WorldSceneBase = {
 export type ExteriorWorldScene = WorldSceneBase & {
   kind: "exterior";
   visual: DevScene;
+  // A narrative microscene: drawn from its composition only. The Doctor is not
+  // the controllable protagonist there (he is a placed picture) and there is no
+  // spawn, movement, collision or exit.
+  narrative?: true;
 };
 export type InteriorWorldScene = WorldSceneBase & { kind: "interior" };
 export type WorldScene = ExteriorWorldScene | InteriorWorldScene;
@@ -517,7 +522,27 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
         bakeryInteriorSpawns,
         "bakery-interior-spawn-1",
       ),
+      // Back from the narrative bedroom: the same floor spot as the door, but
+      // standing still facing south. Only this arrival; the other spawns keep
+      // their own direction.
+      "from-bakers-bedroom": {
+        ...spawnAt(bakeryInteriorSpawns, "bakery-interior-spawn-1"),
+        direction: "south",
+      },
     },
+  },
+  // The Baker's Bedroom is a NARRATIVE microscene: the story takes the Doctor
+  // there and back (see GameWorld) and the player never moves in it, so it has
+  // no colliders, exits or doors, and no place of its own on the map.
+  "bakers-bedroom": {
+    id: "bakers-bedroom",
+    kind: "exterior",
+    narrative: true,
+    visual: visualOf("bakers-bedroom"),
+    colliders: [],
+    exits: [],
+    // No arrival: nobody spawns here (see `narrative`).
+    arrivals: {},
   },
   "smithy-street": {
     id: "smithy-street",

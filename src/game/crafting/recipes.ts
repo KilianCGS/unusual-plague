@@ -68,4 +68,22 @@ export const RECIPES: Recipe[] = [
     ],
     output: { itemId: "mushroom-soup", quantity: 1 },
   },
+  {
+    id: "fire.medicinal-infusion",
+    station: "fire",
+    inputs: [
+      { itemId: "water", quantity: 1 },
+      { itemId: "medicinal-herb", quantity: 1 },
+    ],
+    output: { itemId: "medicinal-infusion", quantity: 1 },
+  },
+  {
+    id: "manual.cold-cloth",
+    station: "manual",
+    inputs: [
+      { itemId: "water", quantity: 1 },
+      { itemId: "cloth", quantity: 1 },
+    ],
+    output: { itemId: "cold-cloth", quantity: 1 },
+  },
 ];

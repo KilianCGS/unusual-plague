@@ -139,9 +139,10 @@ test("spawns and the start position are free floor and not on an exit (no transi
   }
 });
 
-test("18. the recipes are untouched", () => {
+test("18. the original four recipes are untouched (two patient recipes were added after them)", () => {
+  assert.equal(RECIPES.length, 6);
   assert.deepEqual(
-    RECIPES.map((r) => [r.id, r.station, r.inputs.map((i) => i.itemId + "x" + i.quantity).join("+"), r.output.itemId]),
+    RECIPES.slice(0, 4).map((r) => [r.id, r.station, r.inputs.map((i) => i.itemId + "x" + i.quantity).join("+"), r.output.itemId]),
     [
       ["manual.disinfected-bandage", "manual", "clothx1+alcoholx1", "disinfected-bandage"],
       ["manual.medicinal-paste", "manual", "medicinal-herbx1+honeyx1", "medicinal-paste"],

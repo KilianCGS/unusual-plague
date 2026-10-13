@@ -14,8 +14,11 @@ import { getSceneWorld, REFERENCE_VIEWPORT } from "../../app/dev/scene/scenes";
 import type { CollectedInstanceIds } from "../collectibles/collectibles";
 import { getChapterInteractions, getComposition } from "../compositions";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
+import { AttentionMark } from "../ui/AttentionMark";
 import { DecorSprite } from "../decor/DecorSprite";
+import { DOCTOR_NARRATIVE_ASSET_ID } from "../decor/decorAssets";
 import { resolveDecorInstances } from "../decor/decorRuntime";
+import type { DecorAsset, DecorInstance } from "../decor/decorTypes";
 import { InteractionPrompt } from "../interactions/InteractionPrompt";
 import { getSceneInteractionZones } from "../interactions/sceneInteractions";
 import { useInteraction } from "../interactions/useInteraction";
@@ -49,9 +52,26 @@ export type SceneOverlayContext = {
   frameWidth: number;
   frameHeight: number;
   // Point just above a speaker's head: "doctor", a decor instanceId or a scene
-  // NPC id. Null when that speaker is not in this scene.
-  getSpeakerAnchor: (speakerId: string) => { x: number; y: number } | null;
+  // NPC id. Null when that speaker is not in this scene. `placement` says on
+  // which side of the point the bubble goes (below = the anchor is the bottom
+  // of a lying character's sprite).
+  getSpeakerAnchor: (
+    speakerId: string,
+  ) => { x: number; y: number; placement?: "above" | "below" } | null;
 };
+
+// The point just above a placed character's head: the top of the asset's body
+// collider (its sprite frame has unknown padding), scaled with the instance.
+// Speech bubbles and the "!" both hang from it, so they follow the instance.
+function getInstanceHeadTop(asset: DecorAsset, instance: DecorInstance) {
+  const bodyHeight =
+    asset.headHeight ??
+    (asset.defaultCollider
+      ? -asset.defaultCollider.offsetY
+      : asset.sprite.frameHeight * asset.anchor.y);
+
+  return instance.y - bodyHeight * instance.scale;
+}
 
 function getZoom(zoomMultiplier: number) {
   if (typeof window === "undefined") {
@@ -81,12 +101,14 @@ export function ExteriorScene({
   onPlayerMoved,
   onInteractionAvailable,
   collectedInstanceIds,
+  attentionInstanceIds,
 }: {
   scene: ExteriorWorldScene;
   // Selects which versioned composition (src/game/compositions) populates the
   // scene. Without it (dev pages) the scene has no decor instances.
   chapterId?: string;
-  spawn: SpawnPoint;
+  // Where the controllable Doctor starts. Absent in narrative scenes.
+  spawn?: SpawnPoint;
   input: DirectionInputHandle;
   isPlaying: boolean;
   onExit: (exitName: string) => void;
@@ -105,6 +127,8 @@ export function ExteriorScene({
   // Collectibles already picked up this session; they are not drawn, do not
   // block and give no prompt.
   collectedInstanceIds?: CollectedInstanceIds;
+  // Placed characters that show the "!" (they have news for the Doctor).
+  attentionInstanceIds?: ReadonlySet<string>;
 }) {
   const zoomMultiplier = scene.visual.zoomMultiplier ?? 1;
   const world = getSceneWorld(scene.visual);
@@ -129,13 +153,21 @@ export function ExteriorScene({
     () => [...scene.colliders, ...npcColliders, ...decor.colliders],
     [scene.colliders, npcColliders, decor.colliders],
   );
+  // A narrative scene has no spawn: the controller (disabled, invisible) only
+  // needs a neutral seed inside the world.
+  const narrative = scene.narrative === true;
+  const start = spawn ?? {
+    x: world.width / 2,
+    y: world.height / 2,
+    direction: "south" as const,
+  };
   const { player, playerFeetHitbox, currentSpriteSrc, spriteSize } =
     useProtagonistController({
       sceneWidth: world.width,
       sceneHeight: world.height,
-      initialX: spawn.x,
-      initialY: spawn.y,
-      initialDirection: spawn.direction,
+      initialX: start.x,
+      initialY: start.y,
+      initialDirection: start.direction,
       spriteSize: SPRITE_SIZE,
       sceneColliders: blockingColliders,
       input,
@@ -208,8 +240,22 @@ export function ExteriorScene({
     );
     let feetX: number;
     let headTopY: number;
+    let placement: "above" | "below" = "above";
 
-    if (speakerId === "doctor") {
+    // In a narrative scene the Doctor is the picture placed in its composition.
+    const narrativeDoctor = narrative
+      ? decor.sprites.find(
+          ({ asset }) => asset.id === DOCTOR_NARRATIVE_ASSET_ID,
+        )
+      : undefined;
+
+    if (speakerId === "doctor" && narrativeDoctor) {
+      feetX = narrativeDoctor.instance.x;
+      headTopY = getInstanceHeadTop(
+        narrativeDoctor.asset,
+        narrativeDoctor.instance,
+      );
+    } else if (speakerId === "doctor") {
       feetX = player.x;
       headTopY =
         player.y -
@@ -220,12 +266,17 @@ export function ExteriorScene({
       // rescaled instance carries its bubble with it. The head is the top of
       // the asset's body collider (its sprite frame has unknown padding).
       const { asset, instance } = decorSpeaker;
-      const bodyHeight = asset.defaultCollider
-        ? -asset.defaultCollider.offsetY
-        : asset.sprite.frameHeight * asset.anchor.y;
 
       feetX = instance.x;
-      headTopY = instance.y - bodyHeight * instance.scale;
+
+      if (asset.dialoguePlacement === "below") {
+        // Lying characters: the anchor is the bottom of the sprite, which is
+        // the instance anchor itself (the silhouette's lowest point).
+        placement = "below";
+        headTopY = instance.y;
+      } else {
+        headTopY = getInstanceHeadTop(asset, instance);
+      }
     } else {
       const npc = npcs.find((candidate) => candidate.id === speakerId);
 
@@ -242,6 +293,7 @@ export function ExteriorScene({
     return {
       x: Math.round(feetX * zoom - camera.offsetX),
       y: Math.round(headTopY * zoom - camera.offsetY),
+      placement,
     };
   };
 
@@ -270,19 +322,31 @@ export function ExteriorScene({
               instance={instance}
             />
           ))}
+          {decor.sprites.map(({ asset, instance }) =>
+            attentionInstanceIds?.has(instance.instanceId) ? (
+              <AttentionMark
+                key={`${instance.instanceId}-attention`}
+                x={instance.x}
+                y={getInstanceHeadTop(asset, instance) - 4}
+                zIndex={Math.round(instance.y) + instance.zOffset + 1000}
+              />
+            ) : null,
+          )}
           {npcs.map((npc) => (
             <SceneNpcSprite key={npc.id} npc={npc} />
           ))}
-          <ProtagonistSprite
-            x={player.x}
-            y={player.y}
-            spriteSrc={currentSpriteSrc}
-            spriteSize={spriteSize}
-            direction={player.direction}
-            isWalking={player.isWalking}
-            scale={scene.visual.protagonistScale}
-            zIndex={Math.round(player.y)}
-          />
+          {narrative ? null : (
+            <ProtagonistSprite
+              x={player.x}
+              y={player.y}
+              spriteSrc={currentSpriteSrc}
+              spriteSize={spriteSize}
+              direction={player.direction}
+              isWalking={player.isWalking}
+              scale={scene.visual.protagonistScale}
+              zIndex={Math.round(player.y)}
+            />
+          )}
           {SHOW_COLLISION_DEBUG ? (
             <div
               style={{

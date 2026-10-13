@@ -17,6 +17,8 @@ const DEV_HERB_SVG = [
   "</svg>",
 ].join("");
 
+export const DOCTOR_NARRATIVE_ASSET_ID = "doctor-narrative";
+
 export const DECOR_ASSETS: DecorAsset[] = [
   {
     // The approved pilot villager, static.
@@ -47,9 +49,7 @@ export const DECOR_ASSETS: DecorAsset[] = [
     sprite: {
       // 4-frame near-static breathing loop (arms stay down the whole time);
       // slower fps than the other idles reads as calmer, not gesturing.
-      frames: [0, 1, 2, 3].map(
-        (i) => `/game/npcs/farmer-old/idle/${i}.png`,
-      ),
+      frames: [0, 1, 2, 3].map((i) => `/game/npcs/farmer-old/idle/${i}.png`),
       frameWidth: 96,
       frameHeight: 96,
       fps: 4,
@@ -603,6 +603,8 @@ export const DECOR_ASSETS: DecorAsset[] = [
     // Union silhouette x12-118 y14-72 of the 128x80 frame.
     anchor: { x: 0.512, y: 0.912 },
     defaultScale: 1,
+    // Lying down: his lines hang under the bed instead of over his head.
+    dialoguePlacement: "below",
   },
   {
     id: "tavern-patient-sick",
@@ -626,9 +628,7 @@ export const DECOR_ASSETS: DecorAsset[] = [
     label: "Miner - Injured (sitting)",
     category: "people",
     sprite: {
-      frames: [0, 1, 2, 3].map(
-        (i) => `/game/npcs/injured-miner/idle/${i}.png`,
-      ),
+      frames: [0, 1, 2, 3].map((i) => `/game/npcs/injured-miner/idle/${i}.png`),
       frameWidth: 96,
       frameHeight: 96,
       fps: 2,
@@ -636,6 +636,54 @@ export const DECOR_ASSETS: DecorAsset[] = [
     },
     // Union silhouette x3-90 y12-83 of the 96x96 frame.
     anchor: { x: 0.49, y: 0.875 },
+    defaultScale: 1,
+  },
+  {
+    // The baker as a full-body standing figure, for narrative scenes (the Baker's
+    // Bedroom). The one in the bakery (id "baker") is the half-body kneading
+    // her dough; both are the same character. The PNG is the hand-adjusted
+    // 114x257 drawing, used exactly as delivered (source copy in
+    // art/population-batch-8). Its RESOLUTION is not its SIZE IN THE WORLD:
+    // frameWidth/frameHeight below are the size it is drawn at, 0.3 world
+    // units per image pixel, so the figure (242 px tall) stands ~72 units
+    // high, just under the Doctor. Change an instance's scale to resize it;
+    // the pixels are never touched.
+    id: "baker-standing",
+    label: "Baker (standing, full body)",
+    category: "people",
+    sprite: {
+      frames: ["/game/npcs/baker-standing/static.png"],
+      frameWidth: 34.2,
+      frameHeight: 77.1,
+      fps: 0,
+      loop: false,
+    },
+    // Feet at the bottom of the figure (image y 251 of 257) and its horizontal
+    // centre (x 61 of 114).
+    anchor: { x: 0.54, y: 0.98 },
+    // Figure top at image y 10: (252 - 10) * 0.3.
+    headHeight: 72.6,
+    defaultScale: 1,
+  },
+  {
+    // The Doctor for NARRATIVE scenes only (e.g. the Baker's Bedroom): a static
+    // picture placed like any other instance. It is exactly the frame the game
+    // draws when the protagonist stands still facing south (ProtagonistSprite
+    // with idle/south.png, 96x96, feet at the bottom centre). In gameplay the
+    // Doctor is still the controllable protagonist, never this asset.
+    id: DOCTOR_NARRATIVE_ASSET_ID,
+    label: "Doctor - narrative position (idle, south)",
+    category: "narrative",
+    sprite: {
+      frames: ["/game/characters/protagonist/idle/south.png"],
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 0,
+      loop: false,
+    },
+    anchor: { x: 0.5, y: 1 },
+    // Same head point the Doctor's own speech bubble uses (14 transparent rows).
+    headHeight: 82,
     defaultScale: 1,
   },
   // FIRST WORLD COLLECTIBLE (DEV placeholder art). Placing it makes a Medicinal
@@ -662,6 +710,7 @@ export const DECOR_CATEGORY_ORDER: DecorCategory[] = [
   "animals",
   "ambient",
   "resources",
+  "narrative",
   "test",
 ];
 

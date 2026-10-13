@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ApothecaryScene } from "../apothecary/ApothecaryScene";
 import { BookOverlay } from "../book/BookOverlay";
@@ -14,6 +14,12 @@ import { CraftingOverlay } from "../crafting/CraftingOverlay";
 import { CRAFT_STATION_BY_INTERACTION_ID } from "../crafting/crafting";
 import type { CraftStation } from "../crafting/recipes";
 import { DialogueBubble } from "../dialogue/DialogueBubble";
+import {
+  buildMissingIngredientConversation,
+  getExaminationConversation,
+  resolveStoryInteraction,
+  type StoryEffect,
+} from "../dialogue/storyInteractions";
 import { DOCTOR_SPEAKER } from "../dialogue/dialogueTypes";
 import {
   resolveChapterIntro,
@@ -26,13 +32,25 @@ import type { Language } from "../i18n/types";
 import {
   addItem,
   canAddItem,
-  createEmptyInventory,
   type InventoryState,
 } from "../inventory/inventory";
+import { createChapter1Inventory } from "../inventory/initialInventory";
 import { InventoryOverlay } from "../inventory/InventoryOverlay";
 import { useInventoryHotkeys } from "../inventory/useInventoryHotkeys";
 import { getItemName } from "../items/items";
 import { MapOverlay } from "../map/MapOverlay";
+import {
+  BAKER_HUSBAND_ID,
+  CHAPTER1_INITIAL_PATIENTS,
+  getAttentionInstanceIds,
+  CHAPTER1_PATIENTS,
+} from "../patients/chapter1Patients";
+import {
+  advancePatient,
+  treatPatient,
+  type PatientCasesState,
+} from "../patients/patientCases";
+import { getPatientMissingIngredients } from "../patients/patientNeeds";
 import { SCENE_TO_MAP_LOCATION } from "../map/mapLocations";
 import { useMapHold } from "../map/useMapHold";
 import { useDirectionInput } from "../protagonist/useDirectionInput";
@@ -89,12 +107,30 @@ export function GameWorld({ language }: { language: Language }) {
     null,
   );
   const mapHeld = useMapHold();
+  // STORY STATE (session only). The status of each patient case is the only
+  // thing stored about a case; "can he be treated", the ticks in the Book and
+  // the "!" over the baker are derived from it and the inventory. The recipes
+  // the Doctor has been shown (PREPARADOS) are stored as ids. Refs mirror both
+  // so effects and event handlers never read a stale value.
+  const [patients, setPatients] = useState<PatientCasesState>(
+    CHAPTER1_INITIAL_PATIENTS,
+  );
+  const patientsRef = useRef(patients);
+  const [knownRecipeIds, setKnownRecipeIds] = useState<ReadonlySet<string>>(
+    new Set(),
+  );
+  // What happens when the conversation on screen ends (a scripted flow).
+  const afterDialogueRef = useRef<
+    "go-to-examination" | "examination-finished" | "leave-bedroom" | null
+  >(null);
+  const examinationStartedRef = useRef(false);
   // What the Doctor carries and which world collectibles he has picked up.
   // Both live here, above the scenes, so they survive scene changes; they last
   // for the session (no saving yet). The ref mirrors the inventory so two
   // pickups in the same frame cannot both read a stale one.
-  const [inventory, setInventory] =
-    useState<InventoryState>(createEmptyInventory);
+  const [inventory, setInventory] = useState<InventoryState>(
+    createChapter1Inventory,
+  );
   const inventoryRef = useRef(inventory);
   const [collected, setCollected] =
     useState<CollectedInstanceIds>(NO_COLLECTED);
@@ -106,8 +142,14 @@ export function GameWorld({ language }: { language: Language }) {
   const tutorial = useTutorial();
   const notifyTutorial = tutorial.notify;
   const [interactionAvailable, setInteractionAvailable] = useState(false);
+  // The Baker's Bedroom is a narrative scene: nothing opens and the Doctor does
+  // not walk while the story is there.
+  const inNarrativeScene = world.sceneId === "bakers-bedroom";
   const canOpenInterface =
-    phase === "playing" && !dialogue.active && craftingStation === null;
+    phase === "playing" &&
+    !dialogue.active &&
+    craftingStation === null &&
+    !inNarrativeScene;
   const mapVisible = mapHeld && canOpenInterface && !bookOpen && !inventoryOpen;
   const pendingRef = useRef<{ sceneId: SceneId; spawnName: string } | null>(
     null,
@@ -122,7 +164,8 @@ export function GameWorld({ language }: { language: Language }) {
     !bookOpen &&
     !mapVisible &&
     !inventoryOpen &&
-    craftingStation === null;
+    craftingStation === null &&
+    !inNarrativeScene;
 
   useBookHotkeys({
     open: bookOpen,
@@ -152,27 +195,88 @@ export function GameWorld({ language }: { language: Language }) {
 
   // A transition only starts while the game is playable; while a fade or a
   // scene change is running nothing else can trigger.
-  const handleExit = useCallback(
-    (exitName: string) => {
+  const startTransition = useCallback(
+    (sceneId: SceneId, spawnName: string) => {
       if (phaseRef.current !== "playing") {
         return;
       }
 
+      pendingRef.current = { sceneId, spawnName };
+      changePhase("fading-out");
+    },
+    [changePhase],
+  );
+
+  const handleExit = useCallback(
+    (exitName: string) => {
       const exit = WORLD_SCENES[world.sceneId].exits.find(
         (candidate) => candidate.name === exitName,
       );
 
-      if (!exit) {
-        return;
+      if (exit) {
+        startTransition(exit.targetScene, exit.targetSpawn);
+      }
+    },
+    [world.sceneId, startTransition],
+  );
+
+  const showNotice = useCallback(
+    (text: string) =>
+      setNotice((current) => ({ id: (current?.id ?? 0) + 1, text })),
+    [],
+  );
+
+  // Applies what a story interaction decided, all or nothing: every effect is
+  // checked first and nothing changes if one cannot be done. Returns whether
+  // it was applied.
+  const applyStoryEffects = useCallback(
+    (effects: readonly StoryEffect[]): boolean => {
+      let nextInventory = inventoryRef.current;
+      let nextPatients = patientsRef.current;
+      const obtained: string[] = [];
+
+      for (const effect of effects) {
+        if (effect.type === "give-item") {
+          const added = addItem(nextInventory, effect.itemId, effect.quantity);
+
+          if (!added) {
+            return false;
+          }
+
+          nextInventory = added;
+          obtained.push(effect.itemId);
+        } else {
+          const definition = CHAPTER1_PATIENTS[effect.patientId];
+          const treated = treatPatient(nextPatients, definition, nextInventory);
+
+          if (!treated) {
+            return false;
+          }
+
+          nextPatients = treated.state;
+          nextInventory = treated.inventory;
+        }
       }
 
-      pendingRef.current = {
-        sceneId: exit.targetScene,
-        spawnName: exit.targetSpawn,
-      };
-      changePhase("fading-out");
+      if (nextInventory !== inventoryRef.current) {
+        inventoryRef.current = nextInventory;
+        setInventory(nextInventory);
+      }
+
+      if (nextPatients !== patientsRef.current) {
+        patientsRef.current = nextPatients;
+        setPatients(nextPatients);
+      }
+
+      for (const itemId of obtained) {
+        showNotice(
+          itemFeedbackCopy[language].obtained + getItemName(itemId, language),
+        );
+      }
+
+      return true;
     },
-    [world.sceneId, changePhase],
+    [language, showNotice],
   );
 
   // The scene only reports WHICH interaction was activated (and the decor
@@ -218,6 +322,22 @@ export function GameWorld({ language }: { language: Language }) {
         return;
       }
 
+      // Interactions whose result depends on the story and on what the Doctor
+      // carries (the baker, the merchant's cloth, the river).
+      const outcome = resolveStoryInteraction(
+        interactionId,
+        { patients: patientsRef.current, inventory: inventoryRef.current },
+        language,
+        source.instanceId ?? "",
+      );
+
+      if (outcome && applyStoryEffects(outcome.effects)) {
+        afterDialogueRef.current =
+          outcome.after === "go-to-examination" ? "go-to-examination" : null;
+        startDialogue(outcome.conversation);
+        return;
+      }
+
       const conversation = resolveInteractionConversation(
         interactionId,
         language,
@@ -228,7 +348,7 @@ export function GameWorld({ language }: { language: Language }) {
         startDialogue(conversation);
       }
     },
-    [language, startDialogue, notifyTutorial],
+    [language, startDialogue, notifyTutorial, applyStoryEffects],
   );
 
   // The notice only needs to disappear after a while.
@@ -289,6 +409,74 @@ export function GameWorld({ language }: { language: Language }) {
     [notifyTutorial],
   );
 
+  // The patient flow of the baker's husband, driven by the end of each
+  // conversation: the baker's invitation > fade to the bedroom > examination >
+  // (Doctor's thoughts about what he still lacks) > fade back to the bakery.
+  const finishExamination = useCallback(() => {
+    const definition = CHAPTER1_PATIENTS[BAKER_HUSBAND_ID];
+    const examined = advancePatient(
+      patientsRef.current,
+      BAKER_HUSBAND_ID,
+      "examined",
+    );
+
+    patientsRef.current = examined;
+    setPatients(examined);
+    setKnownRecipeIds(
+      (current) => new Set([...current, ...definition.revealsRecipeIds]),
+    );
+
+    const thoughts = buildMissingIngredientConversation(
+      getPatientMissingIngredients(definition, inventoryRef.current),
+      language,
+    );
+
+    if (thoughts) {
+      afterDialogueRef.current = "leave-bedroom";
+      startDialogue(thoughts);
+    } else {
+      startTransition("bakery-interior", "from-bakers-bedroom");
+    }
+  }, [language, startDialogue, startTransition]);
+
+  useEffect(() => {
+    if (dialogue.active) {
+      return;
+    }
+
+    const action = afterDialogueRef.current;
+
+    afterDialogueRef.current = null;
+
+    if (action === "go-to-examination") {
+      startTransition("bakers-bedroom", "narrative");
+    } else if (action === "examination-finished") {
+      finishExamination();
+    } else if (action === "leave-bedroom") {
+      startTransition("bakery-interior", "from-bakers-bedroom");
+    }
+  }, [dialogue.active, startTransition, finishExamination]);
+
+  // Once the fade into the bedroom is over, the examination starts (once).
+  useEffect(() => {
+    if (!inNarrativeScene) {
+      examinationStartedRef.current = false;
+      return;
+    }
+
+    if (phase !== "playing" || examinationStartedRef.current) {
+      return;
+    }
+
+    const examination = getExaminationConversation(BAKER_HUSBAND_ID, language);
+
+    if (examination) {
+      examinationStartedRef.current = true;
+      afterDialogueRef.current = "examination-finished";
+      startDialogue(examination);
+    }
+  }, [inNarrativeScene, phase, language, startDialogue]);
+
   useEffect(() => {
     if (phase === "fading-out") {
       const timeoutId = window.setTimeout(() => {
@@ -332,12 +520,17 @@ export function GameWorld({ language }: { language: Language }) {
       return null;
     }
 
-    const anchor = context.getSpeakerAnchor(dialogue.line.speaker);
+    // A speaker that is not in the scene (e.g. the husband before he is placed)
+    // speaks from the Doctor's anchor instead of silently vanishing.
+    const anchor =
+      context.getSpeakerAnchor(dialogue.line.speaker) ??
+      context.getSpeakerAnchor(DOCTOR_SPEAKER);
 
     return anchor ? (
       <DialogueBubble
         anchorX={anchor.x}
         anchorY={anchor.y}
+        placement={anchor.placement}
         frameWidth={context.frameWidth}
         frameHeight={context.frameHeight}
         visibleText={dialogue.visibleText}
@@ -347,6 +540,13 @@ export function GameWorld({ language }: { language: Language }) {
       />
     ) : null;
   };
+
+  // The characters with news for the Doctor: derived from the cases (a case
+  // that is only discovered still waits for its visit).
+  const attentionInstanceIds = useMemo(
+    () => getAttentionInstanceIds(patients),
+    [patients],
+  );
 
   // The hint of the current step. The interaction hint only shows while the
   // [E] prompt does; none shows over an open interface or a conversation.
@@ -365,7 +565,8 @@ export function GameWorld({ language }: { language: Language }) {
     !bookOpen &&
     !mapVisible &&
     !inventoryOpen &&
-    craftingStation === null;
+    craftingStation === null &&
+    !inNarrativeScene;
 
   return (
     <>
@@ -393,12 +594,17 @@ export function GameWorld({ language }: { language: Language }) {
           onExit={handleExit}
           onInteract={handleInteract}
           collectedInstanceIds={collected}
+          attentionInstanceIds={attentionInstanceIds}
           renderOverlay={renderDialogue}
           onPlayerMoved={handlePlayerMoved}
           onInteractionAvailable={setInteractionAvailable}
         />
       )}
-      {bookOpen ? <BookOverlay /> : null}
+      {bookOpen ? (
+        <BookOverlay
+          context={{ language, patients, inventory, knownRecipeIds }}
+        />
+      ) : null}
       {mapVisible ? (
         <MapOverlay currentLocationId={SCENE_TO_MAP_LOCATION[world.sceneId]} />
       ) : null}

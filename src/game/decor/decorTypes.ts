@@ -15,6 +15,7 @@ export type DecorCategory =
   | "animals"
   | "ambient"
   | "resources"
+  | "narrative"
   | "test";
 
 export type DecorAsset = {
@@ -37,6 +38,14 @@ export type DecorAsset = {
   defaultScale?: number;
   // Blocking area relative to the anchor, in unscaled logical units.
   defaultCollider?: AnchorHitbox;
+  // Height from the anchor up to the top of the head, in unscaled units. Speech
+  // bubbles and the "!" hang from it. Without it the body collider (or the
+  // sprite frame) is used.
+  headHeight?: number;
+  // Where this asset's speech bubble sits relative to its sprite: "above" (the
+  // default, over the head) or "below" (under the sprite's bottom edge, for
+  // characters lying down). Always computed from the instance, never absolute.
+  dialoguePlacement?: "above" | "below";
   // Set on assets that are WORLD COLLECTIBLES: every instance of this asset can
   // be picked up with E and gives this item (an id of src/game/items).
   collectibleItemId?: string;

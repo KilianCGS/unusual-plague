@@ -45,12 +45,19 @@ const { chapter1Interactions } = at(
 const { getComposition, getChapterInteractions } = at(
   "src/game/compositions/index.ts",
 );
-const { chapter1AmbientDialogues } = at("src/game/dialogue/chapter1Dialogues.ts");
+const { chapter1AmbientDialogues } = at(
+  "src/game/dialogue/chapter1Dialogues.ts",
+);
 const { resolveInteractionConversation, resolveChapterIntro } = at(
   "src/game/dialogue/interactionDialogues.ts",
 );
 const { getSceneNpcs } = at("src/game/npcs/sceneNpcs.ts");
-const { getSceneInteractionZones } = at("src/game/interactions/sceneInteractions.ts");
+const { PATIENT_INTERACTION_IDS } = at(
+  "src/game/dialogue/storyInteractions.ts",
+);
+const { getSceneInteractionZones } = at(
+  "src/game/interactions/sceneInteractions.ts",
+);
 const smithyInterior = at("src/game/smithy-interior/smithyInteriorGeometry.ts");
 const { withInteractions, resolveDecorInstances } = at(
   "src/game/decor/decorRuntime.ts",
@@ -60,7 +67,10 @@ const tavernStreet = at("src/game/tavern-street/tavernStreetGeometry.ts");
 
 const feet = ({ x, y }) => ({ x: x - 6, y: y - 19, width: 12, height: 12 });
 const hit = (a, b) =>
-  a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+  a.x < b.x + b.width &&
+  a.x + a.width > b.x &&
+  a.y < b.y + b.height &&
+  a.y + a.height > b.y;
 
 const instances = chapter1Compositions.flatMap((c) => c.instances);
 const byId = new Map(instances.map((i) => [i.instanceId, i]));
@@ -78,13 +88,11 @@ const NOT_INTERACTABLE = [
   "farm-chicken-02",
   "plaza-merchant-cart-01",
   "plaza-merchant-table-01",
-  // The baker is pending (narrative logic about her sick husband).
-  "bakery-interior-baker-01",
 ];
 
-test("26 interactable instances, all of them real chapter-1 instances", () => {
+test("27 interactable instances, all of them real chapter-1 instances", () => {
   const ids = Object.keys(chapter1Interactions);
-  assert.equal(ids.length, 26);
+  assert.equal(ids.length, 27);
   for (const id of ids) assert.ok(byId.has(id), `${id} is not in chapter-1.ts`);
 });
 
@@ -98,19 +106,32 @@ test("cow, chickens, merchant cart/table and the baker have no interaction", () 
 test("interactionIds are stable names, unique per instance, never coordinates", () => {
   const ids = Object.values(chapter1Interactions).map((i) => i.interactionId);
   assert.equal(new Set(ids).size, ids.length);
-  for (const id of ids) assert.match(id, /^chapter1\.[A-Za-z]+\.[A-Za-z]+(\.\d+)?$/);
+  for (const id of ids)
+    assert.match(id, /^chapter1\.[A-Za-z]+\.[A-Za-z]+(\.\d+)?$/);
 });
 
 test("zones are sane rectangles relative to the anchor", () => {
   for (const [id, { zone }] of Object.entries(chapter1Interactions)) {
     assert.ok(zone.width > 0 && zone.height > 0, id);
-    assert.ok(zone.offsetX < 0 && zone.offsetX + zone.width > 0, `${id}: spans the anchor in x`);
-    assert.ok(zone.offsetY < 0 && zone.offsetY + zone.height > 0, `${id}: spans the anchor in y`);
+    assert.ok(
+      zone.offsetX < 0 && zone.offsetX + zone.width > 0,
+      `${id}: spans the anchor in x`,
+    );
+    assert.ok(
+      zone.offsetY < 0 && zone.offsetY + zone.height > 0,
+      `${id}: spans the anchor in y`,
+    );
   }
 });
 
 test("every interaction has a conversation with ES and EN text on every line", () => {
-  for (const { interactionId } of Object.values(chapter1Interactions)) {
+  // The baker's conversations depend on her patient case (storyInteractions).
+  const storyIds = Object.keys(PATIENT_INTERACTION_IDS);
+  const ambient = Object.values(chapter1Interactions).filter(
+    ({ interactionId }) => !storyIds.includes(interactionId),
+  );
+
+  for (const { interactionId } of ambient) {
     const conversation = chapter1AmbientDialogues[interactionId];
     assert.ok(conversation, `no conversation for ${interactionId}`);
     assert.ok(conversation.lines.length >= 1);
@@ -121,23 +142,44 @@ test("every interaction has a conversation with ES and EN text on every line", (
   }
   assert.equal(
     Object.keys(chapter1AmbientDialogues).length,
-    Object.keys(chapter1Interactions).length,
+    ambient.length,
     "no orphan conversations",
   );
 });
 
 test("language switches the text; 'subject' binds to the instance, not to a position", () => {
-  const es = resolveInteractionConversation("chapter1.plaza.merchant", "es", "plaza-merchant-01");
-  const en = resolveInteractionConversation("chapter1.plaza.merchant", "en", "plaza-merchant-01");
-  assert.equal(es.lines[0].text, "Amuletos contra la mala suerte. Garantía de tres días.");
-  assert.equal(en.lines[0].text, "Charms against bad luck. Three-day guarantee.");
-  assert.deepEqual(es.lines.map((l) => l.speaker), ["plaza-merchant-01", "doctor", "plaza-merchant-01"]);
+  const es = resolveInteractionConversation(
+    "chapter1.plaza.merchant",
+    "es",
+    "plaza-merchant-01",
+  );
+  const en = resolveInteractionConversation(
+    "chapter1.plaza.merchant",
+    "en",
+    "plaza-merchant-01",
+  );
+  assert.equal(
+    es.lines[0].text,
+    "Amuletos contra la mala suerte. Garantía de tres días.",
+  );
+  assert.equal(
+    en.lines[0].text,
+    "Charms against bad luck. Three-day guarantee.",
+  );
+  assert.deepEqual(
+    es.lines.map((l) => l.speaker),
+    ["plaza-merchant-01", "doctor", "plaza-merchant-01"],
+  );
   assert.equal(resolveInteractionConversation("nobody.home", "es", "x"), null);
 });
 
 test("sheep share content but keep their own interactionId and speaker", () => {
   for (const n of ["01", "02", "03"]) {
-    const c = resolveInteractionConversation(`chapter1.farm.sheep.${n}`, "en", `farm-sheep-${n}`);
+    const c = resolveInteractionConversation(
+      `chapter1.farm.sheep.${n}`,
+      "en",
+      `farm-sheep-${n}`,
+    );
     assert.deepEqual(c.lines, [{ speaker: `farm-sheep-${n}`, text: "Baaah." }]);
   }
 });
@@ -153,13 +195,22 @@ test("zones follow the instance: moving an NPC moves its zone, same interactionI
 });
 
 test("an interaction authored in the Decorator wins over the table", () => {
-  const own = { interactionId: "custom.id", zone: { offsetX: -1, offsetY: -1, width: 2, height: 2 } };
-  const [merged] = withInteractions([{ ...byId.get("farm-dog-01"), interaction: own }], chapter1Interactions);
+  const own = {
+    interactionId: "custom.id",
+    zone: { offsetX: -1, offsetY: -1, width: 2, height: 2 },
+  };
+  const [merged] = withInteractions(
+    [{ ...byId.get("farm-dog-01"), interaction: own }],
+    chapter1Interactions,
+  );
   assert.equal(merged.interaction.interactionId, "custom.id");
 });
 
 test("COPY CHAPTER output cannot erase interactions: the table is a separate file", () => {
-  assert.ok(instances.every((i) => i.interaction === undefined), "chapter-1.ts carries no interaction data");
+  assert.ok(
+    instances.every((i) => i.interaction === undefined),
+    "chapter-1.ts carries no interaction data",
+  );
   assert.equal(getChapterInteractions("chapter-1"), chapter1Interactions);
   assert.ok(getComposition("plaza", "chapter-1"));
   assert.equal(getComposition("plaza", "chapter-2"), undefined);
@@ -168,29 +219,80 @@ test("COPY CHAPTER output cannot erase interactions: the table is a separate fil
 test("blacksmith: the Doctor can interact from south of the anvil", () => {
   const smith = byId.get("smithy-interior-blacksmith-01");
   const { zone } = chapter1Interactions[smith.instanceId];
-  const anvil = smithyInterior.smithyInteriorColliders.find((c) => c.id === "smithy-interior-8");
+  const anvil = smithyInterior.smithyInteriorColliders.find(
+    (c) => c.id === "smithy-interior-8",
+  );
   const feetY = anvil.y + anvil.height + 19; // closest the feet can get, below the anvil
   const hitbox = { x: smith.x - 6, y: feetY - 19, width: 12, height: 12 };
-  const rect = { x: smith.x + zone.offsetX, y: smith.y + zone.offsetY, width: zone.width, height: zone.height };
+  const rect = {
+    x: smith.x + zone.offsetX,
+    y: smith.y + zone.offsetY,
+    width: zone.width,
+    height: zone.height,
+  };
   assert.ok(hit(hitbox, rect));
 });
 
 test("washerwoman and injured miner conversations", () => {
-  const w = resolveInteractionConversation("chapter1.outskirts.washingWoman", "es", "w");
-  assert.deepEqual(w.lines.map((l) => l.speaker), ["w", "doctor", "w"]);
-  assert.equal(w.lines[0].text, "Doctor, con esa ropa negra debe de ser imposible saber cuándo está sucia.");
-  const m = resolveInteractionConversation("chapter1.mine.injuredMiner", "en", "m");
-  assert.deepEqual(m.lines.map((l) => l.speaker), ["m", "doctor", "doctor"]);
-  assert.equal(m.lines[2].text, "Hold on. I'll be back soon with something to treat it.");
+  const w = resolveInteractionConversation(
+    "chapter1.outskirts.washingWoman",
+    "es",
+    "w",
+  );
+  assert.deepEqual(
+    w.lines.map((l) => l.speaker),
+    ["w", "doctor", "w"],
+  );
+  assert.equal(
+    w.lines[0].text,
+    "Doctor, con esa ropa negra debe de ser imposible saber cuándo está sucia.",
+  );
+  const m = resolveInteractionConversation(
+    "chapter1.mine.injuredMiner",
+    "en",
+    "m",
+  );
+  assert.deepEqual(
+    m.lines.map((l) => l.speaker),
+    ["m", "doctor", "doctor"],
+  );
+  assert.equal(
+    m.lines[2].text,
+    "Hold on. I'll be back soon with something to treat it.",
+  );
 });
 
 test("chapter 1 opening monologue: seven Doctor lines, ES and EN", () => {
   for (const lang of ["es", "en"]) {
     const intro = resolveChapterIntro("chapter-1", lang);
     assert.equal(intro.lines.length, 7);
-    assert.ok(intro.lines.every((l) => l.speaker === "doctor" && l.text.trim()));
+    assert.ok(
+      intro.lines.every((l) => l.speaker === "doctor" && l.text.trim()),
+    );
   }
-  assert.equal(resolveChapterIntro("chapter-1", "en").lines[0].text, "Another morning.");
+  assert.equal(
+    resolveChapterIntro("chapter-1", "en").lines[0].text,
+    "Another day.",
+  );
+  assert.equal(
+    resolveChapterIntro("chapter-1", "es").lines[0].text,
+    "Otro día.",
+  );
+  // the Doctor only knows about the baker's visit: no three patients, tavern or miner
+  for (const lang of ["es", "en"]) {
+    const text = resolveChapterIntro("chapter-1", lang)
+      .lines.map((l) => l.text)
+      .join(" ")
+      .toLowerCase();
+    assert.ok(!/tres|three|taberna|tavern|minero|miner/.test(text), lang);
+    assert.ok(/panadera|baker/.test(text), lang);
+    assert.ok(/frasco|flask/.test(text), lang); // the flask line closes the monologue
+  }
+  assert.ok(
+    resolveChapterIntro("chapter-1", "es")
+      .lines.at(-1)
+      .text.includes("frasco vacío"),
+  );
   assert.equal(resolveChapterIntro("chapter-9", "es"), null);
 });
 
@@ -203,20 +305,28 @@ test("the old pilot villager and its Plaza interaction zones are gone", () => {
 
 test("tavern interior spawn is free: no collider, not on the exit (no loop)", () => {
   const spawn = tavernInterior.tavernInteriorSpawns[0];
-  for (const c of tavernInterior.tavernInteriorColliders) assert.ok(!hit(feet(spawn), c), c.id);
-  for (const t of tavernInterior.tavernInteriorTransitions) assert.ok(!hit(feet(spawn), t), t.id);
+  for (const c of tavernInterior.tavernInteriorColliders)
+    assert.ok(!hit(feet(spawn), c), c.id);
+  for (const t of tavernInterior.tavernInteriorTransitions)
+    assert.ok(!hit(feet(spawn), t), t.id);
 });
 
 test("tavern street spawn-3 is free and outside its own door zone (no loop)", () => {
-  const spawn = tavernStreet.tavernStreetSpawns.find((s) => s.id === "tavern-street-spawn-3");
-  for (const c of tavernStreet.tavernStreetColliders) assert.ok(!hit(feet(spawn), c), c.id);
-  const door = tavernStreet.tavernStreetTransitions.find((t) => t.id === "tavern-street-transition-3");
+  const spawn = tavernStreet.tavernStreetSpawns.find(
+    (s) => s.id === "tavern-street-spawn-3",
+  );
+  for (const c of tavernStreet.tavernStreetColliders)
+    assert.ok(!hit(feet(spawn), c), c.id);
+  const door = tavernStreet.tavernStreetTransitions.find(
+    (t) => t.id === "tavern-street-transition-3",
+  );
   assert.ok(!hit(feet(spawn), door));
 });
 
 test("the doorway is open: the exit zone touches no collider", () => {
   const [exit] = tavernInterior.tavernInteriorTransitions;
-  for (const c of tavernInterior.tavernInteriorColliders) assert.ok(!hit(exit, c), c.id);
+  for (const c of tavernInterior.tavernInteriorColliders)
+    assert.ok(!hit(exit, c), c.id);
 });
 
 console.log(`\n${passed} tests passed`);

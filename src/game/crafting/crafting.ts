@@ -70,11 +70,16 @@ export function deselectSlot(
   );
 }
 
-// COMBINE can be pressed once every slot of the station is filled. That only
+// A station's capacity is the MOST units that can be selected (manual 2, fire
+// 3), not how many a recipe needs: a fire recipe may use only two. COMBINE can
+// be pressed once at least MIN_COMBINE_INPUTS units are selected. That only
 // means "there are enough ingredients to try", not that a recipe exists.
+export const MIN_COMBINE_INPUTS = 2;
+
 export function canAttemptCombine(selection: CraftSelection): boolean {
   return (
-    selection.length > 0 && selection.every((selected) => selected !== null)
+    selection.filter((selected) => selected !== null).length >=
+    MIN_COMBINE_INPUTS
   );
 }
 

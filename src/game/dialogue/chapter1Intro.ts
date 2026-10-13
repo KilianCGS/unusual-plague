@@ -1,7 +1,7 @@
 import type { LocalizedConversation } from "./localizedConversation";
 
 // What the Doctor says to himself when Chapter 1 begins: an ordinary morning
-// in an established routine, with a dry hint that it will not stay that way.
+// in which he only knows that the baker has asked him to visit her husband.
 // Played once per game session by GameWorld; the tutorial starts when it ends.
 const doctor = (es: string, en: string) => ({
   speaker: "doctor",
@@ -11,27 +11,30 @@ const doctor = (es: string, en: string) => ({
 export const chapter1Intro: LocalizedConversation = {
   id: "chapter1.intro.doctorMorning",
   lines: [
-    doctor("Otra mañana.", "Another morning."),
+    doctor("Otro día.", "Another day."),
     doctor(
       "La ciudad parece tranquila. Últimamente eso ya es motivo suficiente para estar agradecido.",
       "The town seems quiet. Lately, that's reason enough to be grateful.",
     ),
     doctor(
-      "Tres pacientes esperan hoy. Nada fuera de lo habitual, por lo que parece.",
-      "Three patients are waiting today. Nothing out of the ordinary, by the sound of it.",
+      "La panadera ha pedido que pase a verla. Al parecer, su marido no se encuentra bien.",
+      "The baker has asked me to stop by. Her husband, it seems, is not well.",
     ),
     doctor(
-      "Una visita en la panadería, un enfermo en la taberna... y un minero que necesita que le eche un vistazo.",
-      "A visit to the bakery, a sick man at the tavern... and a miner who needs me to take a look at him.",
+      "No parecía demasiado preocupada cuando dejó el aviso.",
+      "She didn't sound too worried when she left word.",
     ),
-    doctor("Podría haber sido peor.", "It could have been worse."),
     doctor(
-      "Aunque llevo suficiente tiempo haciendo esto como para saber que decir eso suele ser una mala idea.",
-      "Though I've been doing this long enough to know that saying that is usually a bad idea.",
+      "Aunque la gente tiene una curiosa tendencia a restarle importancia a sus problemas hasta que me toca examinarlos.",
+      "Then again, people have a curious habit of downplaying their troubles until I'm the one examining them.",
     ),
     doctor(
       "Será mejor que revise mis notas antes de salir.",
       "I should check my notes before I leave.",
+    ),
+    doctor(
+      "Me llevaré un frasco vacío, por si necesito recoger alguna muestra.",
+      "I'll take an empty flask, in case I need to collect a sample.",
     ),
   ],
 };

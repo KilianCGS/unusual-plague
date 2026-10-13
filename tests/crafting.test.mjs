@@ -74,8 +74,8 @@ const permutations = (list) =>
         ]),
       );
 
-test("the four V1 recipes exist with the right stations and sizes", () => {
-  assert.equal(RECIPES.length, 4);
+test("the V1 recipes and the two patient recipes exist with the right stations and sizes", () => {
+  assert.equal(RECIPES.length, 6);
   assert.deepEqual(STATION_MAX_INPUTS, { manual: 2, fire: 3 });
   assert.equal(recipeById("manual.disinfected-bandage").inputs.length, 2);
   assert.equal(recipeById("fire.mushroom-soup").inputs.length, 3);
@@ -387,11 +387,12 @@ test("17. cannot select more units than the inventory holds", () => {
   assert.deepEqual(s2, ["medicinal-herb", "medicinal-herb"]);
 });
 
-test("COMBINE is enabled only when every slot of the station is filled", () => {
+test("COMBINE is enabled once at least two units are selected (capacity is a maximum)", () => {
   assert.equal(cr.canAttemptCombine([null, null]), false);
   assert.equal(cr.canAttemptCombine(["cloth", null]), false);
   assert.equal(cr.canAttemptCombine(["cloth", "honey"]), true); // enabled even without a recipe
-  assert.equal(cr.canAttemptCombine(["water", "salt", null]), false);
+  assert.equal(cr.canAttemptCombine(["water", null, null]), false);
+  assert.equal(cr.canAttemptCombine(["water", "salt", null]), true); // a 2-input recipe in the 3-slot stove
   assert.equal(cr.canAttemptCombine(["water", "salt", "mushroom"]), true);
 });
 

@@ -151,6 +151,22 @@ export const DEV_SCENES: DevScene[] = [
     initialAssetY: 60,
   },
   {
+    id: "bakers-bedroom",
+    label: "Bakers Bedroom (narrativa)",
+    // Unmodified copy of art/locations/bakers-bedroom/bakers-bedroom-v3.png
+    // (400x224), 1 unit per asset pixel, same interior zoom as the other
+    // interiors. A narrative microscene: not part of the map, nothing to walk.
+    // Initial position: the centre of the room (only a neutral seed; nobody
+    // spawns here).
+    backgroundSrc: "/game/areas/bakers-bedroom/bakers-bedroom-background.png",
+    assetWidth: 400,
+    assetHeight: 224,
+    initialAssetX: 200,
+    initialAssetY: 112,
+    logicalUnitsPerAssetPixel: 1,
+    zoomMultiplier: 602 / 270,
+  },
+  {
     id: "bakery-interior",
     label: "Interior Panadería",
     // Lossless 1:1 crop (x 45..433, y 13..254, no resize, no padding) of

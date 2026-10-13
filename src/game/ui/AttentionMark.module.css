@@ -1,0 +1,18 @@
+/* World-space "!": a small dark tag with a yellow exclamation mark, pixel
+   corners, no animation. Sized in scene units so it scales with the scene. */
+.mark {
+  position: absolute;
+  width: 12px;
+  height: 16px;
+  transform: translate(-50%, -100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  font: 700 14px/1 var(--ui-font);
+  color: #ffd60a;
+  background: #2b1a14;
+  border: 1px solid #8a6a4a;
+  pointer-events: none;
+  user-select: none;
+}

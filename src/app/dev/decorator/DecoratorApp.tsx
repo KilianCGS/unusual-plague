@@ -227,7 +227,8 @@ function Workspace({
   const [armedAssetId, setArmedAssetId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showColliders, setShowColliders] = useState(true);
-  const [doctorOn, setDoctorOn] = useState(true);
+  // Narrative scenes have no controllable Doctor: he is a placed picture there.
+  const [doctorOn, setDoctorOn] = useState(scene.narrative !== true);
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
   const [copyStatus, setCopyStatus] = useState("");
   // Free-typed text of the Size input while focused, same pattern as
@@ -888,7 +889,7 @@ function Workspace({
             />
             SHOW COLLIDERS
           </label>
-          <label>
+          <label style={scene.narrative ? { display: "none" } : undefined}>
             <input
               type="checkbox"
               checked={doctorOn}
@@ -925,12 +926,17 @@ function Workspace({
           <span className={styles.hint} data-testid="hud">
             world {world.width}×{world.height} · scale {scale.toFixed(2)}× ·
             view {viewZoom}x ({displayScale.toFixed(2)}×) · cursor{" "}
-            {cursor ? `(${cursor.x}, ${cursor.y})` : "—"} · Doctor (
-            {Math.round(player.x)}, {Math.round(player.y)}) {player.direction} ·
-            interaction:{" "}
-            <b data-testid="doctor-interaction">
-              {available ? available.interactionId || "(no id)" : "none"}
-            </b>
+            {cursor ? `(${cursor.x}, ${cursor.y})` : "—"}
+            {doctorOn ? (
+              <>
+                {" "}
+                · Doctor ({Math.round(player.x)}, {Math.round(player.y)}){" "}
+                {player.direction} · interaction:{" "}
+                <b data-testid="doctor-interaction">
+                  {available ? available.interactionId || "(no id)" : "none"}
+                </b>
+              </>
+            ) : null}
           </span>
         </div>
         <div className={styles.canvasArea}>
@@ -1056,7 +1062,9 @@ function Workspace({
                     {worldZones.map((zone) =>
                       overlayBox(zone.id, zone, "#3ddc84"),
                     )}
-                    {overlayBox("doctor-hitbox", playerFeetHitbox, "#4de7ff")}
+                    {doctorOn
+                      ? overlayBox("doctor-hitbox", playerFeetHitbox, "#4de7ff")
+                      : null}
                   </>
                 ) : null}
               </div>
