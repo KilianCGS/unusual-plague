@@ -510,32 +510,73 @@ test("the merchant's pickup is generic (cloth is just what he provides)", () => 
 });
 
 // ------------------------------------------------------------------------ WATER
-test("water: the river gives one unit per use while it is needed; no zone is placed yet", () => {
-  const water = (pairs) =>
-    story.resolveStoryInteraction(
-      "gather.water",
-      facts("examined", pairs),
-      "es",
-      "river",
+test("water: the river gives one unit per use, only with the flask and while a known need lacks water", () => {
+  const FLASK = [["empty-flask", 1]];
+  const decide = (status, pairs) =>
+    story.getGatherDecision("gather.water", facts(status, pairs));
+  const water = (status, pairs) =>
+    story.resolveStoryInteraction("gather.water", facts(status, pairs), "es", "river");
+
+  // the zone is the one painted by hand, untouched
+  assert.deepEqual(getSceneInteractionZones("outskirts").map(({ interactionId, x, y, width, height }) => ({ interactionId, x, y, width, height })), [
+    { interactionId: "gather.water", x: 427, y: 522, width: 35, height: 66 },
+  ]);
+  assert.equal(story.getGatherDecision("craft.fire", facts("examined", FLASK)), null);
+
+  // no known need (discovered / hidden): nothing to gather
+  assert.equal(decide("discovered", FLASK), "not-needed");
+  assert.equal(decide("hidden", FLASK), "not-needed");
+  assert.deepEqual(water("discovered", FLASK).effects, []);
+
+  // no flask: no water, even with a need
+  assert.equal(decide("examined", []), "no-container");
+  assert.deepEqual(water("examined", []).effects, []);
+  assert.ok(water("examined", []).notice.includes("recipiente"));
+  assert.equal(water("examined", []).conversation, null);
+
+  // need Water x2: E #1 and E #2 give water, E #3 does not
+  const give = { type: "give-item", itemId: "water", quantity: 1 };
+  let state = stock(FLASK);
+  for (const expected of [1, 2]) {
+    const out = story.resolveStoryInteraction("gather.water", { patients: withStatus("examined"), inventory: state }, "es", "river");
+    assert.deepEqual(out.effects, [give]);
+    assert.equal(out.conversation, null);
+    state = inv.addItem(state, "water", 1);
+    assert.equal(inv.countItem(state, "water"), expected);
+  }
+  const third = story.resolveStoryInteraction("gather.water", { patients: withStatus("examined"), inventory: state }, "es", "river");
+  assert.deepEqual(third.effects, []);
+  assert.ok(third.notice.includes("suficiente"));
+  assert.equal(story.resolveStoryInteraction("gather.water", { patients: withStatus("examined"), inventory: state }, "en", "river").notice, "I already have enough water.");
+
+  // the flask is never consumed and nothing is stored: it is just there
+  assert.equal(inv.countItem(state, "empty-flask"), 1);
+  assert.equal(story.GATHER_SOURCES["gather.water"].requires, "empty-flask");
+
+  // a future open case that needs more water re-enables the river by itself
+  // (nothing was stored about the river)
+  ch1.CHAPTER1_PATIENTS["test.second"] = {
+    id: "test.second",
+    requiredTreatments: [{ itemId: "medicinal-infusion", quantity: 1 }],
+  };
+  try {
+    const both = { [HUSBAND]: "examined", "test.second": "examined" };
+    assert.equal(
+      story.getGatherDecision("gather.water", { patients: both, inventory: state }),
+      "gather", // Water x2 carried, x3 now needed
     );
-  assert.deepEqual(water([]).effects, [
-    { type: "give-item", itemId: "water", quantity: 1 },
-  ]);
-  assert.deepEqual(water([["water", 1]]).effects, [
-    { type: "give-item", itemId: "water", quantity: 1 },
-  ]);
-  assert.deepEqual(water([["water", 2]]).effects, []); // enough: no endless water
-  assert.deepEqual(
-    story.resolveStoryInteraction(
-      "gather.water",
-      facts("discovered"),
-      "es",
-      "r",
-    ).effects,
-    [],
+    assert.equal(
+      story.getGatherDecision("gather.water", { patients: { [HUSBAND]: "examined" }, inventory: state }),
+      "not-needed",
+    );
+  } finally {
+    delete ch1.CHAPTER1_PATIENTS["test.second"];
+  }
+  // and spending the water elsewhere makes it useful again
+  assert.equal(
+    story.getGatherDecision("gather.water", { patients: withStatus("examined"), inventory: stock(FLASK) }),
+    "gather",
   );
-  // the zone has to be painted by hand: nothing is guessed in code
-  assert.deepEqual(getSceneInteractionZones("outskirts"), []);
 });
 
 // ------------------------------------------------------------------------- BAKER

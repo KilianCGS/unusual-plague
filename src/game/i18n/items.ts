@@ -19,3 +19,18 @@ export const itemFeedbackCopy: Record<Language, ItemFeedbackCopy> = {
     inventoryFull: "I don't have room to carry this.",
   },
 };
+
+// Short notices of the river (a gathering point, not a conversation).
+export const gatherCopy: Record<
+  Language,
+  { noContainer: string; enough: string }
+> = {
+  es: {
+    noContainer: "Necesito un recipiente para recoger agua.",
+    enough: "Ya llevo suficiente agua.",
+  },
+  en: {
+    noContainer: "I need a container to collect water.",
+    enough: "I already have enough water.",
+  },
+};

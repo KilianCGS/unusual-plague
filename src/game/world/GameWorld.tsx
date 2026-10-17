@@ -331,7 +331,20 @@ export function GameWorld({ language }: { language: Language }) {
         source.instanceId ?? "",
       );
 
-      if (outcome && applyStoryEffects(outcome.effects)) {
+      if (outcome && !outcome.conversation) {
+        // Light interaction (the river): effects and a short notice, no dialogue.
+        if (applyStoryEffects(outcome.effects)) {
+          if (outcome.notice) {
+            showNotice(outcome.notice);
+          }
+        } else {
+          showNotice(itemFeedbackCopy[language].inventoryFull);
+        }
+
+        return;
+      }
+
+      if (outcome?.conversation && applyStoryEffects(outcome.effects)) {
         afterDialogueRef.current =
           outcome.after === "go-to-examination" ? "go-to-examination" : null;
         startDialogue(outcome.conversation);
@@ -348,7 +361,7 @@ export function GameWorld({ language }: { language: Language }) {
         startDialogue(conversation);
       }
     },
-    [language, startDialogue, notifyTutorial, applyStoryEffects],
+    [language, startDialogue, notifyTutorial, applyStoryEffects, showNotice],
   );
 
   // The notice only needs to disappear after a while.

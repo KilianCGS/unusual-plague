@@ -129,18 +129,3 @@ export const merchantCloth: LocalizedConversation = {
     doctor("Se lo agradezco.", "I appreciate it."),
   ],
 };
-
-export const waterGathered: LocalizedConversation = {
-  id: "gather.water.taken",
-  lines: [doctor("Agua limpia. Servirá.", "Clean water. That will do.")],
-};
-
-export const waterNotNeeded: LocalizedConversation = {
-  id: "gather.water.notNeeded",
-  lines: [
-    doctor(
-      "Ahora mismo no necesito más agua.",
-      "I don't need any more water right now.",
-    ),
-  ],
-};

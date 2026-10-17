@@ -1,6 +1,7 @@
 import type { ItemNeed } from "../crafting/needs";
+import { gatherCopy } from "../i18n/items";
 import type { Language } from "../i18n/types";
-import type { InventoryState } from "../inventory/inventory";
+import { countItem, type InventoryState } from "../inventory/inventory";
 import { getItem } from "../items/items";
 import {
   getPatientStatus,
@@ -20,8 +21,6 @@ import {
   bakerWaiting,
   husbandExam,
   merchantCloth,
-  waterGathered,
-  waterNotNeeded,
 } from "./chapter1PatientDialogues";
 import type { Conversation } from "./dialogueTypes";
 import { DOCTOR_SPEAKER } from "./dialogueTypes";
@@ -40,7 +39,10 @@ export type StoryEffect =
   | { type: "give-item"; itemId: string; quantity: number };
 
 export type StoryOutcome = {
-  conversation: Conversation;
+  // Null for light interactions (the river): only effects and a short notice.
+  conversation: Conversation | null;
+  // Short feedback shown as a notice (ItemFeedback), without a dialogue.
+  notice?: string;
   effects: StoryEffect[];
   // What the game does when the conversation ends.
   after?: "go-to-examination";
@@ -64,10 +66,42 @@ export const NPC_PROVIDES: Record<string, string[]> = {
 };
 
 // A source the Doctor can take from while he needs it (not a tap that never
-// runs dry). The river's zone is placed by hand in the Outskirts.
-export const GATHER_SOURCES: Record<string, string> = {
-  "gather.water": "water",
+// runs dry). `requires` is a tool he must carry (it is never consumed). The
+// river's zone is placed by hand in the Outskirts.
+export const GATHER_SOURCES: Record<
+  string,
+  { itemId: string; requires: string }
+> = {
+  "gather.water": { itemId: "water", requires: "empty-flask" },
 };
+
+export type GatherDecision = "gather" | "no-container" | "not-needed";
+
+// Pure: can the Doctor take one unit from this source right now? Derived from
+// the tool he carries and from what the KNOWN patient needs still lack; there
+// is no "depleted" flag, so a new need re-enables the source by itself.
+export function getGatherDecision(
+  interactionId: string,
+  facts: StoryFacts,
+): GatherDecision | null {
+  const source = GATHER_SOURCES[interactionId];
+
+  if (!source) {
+    return null;
+  }
+
+  if (countItem(facts.inventory, source.requires) < 1) {
+    return "no-container";
+  }
+
+  const missing = getActiveMissingIngredients(
+    facts.patients,
+    CHAPTER1_PATIENTS,
+    facts.inventory,
+  );
+
+  return missingOf(missing, source.itemId) > 0 ? "gather" : "not-needed";
+}
 
 function missingOf(missing: readonly ItemNeed[], itemId: string): number {
   return missing.find((need) => need.itemId === itemId)?.quantity ?? 0;
@@ -146,19 +180,30 @@ export function resolveStoryInteraction(
     };
   }
 
-  // A source: gives one unit per use while it is needed.
-  const source = GATHER_SOURCES[interactionId];
+  // A source: gives one unit per use while it is needed and he has the tool.
+  const decision = getGatherDecision(interactionId, facts);
 
-  if (source) {
-    return missingOf(missing, source) > 0
-      ? {
-          conversation: localize(waterGathered, language, subjectId),
-          effects: [{ type: "give-item", itemId: source, quantity: 1 }],
-        }
-      : {
-          conversation: localize(waterNotNeeded, language, subjectId),
-          effects: [],
-        };
+  if (decision) {
+    const copy = gatherCopy[language];
+
+    if (decision === "gather") {
+      return {
+        conversation: null,
+        effects: [
+          {
+            type: "give-item",
+            itemId: GATHER_SOURCES[interactionId].itemId,
+            quantity: 1,
+          },
+        ],
+      };
+    }
+
+    return {
+      conversation: null,
+      effects: [],
+      notice: decision === "no-container" ? copy.noContainer : copy.enough,
+    };
   }
 
   return null;
