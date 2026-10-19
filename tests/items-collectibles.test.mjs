@@ -58,10 +58,10 @@ const types = (n) => Array.from({ length: n }, (_, i) => `item-${i + 1}`);
 const fill = (ids) =>
   ids.reduce((state, id) => inv.addItem(state, id), inv.createEmptyInventory());
 
-test("1. the inventory starts with 12 empty slots", () => {
+test("1. the inventory starts with 6 empty slots", () => {
   const state = inv.createEmptyInventory();
-  assert.equal(state.slots.length, 12);
-  assert.equal(state.capacity, 12);
+  assert.equal(state.slots.length, 6);
+  assert.equal(state.capacity, 6);
   assert.equal(inv.countOccupiedSlots(state), 0);
 });
 
@@ -89,25 +89,25 @@ test("4. different item types take different slots", () => {
   assert.equal(inv.countOccupiedSlots(state), 3);
 });
 
-test("5. twelve different types fill the inventory", () => {
-  const state = fill(types(12));
-  assert.equal(inv.countOccupiedSlots(state), 12);
+test("5. six different types fill the inventory", () => {
+  const state = fill(types(6));
+  assert.equal(inv.countOccupiedSlots(state), 6);
   assert.ok(inv.isValidInventory(state));
 });
 
-test("6. a 13th type cannot be added", () => {
-  const full = fill(types(12));
-  assert.equal(inv.canAddItem(full, "item-13"), false);
-  assert.equal(inv.addItem(full, "item-13"), null);
+test("6. a 7th type cannot be added", () => {
+  const full = fill(types(6));
+  assert.equal(inv.canAddItem(full, "item-7"), false);
+  assert.equal(inv.addItem(full, "item-7"), null);
 });
 
 test("7. a full inventory still accepts more of a type it already holds", () => {
-  const full = fill([HERB, ...types(11)]);
-  assert.equal(inv.countOccupiedSlots(full), 12);
+  const full = fill([HERB, ...types(5)]);
+  assert.equal(inv.countOccupiedSlots(full), 6);
   assert.equal(inv.canAddItem(full, HERB), true);
   const more = inv.addItem(full, HERB, 2);
   assert.equal(inv.countItem(more, HERB), 3);
-  assert.equal(inv.countOccupiedSlots(more), 12);
+  assert.equal(inv.countOccupiedSlots(more), 6);
 });
 
 test("8. addItem is immutable", () => {
@@ -123,9 +123,9 @@ test("8. addItem is immutable", () => {
   assert.notEqual(after.slots, before.slots);
   assert.notEqual(after.slots[0], before.slots[0]);
   // a failed add leaves the state alone too
-  const full = fill(types(12));
+  const full = fill(types(6));
   const fullSnapshot = JSON.stringify(full);
-  inv.addItem(full, "item-13");
+  inv.addItem(full, "item-7");
   assert.equal(JSON.stringify(full), fullSnapshot);
 });
 

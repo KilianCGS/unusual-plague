@@ -6,7 +6,7 @@
 //
 // Every operation is pure: it returns a new state and never mutates the one it
 // receives, so it is safe to use with React state.
-export const INVENTORY_CAPACITY = 12;
+export const INVENTORY_CAPACITY = 6;
 
 // An id from the item catalog (src/game/items). Kept as a string here so the
 // inventory does not depend on the catalog.

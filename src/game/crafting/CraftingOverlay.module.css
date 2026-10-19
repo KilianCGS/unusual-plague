@@ -141,7 +141,7 @@
 .cell,
 .slot,
 .combine {
-  --cell-size: clamp(44px, 10vmin, 84px);
+  --cell-size: clamp(48px, 11vmin, 88px);
 }
 
 /* Filled slots and inventory items are clickable. */
@@ -205,7 +205,7 @@
   display: grid;
   grid-template-columns: repeat(var(--columns), var(--cell-size));
   gap: 6px;
-  --cell-size: clamp(44px, 10vmin, 84px);
+  --cell-size: clamp(48px, 11vmin, 88px);
 }
 
 .name {
@@ -278,4 +278,30 @@
   margin: 0;
   font-size: 20px;
   font-weight: 700;
+}
+
+/* The item's icon fills most of the slot; the quantity sits over its corner
+   with a light outline so it stays readable on any art. */
+.itemIcon {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 96%;
+  height: 96%;
+  transform: translate(-50%, -50%);
+}
+
+.quantityOverIcon {
+  text-shadow:
+    1px 0 0 #e9dbb9,
+    -1px 0 0 #e9dbb9,
+    0 1px 0 #e9dbb9,
+    0 -1px 0 #e9dbb9;
+}
+
+/* The crafted item, shown large in the success modal. */
+.createdIcon {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto;
 }

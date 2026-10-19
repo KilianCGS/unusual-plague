@@ -1,0 +1,7 @@
+/* 48x48 pixel art, scaled with nearest-neighbour only. */
+.icon {
+  display: block;
+  image-rendering: pixelated;
+  user-select: none;
+  pointer-events: none;
+}

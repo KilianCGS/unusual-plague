@@ -80,12 +80,14 @@ test("3-5. exactly 2 spawns: spawn-1 faces north, spawn-2 faces south", () => {
 });
 
 test("6-10. exactly 3 interaction zones: two for the table, one for the stove", () => {
-  assert.equal(zones.length, 3);
-  assert.equal(zones, geo.apothecaryInteriorInteractions);
+  assert.equal(zones.length, 4); // the three crafting zones + the storage chest
+  // the three drawn crafting zones come first, unchanged; the chest is the 4th
+  assert.deepEqual(zones.slice(0, 3), geo.apothecaryInteriorInteractions);
   assert.deepEqual(zones.map((z) => [z.id, z.interactionId]), [
     ["apothecary-interior-interaction-1", "craft.manual"],
     ["apothecary-interior-interaction-2", "craft.manual"],
     ["apothecary-interior-interaction-3", "craft.fire"],
+    ["apothecary-interior-interaction-4", "storage.apothecary"], // the chest (tests/storage.test.mjs)
   ]);
   assert.deepEqual(zones[0], { id: "apothecary-interior-interaction-1", x: 99, y: 173, width: 22, height: 36, interactionId: "craft.manual" });
   assert.deepEqual(zones[1], { id: "apothecary-interior-interaction-2", x: 98, y: 107, width: 21, height: 43, interactionId: "craft.manual" });

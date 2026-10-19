@@ -37,6 +37,13 @@ import {
 import { createChapter1Inventory } from "../inventory/initialInventory";
 import { InventoryOverlay } from "../inventory/InventoryOverlay";
 import { useInventoryHotkeys } from "../inventory/useInventoryHotkeys";
+import { storageCopy } from "../i18n/storage";
+import {
+  createEmptyStorage,
+  STORAGE_INTERACTION_ID,
+  transferStack,
+} from "../storage/storage";
+import { StorageOverlay, type StorageSide } from "../storage/StorageOverlay";
 import { getItemName } from "../items/items";
 import { MapOverlay } from "../map/MapOverlay";
 import {
@@ -102,6 +109,8 @@ export function GameWorld({ language }: { language: Language }) {
   // or during a scene fade, and each one blocks the Doctor while it is up.
   const [bookOpen, setBookOpen] = useState(false);
   const [inventoryOpen, setInventoryOpen] = useState(false);
+  // The Apothecary storage chest interface (another main interface).
+  const [storageOpen, setStorageOpen] = useState(false);
   // The crafting station being used (null = none). Another main interface.
   const [craftingStation, setCraftingStation] = useState<CraftStation | null>(
     null,
@@ -132,6 +141,10 @@ export function GameWorld({ language }: { language: Language }) {
     createChapter1Inventory,
   );
   const inventoryRef = useRef(inventory);
+  // The Apothecary storage: another InventoryState owned here, above the
+  // scenes, for the session. Crafting never reads it.
+  const [storage, setStorage] = useState<InventoryState>(createEmptyStorage);
+  const storageRef = useRef(storage);
   const [collected, setCollected] =
     useState<CollectedInstanceIds>(NO_COLLECTED);
   const [notice, setNotice] = useState<{ id: number; text: string } | null>(
@@ -149,6 +162,7 @@ export function GameWorld({ language }: { language: Language }) {
     phase === "playing" &&
     !dialogue.active &&
     craftingStation === null &&
+    !storageOpen &&
     !inNarrativeScene;
   const mapVisible = mapHeld && canOpenInterface && !bookOpen && !inventoryOpen;
   const pendingRef = useRef<{ sceneId: SceneId; spawnName: string } | null>(
@@ -165,6 +179,7 @@ export function GameWorld({ language }: { language: Language }) {
     !mapVisible &&
     !inventoryOpen &&
     craftingStation === null &&
+    !storageOpen &&
     !inNarrativeScene;
 
   useBookHotkeys({
@@ -279,6 +294,35 @@ export function GameWorld({ language }: { language: Language }) {
     [language, showNotice],
   );
 
+  // Click on a stack in the storage interface: the whole stack goes to the
+  // other side, or nothing moves and a short notice says why.
+  const handleStorageTransfer = useCallback(
+    (from: StorageSide, itemId: string) => {
+      const toStorage = from === "inventory";
+      const result = transferStack(
+        toStorage ? inventoryRef.current : storageRef.current,
+        toStorage ? storageRef.current : inventoryRef.current,
+        itemId,
+      );
+
+      if (!result) {
+        const copy = storageCopy[language];
+
+        showNotice(toStorage ? copy.noRoomInStorage : copy.noRoomInInventory);
+        return;
+      }
+
+      const nextInventory = toStorage ? result.source : result.destination;
+      const nextStorage = toStorage ? result.destination : result.source;
+
+      inventoryRef.current = nextInventory;
+      storageRef.current = nextStorage;
+      setInventory(nextInventory);
+      setStorage(nextStorage);
+    },
+    [language, showNotice],
+  );
+
   // The scene only reports WHICH interaction was activated (and the decor
   // instance it belongs to); a data table turns the id into a conversation in
   // the current language. Nothing here knows what an interactionId means.
@@ -292,6 +336,12 @@ export function GameWorld({ language }: { language: Language }) {
       }
 
       notifyTutorial("interaction-started");
+
+      // The Apothecary storage chest: open its interface.
+      if (interactionId === STORAGE_INTERACTION_ID) {
+        setStorageOpen(true);
+        return;
+      }
 
       // A crafting station: open its interface.
       const station = CRAFT_STATION_BY_INTERACTION_ID[interactionId];
@@ -579,6 +629,7 @@ export function GameWorld({ language }: { language: Language }) {
     !mapVisible &&
     !inventoryOpen &&
     craftingStation === null &&
+    !storageOpen &&
     !inNarrativeScene;
 
   return (
@@ -632,6 +683,15 @@ export function GameWorld({ language }: { language: Language }) {
             setInventory(next);
           }}
           onClose={() => setCraftingStation(null)}
+        />
+      ) : null}
+      {storageOpen ? (
+        <StorageOverlay
+          storage={storage}
+          inventory={inventory}
+          language={language}
+          onTransfer={handleStorageTransfer}
+          onClose={() => setStorageOpen(false)}
         />
       ) : null}
       {inventoryOpen ? (

@@ -6,7 +6,8 @@ import type { CSSProperties } from "react";
 import { craftingCopy } from "../i18n/crafting";
 import type { Language } from "../i18n/types";
 import type { InventoryState } from "../inventory/inventory";
-import { getItemName } from "../items/items";
+import { getItemIcon, getItemName } from "../items/items";
+import { ItemIcon } from "../items/ItemIcon";
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
 import {
   canAttemptCombine,
@@ -19,7 +20,7 @@ import {
 import type { CraftStation } from "./recipes";
 import styles from "./CraftingOverlay.module.css";
 
-const INVENTORY_COLUMNS = 4;
+const INVENTORY_COLUMNS = 6;
 
 // The crafting interface of one station: the slots of the station on top, the
 // real inventory below. Click an inventory item to put ONE unit in the next
@@ -133,7 +134,15 @@ export function CraftingOverlay({
                   disabled={selected === null}
                   onClick={() => handleSlotClick(index)}
                 >
-                  {selected ? getItemName(selected, language) : ""}
+                  {selected ? (
+                    getItemIcon(selected) ? (
+                      <ItemIcon itemId={selected} className={styles.itemIcon} />
+                    ) : (
+                      getItemName(selected, language)
+                    )
+                  ) : (
+                    ""
+                  )}
                 </button>
               </div>
             ))}
@@ -168,14 +177,26 @@ export function CraftingOverlay({
                 data-inventory-slot
                 data-item-id={slot?.itemId}
                 disabled={slot === null}
+                title={slot ? getItemName(slot.itemId, language) : undefined}
                 onClick={() => slot && handleInventoryClick(slot.itemId)}
               >
                 {slot ? (
                   <>
-                    <span className={styles.name}>
-                      {getItemName(slot.itemId, language)}
+                    {getItemIcon(slot.itemId) ? (
+                      <ItemIcon
+                        itemId={slot.itemId}
+                        className={styles.itemIcon}
+                      />
+                    ) : (
+                      <span className={styles.name}>
+                        {getItemName(slot.itemId, language)}
+                      </span>
+                    )}
+                    <span
+                      className={`${styles.quantity}${getItemIcon(slot.itemId) ? ` ${styles.quantityOverIcon}` : ""}`}
+                    >
+                      ×{slot.quantity}
                     </span>
-                    <span className={styles.quantity}>×{slot.quantity}</span>
                   </>
                 ) : null}
               </button>
@@ -197,6 +218,7 @@ export function CraftingOverlay({
                 ×
               </button>
               <p className={styles.createdHeading}>{copy.created}</p>
+              <ItemIcon itemId={createdItemId} className={styles.createdIcon} />
               <p className={styles.createdName}>
                 {getItemName(createdItemId, language)}
               </p>

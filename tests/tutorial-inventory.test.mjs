@@ -108,11 +108,11 @@ test("every hint step has ES and EN copy with its key", () => {
   assert.ok(inventoryCopy.es.title && inventoryCopy.en.title);
 });
 
-test("inventory: capacity is 12 and the initial state is empty", () => {
-  assert.equal(inv.INVENTORY_CAPACITY, 12);
+test("inventory: capacity is 6 and the initial state is empty", () => {
+  assert.equal(inv.INVENTORY_CAPACITY, 6);
   const state = inv.createEmptyInventory();
-  assert.equal(state.capacity, 12);
-  assert.equal(state.slots.length, 12);
+  assert.equal(state.capacity, 6);
+  assert.equal(state.slots.length, 6);
   assert.ok(state.slots.every((slot) => slot === null));
   assert.equal(inv.countOccupiedSlots(state), 0);
   assert.ok(inv.isValidInventory(state));
@@ -124,7 +124,7 @@ test("inventory model supports quantities and rejects impossible states", () => 
   assert.ok(inv.isValidInventory(state));
   assert.equal(inv.countOccupiedSlots(state), 1);
   // more slots than capacity
-  assert.ok(!inv.isValidInventory({ capacity: 12, slots: [...state.slots, { itemId: "x", quantity: 1 }] }));
+  assert.ok(!inv.isValidInventory({ capacity: 6, slots: [...state.slots, { itemId: "x", quantity: 1 }] }));
   // empty or fractional quantities
   assert.ok(!inv.isValidInventory({ ...state, slots: state.slots.map((s, i) => (i === 1 ? { itemId: "x", quantity: 0 } : s)) }));
   assert.ok(!inv.isValidInventory({ ...state, slots: state.slots.map((s, i) => (i === 1 ? { itemId: "x", quantity: 1.5 } : s)) }));

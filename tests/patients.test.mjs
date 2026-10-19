@@ -883,8 +883,8 @@ test("the Doctor starts Chapter 1 with an Empty flask x1 in an ordinary slot", (
   const initial = at(
     "src/game/inventory/initialInventory.ts",
   ).createChapter1Inventory();
-  assert.equal(initial.capacity, 12);
-  assert.equal(initial.slots.length, 12);
+  assert.equal(initial.capacity, 6);
+  assert.equal(initial.slots.length, 6);
   assert.deepEqual(initial.slots[0], { itemId: "empty-flask", quantity: 1 });
   assert.equal(inv.countOccupiedSlots(initial), 1);
   assert.ok(inv.isValidInventory(initial));

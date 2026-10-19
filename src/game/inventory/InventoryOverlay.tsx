@@ -2,12 +2,13 @@ import type { CSSProperties } from "react";
 
 import { inventoryCopy } from "../i18n/inventory";
 import type { Language } from "../i18n/types";
-import { getItemName } from "../items/items";
+import { getItemIcon, getItemName } from "../items/items";
+import { ItemIcon } from "../items/ItemIcon";
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
 import type { InventoryState } from "./inventory";
 import styles from "./InventoryOverlay.module.css";
 
-const COLUMNS = 4;
+const COLUMNS = 6;
 
 // The Doctor's carried items as a grid of slots. Screen-space and not
 // interactive. Today every slot is empty, so only empty slots are drawn; an
@@ -41,6 +42,7 @@ export function InventoryOverlay({
                 data-inventory-slot
                 data-empty={slot === null}
                 data-item-id={slot?.itemId}
+                title={slot ? getItemName(slot.itemId, language) : undefined}
                 aria-label={
                   slot === null
                     ? copy.emptySlot
@@ -48,12 +50,24 @@ export function InventoryOverlay({
                 }
               >
                 {slot ? (
-                  // No item art yet: the localized name and the quantity.
+                  // The item's icon (from the item catalog) and the quantity;
+                  // an item without art is drawn by its localized name.
                   <>
-                    <span className={styles.name}>
-                      {getItemName(slot.itemId, language)}
+                    {getItemIcon(slot.itemId) ? (
+                      <ItemIcon
+                        itemId={slot.itemId}
+                        className={styles.itemIcon}
+                      />
+                    ) : (
+                      <span className={styles.name}>
+                        {getItemName(slot.itemId, language)}
+                      </span>
+                    )}
+                    <span
+                      className={`${styles.quantity}${getItemIcon(slot.itemId) ? ` ${styles.quantityOverIcon}` : ""}`}
+                    >
+                      ×{slot.quantity}
                     </span>
-                    <span className={styles.quantity}>×{slot.quantity}</span>
                   </>
                 ) : null}
               </li>

@@ -262,9 +262,9 @@ test("13. a failed craft leaves the inventory untouched (all or nothing)", () =>
   const snapshot = JSON.stringify(partial);
   assert.equal(cr.craft(partial, bandage), null);
   assert.equal(JSON.stringify(partial), snapshot);
-  // output cannot fit: 12 slots full of other types, inputs are 1 slot each...
-  const filler = Array.from({ length: 10 }, (_, i) => [`filler-${i}`, 1]);
-  const full = stock([["cloth", 1], ["alcohol", 1], ...filler]); // 12 slots
+  // output cannot fit: 6 slots full of other types, inputs are 1 slot each...
+  const filler = Array.from({ length: 4 }, (_, i) => [`filler-${i}`, 1]);
+  const full = stock([["cloth", 1], ["alcohol", 1], ...filler]); // 6 slots
   // ...consuming both inputs frees two slots, so the output DOES fit
   assert.ok(cr.craft(full, bandage));
   // a recipe whose inputs stay in their slots and whose output is a new type cannot fit
@@ -276,7 +276,7 @@ test("13. a failed craft leaves the inventory untouched (all or nothing)", () =>
   };
   const fullStays = stock([
     ["cloth", 2],
-    ...Array.from({ length: 11 }, (_, i) => [`filler-${i}`, 1]),
+    ...Array.from({ length: 5 }, (_, i) => [`filler-${i}`, 1]),
   ]);
   const fullSnapshot = JSON.stringify(fullStays);
   assert.equal(cr.craft(fullStays, stays), null);
@@ -480,7 +480,8 @@ test("21. craft.manual and craft.fire are the two stations of the game, each wit
 
 test("22. the Apothecary places them: two table zones and one stove zone (details in apothecary.test.mjs)", () => {
   const ids = getSceneInteractionZones("apothecary-interior").map((z) => z.interactionId);
-  assert.deepEqual(ids, ["craft.manual", "craft.manual", "craft.fire"]);
+  // the crafting zones, unchanged, followed by the storage chest (not a station)
+  assert.deepEqual(ids, ["craft.manual", "craft.manual", "craft.fire", "storage.apothecary"]);
   assert.ok(!Object.values(chapter1Interactions).some((i) => i.interactionId.startsWith("craft.")));
 });
 

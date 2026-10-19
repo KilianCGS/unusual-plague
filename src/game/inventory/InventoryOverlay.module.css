@@ -70,7 +70,7 @@
   font-weight: 700;
 }
 
-/* 4 columns x 3 rows; the slot size follows the viewport so it fits small
+/* 6 columns x 1 row; the slot size follows the viewport so it fits small
    windows without scrolling. */
 .grid {
   display: grid;
@@ -79,7 +79,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  --slot-size: clamp(40px, 9vmin, 76px);
+  --slot-size: clamp(44px, 10vmin, 84px);
 }
 
 /* An empty slot: an inset square, darker than the paper, with a light bottom
@@ -114,4 +114,23 @@
   bottom: 2px;
   font-size: clamp(10px, 1.9vmin, 15px);
   font-weight: 700;
+}
+
+/* The item's icon fills most of the slot; the quantity sits over its corner
+   with a light outline so it stays readable on any art. */
+.itemIcon {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  width: 92%;
+  height: 92%;
+  transform: translate(-50%, -50%);
+}
+
+.quantityOverIcon {
+  text-shadow:
+    1px 0 0 #e9dbb9,
+    -1px 0 0 #e9dbb9,
+    0 1px 0 #e9dbb9,
+    0 -1px 0 #e9dbb9;
 }
