@@ -4,22 +4,9 @@ import type { DecorAsset, DecorCategory, DecorInstance } from "./decorTypes";
 
 // Asset library V1. Only REAL assets that already exist in the project; new
 // assets (animals, ambient, resources...) get registered here when they exist.
-// DEV placeholder for the first collectible: a flat green leaf inside a magenta
-// frame, drawn as an inline SVG so no art file is invented. It is clearly NOT
-// final art and is meant to be replaced by the real herb sprite.
-const DEV_HERB_SVG = [
-  "<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' shape-rendering='crispEdges'>",
-  "<rect x='0.5' y='0.5' width='31' height='31' fill='none' stroke='#ff00ff'/>",
-  "<rect x='14' y='18' width='4' height='11' fill='#3b5a2a'/>",
-  "<rect x='9' y='9' width='14' height='10' fill='#5f9e43'/>",
-  "<rect x='12' y='6' width='8' height='4' fill='#7ec25a'/>",
-  "<rect x='15' y='9' width='2' height='10' fill='#3b5a2a'/>",
-  "</svg>",
-].join("");
-
 export const DOCTOR_NARRATIVE_ASSET_ID = "doctor-narrative";
 
-export const DECOR_ASSETS: DecorAsset[] = [
+const BASE_DECOR_ASSETS: DecorAsset[] = [
   {
     // The approved pilot villager, static.
     id: "villager-pilot",
@@ -686,23 +673,261 @@ export const DECOR_ASSETS: DecorAsset[] = [
     headHeight: 82,
     defaultScale: 1,
   },
-  // FIRST WORLD COLLECTIBLE (DEV placeholder art). Placing it makes a Medicinal
-  // herb that the Doctor can pick up with E.
+  // FIRST WORLD COLLECTIBLE. The id keeps its historical "-dev" suffix on
+  // purpose: the placed instance (forest-medicinal-herb-01) references it, and
+  // renaming it would orphan that instance. Only the art is final now: the wild
+  // plant growing from the soil (48x48), not the harvested bundle of the
+  // inventory icon.
   {
     id: "medicinal-herb-dev",
-    label: "Medicinal herb (DEV placeholder)",
+    label: "Medicinal herb (world)",
     category: "resources",
     sprite: {
-      frames: [`data:image/svg+xml;utf8,${encodeURIComponent(DEV_HERB_SVG)}`],
+      frames: ["/game/resources/medicinal-herb/world.png"],
+      frameWidth: 48,
+      frameHeight: 48,
+      fps: 0,
+      loop: false,
+    },
+    // The soil patch ends at y38 of the 48 px frame and the plant is centred on
+    // x23: the instance position is where it is rooted in the ground.
+    anchor: { x: 0.48, y: 0.81 },
+    // The plant is ~22x29 px at 1:1, about as tall as a chicken; 0.75 keeps it
+    // a small ground plant next to the 66 px people.
+    defaultScale: 0.75,
+    collectibleItemId: "medicinal-herb",
+  },
+  // WORLD LEECH (art only for now): a living resource for a shallow cave pool.
+  // Transparent on purpose, so it can be placed over the pool of the map. It is
+  // NOT placed in any composition and NOT collectible yet.
+  {
+    id: "leech-world",
+    label: "Leech (world, animated)",
+    category: "resources",
+    sprite: {
+      frames: [0, 1, 2, 3].map((i) => `/game/resources/leech/idle/${i}.png`),
       frameWidth: 32,
       frameHeight: 32,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.8 },
+    defaultScale: 1,
+  },
+  // WORLD RESOURCES prepared for later placement (art only for now): the same
+  // model as the Medicinal herb. Each declares the item it will give
+  // (`collectibleItemId`), has no blocking collider, and is NOT placed in any
+  // chapter. Placing one in the Decorator is what will make it collectible with
+  // the existing collectible mechanism; nothing here adds a pick-up of its own.
+  {
+    id: "mint-world",
+    label: "Mint (world)",
+    category: "resources",
+    sprite: {
+      frames: ["/game/resources/mint/world.png"],
+      frameWidth: 48,
+      frameHeight: 48,
+      fps: 0,
+      loop: false,
+    },
+    // Soil patch ends at y39 of the 48 px frame; plant centred on x23.
+    anchor: { x: 0.48, y: 0.81 },
+    defaultScale: 0.75,
+    collectibleItemId: "mint",
+  },
+  {
+    id: "mushroom-world",
+    label: "Mushroom (world)",
+    category: "resources",
+    sprite: {
+      frames: ["/game/resources/mushroom/world.png"],
+      frameWidth: 48,
+      frameHeight: 48,
+      fps: 0,
+      loop: false,
+    },
+    // Cluster base ends at y39; centred on x22.
+    anchor: { x: 0.46, y: 0.81 },
+    defaultScale: 0.75,
+    collectibleItemId: "mushroom",
+  },
+  {
+    id: "resin-world",
+    label: "Resin (world, on bark)",
+    category: "resources",
+    sprite: {
+      frames: ["/game/resources/resin/world.png"],
+      frameWidth: 48,
+      frameHeight: 48,
+      fps: 0,
+      loop: false,
+    },
+    // Meant to be overlaid on an existing trunk or log, so it is anchored at
+    // the middle of the patch rather than at a ground line.
+    anchor: { x: 0.48, y: 0.49 },
+    defaultScale: 1,
+    collectibleItemId: "resin",
+  },
+  {
+    id: "orange-world",
+    label: "Orange (world, on branch)",
+    category: "resources",
+    sprite: {
+      frames: ["/game/resources/orange/world.png"],
+      frameWidth: 48,
+      frameHeight: 48,
+      fps: 0,
+      loop: false,
+    },
+    // Meant to be overlaid on an existing fruit tree: anchored at the middle of
+    // the branch.
+    anchor: { x: 0.46, y: 0.5 },
+    defaultScale: 1,
+    collectibleItemId: "orange",
+  },
+  // Reusable town population, PixelLab, style-matched to the existing NPCs.
+  // Available in the Decorator only: none of them is placed in a chapter.
+  {
+    id: "elderly-man-with-jug",
+    label: "Elderly man with jug",
+    category: "people",
+    sprite: {
+      // 4-frame subtle idle (breathing, jug hand), calm cadence.
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/elderly-man-with-jug/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    headHeight: 80,
+    defaultScale: 1,
+    // Visible silhouette x27-58 y16-81 of the 96x96 frame (resting pose).
+    defaultCollider: { offsetX: -21, offsetY: -80, width: 32, height: 66 },
+  },
+  {
+    id: "elderly-woman-with-cane",
+    label: "Elderly woman with cane",
+    category: "people",
+    sprite: {
+      // 4-frame subtle idle (breathing, head); the cane stays planted.
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/elderly-woman-with-cane/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    headHeight: 77,
+    defaultScale: 1,
+    // Visible silhouette x31-57 y19-79 of the 96x96 frame.
+    defaultCollider: { offsetX: -17, offsetY: -77, width: 27, height: 61 },
+  },
+  {
+    id: "fruit-vegetable-seller-stall",
+    label: "Fruit & vegetable seller (with stall)",
+    category: "people",
+    sprite: {
+      // Static, seen from the front. One combined asset on purpose: the seller
+      // stands behind her counter, so they are placed (and overlap) as one.
+      frames: ["/game/npcs/fruit-vegetable-seller-stall/static.png"],
+      frameWidth: 128,
+      frameHeight: 96,
       fps: 0,
       loop: false,
     },
     anchor: { x: 0.5, y: 1 },
+    headHeight: 81,
     defaultScale: 1,
-    collectibleItemId: "medicinal-herb",
+    // Silhouette x20-106 y15-83; only the counter and crates block, not her.
+    defaultCollider: { offsetX: -44, offsetY: -48, width: 87, height: 36 },
   },
+  {
+    id: "horse",
+    label: "Horse",
+    category: "animals",
+    sprite: {
+      // 4-frame calm idle (head, ear and tail), front-facing, never walks.
+      frames: [0, 1, 2, 3].map((i) => `/game/npcs/horse/idle/${i}.png`),
+      frameWidth: 128,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Visible silhouette x44-76 y11-81 of the 128x96 frame.
+    defaultCollider: { offsetX: -20, offsetY: -85, width: 33, height: 71 },
+  },
+  {
+    id: "squirrel",
+    label: "Squirrel",
+    category: "animals",
+    sprite: {
+      // 2-frame tail idle.
+      frames: [0, 1].map((i) => `/game/npcs/squirrel/idle/${i}.png`),
+      frameWidth: 64,
+      frameHeight: 64,
+      fps: 2,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Visible silhouette x18-45 y17-50 of the 64x64 frame.
+    defaultCollider: { offsetX: -14, offsetY: -47, width: 28, height: 34 },
+  },
+];
+
+// FINAL-DAY (smartphone) VARIANTS of existing characters. They are ASSETS ONLY:
+// nothing in the chapters uses them yet and they never replace the normal NPC.
+// Each one is derived from its original definition, so the anchor, scale,
+// collider and head height cannot drift apart, and only the art and the very
+// slow two-frame cadence (a thumb tap, a head tilt) are its own. Frames live in
+// /game/npcs/<id>-smartphone/idle/{0,1}.png at the same size as the original.
+export const SMARTPHONE_VARIANT_BASE_IDS = [
+  "woman-sweeping",
+  "fisherman",
+  "bartender",
+  "baker",
+  "villager-sitting",
+  "woodcutter",
+  "blacksmith",
+  "woman-washing-clothes",
+] as const;
+
+const SMARTPHONE_FPS = 1.5;
+
+const SMARTPHONE_VARIANTS: DecorAsset[] = SMARTPHONE_VARIANT_BASE_IDS.map(
+  (baseId) => {
+    const base = BASE_DECOR_ASSETS.find((asset) => asset.id === baseId);
+
+    if (!base) {
+      throw new Error(`Smartphone variant of an unknown asset: ${baseId}`);
+    }
+
+    return {
+      ...base,
+      id: `${baseId}-smartphone`,
+      label: `${base.label} (smartphone)`,
+      sprite: {
+        ...base.sprite,
+        frames: [0, 1].map(
+          (i) => `/game/npcs/${baseId}-smartphone/idle/${i}.png`,
+        ),
+        fps: SMARTPHONE_FPS,
+        loop: true,
+      },
+    };
+  },
+);
+
+export const DECOR_ASSETS: DecorAsset[] = [
+  ...BASE_DECOR_ASSETS,
+  ...SMARTPHONE_VARIANTS,
 ];
 
 export const DECOR_CATEGORY_ORDER: DecorCategory[] = [
