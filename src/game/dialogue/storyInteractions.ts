@@ -1,7 +1,11 @@
 import type { ItemNeed } from "../crafting/needs";
 import { gatherCopy } from "../i18n/items";
 import type { Language } from "../i18n/types";
-import { countItem, type InventoryState } from "../inventory/inventory";
+import {
+  canAddItem,
+  countItem,
+  type InventoryState,
+} from "../inventory/inventory";
 import { getItem } from "../items/items";
 import {
   getPatientStatus,
@@ -9,6 +13,8 @@ import {
   type PatientCasesState,
 } from "../patients/patientCases";
 import {
+  BAKER_SALT_REWARD,
+  BAKER_SALT_REWARD_ID,
   BAKER_HUSBAND_ID,
   BAKER_HUSBAND_INSTANCE_ID,
   CHAPTER1_PATIENTS,
@@ -17,6 +23,8 @@ import { getActiveMissingIngredients } from "../patients/patientNeeds";
 import {
   bakerAfter,
   bakerDelivery,
+  bakerReward,
+  bakerRewardNoRoom,
   bakerIntro,
   bakerWaiting,
   husbandExam,
@@ -36,6 +44,9 @@ import {
 
 export type StoryEffect =
   | { type: "treat"; patientId: string }
+  // Marks a one-time reward as received. Applied together with its item or not
+  // at all, so a reward that did not fit is never recorded as given.
+  | { type: "claim-reward"; rewardId: string }
   | { type: "give-item"; itemId: string; quantity: number };
 
 export type StoryOutcome = {
@@ -51,6 +62,9 @@ export type StoryOutcome = {
 export type StoryFacts = {
   patients: PatientCasesState;
   inventory: InventoryState;
+  // Narrative flags, separate from the medical status of the cases: the
+  // one-time rewards already received (absent = none).
+  claimedRewards?: ReadonlySet<string>;
 };
 
 // interactionId of the interactable that belongs to a patient case.
@@ -154,6 +168,28 @@ export function resolveStoryInteraction(
     }
 
     if (status === "treated") {
+      // First visit after the treatment: her thank-you, Salt x1, ONCE. Whether
+      // it was received is its own flag (Salt may be used up later), and it is
+      // only given if it really fits in the carried inventory.
+      if (!facts.claimedRewards?.has(BAKER_SALT_REWARD_ID)) {
+        return canAddItem(facts.inventory, BAKER_SALT_REWARD.itemId)
+          ? {
+              conversation: localize(bakerReward, language, subjectId),
+              effects: [
+                {
+                  type: "give-item",
+                  itemId: BAKER_SALT_REWARD.itemId,
+                  quantity: BAKER_SALT_REWARD.quantity,
+                },
+                { type: "claim-reward", rewardId: BAKER_SALT_REWARD_ID },
+              ],
+            }
+          : {
+              conversation: localize(bakerRewardNoRoom, language, subjectId),
+              effects: [],
+            };
+      }
+
       return {
         conversation: localize(bakerAfter, language, subjectId),
         effects: [],

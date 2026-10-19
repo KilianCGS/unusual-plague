@@ -132,6 +132,12 @@ export function GameWorld({ language }: { language: Language }) {
     CHAPTER1_INITIAL_PATIENTS,
   );
   const patientsRef = useRef(patients);
+  // One-time narrative rewards already received (session only). Kept apart
+  // from the patients: a case is "treated" with or without its thank-you.
+  const [claimedRewards, setClaimedRewards] = useState<ReadonlySet<string>>(
+    new Set(),
+  );
+  const claimedRewardsRef = useRef(claimedRewards);
   const [knownRecipeIds, setKnownRecipeIds] = useState<ReadonlySet<string>>(
     new Set(),
   );
@@ -260,6 +266,7 @@ export function GameWorld({ language }: { language: Language }) {
     (effects: readonly StoryEffect[]): boolean => {
       let nextInventory = inventoryRef.current;
       let nextPatients = patientsRef.current;
+      let nextRewards = claimedRewardsRef.current;
       const obtained: string[] = [];
 
       for (const effect of effects) {
@@ -272,6 +279,8 @@ export function GameWorld({ language }: { language: Language }) {
 
           nextInventory = added;
           obtained.push(effect.itemId);
+        } else if (effect.type === "claim-reward") {
+          nextRewards = new Set([...nextRewards, effect.rewardId]);
         } else {
           const definition = CHAPTER1_PATIENTS[effect.patientId];
           const treated = treatPatient(nextPatients, definition, nextInventory);
@@ -293,6 +302,11 @@ export function GameWorld({ language }: { language: Language }) {
       if (nextPatients !== patientsRef.current) {
         patientsRef.current = nextPatients;
         setPatients(nextPatients);
+      }
+
+      if (nextRewards !== claimedRewardsRef.current) {
+        claimedRewardsRef.current = nextRewards;
+        setClaimedRewards(nextRewards);
       }
 
       for (const itemId of obtained) {
@@ -386,7 +400,11 @@ export function GameWorld({ language }: { language: Language }) {
       // carries (the baker, the merchant's cloth, the river).
       const outcome = resolveStoryInteraction(
         interactionId,
-        { patients: patientsRef.current, inventory: inventoryRef.current },
+        {
+          patients: patientsRef.current,
+          inventory: inventoryRef.current,
+          claimedRewards: claimedRewardsRef.current,
+        },
         language,
         source.instanceId ?? "",
       );
@@ -639,10 +657,11 @@ export function GameWorld({ language }: { language: Language }) {
   };
 
   // The characters with news for the Doctor: derived from the cases (a case
-  // that is only discovered still waits for its visit).
+  // that is only discovered still waits for its visit, a treated one may still
+  // owe its thank-you).
   const attentionInstanceIds = useMemo(
-    () => getAttentionInstanceIds(patients),
-    [patients],
+    () => getAttentionInstanceIds(patients, claimedRewards),
+    [patients, claimedRewards],
   );
 
   // The hint of the current step. The interaction hint only shows while the

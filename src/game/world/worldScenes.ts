@@ -217,10 +217,14 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
         apothecaryInteriorSpawns,
         "apothecary-interior-spawn-2",
       ),
-      "from-doctor-room": spawnAt(
-        apothecaryInteriorSpawns,
-        "apothecary-interior-spawn-1",
-      ),
+      // Down from the Doctor's Room: the painted spawn point (same x, y), but
+      // the Doctor faces south into the room. The facing is set here, on this
+      // one arrival, so the painted spawn record and every other arrival keep
+      // their own direction.
+      "from-doctor-room": {
+        ...spawnAt(apothecaryInteriorSpawns, "apothecary-interior-spawn-1"),
+        direction: "south",
+      },
     },
   },
   "doctor-room": {

@@ -123,6 +123,41 @@ test("the Doctor starts beside the bed, facing south, clear of furniture and the
   assert.ok(WORLD_SCENES["apothecary-interior"].arrivals["from-doctor-room"]);
 });
 
+test("leaving the Doctor's Room: the Doctor arrives in the Apothecary at the approved spot, facing SOUTH", () => {
+  const { apothecaryInteriorSpawns } = at(
+    "src/game/apothecary/apothecaryInteriorGeometry.ts",
+  );
+  const arrivals = WORLD_SCENES["apothecary-interior"].arrivals;
+  const painted = apothecaryInteriorSpawns.find(
+    (spawn) => spawn.id === "apothecary-interior-spawn-1",
+  );
+  // the exit really leads to this arrival
+  const exit = WORLD_SCENES["doctor-room"].exits[0];
+  assert.equal(exit.targetScene, "apothecary-interior");
+  assert.equal(arrivals[exit.targetSpawn], arrivals["from-doctor-room"]);
+  // same coordinates as before, now facing south
+  assert.deepEqual(arrivals["from-doctor-room"], {
+    x: 444,
+    y: 147,
+    direction: "south",
+  });
+  assert.equal(arrivals["from-doctor-room"].x, painted.x);
+  assert.equal(arrivals["from-doctor-room"].y, painted.y);
+  // the painted spawn record and the other arrivals are untouched
+  assert.equal(painted.direction, "north");
+  assert.deepEqual(arrivals["from-apothecary-street"], {
+    x: 235,
+    y: 219,
+    direction: "south",
+  });
+  // nothing in the scene overrides the arrival's facing
+  assert.ok(
+    read("src/game/apothecary/ApothecaryScene.tsx").includes(
+      "initialDirection: spawn.direction",
+    ),
+  );
+});
+
 test("the opening uses the writing illustration only; the other two stay available, unused", () => {
   for (const [id, illustration] of Object.entries(NARRATIVE_ILLUSTRATIONS)) {
     const file = path.join(root, "public", illustration.src);

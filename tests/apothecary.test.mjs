@@ -222,10 +222,12 @@ test("15-16. the transitions keep their destinations", () => {
 test("17. the neighbouring scenes arrive at the right Botica spawns", () => {
   const [s1, s2] = geo.apothecaryInteriorSpawns;
   // from the Doctor room: the right-hand door side (spawn-1); from the street: in front of the bottom exit (spawn-2)
+  // same spot as the painted spawn, but facing south into the room (the
+  // painted spawn itself still says north; see worldScenes.ts)
   assert.deepEqual(botica.arrivals["from-doctor-room"], {
     x: s1.x,
     y: s1.y,
-    direction: s1.direction,
+    direction: "south",
   });
   assert.deepEqual(botica.arrivals["from-apothecary-street"], {
     x: s2.x,

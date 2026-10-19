@@ -42,17 +42,40 @@ export const CHAPTER1_PATIENT_NPC_INSTANCES: Record<string, string> = {
   [BAKER_HUSBAND_ID]: "bakery-interior-baker-01",
 };
 
+// The one-time thank-you of the baker once her husband is treated: Salt x1.
+// It is a narrative flag (see GameWorld's claimed rewards), NOT a patient
+// status: the case stays "treated" whether or not the gift was collected.
+export const BAKER_SALT_REWARD_ID = "chapter1.baker.salt";
+export const BAKER_SALT_REWARD = { itemId: "salt", quantity: 1 } as const;
+
+// The one-time thank-you each case may still owe the Doctor.
+export const CHAPTER1_PATIENT_REWARDS: Record<string, string> = {
+  [BAKER_HUSBAND_ID]: BAKER_SALT_REWARD_ID,
+};
+
 // The placed characters that show the "!": the person attached to each case
-// that is still only discovered (its visit is pending). Derived from the
-// statuses, so it is never stored and it vanishes by itself after the visit.
+// that either still has its visit pending (DISCOVERED) or, once TREATED, still
+// has a thank-you waiting that was not received yet. Derived from the statuses
+// and the claimed rewards, so it is never stored: it vanishes by itself after
+// the visit, and again the moment the reward is really received (a reward that
+// did not fit in the inventory is not received, so the "!" stays).
 export function getAttentionInstanceIds(
   state: PatientCasesState,
+  claimedRewards: ReadonlySet<string> = new Set(),
 ): ReadonlySet<string> {
   return new Set(
     Object.entries(CHAPTER1_PATIENT_NPC_INSTANCES)
-      .filter(
-        ([patientId]) => getPatientStatus(state, patientId) === "discovered",
-      )
+      .filter(([patientId]) => {
+        const status = getPatientStatus(state, patientId);
+        const rewardId = CHAPTER1_PATIENT_REWARDS[patientId];
+
+        return (
+          status === "discovered" ||
+          (status === "treated" &&
+            rewardId !== undefined &&
+            !claimedRewards.has(rewardId))
+        );
+      })
       .map(([, instanceId]) => instanceId),
   );
 }

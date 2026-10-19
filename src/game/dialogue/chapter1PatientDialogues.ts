@@ -87,6 +87,36 @@ export const bakerAfter: LocalizedConversation = {
   ],
 };
 
+// The first time the baker is spoken to after her husband was treated: she
+// thanks the Doctor with a practical gift. Nothing about what it is for.
+export const bakerReward: LocalizedConversation = {
+  id: "chapter1.bakery.baker.reward",
+  lines: [
+    subject(
+      "Ya tiene mejor color, Doctor. No es mucho, pero llévese esto.",
+      "He already looks better, Doctor. It isn't much, but please take this.",
+    ),
+    doctor("¿Sal?", "Salt?"),
+    subject("Siempre hace falta.", "One always needs some."),
+  ],
+};
+
+// The same moment when the Doctor has nowhere to put it: the gift stays hers
+// until he comes back with room.
+export const bakerRewardNoRoom: LocalizedConversation = {
+  id: "chapter1.bakery.baker.rewardNoRoom",
+  lines: [
+    subject(
+      "Doctor, espere. Quería darle algo por las molestias.",
+      "Doctor, wait. I wanted to give you something for your trouble.",
+    ),
+    doctor(
+      "Ahora mismo no puedo cargar nada más. Déjeme hacer sitio y vuelvo.",
+      "I can't carry anything else right now. Let me make some room and I'll be back.",
+    ),
+  ],
+};
+
 export const husbandExam: LocalizedConversation = {
   id: "chapter1.bakery.husband.exam",
   lines: [

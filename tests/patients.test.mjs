@@ -39,6 +39,8 @@ function load(file) {
   return mod.exports;
 }
 const at = (rel) => load(path.join(root, rel));
+const readFileSync = (rel, encoding) =>
+  fs.readFileSync(path.join(root, rel), encoding);
 
 const inv = at("src/game/inventory/inventory.ts");
 const pc = at("src/game/patients/patientCases.ts");
@@ -701,13 +703,16 @@ test("baker: a failed delivery consumes nothing (no partial treatment)", () => {
   assert.equal(pc.treatPatient(withStatus("treated"), DEF, full), null);
 });
 
-test("baker: TREATED > the later dialogue, no scene, no consumption", () => {
+test("baker: TREATED > the later dialogue (after the reward was received), no scene, no consumption", () => {
   const out = story.resolveStoryInteraction(
     BAKER,
-    facts("treated", [
-      ["medicinal-infusion", 1],
-      ["cold-cloth", 1],
-    ]),
+    {
+      ...facts("treated", [
+        ["medicinal-infusion", 1],
+        ["cold-cloth", 1],
+      ]),
+      claimedRewards: new Set([ch1.BAKER_SALT_REWARD_ID]),
+    },
     "es",
     "baker",
   );
@@ -735,20 +740,88 @@ test("baker and husband dialogues exist in ES and EN", () => {
 });
 
 // ---------------------------------------------------------- ATTENTION INDICATOR
-test('the "!" is derived from the case: baker while DISCOVERED only, never stored', () => {
-  const ids = (status) => [...ch1.getAttentionInstanceIds(withStatus(status))];
-  assert.deepEqual(ids("discovered"), ["bakery-interior-baker-01"]);
+test('the "!" is derived from the case: baker while DISCOVERED, never stored', () => {
+  const ids = (status, claimed = []) => [
+    ...ch1.getAttentionInstanceIds(withStatus(status), new Set(claimed)),
+  ];
+  const BAKER_NPC = "bakery-interior-baker-01";
+  // before the treatment: exactly as it always was
+  assert.deepEqual(ids("discovered"), [BAKER_NPC]);
   assert.deepEqual(ids("examined"), []);
-  assert.deepEqual(ids("treated"), []);
   assert.deepEqual(ids("hidden"), []);
   assert.deepEqual(
     [...ch1.getAttentionInstanceIds(ch1.CHAPTER1_INITIAL_PATIENTS)],
-    ["bakery-interior-baker-01"],
+    [BAKER_NPC],
   );
+  // a claimed reward changes nothing before the treatment
+  assert.deepEqual(ids("discovered", [ch1.BAKER_SALT_REWARD_ID]), [BAKER_NPC]);
+  assert.deepEqual(ids("examined", [ch1.BAKER_SALT_REWARD_ID]), []);
   // the baker is a real placed character with an interaction
-  assert.equal(
-    chapter1Interactions["bakery-interior-baker-01"].interactionId,
-    BAKER,
+  assert.equal(chapter1Interactions[BAKER_NPC].interactionId, BAKER);
+});
+
+test('the "!" while the baker\'s Salt is pending: treated and unclaimed shows it; claimed hides it', () => {
+  const BAKER_NPC = "bakery-interior-baker-01";
+  const mark = (claimed) => [
+    ...ch1.getAttentionInstanceIds(withStatus("treated"), new Set(claimed)),
+  ];
+  // treated + reward pending => the mark (also when no claimed set is given)
+  assert.deepEqual(mark([]), [BAKER_NPC]);
+  assert.deepEqual(
+    [...ch1.getAttentionInstanceIds(withStatus("treated"))],
+    [BAKER_NPC],
+  );
+  // treated + reward claimed => no mark
+  assert.deepEqual(mark([ch1.BAKER_SALT_REWARD_ID]), []);
+  // an unrelated claimed reward does not hide it
+  assert.deepEqual(mark(["some.other.reward"]), [BAKER_NPC]);
+  // the status itself is unchanged: still the same four values
+  assert.equal(pc.getPatientStatus(withStatus("treated"), HUSBAND), "treated");
+});
+
+test('the "!" follows the real reward: a full inventory keeps it, a successful retry removes it', () => {
+  const BAKER_NPC = "bakery-interior-baker-01";
+  let claimed = new Set();
+  const marked = () => [
+    ...ch1.getAttentionInstanceIds(withStatus("treated"), claimed),
+  ];
+  // what GameWorld does with an outcome: only if its effects applied does it claim
+  const talk = (pairs) => {
+    const out = story.resolveStoryInteraction(
+      BAKER,
+      { ...facts("treated", pairs), claimedRewards: claimed },
+      "es",
+      "baker",
+    );
+    const claim = out.effects.find((e) => e.type === "claim-reward");
+    if (claim) claimed = new Set([...claimed, claim.rewardId]);
+    return out;
+  };
+  const full = ["a", "b", "c", "d", "e", "f"].map((id) => [id, 1]);
+
+  assert.deepEqual(marked(), [BAKER_NPC]); // treated, reward pending
+  talk(full); // full inventory: no Salt, nothing claimed
+  assert.deepEqual(marked(), [BAKER_NPC]); // the "!" stays
+  talk(full);
+  assert.deepEqual(marked(), [BAKER_NPC]);
+  talk(full.slice(1)); // room made: Salt received
+  assert.deepEqual(marked(), []); // the "!" is gone at once
+  // later talks: no mark, no Salt, the normal aftermath
+  const again = talk([["salt", 1]]);
+  assert.equal(again.conversation.id, "chapter1.bakery.baker.after");
+  assert.deepEqual(again.effects, []);
+  assert.deepEqual(marked(), []);
+
+  // GameWorld feeds the real claimed set to the one marker system
+  const game = readFileSync("src/game/world/GameWorld.tsx", "utf8");
+  assert.ok(game.includes("getAttentionInstanceIds(patients, claimedRewards)"));
+  assert.ok(game.includes("[patients, claimedRewards]"));
+  // no second marker component and no new status
+  assert.ok(!/RewardMark|SaltMark|PendingMark/.test(game));
+  assert.ok(
+    !/rewarded|claimed|completed/i.test(
+      readFileSync("src/game/patients/patientCases.ts", "utf8"),
+    ),
   );
 });
 
@@ -1015,6 +1088,173 @@ test("dialogue placement: only the sick husband speaks from below; returning fro
     arrivals["from-bakery-street"].y,
   );
   assert.notEqual(arrivals["from-bakery-street"].direction, "south");
+});
+
+// ------------------------------------------------------------ BAKER'S SALT
+const SALT = { type: "give-item", itemId: "salt", quantity: 1 };
+const CLAIM = { type: "claim-reward", rewardId: ch1.BAKER_SALT_REWARD_ID };
+const talkToBaker = (status, pairs = [], claimed = []) =>
+  story.resolveStoryInteraction(
+    BAKER,
+    { ...facts(status, pairs), claimedRewards: new Set(claimed) },
+    "es",
+    "baker",
+  );
+
+test("baker's Salt: nothing is given before Patient 1 is treated", () => {
+  for (const status of ["hidden", "discovered", "examined"]) {
+    const out = talkToBaker(status);
+    const effects = out ? out.effects : [];
+    assert.ok(
+      !effects.some((e) => e.type === "give-item" && e.itemId === "salt"),
+      status,
+    );
+    assert.ok(!effects.some((e) => e.type === "claim-reward"), status);
+  }
+  // delivering the treatment only treats: no Salt comes with it
+  const delivery = talkToBaker("examined", [
+    ["medicinal-infusion", 1],
+    ["cold-cloth", 1],
+  ]);
+  assert.deepEqual(delivery.effects, [{ type: "treat", patientId: HUSBAND }]);
+});
+
+test("baker's Salt: the first talk after the treatment gives Salt x1 and claims the reward, together", () => {
+  const out = talkToBaker("treated");
+  assert.equal(out.conversation.id, "chapter1.bakery.baker.reward");
+  assert.deepEqual(out.effects, [SALT, CLAIM]);
+  assert.equal(out.after, undefined);
+  // ordinary Salt: the catalog item, no special variant, not locked or quest-only
+  assert.equal(ch1.BAKER_SALT_REWARD.itemId, "salt");
+  assert.equal(ch1.BAKER_SALT_REWARD.quantity, 1);
+  assert.ok(getItem("salt"));
+  assert.ok(
+    !Object.keys(at("src/game/items/items.ts").ITEMS).some((id) =>
+      /quest|baker-salt/.test(id),
+    ),
+  );
+  // the item is added with the normal inventory API (merge or new slot)
+  const added = inv.addItem(stock([]), "salt", 1);
+  assert.equal(inv.countItem(added, "salt"), 1);
+});
+
+test("baker's Salt: an existing Salt stack merges, even in a full inventory", () => {
+  const withSalt = stock([["salt", 2]]);
+  const out = talkToBaker("treated", [["salt", 2]]);
+  assert.deepEqual(out.effects, [SALT, CLAIM]);
+  assert.equal(inv.countItem(inv.addItem(withSalt, "salt", 1), "salt"), 3);
+  // all 6 slots taken, one of them Salt: still fits (no new slot needed)
+  const fullWithSalt = stock([
+    ["salt", 1],
+    ...["a", "b", "c", "d", "e"].map((id) => [id, 1]),
+  ]);
+  assert.equal(inv.countOccupiedSlots(fullWithSalt), 6);
+  const merged = talkToBaker("treated", [
+    ["salt", 1],
+    ...["a", "b", "c", "d", "e"].map((id) => [id, 1]),
+  ]);
+  assert.deepEqual(merged.effects, [SALT, CLAIM]);
+  assert.equal(inv.countItem(inv.addItem(fullWithSalt, "salt", 1), "salt"), 2);
+});
+
+test("baker's Salt: exactly once; using the Salt up later does not bring it back", () => {
+  const claimed = [ch1.BAKER_SALT_REWARD_ID];
+  // asking again (with and without Salt in the pocket) never gives more
+  for (const pairs of [[["salt", 1]], [], [["water", 2]]]) {
+    const out = talkToBaker("treated", pairs, claimed);
+    assert.equal(out.conversation.id, "chapter1.bakery.baker.after");
+    assert.deepEqual(out.effects, []);
+  }
+  // having Salt never marks the reward as received: only the flag does
+  assert.deepEqual(talkToBaker("treated", [["salt", 5]]).effects, [
+    SALT,
+    CLAIM,
+  ]);
+});
+
+test("baker's Salt: a full inventory gives nothing and records nothing; with room it is given on the next try", () => {
+  const full = ["a", "b", "c", "d", "e", "f"].map((id) => [id, 1]);
+  const blocked = talkToBaker("treated", full);
+  assert.equal(blocked.conversation.id, "chapter1.bakery.baker.rewardNoRoom");
+  assert.deepEqual(blocked.effects, []); // no item, no claim, no loss, no duplicate
+  // asking again while still full: same refusal, still unclaimed
+  assert.equal(
+    talkToBaker("treated", full).conversation.id,
+    "chapter1.bakery.baker.rewardNoRoom",
+  );
+  // the Doctor makes room (puts one thing away) and tries again
+  const room = full.slice(1);
+  const retry = talkToBaker("treated", room);
+  assert.equal(retry.conversation.id, "chapter1.bakery.baker.reward");
+  assert.deepEqual(retry.effects, [SALT, CLAIM]);
+  // the gift never goes to Storage or the floor: the only effects are give-item + claim
+  assert.ok(
+    retry.effects.every(
+      (e) => e.type === "give-item" || e.type === "claim-reward",
+    ),
+  );
+});
+
+test("baker's Salt: the flag is applied together with the item, separate from the patient's status", () => {
+  const game = readFileSync("src/game/world/GameWorld.tsx", "utf8");
+  // inside applyStoryEffects: added with addItem, and committed only if every effect worked
+  const apply = game.slice(
+    game.indexOf("const applyStoryEffects = useCallback("),
+    game.indexOf("const handleStorageTransfer"),
+  );
+  assert.ok(
+    apply.includes("addItem(nextInventory, effect.itemId, effect.quantity)"),
+  );
+  assert.ok(apply.includes('effect.type === "claim-reward"'));
+  assert.ok(apply.indexOf("return false") < apply.indexOf("setClaimedRewards"));
+  assert.ok(game.includes("claimedRewards: claimedRewardsRef.current"));
+  // the medical statuses were not expanded
+  const cases = readFileSync("src/game/patients/patientCases.ts", "utf8");
+  assert.ok(!/rewarded|claimed|completed/i.test(cases));
+  // the case is still "treated" after the reward
+  let state = pc.advancePatient(
+    pc.advancePatient(withStatus("discovered"), HUSBAND, "examined"),
+    HUSBAND,
+    "treated",
+  );
+  assert.equal(pc.getPatientStatus(state, HUSBAND), "treated");
+  assert.ok(patientTexts("treated").includes("✓ TRATADO")); // the Book is unchanged
+});
+
+test("baker's Salt: Patient 1's treatment is unchanged and no other patient or recipe appears", () => {
+  // treating still consumes exactly the two prepared items
+  const full = stock([
+    ["medicinal-infusion", 1],
+    ["cold-cloth", 1],
+    ["water", 1],
+  ]);
+  const result = pc.treatPatient(withStatus("examined"), DEF, full);
+  assert.equal(inv.countItem(result.inventory, "medicinal-infusion"), 0);
+  assert.equal(inv.countItem(result.inventory, "cold-cloth"), 0);
+  assert.equal(inv.countItem(result.inventory, "water"), 1);
+  assert.equal(inv.countItem(result.inventory, "salt"), 0); // no Salt from the treatment itself
+  assert.deepEqual(DEF.requiredTreatments, [
+    { itemId: "medicinal-infusion", quantity: 1 },
+    { itemId: "cold-cloth", quantity: 1 },
+  ]);
+  assert.deepEqual(Object.keys(ch1.CHAPTER1_PATIENTS), [HUSBAND]);
+  assert.deepEqual(Object.keys(ch1.CHAPTER1_INITIAL_PATIENTS), [HUSBAND]);
+  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 6);
+  // the reward conversations say nothing about patients, soup or recipes
+  for (const lang of ["es", "en"]) {
+    for (const key of ["bakerReward", "bakerRewardNoRoom"]) {
+      const lines = at("src/game/dialogue/chapter1PatientDialogues.ts")[key]
+        .lines;
+      const text = lines
+        .map((l) => (typeof l.text === "string" ? l.text : l.text[lang]))
+        .join(" ")
+        .toLowerCase();
+      assert.ok(
+        text.trim() && !/sopa|soup|receta|recipe|paciente|patient/.test(text),
+        `${lang}/${key}`,
+      );
+    }
+  }
 });
 
 console.log(`\n${passed} tests passed`);
