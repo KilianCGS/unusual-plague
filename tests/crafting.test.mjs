@@ -475,14 +475,22 @@ test("20. every visible crafting text exists in ES and EN", () => {
 test("21. craft.manual and craft.fire are the two stations of the game, each with its own station", () => {
   assert.equal(cr.CRAFT_STATION_BY_INTERACTION_ID["craft.manual"], "manual");
   assert.equal(cr.CRAFT_STATION_BY_INTERACTION_ID["craft.fire"], "fire");
-  assert.deepEqual(Object.keys(cr.CRAFT_STATION_BY_INTERACTION_ID).sort(), ["craft.fire", "craft.manual"]);
+  assert.deepEqual(Object.keys(cr.CRAFT_STATION_BY_INTERACTION_ID).sort(), [
+    "craft.fire",
+    "craft.manual",
+  ]);
 });
 
 test("22. the Apothecary places them: two table zones and one stove zone (details in apothecary.test.mjs)", () => {
-  const ids = getSceneInteractionZones("apothecary-interior").map((z) => z.interactionId);
-  // the crafting zones, unchanged, followed by the storage chest (not a station)
-  assert.deepEqual(ids, ["craft.manual", "craft.manual", "craft.fire", "storage.apothecary"]);
-  assert.ok(!Object.values(chapter1Interactions).some((i) => i.interactionId.startsWith("craft.")));
+  const ids = getSceneInteractionZones("apothecary-interior").map(
+    (z) => z.interactionId,
+  );
+  assert.deepEqual(ids, ["craft.manual", "craft.manual", "craft.fire"]);
+  assert.ok(
+    !Object.values(chapter1Interactions).some((i) =>
+      i.interactionId.startsWith("craft."),
+    ),
+  );
 });
 
 console.log(`\n${passed} tests passed`);

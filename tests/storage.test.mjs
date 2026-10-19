@@ -46,7 +46,7 @@ const cr = at("src/game/crafting/crafting.ts");
 const pc = at("src/game/patients/patientCases.ts");
 const ch1 = at("src/game/patients/chapter1Patients.ts");
 const { RECIPES } = at("src/game/crafting/recipes.ts");
-const { createChapter1Inventory } = at(
+const { createChapter1Inventory, createChapter1Storage } = at(
   "src/game/inventory/initialInventory.ts",
 );
 const { getSceneInteractionZones } = at(
@@ -131,23 +131,36 @@ test("F. a full Doctor inventory still receives more of a type it already carrie
   assert.equal(inv.countOccupiedSlots(out.destination), 6);
 });
 
-test("G/H. the Empty flask is an ordinary item: it can be stored and retrieved", () => {
+test("G/H. the Empty flask is an ordinary item: it can be retrieved from the chest and stored again", () => {
   const doctor = createChapter1Inventory();
-  assert.equal(inv.countItem(doctor, "empty-flask"), 1);
+  const chest = createChapter1Storage();
+  assert.equal(inv.countItem(doctor, "empty-flask"), 0);
+  assert.equal(inv.countItem(chest, "empty-flask"), 1);
+  // retrieve it (the normal full-stack transfer, nothing special)
+  const taken = st.transferStack(chest, doctor, "empty-flask");
+  assert.equal(inv.countItem(taken.destination, "empty-flask"), 1);
+  assert.equal(inv.countItem(taken.source, "empty-flask"), 0);
+  // ...and put it back
   const stored = st.transferStack(
-    doctor,
-    st.createEmptyStorage(),
+    taken.destination,
+    taken.source,
     "empty-flask",
   );
-  assert.equal(inv.countItem(stored.source, "empty-flask"), 0);
   assert.equal(inv.countItem(stored.destination, "empty-flask"), 1);
-  const back = st.transferStack(
-    stored.destination,
-    stored.source,
-    "empty-flask",
-  );
-  assert.equal(inv.countItem(back.destination, "empty-flask"), 1);
-  assert.equal(inv.countItem(back.source, "empty-flask"), 0);
+  assert.equal(inv.countItem(stored.source, "empty-flask"), 0);
+});
+
+test("exactly ONE initial Empty flask exists across the carried inventory and the Storage", () => {
+  const total = (a, b) =>
+    inv.countItem(a, "empty-flask") + inv.countItem(b, "empty-flask");
+  const doctor = createChapter1Inventory();
+  const chest = createChapter1Storage();
+  assert.equal(total(doctor, chest), 1);
+  // taking it never duplicates it
+  const taken = st.transferStack(chest, doctor, "empty-flask");
+  assert.equal(total(taken.destination, taken.source), 1);
+  assert.equal(chest.capacity, st.STORAGE_CAPACITY);
+  assert.equal(st.STORAGE_CAPACITY, 24);
 });
 
 test("I/J. gather.water needs the flask CARRIED (not stored) and never consumes it", () => {
@@ -155,29 +168,29 @@ test("I/J. gather.water needs the flask CARRIED (not stored) and never consumes 
   const decide = (inventory) =>
     story.getGatherDecision("gather.water", { patients: examined, inventory });
 
-  assert.equal(decide(createChapter1Inventory()), "gather");
-
-  // flask left in storage: the Doctor carries none
-  const left = st.transferStack(
-    createChapter1Inventory(),
-    st.createEmptyStorage(),
-    "empty-flask",
-  );
-  assert.equal(decide(left.source), "no-container");
-  const out = story.resolveStoryInteraction(
+  // at the start of the game the flask is still in the chest
+  const start = createChapter1Inventory();
+  const chest = createChapter1Storage();
+  assert.equal(decide(start), "no-container");
+  const refusal = story.resolveStoryInteraction(
     "gather.water",
-    { patients: examined, inventory: left.source },
+    { patients: examined, inventory: start },
     "en",
     "river",
   );
-  assert.deepEqual(out.effects, []);
-  assert.equal(out.notice, "I need a container to collect water.");
+  assert.deepEqual(refusal.effects, []);
+  assert.equal(refusal.notice, "I need a container to collect water.");
 
-  // taken out again: water is available and the flask stays
-  const again = st.transferStack(left.destination, left.source, "empty-flask");
-  const gathered = inv.addItem(again.destination, "water", 1);
+  // once it is taken out, water can be gathered and the flask stays
+  const taken = st.transferStack(chest, start, "empty-flask");
+  assert.equal(decide(taken.destination), "gather");
+  const gathered = inv.addItem(taken.destination, "water", 1);
   assert.equal(decide(gathered), "gather");
   assert.equal(inv.countItem(gathered, "empty-flask"), 1);
+
+  // left in the chest again: the Doctor carries none
+  const left = st.transferStack(taken.destination, taken.source, "empty-flask");
+  assert.equal(decide(left.source), "no-container");
 });
 
 test("storage is not crafting stock: a recipe only sees the carried inventory", () => {
@@ -189,30 +202,46 @@ test("storage is not crafting stock: a recipe only sees the carried inventory", 
   assert.equal(cr.canCraft(moved.destination, bandage), true);
 });
 
-test("the storage chest zone is exactly the measured rectangle, any facing, and the crafting zones are untouched", () => {
-  assert.equal(st.STORAGE_INTERACTION_ID, "storage.apothecary");
-  assert.deepEqual(st.apothecaryStorageInteractions, [
+test("the Doctor's Storage is reached ONLY from the chest in his room: exact zone, any facing, no Apothecary access", () => {
+  assert.equal(st.STORAGE_INTERACTION_ID, "storage.doctor-room");
+  assert.deepEqual(st.doctorRoomStorageInteractions, [
     {
-      id: "apothecary-interior-interaction-4",
-      x: 130,
-      y: 97,
-      width: 26,
-      height: 4,
-      interactionId: "storage.apothecary",
+      id: "doctor-room-interaction-1",
+      x: 228,
+      y: 212,
+      width: 9,
+      height: 47,
+      interactionId: "storage.doctor-room",
     },
   ]);
   assert.equal(
-    st.apothecaryStorageInteractions[0].requiredDirection,
+    st.doctorRoomStorageInteractions[0].requiredDirection,
     undefined,
   );
-
-  const zones = getSceneInteractionZones("apothecary-interior");
-  assert.equal(zones.length, 4);
   assert.deepEqual(
-    zones.slice(0, 3).map((z) => z.interactionId),
+    getSceneInteractionZones("doctor-room"),
+    st.doctorRoomStorageInteractions,
+  );
+
+  // the Apothecary keeps only its three crafting zones
+  const zones = getSceneInteractionZones("apothecary-interior");
+  assert.deepEqual(
+    zones.map((z) => z.interactionId),
     ["craft.manual", "craft.manual", "craft.fire"],
   );
-  assert.deepEqual(zones[3], st.apothecaryStorageInteractions[0]);
+  for (const zone of zones)
+    assert.notEqual(zone.interactionId, "storage.apothecary");
+  assert.equal(st.apothecaryStorageInteractions, undefined);
+
+  // a zone, not a collider
+  const { doctorRoomColliders } = at(
+    "src/game/doctor-room/doctorRoomGeometry.ts",
+  );
+  assert.ok(
+    !doctorRoomColliders.some(
+      (c) => c.x === 228 && c.y === 212 && c.width === 9 && c.height === 47,
+    ),
+  );
 });
 
 test("crafting shapes for the first days: generic 2- and 3-input recipes on both stations", () => {
@@ -253,7 +282,12 @@ test("crafting shapes for the first days: generic 2- and 3-input recipes on both
 test("K. the baker's husband stays completable within 6 slots (gather > craft > treat)", () => {
   const def = ch1.CHAPTER1_PATIENTS[ch1.BAKER_HUSBAND_ID];
   const recipe = (id) => RECIPES.find((r) => r.id === id);
-  let doctor = createChapter1Inventory(); // flask
+  // the flask is taken out of the chest first (it starts there)
+  let doctor = st.transferStack(
+    createChapter1Storage(),
+    createChapter1Inventory(),
+    "empty-flask",
+  ).destination;
   // gather 2 water, 1 herb, 1 cloth: flask + water + herb + cloth = 4 types
   doctor = stock(
     [

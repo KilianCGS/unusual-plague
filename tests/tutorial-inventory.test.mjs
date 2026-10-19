@@ -36,7 +36,9 @@ function load(file) {
 }
 const at = (rel) => load(path.join(root, rel));
 
-const { advanceTutorial, INITIAL_TUTORIAL_STEP } = at("src/game/tutorial/tutorialFlow.ts");
+const { advanceTutorial, INITIAL_TUTORIAL_STEP } = at(
+  "src/game/tutorial/tutorialFlow.ts",
+);
 const { tutorialCopy } = at("src/game/i18n/tutorial.ts");
 const { inventoryCopy } = at("src/game/i18n/inventory.ts");
 const inv = at("src/game/inventory/inventory.ts");
@@ -48,20 +50,45 @@ const test = (name, fn) => {
   console.log("ok -", name);
 };
 
-const ALL_EVENTS = ["intro-finished", "book-opened", "map-opened", "player-moved", "interaction-started"];
+const ALL_EVENTS = [
+  "intro-finished",
+  "book-opened",
+  "book-page-changed",
+  "book-tab-changed",
+  "book-closed",
+  "map-opened",
+  "player-moved",
+  "chest-in-range",
+  "chest-out-of-range",
+  "chest-opened",
+  "storage-closed",
+  "flask-taken",
+];
 const ORDER = [
   ["intro", "intro-finished", "book"],
-  ["book", "book-opened", "map"],
+  ["book", "book-opened", "book-page"],
+  ["book-page", "book-page-changed", "book-tab"],
+  ["book-tab", "book-tab-changed", "book-close"],
+  ["book-close", "book-closed", "map"],
   ["map", "map-opened", "move"],
-  ["move", "player-moved", "interact"],
-  ["interact", "interaction-started", "done"],
+  ["move", "player-moved", "chest-approach"],
+  ["chest-approach", "chest-in-range", "chest-interact"],
+  ["chest-interact", "chest-opened", "take-flask"],
+  ["take-flask", "flask-taken", "done"],
 ];
+// The only other transitions: walking away from the chest / closing the
+// Storage step back one, and the flask (already carried) finishes any chest step.
+const EXTRA = {
+  "chest-approach": ["flask-taken"],
+  "chest-interact": ["chest-out-of-range", "flask-taken"],
+  "take-flask": ["storage-closed"],
+};
 
 test("the tutorial starts at the monologue", () => {
   assert.equal(INITIAL_TUTORIAL_STEP, "intro");
 });
 
-test("steps go intro > book > map > move > interact > done, each by its own event", () => {
+test("steps go intro > book > page > tab > close > map > move > chest-approach > chest-interact > take-flask > done, each by its own event", () => {
   let step = INITIAL_TUTORIAL_STEP;
   for (const [from, event, to] of ORDER) {
     assert.equal(step, from);
@@ -72,37 +99,108 @@ test("steps go intro > book > map > move > interact > done, each by its own even
 
 test("any other event does not advance a step", () => {
   for (const [from, own] of ORDER) {
-    for (const event of ALL_EVENTS.filter((e) => e !== own)) {
-      assert.equal(advanceTutorial(from, event), from, `${from} ignores ${event}`);
+    for (const event of ALL_EVENTS.filter(
+      (e) => e !== own && !(EXTRA[from] ?? []).includes(e),
+    )) {
+      assert.equal(
+        advanceTutorial(from, event),
+        from,
+        `${from} ignores ${event}`,
+      );
     }
   }
 });
 
-test("interaction only completes the LAST step (an early E does nothing)", () => {
-  for (const step of ["intro", "book", "map", "move"]) {
-    assert.equal(advanceTutorial(step, "interaction-started"), step);
+test("the chest steps cannot be skipped by early events, and a random E has no event at all", () => {
+  for (const step of [
+    "intro",
+    "book",
+    "book-page",
+    "book-tab",
+    "book-close",
+    "map",
+    "move",
+  ]) {
+    for (const event of [
+      "chest-in-range",
+      "chest-opened",
+      "flask-taken",
+      "storage-closed",
+      "chest-out-of-range",
+    ]) {
+      assert.equal(
+        advanceTutorial(step, event),
+        step,
+        `${step} ignores ${event}`,
+      );
+    }
   }
-  assert.equal(advanceTutorial("interact", "interaction-started"), "done");
+  assert.equal(
+    advanceTutorial("chest-approach", "chest-opened"),
+    "chest-approach",
+  );
+  assert.equal(
+    advanceTutorial("chest-approach", "storage-closed"),
+    "chest-approach",
+  );
+  assert.equal(
+    advanceTutorial("chest-interact", "chest-in-range"),
+    "chest-interact",
+  );
 });
 
 test("events fired early are not remembered (movement before its step is lost)", () => {
   let step = advanceTutorial("book", "player-moved");
   assert.equal(step, "book");
-  step = advanceTutorial(advanceTutorial(step, "book-opened"), "map-opened");
+  for (const event of [
+    "book-opened",
+    "book-page-changed",
+    "book-tab-changed",
+    "book-closed",
+    "map-opened",
+  ]) {
+    step = advanceTutorial(step, event);
+  }
   assert.equal(step, "move"); // still has to move for real
+  // being at the chest before the movement step is not remembered either
+  assert.equal(
+    advanceTutorial(advanceTutorial("move", "chest-in-range"), "player-moved"),
+    "chest-approach",
+  );
 });
 
 test("done is final", () => {
-  for (const event of ALL_EVENTS) assert.equal(advanceTutorial("done", event), "done");
+  for (const event of ALL_EVENTS)
+    assert.equal(advanceTutorial("done", event), "done");
 });
 
 test("every hint step has ES and EN copy with its key", () => {
-  const keys = { book: "Q", map: "TAB", move: "WASD", interact: "E" };
+  const keys = {
+    book: "Q",
+    "book-page": "→",
+    "book-close": "Esc",
+    map: "TAB",
+    move: "WASD",
+    "chest-interact": "E",
+  };
   for (const lang of ["es", "en"]) {
     for (const [step, key] of Object.entries(keys)) {
       const copy = tutorialCopy[lang][step];
       assert.ok(copy.body.trim());
-      assert.ok(copy.title.some((p) => typeof p === "object" && p.key === key), `${lang}/${step}`);
+      assert.ok(
+        copy.title.some((p) => typeof p === "object" && p.key === key),
+        `${lang}/${step}`,
+      );
+    }
+  }
+  // the tab, approach and take-flask steps name no key but still have copy
+  for (const lang of ["es", "en"]) {
+    for (const step of ["book-tab", "chest-approach", "take-flask"]) {
+      assert.ok(
+        tutorialCopy[lang][step].title.length &&
+          tutorialCopy[lang][step].body.trim(),
+        `${lang}/${step}`,
+      );
     }
   }
   assert.ok(inventoryCopy.es.title && inventoryCopy.en.title);
@@ -124,10 +222,29 @@ test("inventory model supports quantities and rejects impossible states", () => 
   assert.ok(inv.isValidInventory(state));
   assert.equal(inv.countOccupiedSlots(state), 1);
   // more slots than capacity
-  assert.ok(!inv.isValidInventory({ capacity: 6, slots: [...state.slots, { itemId: "x", quantity: 1 }] }));
+  assert.ok(
+    !inv.isValidInventory({
+      capacity: 6,
+      slots: [...state.slots, { itemId: "x", quantity: 1 }],
+    }),
+  );
   // empty or fractional quantities
-  assert.ok(!inv.isValidInventory({ ...state, slots: state.slots.map((s, i) => (i === 1 ? { itemId: "x", quantity: 0 } : s)) }));
-  assert.ok(!inv.isValidInventory({ ...state, slots: state.slots.map((s, i) => (i === 1 ? { itemId: "x", quantity: 1.5 } : s)) }));
+  assert.ok(
+    !inv.isValidInventory({
+      ...state,
+      slots: state.slots.map((s, i) =>
+        i === 1 ? { itemId: "x", quantity: 0 } : s,
+      ),
+    }),
+  );
+  assert.ok(
+    !inv.isValidInventory({
+      ...state,
+      slots: state.slots.map((s, i) =>
+        i === 1 ? { itemId: "x", quantity: 1.5 } : s,
+      ),
+    }),
+  );
 });
 
 test("each inventory is independent (no shared slots array)", () => {

@@ -32,17 +32,17 @@ import type { Language } from "../i18n/types";
 import {
   addItem,
   canAddItem,
+  countItem,
   type InventoryState,
 } from "../inventory/inventory";
-import { createChapter1Inventory } from "../inventory/initialInventory";
+import {
+  createChapter1Inventory,
+  createChapter1Storage,
+} from "../inventory/initialInventory";
 import { InventoryOverlay } from "../inventory/InventoryOverlay";
 import { useInventoryHotkeys } from "../inventory/useInventoryHotkeys";
 import { storageCopy } from "../i18n/storage";
-import {
-  createEmptyStorage,
-  STORAGE_INTERACTION_ID,
-  transferStack,
-} from "../storage/storage";
+import { STORAGE_INTERACTION_ID, transferStack } from "../storage/storage";
 import { StorageOverlay, type StorageSide } from "../storage/StorageOverlay";
 import { getItemName } from "../items/items";
 import { MapOverlay } from "../map/MapOverlay";
@@ -61,12 +61,15 @@ import { getPatientMissingIngredients } from "../patients/patientNeeds";
 import { SCENE_TO_MAP_LOCATION } from "../map/mapLocations";
 import { useMapHold } from "../map/useMapHold";
 import { useDirectionInput } from "../protagonist/useDirectionInput";
+import { NarrativeInterlude } from "../narrative/NarrativeInterlude";
+import { NARRATIVE_ILLUSTRATIONS } from "../narrative/illustrations";
 import { TutorialHint } from "../tutorial/TutorialHint";
 import { useTutorial } from "../tutorial/useTutorial";
 import { ItemFeedback } from "../ui/ItemFeedback";
 import { INITIAL_CHAPTER_ID } from "./currentChapter";
 import { ExteriorScene, type SceneOverlayContext } from "./ExteriorScene";
-import { START_SCENE, START_SPAWN, WORLD_SCENES } from "./worldScenes";
+import { getChapterStart } from "./chapterStart";
+import { WORLD_SCENES } from "./worldScenes";
 import type { SceneId } from "./worldScenes";
 
 // Scene changes fade to black and back. The scene swap happens while the
@@ -76,8 +79,8 @@ const SCENE_FADE_MS = 450;
 const COVER_MARGIN_MS = 50;
 // How long an item notice stays on screen (display time only, not gameplay).
 const ITEM_NOTICE_MS = 2600;
-// The opening monologue waits for the title-to-game fade to finish.
-const INTRO_DELAY_MS = 1200;
+// Where the chapter begins: its first scene and, if it has one, its opening.
+const CHAPTER_START = getChapterStart(INITIAL_CHAPTER_ID);
 
 type Phase = "playing" | "fading-out" | "fading-in";
 type WorldState = { sceneId: SceneId; spawnName: string; arrival: number };
@@ -87,8 +90,8 @@ type WorldState = { sceneId: SceneId; spawnName: string; arrival: number };
 export function GameWorld({ language }: { language: Language }) {
   const input = useDirectionInput();
   const [world, setWorld] = useState<WorldState>({
-    sceneId: START_SCENE,
-    spawnName: START_SPAWN,
+    sceneId: CHAPTER_START.sceneId,
+    spawnName: CHAPTER_START.spawnName,
     arrival: 0,
   });
   const dialogue = useDialogue();
@@ -97,13 +100,17 @@ export function GameWorld({ language }: { language: Language }) {
   // No narrative state yet: the chapter is fixed at its initial value.
   const [chapterId] = useState(INITIAL_CHAPTER_ID);
   const phaseRef = useRef<Phase>("playing");
-  // In-memory only: the Chapter's opening monologue plays once per GameWorld
-  // (= per game session), never again on scene changes, book open/close or
-  // re-renders. There is no persistent game state yet.
-  const introPlayedRef = useRef(false);
-  // True while the opening monologue is the conversation on screen, so its end
-  // (and only its end) starts the tutorial.
-  const introActiveRef = useRef(false);
+  // The chapter's opening (illustration + monologue over black) runs once per
+  // GameWorld (= per game session) and never again on scene changes or
+  // re-renders. There is no persistent game state yet. While it runs, the first
+  // scene is already loaded behind it, but nothing can be done in it.
+  const openingConversation = useMemo(
+    () => resolveChapterIntro(INITIAL_CHAPTER_ID, language),
+    [language],
+  );
+  const [openingActive, setOpeningActive] = useState(
+    () => CHAPTER_START.opening !== undefined && openingConversation !== null,
+  );
 
   // Main interfaces. They never open on top of each other, of a conversation
   // or during a scene fade, and each one blocks the Doctor while it is up.
@@ -143,7 +150,7 @@ export function GameWorld({ language }: { language: Language }) {
   const inventoryRef = useRef(inventory);
   // The Apothecary storage: another InventoryState owned here, above the
   // scenes, for the session. Crafting never reads it.
-  const [storage, setStorage] = useState<InventoryState>(createEmptyStorage);
+  const [storage, setStorage] = useState<InventoryState>(createChapter1Storage);
   const storageRef = useRef(storage);
   const [collected, setCollected] =
     useState<CollectedInstanceIds>(NO_COLLECTED);
@@ -154,12 +161,16 @@ export function GameWorld({ language }: { language: Language }) {
   // The tutorial only OBSERVES: the pieces below report what really happened.
   const tutorial = useTutorial();
   const notifyTutorial = tutorial.notify;
-  const [interactionAvailable, setInteractionAvailable] = useState(false);
+  // Which interaction the [E] prompt is for right now (null = none).
+  const [availableInteractionId, setAvailableInteractionId] = useState<
+    string | null
+  >(null);
   // The Baker's Bedroom is a narrative scene: nothing opens and the Doctor does
   // not walk while the story is there.
   const inNarrativeScene = world.sceneId === "bakers-bedroom";
   const canOpenInterface =
     phase === "playing" &&
+    !openingActive &&
     !dialogue.active &&
     craftingStation === null &&
     !storageOpen &&
@@ -174,6 +185,7 @@ export function GameWorld({ language }: { language: Language }) {
   // while a conversation is open; control returns when its last line closes.
   const isPlaying =
     phase === "playing" &&
+    !openingActive &&
     !dialogue.active &&
     !bookOpen &&
     !mapVisible &&
@@ -335,9 +347,7 @@ export function GameWorld({ language }: { language: Language }) {
         return;
       }
 
-      notifyTutorial("interaction-started");
-
-      // The Apothecary storage chest: open its interface.
+      // The Doctor's Storage chest: open its interface.
       if (interactionId === STORAGE_INTERACTION_ID) {
         setStorageOpen(true);
         return;
@@ -411,7 +421,7 @@ export function GameWorld({ language }: { language: Language }) {
         startDialogue(conversation);
       }
     },
-    [language, startDialogue, notifyTutorial, applyStoryEffects, showNotice],
+    [language, startDialogue, applyStoryEffects, showNotice],
   );
 
   // The notice only needs to disappear after a while.
@@ -425,40 +435,25 @@ export function GameWorld({ language }: { language: Language }) {
     return () => window.clearTimeout(timeoutId);
   }, [noticeId]);
 
-  useEffect(() => {
-    if (introPlayedRef.current) {
-      return;
-    }
+  // The opening is over (it ended or was skipped): the Doctor's Room is
+  // revealed and the tutorial begins.
+  const finishOpening = useCallback(() => {
+    setOpeningActive(false);
+    notifyTutorial("intro-finished");
+  }, [notifyTutorial]);
 
-    const timeoutId = window.setTimeout(() => {
-      introPlayedRef.current = true;
-
-      const intro = resolveChapterIntro(chapterId, language);
-
-      if (intro) {
-        introActiveRef.current = true;
-        startDialogue(intro);
-      }
-    }, INTRO_DELAY_MS);
-
-    return () => {
-      window.clearTimeout(timeoutId);
-    };
-  }, [chapterId, language, startDialogue]);
-
-  // Real events for the tutorial: the monologue ended, the Book / the Map were
+  // Real events for the tutorial: the Book was opened / closed, the Map was
   // actually shown.
-  useEffect(() => {
-    if (introActiveRef.current && !dialogue.active) {
-      introActiveRef.current = false;
-      notifyTutorial("intro-finished");
-    }
-  }, [dialogue.active, notifyTutorial]);
+  const bookWasOpenRef = useRef(false);
 
   useEffect(() => {
     if (bookOpen) {
       notifyTutorial("book-opened");
+    } else if (bookWasOpenRef.current) {
+      notifyTutorial("book-closed");
     }
+
+    bookWasOpenRef.current = bookOpen;
   }, [bookOpen, notifyTutorial]);
 
   useEffect(() => {
@@ -466,6 +461,45 @@ export function GameWorld({ language }: { language: Language }) {
       notifyTutorial("map-opened");
     }
   }, [mapVisible, notifyTutorial]);
+
+  // The chest steps, from REAL state. Range: the interaction zone of the chest
+  // is the one the [E] prompt is for (the scene already runs the proximity
+  // test; only while the Doctor can act). Opened / closed: the Storage
+  // interface itself. Flask: the carried inventory really holds it (a failed
+  // transfer changes nothing, so it can never count).
+  const tutorialStepNow = tutorial.step;
+
+  useEffect(() => {
+    if (!isPlaying) {
+      return;
+    }
+
+    notifyTutorial(
+      availableInteractionId === STORAGE_INTERACTION_ID
+        ? "chest-in-range"
+        : "chest-out-of-range",
+    );
+  }, [availableInteractionId, isPlaying, tutorialStepNow, notifyTutorial]);
+
+  const storageWasOpenRef = useRef(false);
+
+  useEffect(() => {
+    if (storageOpen) {
+      notifyTutorial("chest-opened");
+    } else if (storageWasOpenRef.current) {
+      notifyTutorial("storage-closed");
+    }
+
+    storageWasOpenRef.current = storageOpen;
+  }, [storageOpen, notifyTutorial]);
+
+  const carriesFlask = countItem(inventory, "empty-flask") > 0;
+
+  useEffect(() => {
+    if (carriesFlask) {
+      notifyTutorial("flask-taken");
+    }
+  }, [carriesFlask, tutorialStepNow, notifyTutorial]);
 
   const handlePlayerMoved = useCallback(
     () => notifyTutorial("player-moved"),
@@ -614,22 +648,38 @@ export function GameWorld({ language }: { language: Language }) {
   // The hint of the current step. The interaction hint only shows while the
   // [E] prompt does; none shows over an open interface or a conversation.
   const tutorialStep = tutorial.step;
+  // The Book steps only make sense with the Book open; if it is closed again
+  // before they are done, the hint goes back to "open the book".
+  const inBookStep =
+    tutorialStep === "book-page" ||
+    tutorialStep === "book-tab" ||
+    tutorialStep === "book-close";
+  const hintStep = inBookStep && !bookOpen ? "book" : tutorialStep;
+  // The Storage step is taught with the Storage open (and over it); the
+  // "press E" step only while the chest's [E] prompt is showing.
+  const hintOverStorage = storageOpen && tutorialStep === "take-flask";
+  const hintOverBook = bookOpen && inBookStep;
   const hintCopy =
-    tutorialStep === "book" ||
-    tutorialStep === "map" ||
-    tutorialStep === "move" ||
-    (tutorialStep === "interact" && interactionAvailable)
-      ? tutorialCopy[language][tutorialStep]
+    hintStep === "book" ||
+    inBookStep ||
+    hintStep === "map" ||
+    hintStep === "move" ||
+    hintStep === "chest-approach" ||
+    (hintStep === "chest-interact" &&
+      availableInteractionId === STORAGE_INTERACTION_ID) ||
+    hintOverStorage
+      ? tutorialCopy[language][hintStep as keyof (typeof tutorialCopy)["es"]]
       : null;
   const showHint =
     hintCopy !== null &&
     phase === "playing" &&
+    !openingActive &&
     !dialogue.active &&
-    !bookOpen &&
+    (!bookOpen || hintOverBook) &&
     !mapVisible &&
     !inventoryOpen &&
     craftingStation === null &&
-    !storageOpen &&
+    (!storageOpen || hintOverStorage) &&
     !inNarrativeScene;
 
   return (
@@ -645,7 +695,7 @@ export function GameWorld({ language }: { language: Language }) {
           renderOverlay={renderDialogue}
           onPlayerMoved={handlePlayerMoved}
           onInteract={handleInteract}
-          onInteractionAvailable={setInteractionAvailable}
+          onInteractionAvailable={setAvailableInteractionId}
         />
       ) : (
         <ExteriorScene
@@ -661,12 +711,24 @@ export function GameWorld({ language }: { language: Language }) {
           attentionInstanceIds={attentionInstanceIds}
           renderOverlay={renderDialogue}
           onPlayerMoved={handlePlayerMoved}
-          onInteractionAvailable={setInteractionAvailable}
+          onInteractionAvailable={setAvailableInteractionId}
         />
       )}
       {bookOpen ? (
         <BookOverlay
           context={{ language, patients, inventory, knownRecipeIds }}
+          // While the tutorial teaches page turning, the book opens on a section
+          // with several pages made of things the Doctor already knows
+          // (PACIENTES has a single page at the start). INGREDIENTES, not
+          // DOLENCIAS: its pages are plain descriptions, whereas the ailment
+          // pages already spell out future treatments. Only the tab changes.
+          initialSectionId={
+            tutorialStep === "book" || tutorialStep === "book-page"
+              ? "ingredients"
+              : undefined
+          }
+          onPageChange={() => notifyTutorial("book-page-changed")}
+          onSectionChange={() => notifyTutorial("book-tab-changed")}
         />
       ) : null}
       {mapVisible ? (
@@ -697,7 +759,12 @@ export function GameWorld({ language }: { language: Language }) {
       {inventoryOpen ? (
         <InventoryOverlay inventory={inventory} language={language} />
       ) : null}
-      {showHint ? <TutorialHint copy={hintCopy} /> : null}
+      {showHint ? (
+        <TutorialHint
+          copy={hintCopy}
+          aboveOverlays={hintOverBook || hintOverStorage}
+        />
+      ) : null}
       {notice ? <ItemFeedback text={notice.text} /> : null}
       <div
         className="title-screen-fade"
@@ -709,6 +776,16 @@ export function GameWorld({ language }: { language: Language }) {
           transitionDuration: `${SCENE_FADE_MS}ms`,
         }}
       />
+      {openingActive && openingConversation && CHAPTER_START.opening ? (
+        <NarrativeInterlude
+          illustration={
+            NARRATIVE_ILLUSTRATIONS[CHAPTER_START.opening.illustration]
+          }
+          conversation={openingConversation}
+          language={language}
+          onFinished={finishOpening}
+        />
+      ) : null}
     </>
   );
 }

@@ -8,7 +8,17 @@ import type { Language } from "../../../game/i18n/types";
 import { TutorialHint } from "../../../game/tutorial/TutorialHint";
 import styles from "./page.module.css";
 
-const STEPS: TutorialHintStep[] = ["book", "map", "move", "interact"];
+const STEPS: TutorialHintStep[] = [
+  "book",
+  "book-page",
+  "book-tab",
+  "book-close",
+  "map",
+  "move",
+  "chest-approach",
+  "chest-interact",
+  "take-flask",
+];
 
 // Tutorial preview: every hint of the real component, in both languages,
 // without playing through the game. (The real flow lives in GameWorld.)

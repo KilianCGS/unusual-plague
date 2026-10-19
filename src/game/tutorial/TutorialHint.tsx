@@ -6,10 +6,17 @@ import styles from "./TutorialHint.module.css";
 
 // A small contextual help box at the bottom of the screen. It never takes
 // focus, blocks input or dims the world: it only shows the text it is given.
-export function TutorialHint({ copy }: { copy: TutorialHintCopy }) {
+export function TutorialHint({
+  copy,
+  aboveOverlays = false,
+}: {
+  copy: TutorialHintCopy;
+  // Drawn over the Book (its backdrop sits above the normal hint layer).
+  aboveOverlays?: boolean;
+}) {
   return (
     <div
-      className={styles.hint}
+      className={`${styles.hint}${aboveOverlays ? ` ${styles.aboveOverlays}` : ""}`}
       style={{ ["--ui-font" as string]: PIXEL_FONT_FAMILY } as CSSProperties}
       data-tutorial-hint
       role="status"

@@ -78,7 +78,8 @@ export function ApothecaryScene({
   // The room has interaction zones (the crafting table); the owner decides
   // what an interactionId does.
   onInteract?: (interactionId: string, source: { instanceId?: string }) => void;
-  onInteractionAvailable?: (available: boolean) => void;
+  // The interactionId available right now (null = none).
+  onInteractionAvailable?: (interactionId: string | null) => void;
 }) {
   const [sceneScale, setSceneScale] = useState(1);
   const { player, playerFeetHitbox, currentSpriteSrc, spriteSize } =
@@ -103,7 +104,7 @@ export function ApothecaryScene({
     enabled: isPlaying,
     onInteract: (interactionId) => onInteract?.(interactionId, {}),
   });
-  const isInteractionAvailable = availableInteraction !== null;
+  const availableInteractionId = availableInteraction?.interactionId ?? null;
   const onInteractionAvailableRef = useRef(onInteractionAvailable);
 
   useEffect(() => {
@@ -111,10 +112,10 @@ export function ApothecaryScene({
   });
 
   useEffect(() => {
-    onInteractionAvailableRef.current?.(isInteractionAvailable);
+    onInteractionAvailableRef.current?.(availableInteractionId);
 
-    return () => onInteractionAvailableRef.current?.(false);
-  }, [isInteractionAvailable]);
+    return () => onInteractionAvailableRef.current?.(null);
+  }, [availableInteractionId]);
 
   useTransitionTrigger({
     feetHitbox: playerFeetHitbox,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
 import { bookCopy } from "../i18n/book";
@@ -49,14 +49,28 @@ const EMPTY_CONTEXT: BookContext = {
 
 export function BookOverlay({
   context = EMPTY_CONTEXT,
+  initialSectionId,
+  onPageChange,
+  onSectionChange,
 }: {
   context?: BookContext;
+  // The section the book opens on (default: the first one, PACIENTES).
+  initialSectionId?: string;
+  // REPORT real navigation, nothing else: a page was turned / another section
+  // was chosen. The owner (the tutorial) decides what that means.
+  onPageChange?: () => void;
+  onSectionChange?: () => void;
 }) {
   const copy = bookCopy[context.language];
   const sections = buildBookSections(context);
   const scale = useFitScale(BOOK_WIDTH, STAGE_HEIGHT, VIEWPORT_FRACTION);
   const [isOpen, setIsOpen] = useState(false);
-  const [sectionIndex, setSectionIndex] = useState(0);
+  const [sectionIndex, setSectionIndex] = useState(() =>
+    Math.max(
+      0,
+      sections.findIndex(({ id }) => id === initialSectionId),
+    ),
+  );
   const [spreadIndex, setSpreadIndex] = useState(0);
 
   const section = sections[sectionIndex];
@@ -65,9 +79,51 @@ export function BookOverlay({
   const hasNext = spreadIndex < section.spreads.length - 1;
 
   function selectSection(index: number) {
+    if (index !== sectionIndex) {
+      onSectionChange?.();
+    }
+
     setSectionIndex(index);
     setSpreadIndex(0);
   }
+
+  function turnPage(delta: -1 | 1) {
+    const next = spreadIndex + delta;
+
+    if (next < 0 || next >= section.spreads.length) {
+      return;
+    }
+
+    setSpreadIndex(next);
+    onPageChange?.();
+  }
+
+  // Keyboard: Space / Enter open the cover; Left / Right turn the pages of an
+  // open book. (World movement is blocked while the book is up.)
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (!isOpen) {
+        if (event.code === "Space" || event.code === "Enter") {
+          event.preventDefault();
+
+          if (!event.repeat) {
+            setIsOpen(true);
+          }
+        }
+
+        return;
+      }
+
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        event.preventDefault();
+        turnPage(event.key === "ArrowLeft" ? -1 : 1);
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  });
 
   return (
     <div
@@ -97,7 +153,7 @@ export function BookOverlay({
                   type="button"
                   className={`${styles.arrow} ${styles.arrowPrevious}`}
                   aria-label={copy.previousLabel}
-                  onClick={() => setSpreadIndex(spreadIndex - 1)}
+                  onClick={() => turnPage(-1)}
                 >
                   <span className={styles.arrowFace}>
                     <span className={styles.glyphLeft} />
@@ -109,7 +165,7 @@ export function BookOverlay({
                   type="button"
                   className={`${styles.arrow} ${styles.arrowNext}`}
                   aria-label={copy.nextLabel}
-                  onClick={() => setSpreadIndex(spreadIndex + 1)}
+                  onClick={() => turnPage(1)}
                 >
                   <span className={styles.arrowFace}>
                     <span className={styles.glyphRight} />

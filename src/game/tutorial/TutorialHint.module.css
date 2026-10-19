@@ -79,3 +79,8 @@
   border: 2px solid #2b1a14;
   border-bottom-width: 4px;
 }
+
+/* Over the Book overlay (z-index 1000) while a Book step is being taught. */
+.aboveOverlays {
+  z-index: 1100;
+}

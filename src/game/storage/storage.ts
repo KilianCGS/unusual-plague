@@ -8,25 +8,26 @@ import {
   type InventoryState,
 } from "../inventory/inventory";
 
-// The Doctor's personal storage chest in the Apothecary. It is just another
+// The Doctor's personal storage chest, in his room. It is just another
 // InventoryState (same stack model, same operations), so it can be serialized
 // next to the carried inventory later. Crafting never reads it: the Doctor has
 // to take things out first.
 export const STORAGE_CAPACITY = 24;
 
 // What the chest's interaction zone reports to the owner of the game state.
-export const STORAGE_INTERACTION_ID = "storage.apothecary";
+export const STORAGE_INTERACTION_ID = "storage.doctor-room";
 
-// WHERE the chest can be opened in the Apothecary: an interaction zone (never a
-// collider) measured by hand in /dev/collisions. No requiredDirection: any
-// facing.
-export const apothecaryStorageInteractions: InteractionZone[] = [
+// WHERE the Doctor's Storage can be opened: the chest in the Doctor's Room, an
+// interaction zone (never a collider) authored by hand in /dev/collisions. No
+// requiredDirection: any facing. It is the ONLY access point; the id names the
+// access point, not a second storage (there is one Doctor Storage state).
+export const doctorRoomStorageInteractions: InteractionZone[] = [
   {
-    id: "apothecary-interior-interaction-4",
-    x: 130,
-    y: 97,
-    width: 26,
-    height: 4,
+    id: "doctor-room-interaction-1",
+    x: 228,
+    y: 212,
+    width: 9,
+    height: 47,
     interactionId: STORAGE_INTERACTION_ID,
   },
 ];

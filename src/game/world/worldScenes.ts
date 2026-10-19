@@ -242,9 +242,10 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
         doctorRoomSpawns,
         "doctor-room-spawn-2",
       ),
-      // doctor-room-spawn-1 is intentionally NOT registered as an arrival
-      // here: it is reserved for a future chapter-start / narrative wake,
-      // not a walk-in transition.
+      // The start of a chapter: the Doctor has just got up and stands beside
+      // the bed, facing south. doctor-room-spawn-1 is deliberately NOT a
+      // walk-in arrival; only a chapter start (see chapterStart.ts) uses it.
+      "chapter-start": spawnAt(doctorRoomSpawns, "doctor-room-spawn-1"),
     },
   },
   "apothecary-street": {
@@ -256,14 +257,20 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
       {
         // South end: to Plaza.
         name: "to-plaza",
-        zone: pick(apothecaryStreetTransitions, "apothecary-street-transition-1"),
+        zone: pick(
+          apothecaryStreetTransitions,
+          "apothecary-street-transition-1",
+        ),
         targetScene: "plaza",
         targetSpawn: "from-apothecary-street",
       },
       {
         // North end: the Apothecary door.
         name: "to-apothecary-interior",
-        zone: pick(apothecaryStreetTransitions, "apothecary-street-transition-2"),
+        zone: pick(
+          apothecaryStreetTransitions,
+          "apothecary-street-transition-2",
+        ),
         targetScene: "apothecary-interior",
         targetSpawn: "from-apothecary-street",
       },
@@ -273,7 +280,10 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
         apothecaryStreetSpawns,
         "apothecary-street-spawn-1",
       ),
-      "from-plaza": spawnAt(apothecaryStreetSpawns, "apothecary-street-spawn-2"),
+      "from-plaza": spawnAt(
+        apothecaryStreetSpawns,
+        "apothecary-street-spawn-2",
+      ),
     },
   },
   plaza: {
@@ -574,7 +584,10 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
     ],
     arrivals: {
       "from-plaza": spawnAt(smithyStreetSpawns, "smithy-street-spawn-1"),
-      "from-mountain-path": spawnAt(smithyStreetSpawns, "smithy-street-spawn-2"),
+      "from-mountain-path": spawnAt(
+        smithyStreetSpawns,
+        "smithy-street-spawn-2",
+      ),
       "from-smithy-interior": spawnAt(
         smithyStreetSpawns,
         "smithy-street-spawn-3",
@@ -624,8 +637,14 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
       },
     ],
     arrivals: {
-      "from-smithy-street": spawnAt(mountainPathSpawns, "mountain-path-spawn-1"),
-      "from-mine-interior": spawnAt(mountainPathSpawns, "mountain-path-spawn-2"),
+      "from-smithy-street": spawnAt(
+        mountainPathSpawns,
+        "mountain-path-spawn-1",
+      ),
+      "from-mine-interior": spawnAt(
+        mountainPathSpawns,
+        "mountain-path-spawn-2",
+      ),
     },
   },
   "mine-interior": {
@@ -650,7 +669,10 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
       },
     ],
     arrivals: {
-      "from-mountain-path": spawnAt(mineInteriorSpawns, "mine-interior-spawn-2"),
+      "from-mountain-path": spawnAt(
+        mineInteriorSpawns,
+        "mine-interior-spawn-2",
+      ),
       "from-mine-natural-cave": spawnAt(
         mineInteriorSpawns,
         "mine-interior-spawn-1",
@@ -681,7 +703,3 @@ export const WORLD_SCENES: Record<SceneId, WorldScene> = {
     },
   },
 };
-
-// The game starts in the Apothecary interior, at its existing start spawn.
-export const START_SCENE: SceneId = "apothecary-interior";
-export const START_SPAWN = "start";

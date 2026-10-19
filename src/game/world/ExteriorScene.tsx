@@ -123,7 +123,8 @@ export function ExteriorScene({
   // Reports (never drives): the Doctor really changed position / an
   // interaction became available or stopped being available.
   onPlayerMoved?: () => void;
-  onInteractionAvailable?: (available: boolean) => void;
+  // The interactionId available right now (null = none).
+  onInteractionAvailable?: (interactionId: string | null) => void;
   // Collectibles already picked up this session; they are not drawn, do not
   // block and give no prompt.
   collectedInstanceIds?: CollectedInstanceIds;
@@ -193,9 +194,9 @@ export function ExteriorScene({
 
   usePlayerMoved(player.x, player.y, onPlayerMoved);
 
-  // Tell the owner whether the [E] prompt is showing (and clear it when this
-  // scene goes away).
-  const isInteractionAvailable = availableInteraction !== null;
+  // Tell the owner which interaction the [E] prompt is for (and clear it when
+  // this scene goes away).
+  const availableInteractionId = availableInteraction?.interactionId ?? null;
   const onInteractionAvailableRef = useRef(onInteractionAvailable);
 
   useEffect(() => {
@@ -203,10 +204,10 @@ export function ExteriorScene({
   });
 
   useEffect(() => {
-    onInteractionAvailableRef.current?.(isInteractionAvailable);
+    onInteractionAvailableRef.current?.(availableInteractionId);
 
-    return () => onInteractionAvailableRef.current?.(false);
-  }, [isInteractionAvailable]);
+    return () => onInteractionAvailableRef.current?.(null);
+  }, [availableInteractionId]);
 
   useTransitionTrigger({
     feetHitbox: playerFeetHitbox,

@@ -515,13 +515,30 @@ test("water: the river gives one unit per use, only with the flask and while a k
   const decide = (status, pairs) =>
     story.getGatherDecision("gather.water", facts(status, pairs));
   const water = (status, pairs) =>
-    story.resolveStoryInteraction("gather.water", facts(status, pairs), "es", "river");
+    story.resolveStoryInteraction(
+      "gather.water",
+      facts(status, pairs),
+      "es",
+      "river",
+    );
 
   // the zone is the one painted by hand, untouched
-  assert.deepEqual(getSceneInteractionZones("outskirts").map(({ interactionId, x, y, width, height }) => ({ interactionId, x, y, width, height })), [
-    { interactionId: "gather.water", x: 427, y: 522, width: 35, height: 66 },
-  ]);
-  assert.equal(story.getGatherDecision("craft.fire", facts("examined", FLASK)), null);
+  assert.deepEqual(
+    getSceneInteractionZones("outskirts").map(
+      ({ interactionId, x, y, width, height }) => ({
+        interactionId,
+        x,
+        y,
+        width,
+        height,
+      }),
+    ),
+    [{ interactionId: "gather.water", x: 427, y: 522, width: 35, height: 66 }],
+  );
+  assert.equal(
+    story.getGatherDecision("craft.fire", facts("examined", FLASK)),
+    null,
+  );
 
   // no known need (discovered / hidden): nothing to gather
   assert.equal(decide("discovered", FLASK), "not-needed");
@@ -538,16 +555,34 @@ test("water: the river gives one unit per use, only with the flask and while a k
   const give = { type: "give-item", itemId: "water", quantity: 1 };
   let state = stock(FLASK);
   for (const expected of [1, 2]) {
-    const out = story.resolveStoryInteraction("gather.water", { patients: withStatus("examined"), inventory: state }, "es", "river");
+    const out = story.resolveStoryInteraction(
+      "gather.water",
+      { patients: withStatus("examined"), inventory: state },
+      "es",
+      "river",
+    );
     assert.deepEqual(out.effects, [give]);
     assert.equal(out.conversation, null);
     state = inv.addItem(state, "water", 1);
     assert.equal(inv.countItem(state, "water"), expected);
   }
-  const third = story.resolveStoryInteraction("gather.water", { patients: withStatus("examined"), inventory: state }, "es", "river");
+  const third = story.resolveStoryInteraction(
+    "gather.water",
+    { patients: withStatus("examined"), inventory: state },
+    "es",
+    "river",
+  );
   assert.deepEqual(third.effects, []);
   assert.ok(third.notice.includes("suficiente"));
-  assert.equal(story.resolveStoryInteraction("gather.water", { patients: withStatus("examined"), inventory: state }, "en", "river").notice, "I already have enough water.");
+  assert.equal(
+    story.resolveStoryInteraction(
+      "gather.water",
+      { patients: withStatus("examined"), inventory: state },
+      "en",
+      "river",
+    ).notice,
+    "I already have enough water.",
+  );
 
   // the flask is never consumed and nothing is stored: it is just there
   assert.equal(inv.countItem(state, "empty-flask"), 1);
@@ -562,11 +597,17 @@ test("water: the river gives one unit per use, only with the flask and while a k
   try {
     const both = { [HUSBAND]: "examined", "test.second": "examined" };
     assert.equal(
-      story.getGatherDecision("gather.water", { patients: both, inventory: state }),
+      story.getGatherDecision("gather.water", {
+        patients: both,
+        inventory: state,
+      }),
       "gather", // Water x2 carried, x3 now needed
     );
     assert.equal(
-      story.getGatherDecision("gather.water", { patients: { [HUSBAND]: "examined" }, inventory: state }),
+      story.getGatherDecision("gather.water", {
+        patients: { [HUSBAND]: "examined" },
+        inventory: state,
+      }),
       "not-needed",
     );
   } finally {
@@ -574,7 +615,10 @@ test("water: the river gives one unit per use, only with the flask and while a k
   }
   // and spending the water elsewhere makes it useful again
   assert.equal(
-    story.getGatherDecision("gather.water", { patients: withStatus("examined"), inventory: stock(FLASK) }),
+    story.getGatherDecision("gather.water", {
+      patients: withStatus("examined"),
+      inventory: stock(FLASK),
+    }),
     "gather",
   );
 });
@@ -879,15 +923,18 @@ test("Bakers Bedroom: ONE source of truth, the composition exported from the Dec
   );
 });
 
-test("the Doctor starts Chapter 1 with an Empty flask x1 in an ordinary slot", () => {
-  const initial = at(
-    "src/game/inventory/initialInventory.ts",
-  ).createChapter1Inventory();
+test("the Empty flask starts in the Doctor's Storage (once), not in his pocket", () => {
+  const initialFile = at("src/game/inventory/initialInventory.ts");
+  const initial = initialFile.createChapter1Inventory();
+  const chest = initialFile.createChapter1Storage();
   assert.equal(initial.capacity, 6);
   assert.equal(initial.slots.length, 6);
-  assert.deepEqual(initial.slots[0], { itemId: "empty-flask", quantity: 1 });
-  assert.equal(inv.countOccupiedSlots(initial), 1);
-  assert.ok(inv.isValidInventory(initial));
+  assert.equal(inv.countOccupiedSlots(initial), 0);
+  assert.equal(inv.countItem(initial, "empty-flask"), 0);
+  assert.equal(chest.capacity, 24);
+  assert.deepEqual(chest.slots[0], { itemId: "empty-flask", quantity: 1 });
+  assert.equal(inv.countOccupiedSlots(chest), 1);
+  assert.ok(inv.isValidInventory(initial) && inv.isValidInventory(chest));
   assert.equal(getItemName("empty-flask", "es"), "Frasco vacío");
   assert.equal(getItemName("empty-flask", "en"), "Empty flask");
   // a normal item: no hint, no special treatment in the needs
@@ -896,12 +943,11 @@ test("the Doctor starts Chapter 1 with an Empty flask x1 in an ordinary slot", (
     asObject(needs.getMissingIngredients(DEF.requiredTreatments, initial)),
     { water: 2, "medicinal-herb": 1, cloth: 1 },
   );
-  // two sessions never share an inventory
-  const other = at(
-    "src/game/inventory/initialInventory.ts",
-  ).createChapter1Inventory();
+  // two sessions never share an inventory or a chest
+  const other = initialFile.createChapter1Inventory();
   other.slots[1] = { itemId: "water", quantity: 1 };
   assert.equal(initial.slots[1], null);
+  assert.equal(initialFile.createChapter1Storage().slots[1], null);
 });
 
 test("only the baker's husband is known at the start: PACIENTES lists just him, and only the baker has the '!'", () => {
@@ -952,14 +998,22 @@ test("the visit moves discovered > examined, and examining reveals the two recip
 
 test("dialogue placement: only the sick husband speaks from below; returning from the bedroom faces south, nothing else changes", () => {
   const { DECOR_ASSETS } = at("src/game/decor/decorAssets.ts");
-  const below = DECOR_ASSETS.filter((a) => a.dialoguePlacement === "below").map((a) => a.id);
+  const below = DECOR_ASSETS.filter((a) => a.dialoguePlacement === "below").map(
+    (a) => a.id,
+  );
   assert.deepEqual(below, ["bakers-husband-sick"]);
 
   const arrivals = WORLD_SCENES["bakery-interior"].arrivals;
   assert.equal(arrivals["from-bakers-bedroom"].direction, "south");
   // same floor spot as the door, only the direction differs
-  assert.equal(arrivals["from-bakers-bedroom"].x, arrivals["from-bakery-street"].x);
-  assert.equal(arrivals["from-bakers-bedroom"].y, arrivals["from-bakery-street"].y);
+  assert.equal(
+    arrivals["from-bakers-bedroom"].x,
+    arrivals["from-bakery-street"].x,
+  );
+  assert.equal(
+    arrivals["from-bakers-bedroom"].y,
+    arrivals["from-bakery-street"].y,
+  );
   assert.notEqual(arrivals["from-bakery-street"].direction, "south");
 });
 
