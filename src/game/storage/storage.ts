@@ -24,10 +24,10 @@ export const STORAGE_INTERACTION_ID = "storage.doctor-room";
 export const doctorRoomStorageInteractions: InteractionZone[] = [
   {
     id: "doctor-room-interaction-1",
-    x: 228,
+    x: 211,
     y: 212,
-    width: 9,
-    height: 47,
+    width: 23,
+    height: 46,
     interactionId: STORAGE_INTERACTION_ID,
   },
 ];

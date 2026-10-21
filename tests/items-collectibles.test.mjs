@@ -137,10 +137,10 @@ test("addItem rejects non-positive or fractional quantities", () => {
 
 test("9. a picked-up instance is identified by its instanceId (immutably)", () => {
   const none = col.NO_COLLECTED;
-  const one = col.markCollected(none, "forest-medicinal-herb-01");
-  assert.equal(col.isCollected(one, "forest-medicinal-herb-01"), true);
+  const one = col.markCollected(none, "forest-medicinal-herb-dev-01");
+  assert.equal(col.isCollected(one, "forest-medicinal-herb-dev-01"), true);
   assert.equal(col.isCollected(one, "forest-medicinal-herb-02"), false);
-  assert.equal(col.isCollected(none, "forest-medicinal-herb-01"), false);
+  assert.equal(col.isCollected(none, "forest-medicinal-herb-dev-01"), false);
   assert.notEqual(one, none);
 });
 
@@ -190,9 +190,9 @@ test("the collectible asset gives a catalog item", () => {
 test("the forest herb: has a zone and gives the item until it is collected, then vanishes", () => {
   const forest = getComposition("forest", "chapter-1");
   const herb = forest.instances.find(
-    (i) => i.instanceId === "forest-medicinal-herb-01",
+    (i) => i.instanceId === "forest-medicinal-herb-dev-01",
   );
-  assert.ok(herb, "the DEV herb is placed in the forest");
+  assert.ok(herb, "the herb is placed in the forest");
   assert.ok(forest.instances.length > 1, "the forest keeps its own population");
 
   const before = resolveDecorInstances(forest.instances, {}, col.NO_COLLECTED);

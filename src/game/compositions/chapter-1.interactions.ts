@@ -106,7 +106,7 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
   },
   "smithy-interior-blacksmith-01": {
     interactionId: "chapter1.smithy.blacksmith",
-    zone: { offsetX: -54, offsetY: -100, width: 110, height: 212 },
+    zone: { offsetX: -36, offsetY: -60, width: 72, height: 140 },
   },
   "smithy-street-child-wooden-sword-01": {
     interactionId: "chapter1.smithyStreet.child",
@@ -118,7 +118,7 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
   },
   "tavern-interior-bartender-01": {
     interactionId: "chapter1.tavern.bartender",
-    zone: { offsetX: -31, offsetY: -62, width: 61, height: 110 },
+    zone: { offsetX: -31, offsetY: -62, width: 61, height: 135 },
   },
   "tavern-interior-tavern-patient-sick-01": {
     interactionId: "chapter1.tavern.sickPatient",

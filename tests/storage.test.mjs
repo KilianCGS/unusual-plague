@@ -207,10 +207,10 @@ test("the Doctor's Storage is reached ONLY from the chest in his room: exact zon
   assert.deepEqual(st.doctorRoomStorageInteractions, [
     {
       id: "doctor-room-interaction-1",
-      x: 228,
+      x: 211,
       y: 212,
-      width: 9,
-      height: 47,
+      width: 23,
+      height: 46,
       interactionId: "storage.doctor-room",
     },
   ]);
@@ -239,7 +239,7 @@ test("the Doctor's Storage is reached ONLY from the chest in his room: exact zon
   );
   assert.ok(
     !doctorRoomColliders.some(
-      (c) => c.x === 228 && c.y === 212 && c.width === 9 && c.height === 47,
+      (c) => c.x === 211 && c.y === 212 && c.width === 23 && c.height === 46,
     ),
   );
 });

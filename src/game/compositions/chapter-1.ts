@@ -63,9 +63,9 @@ export const chapter1Compositions: DecorComposition[] = [
       {
         "instanceId": "bakery-interior-baker-01",
         "assetId": "baker",
-        "x": 107,
-        "y": 141,
-        "scale": 1,
+        "x": 320,
+        "y": 167,
+        "scale": 0.8,
         "flipX": false,
         "colliderEnabled": true,
         "zOffset": 0
@@ -197,6 +197,16 @@ export const chapter1Compositions: DecorComposition[] = [
         "flipX": false,
         "colliderEnabled": true,
         "zOffset": 0
+      },
+      {
+        "instanceId": "forest-medicinal-herb-dev-01",
+        "assetId": "medicinal-herb-dev",
+        "x": 414,
+        "y": 816,
+        "scale": 1.15,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
       }
     ]
   },
@@ -223,6 +233,36 @@ export const chapter1Compositions: DecorComposition[] = [
         "flipX": false,
         "colliderEnabled": true,
         "zOffset": 0
+      },
+      {
+        "instanceId": "mill-farmland-beekeeper-01",
+        "assetId": "beekeeper",
+        "x": 1190,
+        "y": 555,
+        "scale": 1.08,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "mill-farmland-farmer-hoeing-01",
+        "assetId": "farmer-hoeing",
+        "x": 1226,
+        "y": 428,
+        "scale": 1.17,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "mill-farmland-orange-world-01",
+        "assetId": "orange-world",
+        "x": 860,
+        "y": 483,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
       }
     ]
   },
@@ -239,6 +279,16 @@ export const chapter1Compositions: DecorComposition[] = [
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0
+      },
+      {
+        "instanceId": "mine-interior-mushroom-world-01",
+        "assetId": "mushroom-world",
+        "x": 407,
+        "y": 241,
+        "scale": 0.86,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 1
       }
     ]
   },
@@ -357,9 +407,9 @@ export const chapter1Compositions: DecorComposition[] = [
       {
         "instanceId": "smithy-interior-blacksmith-01",
         "assetId": "blacksmith",
-        "x": 384,
-        "y": 287,
-        "scale": 1.61,
+        "x": 411,
+        "y": 164,
+        "scale": 0.99,
         "flipX": false,
         "colliderEnabled": true,
         "zOffset": 0
@@ -399,8 +449,8 @@ export const chapter1Compositions: DecorComposition[] = [
       {
         "instanceId": "tavern-interior-bartender-01",
         "assetId": "bartender",
-        "x": 332,
-        "y": 99,
+        "x": 176,
+        "y": 114,
         "scale": 0.77,
         "flipX": false,
         "colliderEnabled": true,
@@ -409,8 +459,8 @@ export const chapter1Compositions: DecorComposition[] = [
       {
         "instanceId": "tavern-interior-tavern-patient-sick-01",
         "assetId": "tavern-patient-sick",
-        "x": 408,
-        "y": 178,
+        "x": 375,
+        "y": 180,
         "scale": 0.69,
         "flipX": false,
         "colliderEnabled": false,
@@ -438,6 +488,16 @@ export const chapter1Compositions: DecorComposition[] = [
         "x": 547,
         "y": 339,
         "scale": 1,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "tavern-street-fruit-vegetable-seller-stall-01",
+        "assetId": "fruit-vegetable-seller-stall",
+        "x": 158,
+        "y": 334,
+        "scale": 1.29,
         "flipX": false,
         "colliderEnabled": true,
         "zOffset": 0

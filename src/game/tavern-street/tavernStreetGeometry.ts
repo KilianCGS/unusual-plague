@@ -37,3 +37,19 @@ export const tavernStreetSpawns: {
   { id: "tavern-street-spawn-2", x: 58, y: 365, direction: "east" },
   { id: "tavern-street-spawn-3", x: 602, y: 324, direction: "south" },
 ];
+
+// INTERACTION (green), AUTHORED BUT INACTIVE: the area in front of the fruit and
+// vegetable seller's stall. The Decorator export left its interactionId empty
+// and the seller has no behaviour yet (no dialogue, no shop), so it is NOT
+// registered in sceneInteractions.ts: registering it would show an [E] prompt
+// that resolves to nothing. When the seller gets her conversation, give this
+// zone its interactionId and register it (or place it relative to the stall's
+// instance in chapter-1.interactions.ts). The geometry is the authored one.
+export const tavernStreetSellerZone = {
+  id: "tavern-street-interaction-1",
+  x: 280,
+  y: 299,
+  width: 119,
+  height: 27,
+  interactionId: "",
+};

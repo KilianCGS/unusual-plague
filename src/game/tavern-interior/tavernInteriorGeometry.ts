@@ -1,41 +1,40 @@
 import type { LogicalRect, SceneCollider } from "../collision";
 import type { Direction } from "../protagonist/useProtagonistController";
 
-// PROVISIONAL geometry, measured by hand on the approved background
-// (480x270, 1 logical unit per asset pixel): structural walls plus the large
-// furniture, so the room is playable and its single exit (the south doorway,
-// x 202-274) works. It has the same shape and export names as the files
-// /dev/collisions writes, so repainting this scene there and saving over this
-// file replaces it with no other change.
+// Authored against the approved 1536x1024 background (576x384 logical units,
+// 0.375 unit per asset pixel). Rectangles follow the visible architecture and
+// large furniture; practical gameplay collision, not pixel-perfect.
 
 // COLLIDERS (red): floor the feet cannot occupy.
 export const tavernInteriorColliders: SceneCollider[] = [
-  // Walls: back wall, side walls, front wall left and right of the doorway.
-  { id: "tavern-interior-1", x: 0, y: 0, width: 480, height: 83 },
-  { id: "tavern-interior-2", x: 0, y: 0, width: 5, height: 270 },
-  { id: "tavern-interior-3", x: 474, y: 0, width: 6, height: 270 },
-  { id: "tavern-interior-4", x: 0, y: 236, width: 201, height: 34 },
-  { id: "tavern-interior-5", x: 275, y: 236, width: 205, height: 34 },
-  // Fireplace hearth, bar counter and its stools.
-  { id: "tavern-interior-6", x: 52, y: 76, width: 72, height: 30 },
-  { id: "tavern-interior-7", x: 264, y: 59, width: 133, height: 75 },
-  { id: "tavern-interior-8", x: 244, y: 74, width: 18, height: 50 },
-  { id: "tavern-interior-9", x: 284, y: 126, width: 18, height: 24 },
-  { id: "tavern-interior-10", x: 363, y: 126, width: 18, height: 24 },
-  // Round tables with their stools.
-  { id: "tavern-interior-11", x: 20, y: 128, width: 82, height: 52 },
-  { id: "tavern-interior-12", x: 138, y: 108, width: 86, height: 58 },
-  { id: "tavern-interior-13", x: 56, y: 188, width: 88, height: 46 },
-  { id: "tavern-interior-14", x: 314, y: 176, width: 90, height: 58 },
-  // Barrels.
-  { id: "tavern-interior-15", x: 397, y: 96, width: 27, height: 40 },
-  { id: "tavern-interior-16", x: 418, y: 40, width: 56, height: 62 },
-  { id: "tavern-interior-17", x: 446, y: 130, width: 28, height: 106 },
+  { id: "tavern-interior-1", x: 0, y: 0, width: 576, height: 113 },
+  { id: "tavern-interior-2", x: 0, y: 0, width: 49, height: 349 },
+  { id: "tavern-interior-3", x: 540, y: 0, width: 36, height: 349 },
+  { id: "tavern-interior-4", x: 91, y: 112, width: 196, height: 57 },
+  { id: "tavern-interior-5", x: 110, y: 166, width: 24, height: 14 },
+  { id: "tavern-interior-6", x: 155, y: 166, width: 24, height: 14 },
+  { id: "tavern-interior-7", x: 196, y: 166, width: 26, height: 14 },
+  { id: "tavern-interior-8", x: 238, y: 166, width: 25, height: 14 },
+  { id: "tavern-interior-9", x: 286, y: 112, width: 138, height: 38 },
+  { id: "tavern-interior-10", x: 423, y: 112, width: 114, height: 42 },
+  { id: "tavern-interior-11", x: 498, y: 140, width: 42, height: 40 },
+  { id: "tavern-interior-12", x: 48, y: 95, width: 39, height: 59 },
+  { id: "tavern-interior-13", x: 438, y: 168, width: 67, height: 61 },
+  { id: "tavern-interior-14", x: 410, y: 181, width: 24, height: 31 },
+  { id: "tavern-interior-15", x: 121, y: 215, width: 97, height: 85 },
+  { id: "tavern-interior-16", x: 360, y: 232, width: 90, height: 91 },
+  { id: "tavern-interior-17", x: 35, y: 251, width: 46, height: 96 },
+  { id: "tavern-interior-18", x: 496, y: 285, width: 46, height: 64 },
+  { id: "tavern-interior-19", x: 0, y: 346, width: 225, height: 38 },
+  { id: "tavern-interior-20", x: 225, y: 335, width: 38, height: 49 },
+  { id: "tavern-interior-21", x: 350, y: 346, width: 226, height: 38 },
+  { id: "tavern-interior-22", x: 322, y: 335, width: 29, height: 49 },
+  { id: "tavern-interior-23", x: 262, y: 373, width: 61, height: 11 },
 ];
 
 // TRANSITIONS (yellow): activation zones. The doorway to the street.
 export const tavernInteriorTransitions: (LogicalRect & { id: string })[] = [
-  { id: "tavern-interior-transition-1", x: 205, y: 250, width: 66, height: 20 },
+  { id: "tavern-interior-transition-1", x: 264, y: 346, width: 57, height: 22 },
 ];
 
 // SPAWNS (blue): exact feet position on arrival, plus facing.
@@ -44,4 +43,4 @@ export const tavernInteriorSpawns: {
   x: number;
   y: number;
   direction: Direction;
-}[] = [{ id: "tavern-interior-spawn-1", x: 238, y: 214, direction: "north" }];
+}[] = [{ id: "tavern-interior-spawn-1", x: 292, y: 319, direction: "north" }];

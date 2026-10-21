@@ -674,7 +674,7 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
   },
   // FIRST WORLD COLLECTIBLE. The id keeps its historical "-dev" suffix on
-  // purpose: the placed instance (forest-medicinal-herb-01) references it, and
+  // purpose: the placed instance (forest-medicinal-herb-dev-01) references it, and
   // renaming it would orphan that instance. Only the art is final now: the wild
   // plant growing from the soil (48x48), not the harvested bundle of the
   // inventory icon.
@@ -879,6 +879,49 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
     // Visible silhouette x18-45 y17-50 of the 64x64 frame.
     defaultCollider: { offsetX: -14, offsetY: -47, width: 28, height: 34 },
+  },
+  // Two reusable working NPCs (PixelLab, style-matched to the existing ones).
+  // Available in the Decorator only: neither is placed by code.
+  {
+    id: "beekeeper",
+    label: "Beekeeper",
+    category: "people",
+    sprite: {
+      // 4-frame work idle: the stick arm reaches toward the hive and the pale
+      // smoke wisp (no flame) shifts. Slow on purpose.
+      frames: [0, 1, 2, 3].map((i) => `/game/npcs/beekeeper/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    // Hood top is at y18 of the 96x96 frame (the smoke is not counted).
+    headHeight: 78,
+    defaultScale: 1,
+    // Resting body x22-58 y18-80. Excludes the smoking stick and its smoke,
+    // which reach out to x64-66 in some frames.
+    defaultCollider: { offsetX: -26, offsetY: -78, width: 37, height: 63 },
+  },
+  {
+    id: "farmer-hoeing",
+    label: "Farmer (hoeing)",
+    category: "people",
+    sprite: {
+      // 4-frame hoeing stroke: hoe raised, swinging down, at the soil, lifting.
+      frames: [0, 1, 2, 3].map((i) => `/game/npcs/farmer-hoeing/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    // Head top is at y16 of the 96x96 frame.
+    headHeight: 80,
+    defaultScale: 1,
+    // Body x30-59 y16-78. Excludes the hoe, which swings out to x67 and down
+    // to y87 below his feet.
+    defaultCollider: { offsetX: -18, offsetY: -80, width: 30, height: 63 },
   },
 ];
 

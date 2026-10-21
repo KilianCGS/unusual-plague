@@ -128,16 +128,18 @@ export const DEV_SCENES: DevScene[] = [
   {
     id: "tavern-interior",
     label: "Interior Taberna",
-    // Unmodified copy of art/references/tavern-interior-v1.png (480x270), same
-    // interior scale/zoom as the Doctor's room and the Apothecary.
+    // Unmodified copy of the approved 1536x1024 tavern interior. The room is
+    // 576x384 logical units (0.375 per asset pixel) so it reads as a bigger
+    // room than the old 480x270 one at the same Doctor size; zoomMultiplier
+    // 1.5 shows the whole room (frame 576x384), so the camera stays fixed.
     backgroundSrc: "/game/areas/tavern-interior/tavern-interior-background.png",
-    assetWidth: 480,
-    assetHeight: 270,
-    // Provisional: on the floor just in front of the south double door.
-    initialAssetX: 240,
-    initialAssetY: 192,
-    logicalUnitsPerAssetPixel: 1,
-    zoomMultiplier: 602 / 270,
+    assetWidth: 1536,
+    assetHeight: 1024,
+    // On the floor just in front of the south doorway.
+    initialAssetX: 780,
+    initialAssetY: 850,
+    logicalUnitsPerAssetPixel: 0.375,
+    zoomMultiplier: 1.5,
   },
   {
     id: "bakery-street",
@@ -169,19 +171,17 @@ export const DEV_SCENES: DevScene[] = [
   {
     id: "bakery-interior",
     label: "Interior Panadería",
-    // Lossless 1:1 crop (x 45..433, y 13..254, no resize, no padding) of
-    // art/references/bakery-interior-v2.png, which had a white margin around the
-    // room. Interior: 1 unit per asset pixel; zoomMultiplier 602 / 270 keeps the
-    // same zoom (and Doctor size) as the 480x270 interiors. The whole 389x242
-    // room fits the frame, so the camera stays fixed.
+    // Unmodified copy of the approved 1536x1024 bakery interior. Same
+    // 576x384 logical world and zoom as the tavern and smithy interiors (0.375
+    // unit per asset pixel, whole room in frame, fixed camera).
     backgroundSrc: "/game/areas/bakery-interior/bakery-interior-background.png",
-    assetWidth: 389,
-    assetHeight: 242,
-    // Provisional: on the floor above the bottom threshold.
-    initialAssetX: 195,
-    initialAssetY: 157,
-    logicalUnitsPerAssetPixel: 1,
-    zoomMultiplier: 602 / 270,
+    assetWidth: 1536,
+    assetHeight: 1024,
+    // On the floor above the south doorway.
+    initialAssetX: 770,
+    initialAssetY: 760,
+    logicalUnitsPerAssetPixel: 0.375,
+    zoomMultiplier: 1.5,
   },
   {
     id: "smithy-street",
@@ -199,32 +199,19 @@ export const DEV_SCENES: DevScene[] = [
   {
     id: "smithy-interior",
     label: "Interior Herrería",
-    // Unmodified copy of art/references/smithy-interior-v2-approved.png
-    // (833x581): smithy-interior-v1.png (416x304) manually finished by hand,
-    // fixing the two white background patches at the bottom threshold.
-    // Approved as final; 833x581 is the logical world the geometry was
-    // painted against, so it stays exactly as-is.
-    //
-    // zoomMultiplier 1 (not 602/270 like the other interiors): this world is
-    // much bigger than theirs (833x581 vs ~270-480 tall), and 602/270 would
-    // zoom the camera in as if it were the same size, showing only a small
-    // cropped slice at a time. computeFrame(world, REFERENCE_VIEWPORT,
-    // zoomMultiplier) = min(world, referenceViewport / zoomMultiplier), so
-    // zoomMultiplier 1 gives frame = min(833,1161) x min(581,602) = 833x581:
-    // the whole room, no scrolling. This does NOT change the Doctor's size
-    // relative to the furniture (that ratio is fixed by the asset's own
-    // logical pixels vs the sprite's fixed 96-unit size, and camera/zoom
-    // scales both together) - only how much of the room the camera shows and
-    // how large everything appears together on screen.
+    // Unmodified copy of the approved 1536x1024 smithy interior. Same
+    // 576x384 logical world and zoom as the tavern and bakery interiors (0.375
+    // unit per asset pixel, whole room in frame, fixed camera). The Doctor is
+    // drawn at the normal size (the old 833x581 world needed protagonistScale
+    // 1.5 to compensate for its larger logical scale).
     backgroundSrc: "/game/areas/smithy-interior/smithy-interior-background.png",
-    assetWidth: 833,
-    assetHeight: 581,
-    // Provisional: on the floor just above the bottom threshold.
-    initialAssetX: 417,
-    initialAssetY: 497,
-    logicalUnitsPerAssetPixel: 1,
-    zoomMultiplier: 1,
-    protagonistScale: 1.5,
+    assetWidth: 1536,
+    assetHeight: 1024,
+    // On the floor just above the south doorway.
+    initialAssetX: 767,
+    initialAssetY: 760,
+    logicalUnitsPerAssetPixel: 0.375,
+    zoomMultiplier: 1.5,
   },
   {
     id: "mountain-path",

@@ -92,6 +92,7 @@ const NOT_INTERACTABLE = [
 
 test("27 interactable instances, all of them real chapter-1 instances", () => {
   const ids = Object.keys(chapter1Interactions);
+  // (the fruit seller has no interaction yet; the Tavern Street woman keeps hers)
   assert.equal(ids.length, 27);
   for (const id of ids) assert.ok(byId.has(id), `${id} is not in chapter-1.ts`);
 });
@@ -216,12 +217,19 @@ test("COPY CHAPTER output cannot erase interactions: the table is a separate fil
   assert.equal(getComposition("plaza", "chapter-2"), undefined);
 });
 
-test("blacksmith: the Doctor can interact from south of the anvil", () => {
+test("blacksmith: the Doctor can interact from just in front of the anvil he works behind", () => {
   const smith = byId.get("smithy-interior-blacksmith-01");
   const { zone } = chapter1Interactions[smith.instanceId];
-  const anvil = smithyInterior.smithyInteriorColliders.find(
-    (c) => c.id === "smithy-interior-8",
-  );
+  const anvil = smithyInterior.smithyInteriorColliders
+    .filter(
+      (c) =>
+        c.x <= smith.x &&
+        c.x + c.width >= smith.x &&
+        c.y >= smith.y - 10 &&
+        c.y <= smith.y + 20,
+    )
+    .sort((a, b) => b.height - a.height)[0];
+  assert.ok(anvil, "the anvil + stumps block stands right under him");
   const feetY = anvil.y + anvil.height + 19; // closest the feet can get, below the anvil
   const hitbox = { x: smith.x - 6, y: feetY - 19, width: 12, height: 12 };
   const rect = {
@@ -231,6 +239,9 @@ test("blacksmith: the Doctor can interact from south of the anvil", () => {
     height: zone.height,
   };
   assert.ok(hit(hitbox, rect));
+  assert.ok(
+    !smithyInterior.smithyInteriorColliders.some((c) => hit(hitbox, c)),
+  );
 });
 
 test("washerwoman and injured miner conversations", () => {

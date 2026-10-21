@@ -44,9 +44,6 @@ const { DECOR_ASSETS, getDecorAsset, SMARTPHONE_VARIANT_BASE_IDS } = at(
   "src/game/decor/decorAssets.ts",
 );
 const { chapter1Compositions } = at("src/game/compositions/chapter-1.ts");
-const { chapter1CollectibleTestCompositions } = at(
-  "src/game/compositions/chapter-1.collectibles.ts",
-);
 const { getComposition } = at("src/game/compositions/index.ts");
 const { RECIPES } = at("src/game/crafting/recipes.ts");
 const { CHAPTER1_PATIENTS, BAKER_HUSBAND_ID } = at(
@@ -70,10 +67,7 @@ const pngSize = (publicPath) => {
   return { width: header.readUInt32BE(16), height: header.readUInt32BE(20) };
 };
 
-const ALL_PLACED = [
-  ...chapter1Compositions,
-  ...chapter1CollectibleTestCompositions,
-].flatMap((c) => c.instances);
+const ALL_PLACED = chapter1Compositions.flatMap((c) => c.instances);
 
 // The 17 art entries promoted to catalog items in the final refinement pass.
 const PROMOTED_ITEMS = [
@@ -283,11 +277,11 @@ test("world Medicinal herb: final art, rooted anchor, still the same collectible
   assert.ok(asset.defaultScale < 1);
 
   const herb = getComposition("forest", "chapter-1").instances.find(
-    (i) => i.instanceId === "forest-medicinal-herb-01",
+    (i) => i.instanceId === "forest-medicinal-herb-dev-01",
   );
   assert.equal(herb.assetId, "medicinal-herb-dev");
   assert.equal(herb.colliderEnabled, false);
-  assert.equal(herb.scale, asset.defaultScale);
+  assert.equal(herb.scale, 1.15); // as authored in the Decorator
   assert.ok(
     !fs
       .readFileSync(path.join(root, "src/game/decor/decorAssets.ts"), "utf8")
@@ -324,8 +318,13 @@ test("new town population is registered with real, calm animations", () => {
     } else {
       assert.equal(asset.sprite.fps, 0, id);
     }
-    // available in the Decorator only: never placed in a chapter yet
-    assert.ok(!ALL_PLACED.some((i) => i.assetId === id), `${id} is not placed`);
+    // available in the Decorator; only what the user placed by hand is placed
+    // (today the fruit seller, beside the Tavern)
+    assert.equal(
+      ALL_PLACED.some((i) => i.assetId === id),
+      id === "fruit-vegetable-seller-stall",
+      `${id} placement`,
+    );
   }
   // the originals of the approved static versions are still on disk
   pngSize("/game/npcs/elderly-man-with-jug/static.png");
@@ -396,7 +395,7 @@ test("world leech: registered and animated, but not placed or collectible yet", 
   assert.equal(getItem("leech").id, "leech");
 });
 
-test("world Mint, Mushroom, Resin and Orange: registered resources, prepared but not placed", () => {
+test("world Mint, Mushroom, Resin and Orange: registered resources; only the Mushroom and the Orange are placed (by hand)", () => {
   const spec = {
     "mint-world": { item: "mint", dir: "mint" },
     "mushroom-world": { item: "mushroom", dir: "mushroom" },
@@ -425,7 +424,12 @@ test("world Mint, Mushroom, Resin and Orange: registered resources, prepared but
         asset.anchor.y <= 1,
     );
     assert.ok(asset.defaultScale > 0 && asset.defaultScale <= 1);
-    assert.ok(!ALL_PLACED.some((i) => i.assetId === id), `${id} is not placed`);
+    // prepared for placement; only the Mushroom (Mine) and the Orange (Mill Farmland) have been placed by hand
+    assert.equal(
+      ALL_PLACED.some((i) => i.assetId === id),
+      id === "mushroom-world" || id === "orange-world",
+      `${id} placement`,
+    );
   }
   // the six resources of the Decorator's resources category
   const resources = DECOR_ASSETS.filter((a) => a.category === "resources")
