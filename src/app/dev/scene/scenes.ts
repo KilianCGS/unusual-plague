@@ -1,4 +1,10 @@
 import type { SceneCollider } from "../../../game/collision";
+import { NEW_WORLD_MAP } from "../../../game/new-world-map/worldVariant";
+import {
+  FOREST_COTTAGE_INTERIOR_VISUAL,
+  FOREST_COTTAGE_VISUAL,
+  NEW_WORLD_VISUALS,
+} from "../../../game/new-world-map/newWorldVisuals";
 import { plazaColliders } from "../../../game/plaza/plazaGeometry";
 
 // EXPERIMENTAL scale test scenes for /dev/scene. None of these values is an
@@ -38,7 +44,7 @@ export type DevScene = {
   colliders?: SceneCollider[];
 };
 
-export const DEV_SCENES: DevScene[] = [
+const OLD_DEV_SCENES: DevScene[] = [
   {
     id: "plaza",
     label: "Plaza V2",
@@ -227,47 +233,38 @@ export const DEV_SCENES: DevScene[] = [
   {
     id: "mine-interior",
     label: "Interior Mina",
-    // Unmodified copy of art/references/mine-interior-v3.png (632x420):
-    // worked mining zone left, natural cave right, central open area above
-    // the bottom exit. The rock reaches all four canvas edges/corners,
-    // unlike v1/v2. Approved as the definitive Mina Principal. v4 (an
-    // inpaint of v3's right side) and v1/v2 are discarded iterations only.
+    // Unmodified copy of the approved 1602x982 mine interior. Same zoom
+    // approach as the other new interiors: 0.36 unit per asset pixel gives a
+    // 577x354 world, and zoomMultiplier 1.5 shows all of it (fixed camera).
+    // Its geometry (old art, old size) is a placeholder until it is repainted
+    // in /dev/collisions.
     backgroundSrc: "/game/areas/mine-interior/mine-interior-background.png",
-    assetWidth: 632,
-    assetHeight: 420,
-    // Provisional: on the floor just above the bottom exit.
-    initialAssetX: 316,
-    initialAssetY: 380,
-    logicalUnitsPerAssetPixel: 1,
-    zoomMultiplier: 602 / 270,
+    assetWidth: 1602,
+    assetHeight: 982,
+    // On the floor just inside the entrance.
+    initialAssetX: 800,
+    initialAssetY: 700,
+    logicalUnitsPerAssetPixel: 0.36,
+    zoomMultiplier: 1.5,
   },
   {
     id: "mine-natural-cave",
     label: "Cámara Natural",
-    // Unmodified copy of art/references/mine-natural-cave-v3.png (693x550): a
-    // separate, independent asset (not an edit of mine-interior), a small
-    // hidden natural chamber reached from the Mina's right side. Only entrance
-    // is a gap in the LEFT wall; top, right and bottom are fully closed rock.
-    // v3 is v1's composition (approved) with a material-aware recolor toward
-    // the Mina Principal's palette, then manually cropped/finished by hand.
-    // Approved as final; 693x550 is the logical world the geometry was
-    // painted against, so it stays exactly as-is.
-    //
-    // zoomMultiplier 1, same reasoning as smithy-interior: this world is much
-    // bigger than the other interiors', so the shared 602/270 multiplier
-    // cropped the camera in tight. zoomMultiplier 1 gives frame =
-    // min(693,1161) x min(550,602) = 693x550: the whole chamber, no
-    // scrolling, without touching the Doctor/furniture proportion (fixed by
-    // the asset's own logical pixels, unaffected by zoom).
-    backgroundSrc: "/game/areas/mine-natural-cave/mine-natural-cave-background.png",
-    assetWidth: 693,
-    assetHeight: 550,
-    // Provisional: on the floor just inside the left entrance.
-    initialAssetX: 50,
-    initialAssetY: 300,
-    logicalUnitsPerAssetPixel: 1,
-    zoomMultiplier: 1,
-    protagonistScale: 1.5,
+    // Unmodified copy of the approved 1618x972 natural cave (entrance on the
+    // left, underground lake on the right). 0.36 unit per asset pixel gives a
+    // 583x350 world and zoomMultiplier 1.5 shows all of it (fixed camera). The
+    // Doctor is drawn at the normal size (the old 693x550 world needed
+    // protagonistScale 1.5). Its geometry is a placeholder until it is
+    // repainted in /dev/collisions.
+    backgroundSrc:
+      "/game/areas/mine-natural-cave/mine-natural-cave-background.png",
+    assetWidth: 1618,
+    assetHeight: 972,
+    // On the floor just inside the left entrance.
+    initialAssetX: 300,
+    initialAssetY: 500,
+    logicalUnitsPerAssetPixel: 0.36,
+    zoomMultiplier: 1.5,
   },
   {
     id: "apothecary-interior",
@@ -316,6 +313,19 @@ export const DEV_SCENES: DevScene[] = [
     initialAssetX: 430,
     initialAssetY: 260,
   },
+];
+
+// The old exterior backgrounds, or (NEXT_PUBLIC_WORLD=new) the new-world-map
+// ones in their place (same scene ids). The Casita del bosque is listed in both.
+export const DEV_SCENES: DevScene[] = [
+  ...OLD_DEV_SCENES.map(
+    (scene) =>
+      (NEW_WORLD_MAP
+        ? NEW_WORLD_VISUALS.find((visual) => visual.id === scene.id)
+        : undefined) ?? scene,
+  ),
+  FOREST_COTTAGE_VISUAL,
+  FOREST_COTTAGE_INTERIOR_VISUAL,
 ];
 
 export function getSceneWorld(scene: DevScene) {

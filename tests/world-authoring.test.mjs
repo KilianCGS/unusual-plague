@@ -327,22 +327,22 @@ test("Mine Interior: exactly the authored miner and Mushroom; Natural Cave has n
     {
       instanceId: "mine-interior-injured-miner-01",
       assetId: "injured-miner",
-      x: 141,
-      y: 305,
+      x: 167,
+      y: 248,
       scale: 0.72,
       flipX: false,
       colliderEnabled: false,
       zOffset: 0,
     },
     {
-      instanceId: "mine-interior-mushroom-world-01",
+      instanceId: "mine-interior-mushroom-world-02",
       assetId: "mushroom-world",
-      x: 407,
-      y: 241,
-      scale: 0.86,
+      x: 365,
+      y: 108,
+      scale: 0.75,
       flipX: false,
       colliderEnabled: false,
-      zOffset: 1,
+      zOffset: 0,
     },
   ]);
   const cave = getComposition("mine-natural-cave", "chapter-1");
@@ -427,7 +427,7 @@ test("generic collectibles: a placed Mushroom is collectible exactly like the He
     assert.ok(!after.sprites.some((s) => s.instance.instanceId === instanceId));
     assert.ok(!after.zones.some((z) => z.id === zone.id));
   };
-  collectible("mine-interior", "mine-interior-mushroom-world-01", "mushroom");
+  collectible("mine-interior", "mine-interior-mushroom-world-02", "mushroom");
   collectible("forest", "forest-medicinal-herb-dev-01", "medicinal-herb");
   // both assets name their item; nothing else is needed
   assert.equal(getDecorAsset("mushroom-world").collectibleItemId, "mushroom");

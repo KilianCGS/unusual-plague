@@ -1,3 +1,4 @@
+import { NEW_WORLD_MAP } from "../new-world-map/worldVariant";
 import type { SceneId } from "../world/worldScenes";
 
 // GEOGRAPHY of the Doctor's old map, as DATA. This file knows nothing about how
@@ -11,6 +12,7 @@ export type MapLocationId =
   | "tavern"
   | "river"
   | "forest"
+  | "cottage"
   | "farm"
   | "mill"
   | "bakery"
@@ -34,7 +36,7 @@ export const MAP_SIZE = { width: 560, height: 270 };
 const COLUMN = (index: number) => 44 + 94 * index;
 const ROW = (index: number) => [52, 135, 218][index];
 
-export const MAP_LOCATIONS: MapLocation[] = [
+const BASE_MAP_LOCATIONS: MapLocation[] = [
   { id: "pharmacy", label: "BOTICA", x: COLUMN(2), y: ROW(0) },
   { id: "plaza", label: "PLAZA", x: COLUMN(2), y: ROW(1) },
   { id: "bakery", label: "PANADERÍA", x: COLUMN(2), y: ROW(2) },
@@ -48,8 +50,16 @@ export const MAP_LOCATIONS: MapLocation[] = [
   { id: "mill", label: "MOLINO", x: COLUMN(5), y: ROW(0) },
 ];
 
+// The Casita del bosque exists in the new world only: south of the Forest.
+export const MAP_LOCATIONS: MapLocation[] = NEW_WORLD_MAP
+  ? [
+      ...BASE_MAP_LOCATIONS,
+      { id: "cottage", label: "CASITA", x: COLUMN(5), y: ROW(2) },
+    ]
+  : BASE_MAP_LOCATIONS;
+
 // Paths between places (undirected), following the real connections.
-export const MAP_LINKS: [MapLocationId, MapLocationId][] = [
+const BASE_MAP_LINKS: [MapLocationId, MapLocationId][] = [
   ["pharmacy", "plaza"],
   ["plaza", "bakery"],
   ["plaza", "smithy"],
@@ -61,6 +71,10 @@ export const MAP_LINKS: [MapLocationId, MapLocationId][] = [
   ["river", "farm"],
   ["farm", "mill"],
 ];
+
+export const MAP_LINKS: [MapLocationId, MapLocationId][] = NEW_WORLD_MAP
+  ? [...BASE_MAP_LINKS, ["forest", "cottage"]]
+  : BASE_MAP_LINKS;
 
 // Every technical scene belongs to exactly one place (the Record type makes
 // the compiler enforce it when a new SceneId appears). The Doctor's room is
@@ -74,6 +88,8 @@ export const SCENE_TO_MAP_LOCATION: Record<SceneId, MapLocationId> = {
   "tavern-interior": "tavern",
   outskirts: "river",
   forest: "forest",
+  "forest-cottage": "cottage",
+  "forest-cottage-interior": "cottage",
   farm: "farm",
   "mill-farmland": "mill",
   "bakery-street": "bakery",

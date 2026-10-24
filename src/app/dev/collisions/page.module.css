@@ -340,3 +340,14 @@
   min-height: 1.4em;
   color: #a89a82;
 }
+
+/* Shown while a collider is selected. */
+.deleteSelected {
+  font: inherit;
+  color: #fff;
+  background: #a33a3a;
+  border: 1px solid #ff5c5c;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+}

@@ -273,22 +273,22 @@ export const chapter1Compositions: DecorComposition[] = [
       {
         "instanceId": "mine-interior-injured-miner-01",
         "assetId": "injured-miner",
-        "x": 141,
-        "y": 305,
+        "x": 167,
+        "y": 248,
         "scale": 0.72,
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0
       },
       {
-        "instanceId": "mine-interior-mushroom-world-01",
+        "instanceId": "mine-interior-mushroom-world-02",
         "assetId": "mushroom-world",
-        "x": 407,
-        "y": 241,
-        "scale": 0.86,
+        "x": 365,
+        "y": 108,
+        "scale": 0.75,
         "flipX": false,
         "colliderEnabled": false,
-        "zOffset": 1
+        "zOffset": 0
       }
     ]
   },

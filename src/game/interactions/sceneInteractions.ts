@@ -1,3 +1,5 @@
+import { newWorldOutskirtsInteractions } from "../new-world-map/newWorldInteractions";
+import { NEW_WORLD_MAP } from "../new-world-map/worldVariant";
 import { apothecaryInteriorInteractions } from "../apothecary/apothecaryInteriorGeometry";
 import { outskirtsInteractions } from "../outskirts/outskirtsInteractions";
 import { doctorRoomStorageInteractions } from "../storage/storage";
@@ -12,7 +14,10 @@ const SCENE_INTERACTIONS: Record<string, InteractionZone[]> = {
   "apothecary-interior": apothecaryInteriorInteractions,
   // The Doctor's Storage: the chest in his room.
   "doctor-room": doctorRoomStorageInteractions,
-  outskirts: outskirtsInteractions,
+  // The river bank; the new world has its own (adapted) one.
+  outskirts: NEW_WORLD_MAP
+    ? newWorldOutskirtsInteractions
+    : outskirtsInteractions,
 };
 
 const NO_INTERACTIONS: InteractionZone[] = [];

@@ -64,6 +64,62 @@ import {
   smithyStreetSpawns,
   smithyStreetTransitions,
 } from "../../../game/smithy-street/smithyStreetGeometry";
+import { NEW_WORLD_MAP } from "../../../game/new-world-map/worldVariant";
+import {
+  apothecaryStreetColliders as nwApothecaryStreetColliders,
+  apothecaryStreetSpawns as nwApothecaryStreetSpawns,
+  apothecaryStreetTransitions as nwApothecaryStreetTransitions,
+} from "../../../game/new-world-map/geometry/apothecaryStreetGeometry";
+import {
+  bakeryStreetColliders as nwBakeryStreetColliders,
+  bakeryStreetSpawns as nwBakeryStreetSpawns,
+  bakeryStreetTransitions as nwBakeryStreetTransitions,
+} from "../../../game/new-world-map/geometry/bakeryStreetGeometry";
+import {
+  farmColliders as nwFarmColliders,
+  farmSpawns as nwFarmSpawns,
+  farmTransitions as nwFarmTransitions,
+} from "../../../game/new-world-map/geometry/farmGeometry";
+import {
+  forestColliders as nwForestColliders,
+  forestSpawns as nwForestSpawns,
+  forestTransitions as nwForestTransitions,
+} from "../../../game/new-world-map/geometry/forestGeometry";
+import {
+  forestCottageColliders,
+  forestCottageSpawns,
+  forestCottageTransitions,
+} from "../../../game/new-world-map/geometry/forestCottageGeometry";
+import {
+  millFarmlandColliders as nwMillFarmlandColliders,
+  millFarmlandSpawns as nwMillFarmlandSpawns,
+  millFarmlandTransitions as nwMillFarmlandTransitions,
+} from "../../../game/new-world-map/geometry/millFarmlandGeometry";
+import {
+  mountainPathColliders as nwMountainPathColliders,
+  mountainPathSpawns as nwMountainPathSpawns,
+  mountainPathTransitions as nwMountainPathTransitions,
+} from "../../../game/new-world-map/geometry/mountainPathGeometry";
+import {
+  outskirtsColliders as nwOutskirtsColliders,
+  outskirtsSpawns as nwOutskirtsSpawns,
+  outskirtsTransitions as nwOutskirtsTransitions,
+} from "../../../game/new-world-map/geometry/outskirtsGeometry";
+import {
+  plazaColliders as nwPlazaColliders,
+  plazaSpawns as nwPlazaSpawns,
+  plazaTransitions as nwPlazaTransitions,
+} from "../../../game/new-world-map/geometry/plazaGeometry";
+import {
+  tavernStreetColliders as nwTavernStreetColliders,
+  tavernStreetSpawns as nwTavernStreetSpawns,
+  tavernStreetTransitions as nwTavernStreetTransitions,
+} from "../../../game/new-world-map/geometry/tavernStreetGeometry";
+import {
+  smithyStreetColliders as nwSmithyStreetColliders,
+  smithyStreetSpawns as nwSmithyStreetSpawns,
+  smithyStreetTransitions as nwSmithyStreetTransitions,
+} from "../../../game/new-world-map/geometry/smithyStreetGeometry";
 import { DEV_SCENES, getSceneWorld, type DevScene } from "../scene/scenes";
 import {
   clientToWorld,
@@ -155,6 +211,17 @@ const EDITOR_SCENES: {
     exportPrefix: "mineNaturalCave",
   },
   { sceneId: "farm", idPrefix: "farm", exportPrefix: "farm" },
+  {
+    sceneId: "forest-cottage-interior",
+    idPrefix: "forest-cottage-interior",
+    exportPrefix: "forestCottageInterior",
+  },
+  // Only drawn in the new world map (NEXT_PUBLIC_WORLD=new).
+  {
+    sceneId: "forest-cottage",
+    idPrefix: "forest-cottage",
+    exportPrefix: "forestCottage",
+  },
   {
     sceneId: "mill-farmland",
     idPrefix: "mill-farmland",
@@ -280,8 +347,71 @@ const PERSISTED_GEOMETRY: Record<
   },
 };
 
+// The geometry of the new world map (NEXT_PUBLIC_WORLD=new): the scenes it
+// redraws load it instead of the old files, so /dev/collisions shows the new
+// backgrounds with their own colliders, transitions and spawns.
+const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
+  plaza: {
+    colliders: nwPlazaColliders,
+    transitions: nwPlazaTransitions,
+    spawns: nwPlazaSpawns,
+  },
+  "apothecary-street": {
+    colliders: nwApothecaryStreetColliders,
+    transitions: nwApothecaryStreetTransitions,
+    spawns: nwApothecaryStreetSpawns,
+  },
+  "bakery-street": {
+    colliders: nwBakeryStreetColliders,
+    transitions: nwBakeryStreetTransitions,
+    spawns: nwBakeryStreetSpawns,
+  },
+  "smithy-street": {
+    colliders: nwSmithyStreetColliders,
+    transitions: nwSmithyStreetTransitions,
+    spawns: nwSmithyStreetSpawns,
+  },
+  "calle-taberna": {
+    colliders: nwTavernStreetColliders,
+    transitions: nwTavernStreetTransitions,
+    spawns: nwTavernStreetSpawns,
+  },
+  "outskirts-brook-provisional": {
+    colliders: nwOutskirtsColliders,
+    transitions: nwOutskirtsTransitions,
+    spawns: nwOutskirtsSpawns,
+  },
+  "forest-v1": {
+    colliders: nwForestColliders,
+    transitions: nwForestTransitions,
+    spawns: nwForestSpawns,
+  },
+  "forest-cottage": {
+    colliders: forestCottageColliders,
+    transitions: forestCottageTransitions,
+    spawns: forestCottageSpawns,
+  },
+  farm: {
+    colliders: nwFarmColliders,
+    transitions: nwFarmTransitions,
+    spawns: nwFarmSpawns,
+  },
+  "mill-farmland": {
+    colliders: nwMillFarmlandColliders,
+    transitions: nwMillFarmlandTransitions,
+    spawns: nwMillFarmlandSpawns,
+  },
+  "mountain-path": {
+    colliders: nwMountainPathColliders,
+    transitions: nwMountainPathTransitions,
+    spawns: nwMountainPathSpawns,
+  },
+};
+
 function createInitialData(sceneId: string): SceneData {
-  const persisted = PERSISTED_GEOMETRY[sceneId];
+  const persisted =
+    (NEW_WORLD_MAP ? NEW_WORLD_GEOMETRY[sceneId] : undefined) ??
+    PERSISTED_GEOMETRY[sceneId];
   // Persisted interaction zones come from the same registry the game reads.
   const interactions: EditorInteraction[] = getSceneInteractionZones(
     sceneId,
@@ -576,6 +706,28 @@ function SceneGeometryEditor({
 
     setDrag(null);
 
+    if (mode === "collider") {
+      // A click (no drag) on the map SELECTS instead of drawing: the topmost
+      // collider under the cursor, or nothing (clears the selection) on empty
+      // floor. A real drag still draws a new collider as before.
+      const moved = Math.hypot(end.x - drag.start.x, end.y - drag.start.y);
+
+      if (moved <= SPAWN_CLICK_TOLERANCE) {
+        const hit = [...colliders]
+          .reverse()
+          .find(
+            (item) =>
+              end.x >= item.x &&
+              end.x <= item.x + item.width &&
+              end.y >= item.y &&
+              end.y <= item.y + item.height,
+          );
+
+        setSelection(hit ? { kind: "collider", editorId: hit.editorId } : null);
+        return;
+      }
+    }
+
     if (mode === "spawn") {
       // Single click: the spawn goes exactly where the button was pressed.
       const moved = Math.hypot(end.x - drag.start.x, end.y - drag.start.y);
@@ -840,12 +992,21 @@ function SceneGeometryEditor({
             ? "Click once to place the exact point where the feet will appear. The facing is the initial idle direction: arriving from the left → east, right → west, top → south, bottom → north."
             : `Drag on the map to draw a ${mode}.`}{" "}
           Esc cancels a drawing. Click a row to select it; Delete / Backspace or
-          × removes it.
+          × removes it. In collider mode, click a collider on the map to select
+          it (click empty floor to deselect).
         </p>
+        {selection?.kind === "collider" ? (
+          <button
+            type="button"
+            className={styles.deleteSelected}
+            onClick={() => removeItem("collider", selection.editorId)}
+          >
+            Delete collision / Eliminar colisión
+          </button>
+        ) : null}
         <div className={styles.hud}>
           <div>
-            world {world.width}×{world.height} units · scale{" "}
-            {scale.toFixed(2)}×
+            world {world.width}×{world.height} units · scale {scale.toFixed(2)}×
           </div>
           <div>
             cursor {cursor ? `(${cursor.x}, ${cursor.y})` : "—"} · mode {mode}
