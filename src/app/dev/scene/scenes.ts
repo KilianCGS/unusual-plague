@@ -1,5 +1,4 @@
 import type { SceneCollider } from "../../../game/collision";
-import { NEW_WORLD_MAP } from "../../../game/new-world-map/worldVariant";
 import {
   FOREST_COTTAGE_INTERIOR_VISUAL,
   FOREST_COTTAGE_VISUAL,
@@ -315,14 +314,13 @@ const OLD_DEV_SCENES: DevScene[] = [
   },
 ];
 
-// The old exterior backgrounds, or (NEXT_PUBLIC_WORLD=new) the new-world-map
-// ones in their place (same scene ids). The Casita del bosque is listed in both.
+// The new-world-map backgrounds replace the old exterior ones (same scene ids);
+// the rest (interiors...) are unchanged. The old entries of the replaced scenes
+// stay in OLD_DEV_SCENES as legacy.
 export const DEV_SCENES: DevScene[] = [
   ...OLD_DEV_SCENES.map(
     (scene) =>
-      (NEW_WORLD_MAP
-        ? NEW_WORLD_VISUALS.find((visual) => visual.id === scene.id)
-        : undefined) ?? scene,
+      NEW_WORLD_VISUALS.find((visual) => visual.id === scene.id) ?? scene,
   ),
   FOREST_COTTAGE_VISUAL,
   FOREST_COTTAGE_INTERIOR_VISUAL,

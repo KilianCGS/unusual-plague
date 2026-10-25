@@ -64,7 +64,6 @@ import {
   plazaSpawns,
   plazaTransitions,
 } from "../plaza/plazaGeometry";
-import { NEW_WORLD_MAP } from "../new-world-map/worldVariant";
 import { NEW_WORLD_SCENES } from "../new-world-map/newWorldScenes";
 import type { Direction } from "../protagonist/useProtagonistController";
 import {
@@ -185,7 +184,7 @@ function visualOf(devSceneId: string): DevScene {
 }
 
 // The OLD exterior world (default). The new one lives in src/game/new-world-map.
-const OLD_WORLD_SCENES: Record<
+export const OLD_WORLD_SCENES: Record<
   Exclude<SceneId, "forest-cottage" | "forest-cottage-interior">,
   WorldScene
 > = {
@@ -716,14 +715,10 @@ const OLD_WORLD_SCENES: Record<
   },
 };
 
-// Which world is played: the old one, or (NEXT_PUBLIC_WORLD=new) the new-world-map
-// exteriors replacing the scenes of NEW_WORLD_SCENES. The Casita del bosque is
-// in the table in both worlds (nothing links to it in the old one), so the
-// table stays complete for the compiler.
-export const WORLD_SCENES: Record<SceneId, WorldScene> = NEW_WORLD_MAP
-  ? { ...OLD_WORLD_SCENES, ...NEW_WORLD_SCENES }
-  : {
-      ...OLD_WORLD_SCENES,
-      "forest-cottage": NEW_WORLD_SCENES["forest-cottage"],
-      "forest-cottage-interior": NEW_WORLD_SCENES["forest-cottage-interior"],
-    };
+// The world that is played: the new-world-map exteriors (and the two cottage
+// scenes) over the old table, which still provides the interiors. The old
+// exteriors in OLD_WORLD_SCENES are legacy and are no longer reachable.
+export const WORLD_SCENES: Record<SceneId, WorldScene> = {
+  ...OLD_WORLD_SCENES,
+  ...NEW_WORLD_SCENES,
+};

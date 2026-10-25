@@ -86,7 +86,10 @@ const pngSize = (publicPath) => {
   return { width: header.readUInt32BE(16), height: header.readUInt32BE(20) };
 };
 const feetAt = (x, y) => ({ x: x - 6, y: y - 19, width: 12, height: 12 });
-const placed = (sceneId) => getComposition(sceneId, "chapter-1").instances;
+// The placements of chapter-1.ts: current for the interiors, legacy for the old
+// exteriors (the played exteriors are checked in new-world-map.test.mjs).
+const placed = (sceneId) =>
+  chapter1Compositions.find((c) => c.sceneId === sceneId).instances;
 const ALL_PLACED = chapter1Compositions.flatMap((c) => c.instances);
 
 test("Beekeeper and Farmer (hoeing) are registered in the Decorator, with real frames, calm fps and a feet anchor", () => {

@@ -64,7 +64,6 @@ import {
   smithyStreetSpawns,
   smithyStreetTransitions,
 } from "../../../game/smithy-street/smithyStreetGeometry";
-import { NEW_WORLD_MAP } from "../../../game/new-world-map/worldVariant";
 import {
   apothecaryStreetColliders as nwApothecaryStreetColliders,
   apothecaryStreetSpawns as nwApothecaryStreetSpawns,
@@ -216,7 +215,6 @@ const EDITOR_SCENES: {
     idPrefix: "forest-cottage-interior",
     exportPrefix: "forestCottageInterior",
   },
-  // Only drawn in the new world map (NEXT_PUBLIC_WORLD=new).
   {
     sceneId: "forest-cottage",
     idPrefix: "forest-cottage",
@@ -347,9 +345,9 @@ const PERSISTED_GEOMETRY: Record<
   },
 };
 
-// The geometry of the new world map (NEXT_PUBLIC_WORLD=new): the scenes it
-// redraws load it instead of the old files, so /dev/collisions shows the new
-// backgrounds with their own colliders, transitions and spawns.
+// The geometry of the new world map: the scenes it redraws load it instead of
+// the old files, so /dev/collisions shows the new backgrounds with their own
+// colliders, transitions and spawns.
 const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
   plaza: {
     colliders: nwPlazaColliders,
@@ -409,9 +407,7 @@ const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
 };
 
 function createInitialData(sceneId: string): SceneData {
-  const persisted =
-    (NEW_WORLD_MAP ? NEW_WORLD_GEOMETRY[sceneId] : undefined) ??
-    PERSISTED_GEOMETRY[sceneId];
+  const persisted = NEW_WORLD_GEOMETRY[sceneId] ?? PERSISTED_GEOMETRY[sceneId];
   // Persisted interaction zones come from the same registry the game reads.
   const interactions: EditorInteraction[] = getSceneInteractionZones(
     sceneId,

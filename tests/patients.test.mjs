@@ -524,7 +524,7 @@ test("water: the river gives one unit per use, only with the flask and while a k
       "river",
     );
 
-  // the zone is the one painted by hand, untouched
+  // the zone is the one adapted by hand to the new world's river bank
   assert.deepEqual(
     getSceneInteractionZones("outskirts").map(
       ({ interactionId, x, y, width, height }) => ({
@@ -535,7 +535,7 @@ test("water: the river gives one unit per use, only with the flask and while a k
         height,
       }),
     ),
-    [{ interactionId: "gather.water", x: 427, y: 522, width: 35, height: 66 }],
+    [{ interactionId: "gather.water", x: 408, y: 553, width: 77, height: 94 }],
   );
   assert.equal(
     story.getGatherDecision("craft.fire", facts("examined", FLASK)),

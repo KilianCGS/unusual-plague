@@ -1,7 +1,4 @@
-import {
-  NEW_WORLD_MAP,
-  NEW_WORLD_SCENE_IDS,
-} from "../new-world-map/worldVariant";
+import { NEW_WORLD_SCENE_IDS } from "../new-world-map/worldVariant";
 import { newWorldChapter1Compositions } from "../new-world-map/newWorldCompositions";
 import type { DecorComposition, DecorInteraction } from "../decor/decorTypes";
 import { chapter1Compositions } from "./chapter-1";
@@ -13,20 +10,17 @@ import { chapter1Interactions } from "./chapter-1.interactions";
 //
 // To add a chapter: save its export as chapter-N.ts here, import it and add it
 // to the list below.
-// In the new world the scenes it redraws start from ITS compositions (empty
-// until they are authored in /dev/decorator): the old placements were made for
-// the old maps. They stay in chapter-1.ts, untouched.
-const ALL_COMPOSITIONS: DecorComposition[] = NEW_WORLD_MAP
-  ? [
-      ...chapter1Compositions.filter(
-        (composition) =>
-          !(NEW_WORLD_SCENE_IDS as readonly string[]).includes(
-            composition.sceneId,
-          ),
-      ),
-      ...newWorldChapter1Compositions,
-    ]
-  : [...chapter1Compositions];
+// The exterior scenes of the new world take their population from
+// newWorldCompositions (authored in /dev/decorator on the new maps). The old
+// placements of those scenes stay in chapter-1.ts as legacy, unused; its
+// interiors are still the ones in use.
+const ALL_COMPOSITIONS: DecorComposition[] = [
+  ...chapter1Compositions.filter(
+    (composition) =>
+      !(NEW_WORLD_SCENE_IDS as readonly string[]).includes(composition.sceneId),
+  ),
+  ...newWorldChapter1Compositions,
+];
 
 // A scene + chapter can be listed more than once; their instances are merged.
 const BY_SCENE_AND_CHAPTER = new Map<string, DecorComposition>();

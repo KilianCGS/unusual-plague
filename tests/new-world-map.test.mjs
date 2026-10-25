@@ -11,50 +11,39 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const require = createRequire(import.meta.url);
 const ts = require("typescript");
 
-// One independent module graph per world: NEXT_PUBLIC_WORLD is read when
-// worldVariant.ts is first loaded.
-function makeLoader(worldValue) {
-  const cache = new Map();
-  function load(file) {
-    if (cache.has(file)) return cache.get(file).exports;
-    const src = fs.readFileSync(file, "utf8");
-    const js = ts.transpileModule(src, {
-      compilerOptions: { module: "commonjs", target: "es2022" },
-    }).outputText;
-    const mod = new Module(file);
-    mod.paths = Module._nodeModulePaths(root);
-    cache.set(file, mod);
-    mod.require = (id) => {
-      if (id.startsWith(".")) {
-        const base = path.resolve(path.dirname(file), id);
-        for (const candidate of [base + ".ts", path.join(base, "index.ts")]) {
-          if (fs.existsSync(candidate)) return load(candidate);
-        }
-        throw new Error(`Cannot resolve ${id} from ${file}`);
+// One module graph. The new world is the only world: nothing reads an
+// environment variable any more.
+const cache = new Map();
+function load(file) {
+  if (cache.has(file)) return cache.get(file).exports;
+  const src = fs.readFileSync(file, "utf8");
+  const js = ts.transpileModule(src, {
+    compilerOptions: { module: "commonjs", target: "es2022" },
+  }).outputText;
+  const mod = new Module(file);
+  mod.paths = Module._nodeModulePaths(root);
+  cache.set(file, mod);
+  mod.require = (id) => {
+    if (id.startsWith(".")) {
+      const base = path.resolve(path.dirname(file), id);
+      for (const candidate of [base + ".ts", path.join(base, "index.ts")]) {
+        if (fs.existsSync(candidate)) return load(candidate);
       }
-      if (id.includes("useProtagonistController"))
-        return { PROTAGONIST_FEET_HITBOX: {} };
-      return require(id);
-    };
-    const previous = process.env.NEXT_PUBLIC_WORLD;
-    if (worldValue === undefined) delete process.env.NEXT_PUBLIC_WORLD;
-    else process.env.NEXT_PUBLIC_WORLD = worldValue;
-    try {
-      mod._compile(js, file);
-    } finally {
-      if (previous === undefined) delete process.env.NEXT_PUBLIC_WORLD;
-      else process.env.NEXT_PUBLIC_WORLD = previous;
+      throw new Error(`Cannot resolve ${id} from ${file}`);
     }
-    return mod.exports;
-  }
-  return (rel) => load(path.join(root, rel));
+    if (id.includes("useProtagonistController"))
+      return { PROTAGONIST_FEET_HITBOX: {} };
+    return require(id);
+  };
+  mod._compile(js, file);
+  return mod.exports;
 }
-
-const newWorld = makeLoader("new");
-const oldWorld = makeLoader(undefined);
+const newWorld = (rel) => load(path.join(root, rel));
 
 const { WORLD_SCENES } = newWorld("src/game/world/worldScenes.ts");
-const OLD = oldWorld("src/game/world/worldScenes.ts").WORLD_SCENES;
+// The legacy exterior tables (kept in the repository, no longer played): the
+// source of the topology the new world must keep.
+const OLD = newWorld("src/game/world/worldScenes.ts").OLD_WORLD_SCENES;
 const { NEW_WORLD_SCENE_IDS } = newWorld(
   "src/game/new-world-map/worldVariant.ts",
 );
@@ -63,10 +52,18 @@ const { getSceneWorld } = newWorld("src/app/dev/scene/scenes.ts");
 const { SCENE_TO_MAP_LOCATION, MAP_LINKS, MAP_LOCATIONS } = newWorld(
   "src/game/map/mapLocations.ts",
 );
-const OLD_MAP = oldWorld("src/game/map/mapLocations.ts");
 const { getComposition } = newWorld("src/game/compositions/index.ts");
-const OLD_COMPOSITIONS = oldWorld("src/game/compositions/index.ts");
-const OLD_INTERACTIONS = oldWorld(
+// The legacy placements of chapter-1.ts (the interiors still use them).
+const LEGACY_COMPOSITIONS = newWorld(
+  "src/game/compositions/chapter-1.ts",
+).chapter1Compositions;
+const OLD_COMPOSITIONS = {
+  getComposition: (sceneId, chapterId) =>
+    LEGACY_COMPOSITIONS.find(
+      (c) => c.sceneId === sceneId && c.chapterId === chapterId,
+    ),
+};
+const OLD_INTERACTIONS = newWorld(
   "src/game/compositions/chapter-1.interactions.ts",
 ).chapter1Interactions;
 const { getSceneInteractionZones } = newWorld(
@@ -94,19 +91,7 @@ const EXPECTED_REMOVED = [
   "mill-farmland-farmer-old-01",
   "mill-farmland-villager-young-01",
 ];
-// Instances whose hand-placed anchor lies inside a static collider rectangle.
-const KNOWN_ANCHOR_OVERLAPS = [
-  "apothecary-street-woman-sweeping-01",
-  "tavern-street-villager-woman-01-01",
-  "outskirts-fisherman-01",
-  "outskirts-woman-washing-clothes-01",
-  "forest-medicinal-herb-dev-01",
-  "mill-farmland-beekeeper-01",
-  "mill-farmland-farmer-hoeing-01",
-  "smithy-street-child-wooden-sword-01",
-  "smithy-street-villager-sitting-01",
-  "mill-farmland-orange-world-02",
-];
+const KNOWN_UNREACHABLE_ZONES = ["forest-medicinal-herb-dev-01-zone"];
 const size = (scene) => getSceneWorld(scene.visual);
 
 function pngSize(publicPath) {
@@ -129,10 +114,6 @@ test("the eleven redrawn scenes keep their ids and use their own new background"
       height: v.assetHeight,
     });
     assert.ok(v.logicalUnitsPerAssetPixel > 0);
-    // the old world still draws the old art for the same scene (not the cottage)
-    if (id !== "forest-cottage") {
-      assert.ok(!OLD[id].visual.backgroundSrc.includes("new-world-map"), id);
-    }
   }
 });
 
@@ -179,7 +160,7 @@ test("the topology of the old world is kept, plus Forest <-> Casita del bosque",
   const toCottage = WORLD_SCENES.forest.exits.find(
     (e) => e.targetScene === "forest-cottage",
   ).zone;
-  assert.ok(toCottage.y + toCottage.height >= forestHeight - 1);
+  assert.ok(toCottage.y > forestHeight * 0.9);
   assert.ok(WORLD_SCENES["forest-cottage"].arrivals["from-forest"].y < 150);
   assert.equal(
     WORLD_SCENES["forest-cottage"].arrivals["from-forest"].direction,
@@ -331,6 +312,7 @@ test("the new world population: same instances as the old one, valid assets, kep
   const { resolveDecorInstances } = newWorld("src/game/decor/decorRuntime.ts");
   const interactions = getChapterInteractions("chapter-1");
   let total = 0;
+  const unreachableZones = [];
 
   for (const id of NEW_IDS) {
     const fresh = getComposition(id, "chapter-1");
@@ -392,14 +374,6 @@ test("the new world population: same instances as the old one, valid assets, kep
         instance.y > 0 && instance.y < world.height,
         instance.instanceId,
       );
-      // Hand-placed anchors may sit on a static collider (beside a building,
-      // a fence...); those are the author's choice and are listed, so a NEW
-      // overlap shows up as a failure.
-      assert.equal(
-        collidesWithScene(feetRect(instance.x, instance.y), scene.colliders),
-        KNOWN_ANCHOR_OVERLAPS.includes(instance.instanceId),
-        `${instance.instanceId}: anchor on a static collider differs from the known list`,
-      );
     }
 
     // placed things never cover an exit or an arrival
@@ -435,15 +409,29 @@ test("the new world population: same instances as the old one, valid assets, kep
       }
     }
 
-    // the river bank zone stays reachable
+    // The gameplay property: an interactive thing (a character with an
+    // interaction, or a collectible) is usable when SOME walkable position of
+    // the Doctor's feet overlaps its interaction zone (that is what the [E]
+    // prompt tests), whatever the anchor of its sprite touches. Zones come
+    // from the same resolver the game uses (collectibles: sprite box + reach).
+    const floor = reachable(withDecor, Object.values(scene.arrivals)[0]);
+    const usable = (zone) =>
+      floor.some(([x, y]) => rectsIntersect(feetRect(x, y), zone));
+
+    for (const zone of decor.zones) {
+      if (!usable(zone)) unreachableZones.push(zone.id);
+    }
+
+    // scene-level zones too (the river bank)
     for (const zone of getSceneInteractionZones(id)) {
-      const floor = reachable(withDecor, Object.values(scene.arrivals)[0]);
-      assert.ok(
-        floor.some(([x, y]) => rectsIntersect(feetRect(x, y), zone)),
-        `${id} ${zone.id}`,
-      );
+      assert.ok(usable(zone), `${id} ${zone.id}`);
     }
   }
+
+  // Interactive things whose zone no walkable position reaches TODAY (the
+  // placement and the geometry are both hand-made; to be fixed by hand). An
+  // exact list: a new gap fails, and so does one that gets fixed (update it).
+  assert.deepEqual(unreachableZones.sort(), KNOWN_UNREACHABLE_ZONES);
 
   assert.equal(total, 33);
 
@@ -474,7 +462,7 @@ test("the new world population: same instances as the old one, valid assets, kep
   }
 });
 
-test("the map shows the Casita del bosque south of the Forest (new world only)", () => {
+test("the map shows the Casita del bosque south of the Forest", () => {
   assert.equal(SCENE_TO_MAP_LOCATION["forest-cottage"], "cottage");
   const forest = MAP_LOCATIONS.find((l) => l.id === "forest");
   const cottage = MAP_LOCATIONS.find((l) => l.id === "cottage");
@@ -482,37 +470,49 @@ test("the map shows the Casita del bosque south of the Forest (new world only)",
   assert.equal(cottage.x, forest.x);
   assert.ok(cottage.y > forest.y);
   assert.ok(MAP_LINKS.some(([a, b]) => a === "forest" && b === "cottage"));
-  assert.equal(
-    OLD_MAP.MAP_LOCATIONS.some((l) => l.id === "cottage"),
-    false,
-  );
-  assert.equal(OLD_MAP.MAP_LINKS.length, MAP_LINKS.length - 1);
 });
 
-test("the old world is the default and is untouched", () => {
-  // the old forest has one exit and the old plaza keeps its old colliders
+test("the new world is the only world: nothing selects a world through an environment variable", () => {
+  // the played table is the new one: new backgrounds, the Forest leads to the cottage
+  assert.equal(
+    WORLD_SCENES.plaza.visual.backgroundSrc,
+    "/game/new-world-map/plaza-background.png",
+  );
+  assert.deepEqual(WORLD_SCENES.forest.exits.map((e) => e.targetScene).sort(), [
+    "forest-cottage",
+    "outskirts",
+  ]);
+  assert.ok(WORLD_SCENES["forest-cottage-interior"]);
+
+  // the legacy tables are still there, untouched and unplayed
   assert.deepEqual(
     OLD.forest.exits.map((e) => e.targetScene),
     ["outskirts"],
   );
-  assert.equal(
-    OLD.plaza.visual.backgroundSrc,
-    "/game/areas/plaza/plaza-background.png",
-  );
   assert.ok(
     OLD_COMPOSITIONS.getComposition("plaza", "chapter-1").instances.length > 0,
   );
-  assert.ok(
-    OLD_COMPOSITIONS.getComposition("mill-farmland", "chapter-1").instances
-      .length > 0,
-  );
-  // nothing in the old world links to the cottage
-  for (const scene of Object.values(OLD)) {
-    assert.ok(
-      !scene.exits.some((e) => e.targetScene === "forest-cottage"),
-      scene.id,
-    );
-  }
+
+  // no code reads NEXT_PUBLIC_WORLD
+  const readers = [];
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) walk(full);
+      else if (/[.](ts|tsx)$/.test(entry.name)) {
+        const code = fs
+          .readFileSync(full, "utf8")
+          .split(String.fromCharCode(10))
+          .filter((line) => !line.trim().startsWith("//"))
+          .join(String.fromCharCode(10));
+
+        if (code.includes("NEXT_PUBLIC_WORLD")) readers.push(full);
+      }
+    }
+  };
+  walk(path.join(root, "src"));
+  assert.deepEqual(readers, []);
 });
 
 test("Mountain Path <-> Mine Interior <-> Mine Natural Cave: wired to the hand-drawn zones, both ways, spawns clear and reachable", () => {
