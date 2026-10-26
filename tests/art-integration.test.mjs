@@ -281,7 +281,7 @@ test("world Medicinal herb: final art, rooted anchor, still the same collectible
   );
   assert.equal(herb.assetId, "medicinal-herb-dev");
   assert.equal(herb.colliderEnabled, false);
-  assert.equal(herb.scale, 1.15); // as authored in the Decorator
+  assert.equal(herb.scale, 1.25); // as authored in the Decorator
   assert.ok(
     !fs
       .readFileSync(path.join(root, "src/game/decor/decorAssets.ts"), "utf8")

@@ -60,7 +60,11 @@ import {
   tavernStreetSpawns,
   tavernStreetTransitions,
 } from "./geometry/tavernStreetGeometry";
-import { forestCottageInteriorColliders } from "../forest-cottage-interior/forestCottageInteriorGeometry";
+import {
+  forestCottageInteriorColliders,
+  forestCottageInteriorSpawns,
+  forestCottageInteriorTransitions,
+} from "../forest-cottage-interior/forestCottageInteriorGeometry";
 import {
   FOREST_COTTAGE_INTERIOR_VISUAL,
   FOREST_COTTAGE_VISUAL,
@@ -376,6 +380,7 @@ export const NEW_WORLD_SCENES: Record<
     visual: FOREST_COTTAGE_VISUAL,
     colliders: forestCottageColliders,
     exits: [
+      // North path: back to the Forest.
       exit(
         "to-forest",
         forestCottageTransitions,
@@ -383,20 +388,44 @@ export const NEW_WORLD_SCENES: Record<
         "forest",
         "from-forest-cottage",
       ),
+      // The door of the house.
+      exit(
+        "to-forest-cottage-interior",
+        forestCottageTransitions,
+        "forest-cottage-transition-2",
+        "forest-cottage-interior",
+        "from-forest-cottage",
+      ),
     ],
     arrivals: {
       "from-forest": spawnAt(forestCottageSpawns, "forest-cottage-spawn-1"),
+      "from-forest-cottage-interior": spawnAt(
+        forestCottageSpawns,
+        "forest-cottage-spawn-2",
+      ),
     },
   },
-  // The witch's house. No exits or arrivals yet: the door in forest-cottage and
-  // the way out of here are placed by hand later.
+  // The inside of the house: its only exit is the door back to the cottage.
   "forest-cottage-interior": {
     id: "forest-cottage-interior",
     kind: "exterior",
     visual: FOREST_COTTAGE_INTERIOR_VISUAL,
     colliders: forestCottageInteriorColliders,
-    exits: [],
-    arrivals: {},
+    exits: [
+      exit(
+        "to-forest-cottage",
+        forestCottageInteriorTransitions,
+        "forest-cottage-interior-transition-1",
+        "forest-cottage",
+        "from-forest-cottage-interior",
+      ),
+    ],
+    arrivals: {
+      "from-forest-cottage": spawnAt(
+        forestCottageInteriorSpawns,
+        "forest-cottage-interior-spawn-1",
+      ),
+    },
   },
   farm: {
     id: "farm",

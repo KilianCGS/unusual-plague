@@ -83,7 +83,6 @@ const NEW_IDS = [...NEW_WORLD_SCENE_IDS];
 const EXPECTED_ADDED = [
   "tavern-street-villager-woman-01-01",
   "forest-resin-world-01",
-  "forest-medicinal-herb-dev-02",
   "mill-farmland-orange-world-02",
 ];
 const EXPECTED_REMOVED = [
@@ -91,7 +90,8 @@ const EXPECTED_REMOVED = [
   "mill-farmland-farmer-old-01",
   "mill-farmland-villager-young-01",
 ];
-const KNOWN_UNREACHABLE_ZONES = ["forest-medicinal-herb-dev-01-zone"];
+// Every interactive thing placed in the new world can be reached on foot.
+const KNOWN_UNREACHABLE_ZONES = [];
 const size = (scene) => getSceneWorld(scene.visual);
 
 function pngSize(publicPath) {
@@ -146,7 +146,10 @@ test("the topology of the old world is kept, plus Forest <-> Casita del bosque",
     assert.deepEqual(targets(WORLD_SCENES, id), expected.sort(), id);
   }
 
-  assert.deepEqual(targets(WORLD_SCENES, "forest-cottage"), ["forest"]);
+  assert.deepEqual(targets(WORLD_SCENES, "forest-cottage"), [
+    "forest",
+    "forest-cottage-interior",
+  ]);
   assert.equal(
     WORLD_SCENES.forest.exits.find((e) => e.targetScene === "forest-cottage")
       .targetSpawn,
@@ -433,7 +436,7 @@ test("the new world population: same instances as the old one, valid assets, kep
   // exact list: a new gap fails, and so does one that gets fixed (update it).
   assert.deepEqual(unreachableZones.sort(), KNOWN_UNREACHABLE_ZONES);
 
-  assert.equal(total, 33);
+  assert.equal(total, 32);
 
   // interactions are keyed by instanceId and untouched: every interactive
   // instance of the old world is still interactive here
@@ -590,9 +593,8 @@ test("the Decorator export is applied literally (x, y, scale, flipX, colliderEna
     },
     forest: {
       "forest-villager-sitting-01": [1012, 913, 1.14, true],
-      "forest-medicinal-herb-dev-01": [414, 816, 1.15, false],
-      "forest-resin-world-01": [572, 188, 1, false],
-      "forest-medicinal-herb-dev-02": [772, 661, 0.98, false],
+      "forest-resin-world-01": [576, 189, 1, false],
+      "forest-medicinal-herb-dev-01": [771, 664, 1.25, false],
     },
     "mill-farmland": {
       "mill-farmland-beekeeper-01": [1909, 850, 1.08, true],
@@ -642,6 +644,11 @@ test("nothing sits outside a scene's logical world: every spawn is inside, every
       prefix: "mineInterior",
     },
     {
+      id: "forest-cottage-interior",
+      file: "src/game/forest-cottage-interior/forestCottageInteriorGeometry.ts",
+      prefix: "forestCottageInterior",
+    },
+    {
       id: "mine-natural-cave",
       file: "src/game/mine-natural-cave/mineNaturalCaveGeometry.ts",
       prefix: "mineNaturalCave",
@@ -673,6 +680,85 @@ test("nothing sits outside a scene's logical world: every spawn is inside, every
         touches(r),
         `${label}: ${r.id} is completely outside the world`,
       );
+    }
+  }
+});
+
+test("Forest <-> Forest Cottage <-> Forest Cottage Interior: wired both ways to the hand-drawn zones, spawns clear, door and way out reachable", () => {
+  const forest = WORLD_SCENES.forest;
+  const cottage = WORLD_SCENES["forest-cottage"];
+  const inside = WORLD_SCENES["forest-cottage-interior"];
+  const exitTo = (scene, name) => scene.exits.find((e) => e.name === name);
+
+  // the exact zones and spawns used by each hop
+  assert.equal(exitTo(forest, "to-forest-cottage").zone.x, 696); // forest-transition-2
+  assert.equal(exitTo(forest, "to-forest-cottage").targetSpawn, "from-forest");
+  assert.deepEqual(cottage.arrivals["from-forest"], {
+    x: 690,
+    y: 100,
+    direction: "south",
+  }); // forest-cottage-spawn-1
+  assert.equal(exitTo(cottage, "to-forest").zone.x, 650); // forest-cottage-transition-1
+  assert.equal(exitTo(cottage, "to-forest").targetSpawn, "from-forest-cottage");
+
+  assert.equal(exitTo(cottage, "to-forest-cottage-interior").zone.x, 311); // forest-cottage-transition-2
+  assert.equal(
+    exitTo(cottage, "to-forest-cottage-interior").targetSpawn,
+    "from-forest-cottage",
+  );
+  assert.deepEqual(inside.arrivals["from-forest-cottage"], {
+    x: 256,
+    y: 307,
+    direction: "south",
+  }); // forest-cottage-interior-spawn-1
+  assert.equal(exitTo(inside, "to-forest-cottage").zone.x, 224); // interior transition-1
+  assert.equal(
+    exitTo(inside, "to-forest-cottage").targetSpawn,
+    "from-forest-cottage-interior",
+  );
+  assert.deepEqual(cottage.arrivals["from-forest-cottage-interior"], {
+    x: 353,
+    y: 597,
+    direction: "south",
+  }); // forest-cottage-spawn-2
+
+  assert.equal(cottage.colliders.length, 25);
+  assert.equal(inside.colliders.length, 11);
+  assert.equal(inside.exits.length, 1);
+  assert.equal(
+    getComposition("forest-cottage-interior", "chapter-1"),
+    undefined,
+  );
+  assert.deepEqual(getSceneInteractionZones("forest-cottage-interior"), []);
+
+  for (const scene of [cottage, inside]) {
+    const world = size(scene);
+
+    for (const [name, spawn] of Object.entries(scene.arrivals)) {
+      const r = feetRect(spawn.x, spawn.y);
+      assert.ok(
+        r.x >= 0 &&
+          r.y >= 0 &&
+          r.x + r.width <= world.width &&
+          r.y + r.height <= world.height,
+        `${scene.id}.${name} outside the world`,
+      );
+      assert.ok(
+        !collidesWithScene(r, scene.colliders),
+        `${scene.id}.${name} in collision`,
+      );
+      const floor = reachable(scene, spawn);
+
+      for (const exit of scene.exits) {
+        assert.ok(
+          !rectsIntersect(r, exit.zone),
+          `${scene.id}.${name} on an exit`,
+        );
+        assert.ok(
+          floor.some(([x, y]) => rectsIntersect(feetRect(x, y), exit.zone)),
+          `${scene.id}.${name} cannot reach ${exit.name}`,
+        );
+      }
     }
   }
 });
