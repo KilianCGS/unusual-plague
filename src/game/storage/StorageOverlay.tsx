@@ -6,8 +6,8 @@ import type { CSSProperties } from "react";
 import { storageCopy } from "../i18n/storage";
 import type { Language } from "../i18n/types";
 import type { InventoryState } from "../inventory/inventory";
-import { getItemIcon, getItemName } from "../items/items";
-import { ItemIcon } from "../items/ItemIcon";
+import { getItemName } from "../items/items";
+import { InventorySlotContents } from "../inventory/InventorySlotView";
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
 import styles from "./StorageOverlay.module.css";
 
@@ -73,22 +73,11 @@ export function StorageOverlay({
             }
             onClick={() => slot && onTransfer(side, slot.itemId)}
           >
-            {slot ? (
-              <>
-                {getItemIcon(slot.itemId) ? (
-                  <ItemIcon itemId={slot.itemId} className={styles.itemIcon} />
-                ) : (
-                  <span className={styles.name}>
-                    {getItemName(slot.itemId, language)}
-                  </span>
-                )}
-                <span
-                  className={`${styles.quantity}${getItemIcon(slot.itemId) ? ` ${styles.quantityOverIcon}` : ""}`}
-                >
-                  ×{slot.quantity}
-                </span>
-              </>
-            ) : null}
+            <InventorySlotContents
+              slot={slot}
+              language={language}
+              classes={styles}
+            />
           </button>
         ))}
       </div>

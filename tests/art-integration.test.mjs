@@ -197,19 +197,9 @@ test("catalogued is NOT implemented: promoted items have no recipe, patient need
   ]);
 });
 
-test("inventory presentation: six slots in ONE row, capacity untouched", () => {
+test("inventory presentation: capacity untouched; storage and crafting keep their row of six", () => {
   assert.equal(INVENTORY_CAPACITY, 6);
-  const overlay = fs.readFileSync(
-    path.join(root, "src/game/inventory/InventoryOverlay.tsx"),
-    "utf8",
-  );
-  const columns = Number(overlay.match(/const COLUMNS = (\d+);/)[1]);
-  assert.equal(
-    columns,
-    INVENTORY_CAPACITY,
-    "one row: as many columns as slots",
-  );
-  // the storage and crafting views of the carried inventory use the same row
+  // the storage and crafting views of the carried inventory lay it out in a row
   for (const file of [
     "src/game/storage/StorageOverlay.tsx",
     "src/game/crafting/CraftingOverlay.tsx",
@@ -222,14 +212,20 @@ test("inventory presentation: six slots in ONE row, capacity untouched", () => {
   }
 });
 
-test("no UI keeps its own itemId > image table: the overlays read the item catalog", () => {
+test("no UI keeps its own itemId > image table: the HUD and overlays read the item catalog", () => {
   for (const file of [
-    "src/game/inventory/InventoryOverlay.tsx",
     "src/game/storage/StorageOverlay.tsx",
     "src/game/crafting/CraftingOverlay.tsx",
+    "src/game/inventory/InventoryHud.tsx",
+    "src/game/inventory/InventorySlotView.tsx",
   ]) {
     const source = fs.readFileSync(path.join(root, file), "utf8");
-    assert.ok(source.includes("ItemIcon"), file);
+    // the overlays and the HUD draw icons through ItemIcon, directly or via the
+    // shared slot component (which is the one that uses ItemIcon)
+    assert.ok(
+      source.includes("ItemIcon") || source.includes("InventorySlot"),
+      file,
+    );
     assert.ok(
       !/\/game\/items\//.test(source),
       `${file} must not hardcode icon paths`,

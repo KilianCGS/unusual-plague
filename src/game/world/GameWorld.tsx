@@ -26,7 +26,7 @@ import {
   resolveInteractionConversation,
 } from "../dialogue/interactionDialogues";
 import { useDialogue } from "../dialogue/useDialogue";
-import { itemFeedbackCopy } from "../i18n/items";
+import { formatObtainedNotice, itemFeedbackCopy } from "../i18n/items";
 import { tutorialCopy } from "../i18n/tutorial";
 import type { Language } from "../i18n/types";
 import {
@@ -39,8 +39,8 @@ import {
   createChapter1Inventory,
   createChapter1Storage,
 } from "../inventory/initialInventory";
-import { InventoryOverlay } from "../inventory/InventoryOverlay";
-import { useInventoryHotkeys } from "../inventory/useInventoryHotkeys";
+import { InventoryHud } from "../inventory/InventoryHud";
+import { isInventoryHudVisible } from "../inventory/inventoryHudVisibility";
 import { storageCopy } from "../i18n/storage";
 import { STORAGE_INTERACTION_ID, transferStack } from "../storage/storage";
 import { StorageOverlay, type StorageSide } from "../storage/StorageOverlay";
@@ -115,7 +115,6 @@ export function GameWorld({ language }: { language: Language }) {
   // Main interfaces. They never open on top of each other, of a conversation
   // or during a scene fade, and each one blocks the Doctor while it is up.
   const [bookOpen, setBookOpen] = useState(false);
-  const [inventoryOpen, setInventoryOpen] = useState(false);
   // The Apothecary storage chest interface (another main interface).
   const [storageOpen, setStorageOpen] = useState(false);
   // The crafting station being used (null = none). Another main interface.
@@ -181,7 +180,7 @@ export function GameWorld({ language }: { language: Language }) {
     craftingStation === null &&
     !storageOpen &&
     !inNarrativeScene;
-  const mapVisible = mapHeld && canOpenInterface && !bookOpen && !inventoryOpen;
+  const mapVisible = mapHeld && canOpenInterface && !bookOpen;
   const pendingRef = useRef<{ sceneId: SceneId; spawnName: string } | null>(
     null,
   );
@@ -195,7 +194,6 @@ export function GameWorld({ language }: { language: Language }) {
     !dialogue.active &&
     !bookOpen &&
     !mapVisible &&
-    !inventoryOpen &&
     craftingStation === null &&
     !storageOpen &&
     !inNarrativeScene;
@@ -205,18 +203,8 @@ export function GameWorld({ language }: { language: Language }) {
     setOpen: (open) => {
       if (!open) {
         setBookOpen(false);
-      } else if (canOpenInterface && !mapVisible && !inventoryOpen) {
+      } else if (canOpenInterface && !mapVisible) {
         setBookOpen(true);
-      }
-    },
-  });
-  useInventoryHotkeys({
-    open: inventoryOpen,
-    setOpen: (open) => {
-      if (!open) {
-        setInventoryOpen(false);
-      } else if (canOpenInterface && !mapVisible && !bookOpen) {
-        setInventoryOpen(true);
       }
     },
   });
@@ -267,7 +255,7 @@ export function GameWorld({ language }: { language: Language }) {
       let nextInventory = inventoryRef.current;
       let nextPatients = patientsRef.current;
       let nextRewards = claimedRewardsRef.current;
-      const obtained: string[] = [];
+      const obtained: { itemId: string; quantity: number }[] = [];
 
       for (const effect of effects) {
         if (effect.type === "give-item") {
@@ -278,7 +266,7 @@ export function GameWorld({ language }: { language: Language }) {
           }
 
           nextInventory = added;
-          obtained.push(effect.itemId);
+          obtained.push({ itemId: effect.itemId, quantity: effect.quantity });
         } else if (effect.type === "claim-reward") {
           nextRewards = new Set([...nextRewards, effect.rewardId]);
         } else {
@@ -309,9 +297,13 @@ export function GameWorld({ language }: { language: Language }) {
         setClaimedRewards(nextRewards);
       }
 
-      for (const itemId of obtained) {
+      for (const { itemId, quantity } of obtained) {
         showNotice(
-          itemFeedbackCopy[language].obtained + getItemName(itemId, language),
+          formatObtainedNotice(
+            language,
+            getItemName(itemId, language),
+            quantity,
+          ),
         );
       }
 
@@ -388,7 +380,13 @@ export function GameWorld({ language }: { language: Language }) {
           inventoryRef.current = next;
           setInventory(next);
           setCollected((current) => markCollected(current, source.instanceId!));
-          showNotice(copy.obtained + getItemName(source.itemId, language));
+          showNotice(
+            formatObtainedNotice(
+              language,
+              getItemName(source.itemId, language),
+              1,
+            ),
+          );
         } else {
           showNotice(copy.inventoryFull);
         }
@@ -656,6 +654,28 @@ export function GameWorld({ language }: { language: Language }) {
     ) : null;
   };
 
+  // The inventory bar lives in the scene overlay layer (the camera frame), next
+  // to the dialogue bubble, so it is centred on the playable area. When it shows
+  // is a pure rule (inventoryHudVisibility.ts).
+  const inventoryHudVisible = isInventoryHudVisible({
+    phase,
+    openingActive,
+    inNarrativeScene,
+    tutorialDone: tutorial.step === "done",
+    bookOpen,
+    storageOpen,
+    craftingOpen: craftingStation !== null,
+    mapVisible,
+  });
+  const renderSceneOverlay = (context: SceneOverlayContext) => (
+    <>
+      {renderDialogue(context)}
+      {inventoryHudVisible ? (
+        <InventoryHud inventory={inventory} language={language} />
+      ) : null}
+    </>
+  );
+
   // The characters with news for the Doctor: derived from the cases (a case
   // that is only discovered still waits for its visit, a treated one may still
   // owe its thank-you).
@@ -696,7 +716,6 @@ export function GameWorld({ language }: { language: Language }) {
     !dialogue.active &&
     (!bookOpen || hintOverBook) &&
     !mapVisible &&
-    !inventoryOpen &&
     craftingStation === null &&
     (!storageOpen || hintOverStorage) &&
     !inNarrativeScene;
@@ -711,7 +730,7 @@ export function GameWorld({ language }: { language: Language }) {
           isPlaying={isPlaying}
           exits={scene.exits}
           onExit={handleExit}
-          renderOverlay={renderDialogue}
+          renderOverlay={renderSceneOverlay}
           onPlayerMoved={handlePlayerMoved}
           onInteract={handleInteract}
           onInteractionAvailable={setAvailableInteractionId}
@@ -728,7 +747,7 @@ export function GameWorld({ language }: { language: Language }) {
           onInteract={handleInteract}
           collectedInstanceIds={collected}
           attentionInstanceIds={attentionInstanceIds}
-          renderOverlay={renderDialogue}
+          renderOverlay={renderSceneOverlay}
           onPlayerMoved={handlePlayerMoved}
           onInteractionAvailable={setAvailableInteractionId}
         />
@@ -774,9 +793,6 @@ export function GameWorld({ language }: { language: Language }) {
           onTransfer={handleStorageTransfer}
           onClose={() => setStorageOpen(false)}
         />
-      ) : null}
-      {inventoryOpen ? (
-        <InventoryOverlay inventory={inventory} language={language} />
       ) : null}
       {showHint ? (
         <TutorialHint

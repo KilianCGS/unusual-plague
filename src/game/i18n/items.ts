@@ -20,6 +20,16 @@ export const itemFeedbackCopy: Record<Language, ItemFeedbackCopy> = {
   },
 };
 
+// "Obtained: Medicinal herb x1": the notice for something that entered the
+// carried inventory, with how many units.
+export function formatObtainedNotice(
+  language: Language,
+  itemName: string,
+  quantity: number,
+): string {
+  return `${itemFeedbackCopy[language].obtained}${itemName} ×${quantity}`;
+}
+
 // Short notices of the river (a gathering point, not a conversation).
 export const gatherCopy: Record<
   Language,
