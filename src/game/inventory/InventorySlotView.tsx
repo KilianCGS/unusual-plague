@@ -2,6 +2,7 @@ import type { Language } from "../i18n/types";
 import { getItemIcon, getItemName } from "../items/items";
 import { ItemIcon } from "../items/ItemIcon";
 import type { InventorySlot } from "./inventory";
+import { InventorySlotTooltip } from "./InventorySlotTooltip";
 
 // The VISUAL of one inventory slot, shared by every interface that shows the
 // carried inventory (the HUD bar, the Storage and the
@@ -66,10 +67,11 @@ export function InventorySlotContents({
 
 // A non-interactive slot as a list item (the HUD bar). Interactive interfaces
 // use InventorySlotContents inside their own button.
-// With `tooltipClassName`, an occupied slot also draws its own small label
-// ("Name ×quantity"), shown by the caller's CSS on :hover / :focus-visible, and
+// With `tooltip`, an occupied slot also draws its own small label ("Name
+// ×quantity", see InventorySlotTooltip), shown on :hover / :focus-visible, and
 // becomes focusable so the label can be reached without a mouse. The browser's
 // native title is then left out: it would show a second, duplicate tooltip.
+// The slot's own CSS must make it `position: relative`.
 export function InventorySlotView({
   slot,
   language,
@@ -77,7 +79,7 @@ export function InventorySlotView({
   className,
   classes,
   showQuantityFromTwo,
-  tooltipClassName,
+  tooltip = false,
 }: {
   slot: InventorySlot | null;
   language: Language;
@@ -85,9 +87,9 @@ export function InventorySlotView({
   className: string;
   classes: InventorySlotClasses;
   showQuantityFromTwo?: boolean;
-  tooltipClassName?: string;
+  tooltip?: boolean;
 }) {
-  const tooltip = tooltipClassName !== undefined && slot !== null;
+  const hasTooltip = tooltip && slot !== null;
 
   return (
     <li
@@ -95,8 +97,10 @@ export function InventorySlotView({
       data-inventory-slot
       data-empty={slot === null}
       data-item-id={slot?.itemId}
-      title={slot && !tooltip ? getItemName(slot.itemId, language) : undefined}
-      tabIndex={tooltip ? 0 : undefined}
+      title={
+        slot && !hasTooltip ? getItemName(slot.itemId, language) : undefined
+      }
+      tabIndex={hasTooltip ? 0 : undefined}
       aria-label={getInventorySlotLabel(slot, language, emptyLabel)}
     >
       <InventorySlotContents
@@ -105,10 +109,8 @@ export function InventorySlotView({
         classes={classes}
         showQuantityFromTwo={showQuantityFromTwo}
       />
-      {tooltip ? (
-        <span className={tooltipClassName} aria-hidden="true" data-slot-tooltip>
-          {getItemName(slot.itemId, language)} ×{slot.quantity}
-        </span>
+      {hasTooltip ? (
+        <InventorySlotTooltip slot={slot} language={language} />
       ) : null}
     </li>
   );

@@ -40,7 +40,7 @@ export function InventoryHud({
             className={styles.slot}
             classes={styles}
             showQuantityFromTwo
-            tooltipClassName={styles.tooltip}
+            tooltip
           />
         ))}
       </ul>

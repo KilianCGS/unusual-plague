@@ -29,6 +29,17 @@ function countSelected(selection: CraftSelection, itemId: string): number {
   return selection.filter((selected) => selected === itemId).length;
 }
 
+// How many units of an item are still free to select: what the inventory holds
+// minus what is already selected. Derived on the fly for display; the
+// inventory itself never changes until a craft succeeds.
+export function availableUnits(
+  inventory: InventoryState,
+  selection: CraftSelection,
+  itemId: string,
+): number {
+  return countItem(inventory, itemId) - countSelected(selection, itemId);
+}
+
 // Whether one more unit of this item can be selected: there is a free slot and
 // the inventory really holds more units than are already selected.
 export function canSelectItem(
@@ -169,13 +180,29 @@ export function canCraft(inventory: InventoryState, recipe: Recipe): boolean {
   return craft(inventory, recipe) !== null;
 }
 
+// Whether the inventory holds every input of the recipe, whatever room the
+// output would need.
+function hasIngredients(inventory: InventoryState, recipe: Recipe): boolean {
+  return recipe.inputs.every(
+    ({ itemId, quantity }) => countItem(inventory, itemId) >= quantity,
+  );
+}
+
 export type CombineResult =
   | { kind: "success"; inventory: InventoryState; recipe: Recipe }
+  // The recipe exists and the ingredients are there, but the output does not
+  // fit even after the inputs are consumed. Nothing is consumed.
+  | { kind: "no-space"; recipe: Recipe }
   | { kind: "no-recipe" };
 
 // What COMBINE does: look for a recipe of this station for the selected
-// ingredients and craft it. Anything else (no recipe, wrong station, missing
-// units) is "no-recipe" and changes nothing.
+// ingredients and craft it. No recipe, a recipe of another station or missing
+// units is "no-recipe"; a valid recipe whose output has no room is "no-space".
+// Neither changes anything.
+//
+// Crafting does not check which recipes the Doctor KNOWS (knownRecipeIds only
+// feeds the Book's PREPARADOS tab): any valid combination can be made, learned
+// or not. That is deliberate for now.
 export function combine(
   inventory: InventoryState,
   station: CraftStation,
@@ -187,10 +214,19 @@ export function combine(
     selectionToIngredients(selection),
     recipes,
   );
-  const next = recipe ? craft(inventory, recipe) : null;
 
-  return recipe && next
-    ? { kind: "success", inventory: next, recipe }
+  if (!recipe) {
+    return { kind: "no-recipe" };
+  }
+
+  const next = craft(inventory, recipe);
+
+  if (next) {
+    return { kind: "success", inventory: next, recipe };
+  }
+
+  return hasIngredients(inventory, recipe)
+    ? { kind: "no-space", recipe }
     : { kind: "no-recipe" };
 }
 

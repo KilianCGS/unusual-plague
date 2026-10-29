@@ -13,9 +13,9 @@ import {
 import styles from "./page.module.css";
 
 // Crafting preview. The REAL crafting interface with a throwaway inventory: it
-// never touches the game. It is the only place where the FIRE station can be
-// used, because the cooking station does not exist in the world yet; the work
-// table (MANUAL) is also in the Apothecary of the real game.
+// never touches the game. Both stations (the work table = manual, the stove =
+// fire) are also in the Apothecary of the real game; here the presets make
+// the hard states easy to reach.
 const PRESETS: Record<string, [string, number][]> = {
   // A bit of everything, to try recipes, wrong combinations and stacks.
   "test set": [
@@ -26,6 +26,16 @@ const PRESETS: Record<string, [string, number][]> = {
     ["mushroom", 1],
     ["honey", 1],
     ["medicinal-herb", 2],
+    ["coal", 1],
+  ],
+  // Six item types, all in stacks: cloth + alcohol is a valid recipe whose
+  // result (a new type) has no free slot even after the inputs are used.
+  "full set": [
+    ["cloth", 2],
+    ["alcohol", 2],
+    ["water", 3],
+    ["salt", 1],
+    ["honey", 1],
     ["coal", 1],
   ],
   // Exactly the chained recipe: herb + honey -> paste, paste + coal -> ointment.

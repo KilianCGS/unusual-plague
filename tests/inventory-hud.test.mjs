@@ -194,8 +194,13 @@ test("Storage and Crafting draw their slots with the same shared contents, uncha
     }),
   );
   assert.equal(count(crafting, "data-inventory-slot"), 6);
-  assert.equal(count(crafting, "×3"), 1);
-  assert.equal(count(crafting, "×1"), 1);
+  // (the hover labels repeat the numbers; this counts the slots themselves)
+  const slotsOnly = crafting.replace(
+    /<span[^>]*data-slot-tooltip[^>]*>.*?<\/span>/g,
+    "",
+  );
+  assert.equal(count(slotsOnly, "×3"), 1);
+  assert.equal(count(slotsOnly, "×1"), 1);
 });
 
 test("the HUD is presentational: no state, no input, no inventory of its own", () => {
@@ -236,12 +241,13 @@ test("HUD: an occupied slot carries its own label 'Name ×quantity'; empty slots
   );
   assert.equal(count(empty, "data-slot-tooltip"), 0);
   assert.equal(count(empty, "tabindex"), 0);
+  // the label's CSS is shared with Crafting (one file), shown on hover / focus
   const css = fs.readFileSync(
-    path.join(root, "src/game/inventory/InventoryHud.module.css"),
+    path.join(root, "src/game/inventory/InventorySlotTooltip.module.css"),
     "utf8",
   );
   assert.ok(
-    /:hover \.tooltip/.test(css) && /:focus-visible \.tooltip/.test(css),
+    /:hover > \.tooltip/.test(css) && /:focus-visible > \.tooltip/.test(css),
   );
   const tip = css.slice(
     css.indexOf(".tooltip {"),

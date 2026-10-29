@@ -281,11 +281,12 @@ test("13. a failed craft leaves the inventory untouched (all or nothing)", () =>
   const fullSnapshot = JSON.stringify(fullStays);
   assert.equal(cr.craft(fullStays, stays), null);
   assert.equal(JSON.stringify(fullStays), fullSnapshot);
-  // and combine reports it as "no recipe" without changing anything
+  // and combine reports it as "no space" (NOT "no recipe") without changing anything
   assert.equal(
-    cr.combine(fullStays, "manual", ["cloth", "cloth"], [stays]).kind,
-    "no-recipe",
+    cr.combine(fullStays, "manual", ["cloth", null], [stays]).kind,
+    "no-space",
   );
+  assert.equal(JSON.stringify(fullStays), fullSnapshot);
 });
 
 test("14. the chained recipe works with no special logic", () => {
@@ -335,6 +336,89 @@ test("combine: fire recipe, wrong station and unknown mix never change the inven
     "no-recipe",
   );
   assert.equal(JSON.stringify(state), snapshot);
+});
+
+test("combine: a valid recipe with no room for the result is no-space, and consumes nothing", () => {
+  // six types, every input stack larger than 1: nothing is freed for the output
+  const full = stock([
+    ["cloth", 2],
+    ["alcohol", 2],
+    ["water", 3],
+    ["salt", 1],
+    ["honey", 1],
+    ["coal", 1],
+  ]);
+  const snapshot = JSON.stringify(full);
+  const result = cr.combine(full, "manual", ["cloth", "alcohol"]);
+  assert.equal(result.kind, "no-space");
+  assert.equal(result.recipe.id, "manual.disinfected-bandage");
+  assert.equal(JSON.stringify(full), snapshot);
+  // a combination that is NOT a recipe stays "no-recipe", even in a full inventory
+  assert.equal(cr.combine(full, "manual", ["salt", "coal"]).kind, "no-recipe");
+  // a recipe of the other station is "no-recipe" too
+  assert.equal(
+    cr.combine(full, "fire", ["cloth", "alcohol", null]).kind,
+    "no-recipe",
+  );
+  // consuming a stack completely frees its slot, so the same recipe now fits
+  const frees = stock([
+    ["cloth", 1],
+    ["alcohol", 2],
+    ["water", 3],
+    ["salt", 1],
+    ["honey", 1],
+    ["coal", 1],
+  ]);
+  const made = cr.combine(frees, "manual", ["alcohol", "cloth"]);
+  assert.equal(made.kind, "success");
+  assert.equal(inv.countItem(made.inventory, "disinfected-bandage"), 1);
+  assert.equal(inv.countItem(made.inventory, "cloth"), 0);
+  // units the inventory does not hold are "no-recipe", never "no-space"
+  assert.equal(
+    cr.combine(stock([["cloth", 1]]), "manual", ["cloth", "alcohol"]).kind,
+    "no-recipe",
+  );
+});
+
+test("availableUnits: the stock minus the selection, derived (the inventory is never touched)", () => {
+  const state = stock([
+    ["water", 3],
+    ["cloth", 1],
+  ]);
+  const snapshot = JSON.stringify(state);
+  let selection = cr.createEmptySelection("fire");
+  assert.equal(cr.availableUnits(state, selection, "water"), 3);
+  selection = cr.selectItem(state, selection, "water");
+  assert.equal(cr.availableUnits(state, selection, "water"), 2);
+  selection = cr.selectItem(state, selection, "water");
+  selection = cr.selectItem(state, selection, "water");
+  assert.equal(cr.availableUnits(state, selection, "water"), 0);
+  assert.equal(cr.availableUnits(state, selection, "cloth"), 1);
+  // spent: nothing more of it can be selected
+  assert.equal(cr.canSelectItem(state, selection, "water"), false);
+  selection = cr.deselectSlot(selection, 0);
+  assert.equal(cr.availableUnits(state, selection, "water"), 1);
+  assert.equal(JSON.stringify(state), snapshot);
+});
+
+test("crafting keeps its current rule: a valid recipe can be made whether or not it is known (knownRecipeIds is only for the Book)", () => {
+  const state = stock([
+    ["medicinal-herb", 1],
+    ["honey", 1],
+  ]);
+  // crafting.ts neither receives nor reads the known recipes
+  assert.ok(
+    !/knownRecipe/.test(
+      fs
+        .readFileSync(path.join(root, "src/game/crafting/crafting.ts"), "utf8")
+        .replace(/\/\/.*$/gm, ""),
+    ),
+  );
+  // manual.medicinal-paste is not revealed by any patient, yet it can be made
+  assert.equal(
+    cr.combine(state, "manual", ["honey", "medicinal-herb"]).kind,
+    "success",
+  );
 });
 
 test("15. manual selection holds at most 2", () => {
@@ -437,10 +521,14 @@ test("20. every visible crafting text exists in ES and EN", () => {
     for (const text of [
       c.title.manual,
       c.title.fire,
+      c.ingredients,
       c.inventoryHeading,
-      c.combine,
+      c.action.manual,
+      c.action.fire,
       c.close,
       c.noRecipe,
+      c.noSpace,
+      c.limitReached,
       c.created,
       c.closeModal,
     ]) {
@@ -455,8 +543,13 @@ test("20. every visible crafting text exists in ES and EN", () => {
     craftingCopy.en.noRecipe,
     "These ingredients don't seem to combine well here.",
   );
-  assert.equal(craftingCopy.es.combine, "COMBINAR");
-  assert.equal(craftingCopy.en.combine, "COMBINE");
+  assert.equal(craftingCopy.es.action.manual, "PREPARAR");
+  assert.equal(craftingCopy.es.action.fire, "COCINAR");
+  assert.equal(craftingCopy.en.action.manual, "PREPARE");
+  assert.equal(craftingCopy.en.action.fire, "COOK");
+  assert.equal(craftingCopy.es.noSpace, "No tengo sitio para llevar esto.");
+  assert.equal(craftingCopy.en.noSpace, "I don't have room to carry this.");
+  assert.equal(craftingCopy.es.limitReached, "Ya no caben más ingredientes.");
   for (const recipe of RECIPES) {
     for (const { itemId } of [...recipe.inputs, recipe.output]) {
       assert.ok(

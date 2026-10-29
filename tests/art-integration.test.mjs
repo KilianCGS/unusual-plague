@@ -197,19 +197,22 @@ test("catalogued is NOT implemented: promoted items have no recipe, patient need
   ]);
 });
 
-test("inventory presentation: capacity untouched; storage and crafting keep their row of six", () => {
+test("inventory presentation: capacity untouched; storage and crafting draw every carried slot", () => {
   assert.equal(INVENTORY_CAPACITY, 6);
-  // the storage and crafting views of the carried inventory lay it out in a row
-  for (const file of [
-    "src/game/storage/StorageOverlay.tsx",
-    "src/game/crafting/CraftingOverlay.tsx",
-  ]) {
-    const source = fs.readFileSync(path.join(root, file), "utf8");
-    assert.ok(
-      /\b6\b/.test(source),
-      `${file} lays the carried inventory out in 6 columns`,
-    );
-  }
+  const storage = fs.readFileSync(
+    path.join(root, "src/game/storage/StorageOverlay.tsx"),
+    "utf8",
+  );
+  assert.ok(
+    /\b6\b/.test(storage),
+    "storage lays the carried inventory out in 6",
+  );
+  // crafting draws `inventory.slots` as they are (6, in order), no table of its own
+  const crafting = fs.readFileSync(
+    path.join(root, "src/game/crafting/CraftingOverlay.tsx"),
+    "utf8",
+  );
+  assert.ok(crafting.includes("inventory.slots.map"));
 });
 
 test("no UI keeps its own itemId > image table: the HUD and overlays read the item catalog", () => {

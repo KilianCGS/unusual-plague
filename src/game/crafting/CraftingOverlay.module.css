@@ -1,5 +1,6 @@
-/* Crafting: the same family as Inventory / Map / Book (dimmed world, dark
-   stepped border, parchment panel), but interactive (it takes clicks). */
+/* Crafting: the same family as Map / Book (dimmed world, dark stepped border,
+   parchment panel), but interactive (it takes clicks). Inside the panel the
+   slots use the InventoryHud look: cream slot, dark brown border. */
 .backdrop {
   position: fixed;
   inset: 0;
@@ -69,8 +70,11 @@
   pointer-events: none;
 }
 
+/* Sizes: ingredient slots show the 48px art at exactly 2x (96px); the
+   inventory slots are the HUD's (60px slot, 56px icon). */
 .title,
-.heading {
+.heading,
+.counter {
   margin: 0;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -78,6 +82,11 @@
 
 .title {
   font-size: 18px;
+}
+
+.counter {
+  font-size: 13px;
+  color: #5a4330;
 }
 
 .heading {
@@ -105,64 +114,69 @@
 .selection {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .selectionCell {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .plus {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
 }
 
-.cell,
-.slot {
+/* An ingredient slot: 96px icon + 3px border each side. Empty = a quiet
+   recess; filled = clickable (click takes the unit out). */
+.cell {
   position: relative;
   box-sizing: border-box;
-  width: var(--cell-size);
-  height: var(--cell-size);
-  padding: 3px 4px;
-  overflow: hidden;
-  font: 700 clamp(7px, 1.05vmin, 9px) / 1.1 var(--ui-font);
-  text-align: left;
-  vertical-align: top;
+  width: 102px;
+  height: 102px;
+  padding: 0;
   color: #2b1a14;
-  background: #c9b88f;
-  border: 3px solid #2b1a14;
-  border-right-color: #8a6a4a;
-  border-bottom-color: #8a6a4a;
-  overflow-wrap: break-word;
+  background: #d8cba6;
+  border: 3px solid #b9a67c;
 }
 
-.cell,
-.slot,
-.combine {
-  --cell-size: clamp(48px, 11vmin, 88px);
-}
-
-/* Filled slots and inventory items are clickable. */
-.cell:not(:disabled),
-.slot:not(:disabled) {
+.cell:not(:disabled) {
   cursor: pointer;
+  background: #c9b88f;
+  border-color: #2b1a14;
+}
+
+.cell:not(:disabled):hover {
   background: #d9c9a3;
 }
 
-.cell:not(:disabled):hover,
-.slot:not(:disabled):hover {
-  background: #f1e6c8;
-}
-
-.cell:disabled,
-.slot:disabled {
+.cell:disabled {
   cursor: default;
 }
 
-.combine {
-  min-width: 140px;
+.cellIcon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 96px;
+  height: 96px;
+}
+
+/* An item with no icon yet: its name, readable and centred. */
+.cellName {
+  position: absolute;
+  inset: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 700 12px/1.2 var(--ui-font);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.action {
+  min-width: 150px;
   padding: 6px 18px 8px;
   font: 700 15px/1 var(--ui-font);
   letter-spacing: 0.12em;
@@ -173,11 +187,11 @@
   cursor: pointer;
 }
 
-.combine:hover:not(:disabled) {
+.action:hover:not(:disabled) {
   background: #f1e6c8;
 }
 
-.combine:disabled {
+.action:disabled {
   color: #8a7a60;
   background: #cdbf9d;
   border-color: #8a6a4a;
@@ -201,25 +215,106 @@
   border-top: 2px solid #8a6a4a;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(var(--columns), var(--cell-size));
-  gap: 6px;
-  --cell-size: clamp(48px, 11vmin, 88px);
+.inventory {
+  display: flex;
+  gap: 4px;
+}
+
+/* An inventory slot, as in the HUD (60px, 56px icon). The real stock is never
+   changed by choosing: the number is what is still free to select. A spent
+   item (none free) keeps its icon, dimmed, and ignores clicks. */
+.slot {
+  position: relative;
+  box-sizing: border-box;
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  font-family: var(--ui-font);
+  color: #2b1a14;
+  background: #c9b88f;
+  border: 2px solid #2b1a14;
+}
+
+.slot:disabled {
+  background: #d8cba6;
+  border-color: #6b5238;
+  cursor: default;
+}
+
+.slot:not(:disabled) {
+  cursor: pointer;
+}
+
+.slot:not(:disabled):hover {
+  background: #d9c9a3;
+}
+
+.slot[data-spent="true"] {
+  background: #d8cba6;
+  cursor: default;
+}
+
+.slot[data-spent="true"] .itemIcon,
+.slot[data-spent="true"] .name,
+.slot[data-spent="true"] .quantity {
+  opacity: 0.4;
+}
+
+.slot:focus-visible {
+  outline: 2px solid #1c110c;
+  outline-offset: 1px;
+}
+
+.itemIcon {
+  position: absolute;
+  inset: 0;
+  width: 56px;
+  height: 56px;
 }
 
 .name {
   position: absolute;
-  top: 3px;
-  left: 4px;
-  right: 4px;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  font-size: 9px;
+  line-height: 1.1;
+  font-weight: 700;
+  text-align: left;
+  overflow-wrap: break-word;
 }
 
 .quantity {
   position: absolute;
-  right: 4px;
-  bottom: 2px;
-  font-size: clamp(10px, 1.9vmin, 15px);
+  right: 2px;
+  bottom: 0;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+/* Over an icon: dark digits with a cream outline so they read on any art. */
+.quantityOverIcon {
+  color: #1c110c;
+  text-shadow:
+    1px 0 0 #f4ead5,
+    -1px 0 0 #f4ead5,
+    0 1px 0 #f4ead5,
+    0 -1px 0 #f4ead5;
+}
+
+/* Short windows: the ingredient art drops to 1x (48px) so the whole panel
+   still fits without scrolling. */
+@media (max-height: 520px) {
+  .cell {
+    width: 54px;
+    height: 54px;
+  }
+
+  .cellIcon {
+    width: 48px;
+    height: 48px;
+  }
 }
 
 /* Success modal, on top of the panel. */
@@ -268,35 +363,17 @@
 }
 
 .createdHeading {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   font-size: 14px;
   letter-spacing: 0.14em;
   font-weight: 700;
+  text-transform: uppercase;
 }
 
 .createdName {
   margin: 0;
   font-size: 20px;
   font-weight: 700;
-}
-
-/* The item's icon fills most of the slot; the quantity sits over its corner
-   with a light outline so it stays readable on any art. */
-.itemIcon {
-  position: absolute;
-  left: 50%;
-  top: 45%;
-  width: 96%;
-  height: 96%;
-  transform: translate(-50%, -50%);
-}
-
-.quantityOverIcon {
-  text-shadow:
-    1px 0 0 #e9dbb9,
-    -1px 0 0 #e9dbb9,
-    0 1px 0 #e9dbb9,
-    0 -1px 0 #e9dbb9;
 }
 
 /* The crafted item, shown large in the success modal. */
