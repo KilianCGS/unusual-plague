@@ -26,6 +26,7 @@ import { getNpcColliders } from "../npcs/sceneNpc";
 import { getSceneNpcs } from "../npcs/sceneNpcs";
 import { SceneNpcSprite } from "../npcs/SceneNpcSprite";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
+import { useReportRunning } from "../protagonist/useReportRunning";
 import type { DirectionInputHandle } from "../protagonist/useDirectionInput";
 import { usePlayerMoved } from "../protagonist/usePlayerMoved";
 import { useProtagonistController } from "../protagonist/useProtagonistController";
@@ -99,6 +100,7 @@ export function ExteriorScene({
   onInteract,
   renderOverlay,
   onPlayerMoved,
+  onRunningChange,
   onInteractionAvailable,
   collectedInstanceIds,
   attentionInstanceIds,
@@ -123,6 +125,8 @@ export function ExteriorScene({
   // Reports (never drives): the Doctor really changed position / an
   // interaction became available or stopped being available.
   onPlayerMoved?: () => void;
+  // Reports (never drives): whether the Doctor is running right now.
+  onRunningChange?: (running: boolean) => void;
   // The interactionId available right now (null = none).
   onInteractionAvailable?: (interactionId: string | null) => void;
   // Collectibles already picked up this session; they are not drawn, do not
@@ -162,18 +166,23 @@ export function ExteriorScene({
     y: world.height / 2,
     direction: "south" as const,
   };
-  const { player, playerFeetHitbox, currentSpriteSrc, spriteSize } =
-    useProtagonistController({
-      sceneWidth: world.width,
-      sceneHeight: world.height,
-      initialX: start.x,
-      initialY: start.y,
-      initialDirection: start.direction,
-      spriteSize: SPRITE_SIZE,
-      sceneColliders: blockingColliders,
-      input,
-      inputEnabled: isPlaying,
-    });
+  const {
+    player,
+    playerFeetHitbox,
+    currentSpriteSrc,
+    spriteMirrored,
+    spriteSize,
+  } = useProtagonistController({
+    sceneWidth: world.width,
+    sceneHeight: world.height,
+    initialX: start.x,
+    initialY: start.y,
+    initialDirection: start.direction,
+    spriteSize: SPRITE_SIZE,
+    sceneColliders: blockingColliders,
+    input,
+    inputEnabled: isPlaying,
+  });
 
   const sceneZones = getSceneInteractionZones(scene.id);
   const interactionZones = useMemo(
@@ -193,6 +202,7 @@ export function ExteriorScene({
   });
 
   usePlayerMoved(player.x, player.y, onPlayerMoved);
+  useReportRunning(player.isRunning, onRunningChange);
 
   // Tell the owner which interaction the [E] prompt is for (and clear it when
   // this scene goes away).
@@ -344,6 +354,7 @@ export function ExteriorScene({
               spriteSize={spriteSize}
               direction={player.direction}
               isWalking={player.isWalking}
+              mirrored={spriteMirrored}
               scale={scene.visual.protagonistScale}
               zIndex={Math.round(player.y)}
             />

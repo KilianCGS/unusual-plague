@@ -1,0 +1,20 @@
+/* The whole remark lives BARK_SECONDS and then goes away (the end of the
+   animation is what removes it). It only fades OUT, in its last moments. */
+.bark {
+  position: absolute;
+  inset: 0;
+  z-index: 16;
+  pointer-events: none;
+  animation: bark-life var(--bark-seconds) linear forwards;
+}
+
+@keyframes bark-life {
+  0%,
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}

@@ -14,6 +14,10 @@ type ProtagonistSpriteProps = {
   scale?: number;
   // Stacking order among scene entities; scenes pass the feet Y to sort them.
   zIndex?: number;
+  // Visual only: draws the image flipped horizontally around its centre (west
+  // runs with the east frames). The anchor, the logical position and every
+  // hitbox are untouched.
+  mirrored?: boolean;
 };
 
 export function ProtagonistSprite({
@@ -25,6 +29,7 @@ export function ProtagonistSprite({
   isWalking,
   scale = 1,
   zIndex,
+  mirrored = false,
 }: ProtagonistSpriteProps) {
   const anchorStyle: CSSProperties = {
     position: "absolute",
@@ -42,9 +47,13 @@ export function ProtagonistSprite({
     width: spriteSize,
     height: spriteSize,
     imageRendering: "pixelated",
-    ...(scale === 1
+    ...(scale === 1 && !mirrored
       ? null
-      : { transform: `scale(${scale})`, transformOrigin: "50% 100%" }),
+      : {
+          transform:
+            `${scale === 1 ? "" : `scale(${scale}) `}${mirrored ? "scaleX(-1)" : ""}`.trim(),
+          transformOrigin: "50% 100%",
+        }),
   };
 
   return (

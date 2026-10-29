@@ -77,17 +77,22 @@ function ScenePlayground({ scene }: { scene: DevScene }) {
         : [...(scene.colliders ?? []), ...npcColliders],
     [scene.colliders, npcColliders],
   );
-  const { player, playerFeetHitbox, currentSpriteSrc, spriteSize } =
-    useProtagonistController({
-      sceneWidth: world.width,
-      sceneHeight: world.height,
-      initialX: world.initialX,
-      initialY: world.initialY,
-      spriteSize: SPRITE_SIZE,
-      playerSpeed: PLAYER_SPEED,
-      // Undefined falls back to the controller's empty default.
-      sceneColliders: blockingColliders,
-    });
+  const {
+    player,
+    playerFeetHitbox,
+    currentSpriteSrc,
+    spriteMirrored,
+    spriteSize,
+  } = useProtagonistController({
+    sceneWidth: world.width,
+    sceneHeight: world.height,
+    initialX: world.initialX,
+    initialY: world.initialY,
+    spriteSize: SPRITE_SIZE,
+    playerSpeed: PLAYER_SPEED,
+    // Undefined falls back to the controller's empty default.
+    sceneColliders: blockingColliders,
+  });
   const showCollisionDebug =
     SHOW_COLLISION_DEBUG && scene.colliders !== undefined;
   // Same interaction system as the real game (same hook, same zone registry),
@@ -213,6 +218,7 @@ function ScenePlayground({ scene }: { scene: DevScene }) {
             spriteSize={spriteSize}
             direction={player.direction}
             isWalking={player.isWalking}
+            mirrored={spriteMirrored}
             scale={scene.protagonistScale}
             zIndex={Math.round(player.y)}
           />

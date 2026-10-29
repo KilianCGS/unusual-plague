@@ -10,6 +10,8 @@ import {
   type CollectedInstanceIds,
 } from "../collectibles/collectibles";
 import { useBookHotkeys } from "../book/useBookHotkeys";
+import { PlayerBark } from "../bark/PlayerBark";
+import { useRunBark } from "../bark/useRunBark";
 import { CraftingOverlay } from "../crafting/CraftingOverlay";
 import { CRAFT_STATION_BY_INTERACTION_ID } from "../crafting/crafting";
 import type { CraftStation } from "../crafting/recipes";
@@ -39,6 +41,7 @@ import {
   createChapter1Inventory,
   createChapter1Storage,
 } from "../inventory/initialInventory";
+import { runBarkLines } from "../i18n/runBarks";
 import { InventoryHud } from "../inventory/InventoryHud";
 import { isInventoryHudVisible } from "../inventory/inventoryHudVisibility";
 import { storageCopy } from "../i18n/storage";
@@ -115,6 +118,8 @@ export function GameWorld({ language }: { language: Language }) {
   // Main interfaces. They never open on top of each other, of a conversation
   // or during a scene fade, and each one blocks the Doctor while it is up.
   const [bookOpen, setBookOpen] = useState(false);
+  // Whether the Doctor is running, as the scene reports it (for his remarks).
+  const [doctorRunning, setDoctorRunning] = useState(false);
   // The Apothecary storage chest interface (another main interface).
   const [storageOpen, setStorageOpen] = useState(false);
   // The crafting station being used (null = none). Another main interface.
@@ -197,6 +202,10 @@ export function GameWorld({ language }: { language: Language }) {
     craftingStation === null &&
     !storageOpen &&
     !inNarrativeScene;
+
+  // The Doctor's remarks while he keeps running: not a conversation, they
+  // never block anything and go away the moment plain play stops.
+  const runBark = useRunBark({ running: doctorRunning, enabled: isPlaying });
 
   useBookHotkeys({
     open: bookOpen,
@@ -667,9 +676,25 @@ export function GameWorld({ language }: { language: Language }) {
     craftingOpen: craftingStation !== null,
     mapVisible,
   });
+  const renderRunBark = (context: SceneOverlayContext) => {
+    const anchor = context.getSpeakerAnchor(DOCTOR_SPEAKER);
+
+    return runBark.phraseIndex !== null && anchor ? (
+      <PlayerBark
+        key={runBark.phraseIndex}
+        text={runBarkLines[language][runBark.phraseIndex]}
+        anchorX={anchor.x}
+        anchorY={anchor.y}
+        frameWidth={context.frameWidth}
+        frameHeight={context.frameHeight}
+        onDone={runBark.dismiss}
+      />
+    ) : null;
+  };
   const renderSceneOverlay = (context: SceneOverlayContext) => (
     <>
       {renderDialogue(context)}
+      {renderRunBark(context)}
       {inventoryHudVisible ? (
         <InventoryHud inventory={inventory} language={language} />
       ) : null}
@@ -732,6 +757,7 @@ export function GameWorld({ language }: { language: Language }) {
           onExit={handleExit}
           renderOverlay={renderSceneOverlay}
           onPlayerMoved={handlePlayerMoved}
+          onRunningChange={setDoctorRunning}
           onInteract={handleInteract}
           onInteractionAvailable={setAvailableInteractionId}
         />
@@ -749,6 +775,7 @@ export function GameWorld({ language }: { language: Language }) {
           attentionInstanceIds={attentionInstanceIds}
           renderOverlay={renderSceneOverlay}
           onPlayerMoved={handlePlayerMoved}
+          onRunningChange={setDoctorRunning}
           onInteractionAvailable={setAvailableInteractionId}
         />
       )}

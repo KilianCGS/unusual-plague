@@ -56,9 +56,11 @@ main.title-screen {
   align-items: center;
   justify-content: center;
   background-color: #0a0a0a;
+  /* The cover art, "cover" and centred, under a very light black veil that
+     only helps the text: the blues and oranges of the picture stay alive. */
   background-image:
-    linear-gradient(rgba(10, 10, 10, 0.42), rgba(10, 10, 10, 0.42)),
-    url("/game/title/title-background.png");
+    linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+    url("/game/narrative/title-background.png");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

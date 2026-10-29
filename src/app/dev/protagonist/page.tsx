@@ -9,13 +9,14 @@ const SCENE_HEIGHT = 270;
 const SPRITE_SIZE = 96;
 
 export default function ProtagonistDevPage() {
-  const { player, currentSpriteSrc, spriteSize } = useProtagonistController({
-    sceneWidth: SCENE_WIDTH,
-    sceneHeight: SCENE_HEIGHT,
-    initialX: 240,
-    initialY: 135,
-    spriteSize: SPRITE_SIZE,
-  });
+  const { player, currentSpriteSrc, spriteMirrored, spriteSize } =
+    useProtagonistController({
+      sceneWidth: SCENE_WIDTH,
+      sceneHeight: SCENE_HEIGHT,
+      initialX: 240,
+      initialY: 135,
+      spriteSize: SPRITE_SIZE,
+    });
 
   return (
     <main className={styles.page}>
@@ -36,6 +37,7 @@ export default function ProtagonistDevPage() {
             spriteSize={spriteSize}
             direction={player.direction}
             isWalking={player.isWalking}
+            mirrored={spriteMirrored}
           />
         </div>
       </section>

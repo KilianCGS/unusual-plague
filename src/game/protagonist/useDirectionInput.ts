@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { MutableRefObject } from "react";
+
+import { createRunInput, type RunInput } from "./runInput";
 
 export type Direction = "north" | "south" | "east" | "west";
 
@@ -11,6 +13,10 @@ export type Direction = "north" | "south" | "east" | "west";
 export type DirectionInputHandle = {
   pressedRef: MutableRefObject<Record<Direction, boolean>>;
   priorityRef: MutableRefObject<Direction[]>;
+  // The run key (Space), see runInput.ts. The protagonist controller reports
+  // its `inputEnabled` to it. Optional: a handle without it (the editor's)
+  // just never runs.
+  run?: RunInput;
 };
 
 const directionKeys: Record<string, Direction> = {
@@ -34,10 +40,13 @@ function createPressedState(): Record<Direction, boolean> {
 // the handle is owned by a parent that outlives it.
 // `listen: false` returns an idle handle (used when an external handle is
 // supplied instead).
-export function useDirectionInput({ listen = true } = {}): DirectionInputHandle {
+export function useDirectionInput({
+  listen = true,
+} = {}): DirectionInputHandle {
   const pressedRef = useRef<Record<Direction, boolean>>(createPressedState());
   const priorityRef = useRef<Direction[]>([]);
-  const handle = useMemo(() => ({ pressedRef, priorityRef }), []);
+  const [run] = useState(createRunInput);
+  const handle = useMemo(() => ({ pressedRef, priorityRef, run }), [run]);
 
   useEffect(() => {
     if (!listen) {
@@ -47,9 +56,20 @@ export function useDirectionInput({ listen = true } = {}): DirectionInputHandle 
     function releaseAll() {
       pressedRef.current = createPressedState();
       priorityRef.current = [];
+      run.reset();
     }
 
     function handleKeyDown(event: KeyboardEvent) {
+      if (event.code === "Space") {
+        // Only while the game takes input: dialogues, books and the other
+        // interfaces keep Space for themselves, with their own handlers.
+        if (run.keyDown(event.repeat)) {
+          event.preventDefault();
+        }
+
+        return;
+      }
+
       const direction = directionKeys[event.key];
 
       if (!direction) {
@@ -67,6 +87,11 @@ export function useDirectionInput({ listen = true } = {}): DirectionInputHandle 
     }
 
     function handleKeyUp(event: KeyboardEvent) {
+      if (event.code === "Space") {
+        run.keyUp();
+        return;
+      }
+
       const direction = directionKeys[event.key];
 
       if (!direction) {
@@ -92,7 +117,7 @@ export function useDirectionInput({ listen = true } = {}): DirectionInputHandle 
       window.removeEventListener("blur", releaseAll);
       releaseAll();
     };
-  }, [listen]);
+  }, [run, listen]);
 
   return handle;
 }

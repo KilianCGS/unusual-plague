@@ -9,6 +9,7 @@ import { useInteraction } from "../interactions/useInteraction";
 import { apothecaryInteriorColliders } from "./apothecaryInteriorGeometry";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
+import { useReportRunning } from "../protagonist/useReportRunning";
 import { usePlayerMoved } from "../protagonist/usePlayerMoved";
 import type { DirectionInputHandle } from "../protagonist/useDirectionInput";
 import {
@@ -63,6 +64,7 @@ export function ApothecaryScene({
   onExit,
   renderOverlay,
   onPlayerMoved,
+  onRunningChange,
   onInteract,
   onInteractionAvailable,
 }: {
@@ -75,6 +77,8 @@ export function ApothecaryScene({
   renderOverlay?: (context: SceneOverlayContext) => ReactNode;
   // Reports (never drives) that the Doctor really changed position.
   onPlayerMoved?: () => void;
+  // Reports (never drives): whether the Doctor is running right now.
+  onRunningChange?: (running: boolean) => void;
   // The room has interaction zones (the crafting table); the owner decides
   // what an interactionId does.
   onInteract?: (interactionId: string, source: { instanceId?: string }) => void;
@@ -82,20 +86,26 @@ export function ApothecaryScene({
   onInteractionAvailable?: (interactionId: string | null) => void;
 }) {
   const [sceneScale, setSceneScale] = useState(1);
-  const { player, playerFeetHitbox, currentSpriteSrc, spriteSize } =
-    useProtagonistController({
-      sceneWidth: SCENE_WIDTH,
-      sceneHeight: SCENE_HEIGHT,
-      initialX: spawn.x,
-      initialY: spawn.y,
-      initialDirection: spawn.direction,
-      spriteSize: SPRITE_SIZE,
-      sceneColliders: apothecaryInteriorColliders,
-      input,
-      inputEnabled: isPlaying,
-    });
+  const {
+    player,
+    playerFeetHitbox,
+    currentSpriteSrc,
+    spriteMirrored,
+    spriteSize,
+  } = useProtagonistController({
+    sceneWidth: SCENE_WIDTH,
+    sceneHeight: SCENE_HEIGHT,
+    initialX: spawn.x,
+    initialY: spawn.y,
+    initialDirection: spawn.direction,
+    spriteSize: SPRITE_SIZE,
+    sceneColliders: apothecaryInteriorColliders,
+    input,
+    inputEnabled: isPlaying,
+  });
 
   usePlayerMoved(player.x, player.y, onPlayerMoved);
+  useReportRunning(player.isRunning, onRunningChange);
 
   const availableInteraction = useInteraction({
     zones: getSceneInteractionZones("apothecary-interior"),
@@ -166,6 +176,7 @@ export function ApothecaryScene({
               spriteSize={spriteSize}
               direction={player.direction}
               isWalking={player.isWalking}
+              mirrored={spriteMirrored}
             />
             {SHOW_COLLISION_DEBUG ? (
               <>

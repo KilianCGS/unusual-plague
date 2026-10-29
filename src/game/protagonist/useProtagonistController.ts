@@ -14,6 +14,15 @@ import {
   type Direction,
   type DirectionInputHandle,
 } from "./useDirectionInput";
+import {
+  MAX_FRAME_DELTA_SECONDS,
+  PROTAGONIST_RUN_FRAME_DURATION,
+  PROTAGONIST_RUN_SPEED,
+  PROTAGONIST_WALK_FRAME_DURATION,
+  PROTAGONIST_WALK_SPEED,
+  getRunSprite,
+  preloadRunSprites,
+} from "./protagonistRun";
 
 export type { Direction };
 export type WalkFrame = 0 | 1 | 2 | 3;
@@ -24,6 +33,8 @@ export type ProtagonistState = {
   direction: Direction;
   isWalking: boolean;
   frame: WalkFrame;
+  // Running (Space armed, see runInput.ts). Only ever true while isWalking.
+  isRunning: boolean;
 };
 
 type ProtagonistControllerOptions = {
@@ -47,8 +58,8 @@ type ProtagonistControllerOptions = {
 };
 
 const DEFAULT_SPRITE_SIZE = 96;
-const DEFAULT_PLAYER_SPEED = 160;
-const DEFAULT_WALK_FRAME_DURATION = 120;
+const DEFAULT_PLAYER_SPEED = PROTAGONIST_WALK_SPEED;
+const DEFAULT_WALK_FRAME_DURATION = PROTAGONIST_WALK_FRAME_DURATION;
 const EMPTY_COLLIDERS: SceneCollider[] = [];
 
 export const PROTAGONIST_FEET_HITBOX: AnchorHitbox = {
@@ -112,6 +123,7 @@ export function useProtagonistController({
     direction: initialDirection,
     isWalking: false,
     frame: 0,
+    isRunning: false,
   });
   // Own keyboard listeners only when no external input handle was given.
   const ownInput = useDirectionInput({ listen: input === undefined });
@@ -122,15 +134,25 @@ export function useProtagonistController({
   const walkFrameElapsedRef = useRef(0);
 
   useEffect(() => {
+    preloadRunSprites();
+  }, []);
+
+  // The run is armed by a fresh Space press while input is accepted; losing
+  // input (dialogue, interface, fade...) disarms it.
+  useEffect(() => {
     inputEnabledRef.current = inputEnabled;
-  }, [inputEnabled]);
+    directionInput.run?.setEnabled(inputEnabled);
+  }, [directionInput, inputEnabled]);
 
   useEffect(() => {
     const { pressedRef, priorityRef } = directionInput;
 
     function updatePlayer(timestamp: number) {
       const previousFrameTime = previousFrameTimeRef.current ?? timestamp;
-      const deltaTime = (timestamp - previousFrameTime) / 1000;
+      const deltaTime = Math.min(
+        (timestamp - previousFrameTime) / 1000,
+        MAX_FRAME_DELTA_SECONDS,
+      );
       previousFrameTimeRef.current = timestamp;
 
       const activeDirection = inputEnabledRef.current
@@ -139,11 +161,20 @@ export function useProtagonistController({
             .find((direction) => pressedRef.current[direction])
         : undefined;
 
+      // Running: Space armed while moving in any direction. It only changes
+      // the speed and the animation.
+      const running =
+        activeDirection !== undefined && directionInput.run?.isArmed() === true;
+      const speed = running ? PROTAGONIST_RUN_SPEED : playerSpeed;
+      const frameDuration = running
+        ? PROTAGONIST_RUN_FRAME_DURATION
+        : walkFrameDuration;
+
       if (activeDirection) {
         setPlayer((currentPlayer) => {
           let proposedX = currentPlayer.x;
           let proposedY = currentPlayer.y;
-          const distance = playerSpeed * deltaTime;
+          const distance = speed * deltaTime;
 
           switch (activeDirection) {
             case "north":
@@ -183,12 +214,12 @@ export function useProtagonistController({
           if (didMove) {
             nextFrame = currentPlayer.frame;
 
-            if (walkFrameElapsedRef.current >= walkFrameDuration) {
+            if (walkFrameElapsedRef.current >= frameDuration) {
               const framesToAdvance = Math.floor(
-                walkFrameElapsedRef.current / walkFrameDuration,
+                walkFrameElapsedRef.current / frameDuration,
               );
 
-              walkFrameElapsedRef.current -= framesToAdvance * walkFrameDuration;
+              walkFrameElapsedRef.current -= framesToAdvance * frameDuration;
               nextFrame = ((currentPlayer.frame + framesToAdvance) %
                 protagonistWalkSprites[activeDirection].length) as WalkFrame;
             }
@@ -196,7 +227,8 @@ export function useProtagonistController({
 
           if (
             (!didMove ||
-              (proposedX === currentPlayer.x && proposedY === currentPlayer.y)) &&
+              (proposedX === currentPlayer.x &&
+                proposedY === currentPlayer.y)) &&
             currentPlayer.direction === activeDirection &&
             !currentPlayer.isWalking &&
             currentPlayer.frame === nextFrame
@@ -210,6 +242,7 @@ export function useProtagonistController({
             direction: activeDirection,
             isWalking: didMove,
             frame: nextFrame,
+            isRunning: didMove && running,
           };
         });
       } else {
@@ -224,6 +257,7 @@ export function useProtagonistController({
             ...currentPlayer,
             isWalking: false,
             frame: 0,
+            isRunning: false,
           };
         });
       }
@@ -251,15 +285,24 @@ export function useProtagonistController({
     walkFrameDuration,
   ]);
 
-  const currentSpriteSrc = player.isWalking
-    ? protagonistWalkSprites[player.direction][player.frame]
-    : protagonistIdleSprites[player.direction];
+  // West has no run frames of its own: it runs with the east ones, mirrored
+  // (a visual flip only, see ProtagonistSprite).
+  const runSprite = player.isRunning
+    ? getRunSprite(player.direction, player.frame)
+    : null;
+  const currentSpriteSrc = runSprite
+    ? runSprite.src
+    : player.isWalking
+      ? protagonistWalkSprites[player.direction][player.frame]
+      : protagonistIdleSprites[player.direction];
+  const spriteMirrored = runSprite?.mirrored ?? false;
   const playerFeetHitbox = getHitboxRect(player.x, player.y, feetHitbox);
 
   return {
     player,
     playerFeetHitbox,
     currentSpriteSrc,
+    spriteMirrored,
     spriteSize,
   };
 }
