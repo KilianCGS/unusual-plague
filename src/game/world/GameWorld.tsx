@@ -40,6 +40,7 @@ import { tutorialCopy } from "../i18n/tutorial";
 import type { Language } from "../i18n/types";
 import {
   addItem,
+  removeItem,
   canAddItem,
   countItem,
   type InventoryState,
@@ -296,6 +297,18 @@ export function GameWorld({ language }: { language: Language }) {
 
           nextInventory = added;
           obtained.push({ itemId: effect.itemId, quantity: effect.quantity });
+        } else if (effect.type === "take-item") {
+          const removed = removeItem(
+            nextInventory,
+            effect.itemId,
+            effect.quantity,
+          );
+
+          if (!removed) {
+            return false;
+          }
+
+          nextInventory = removed;
         } else if (effect.type === "claim-reward") {
           nextRewards = new Set([...nextRewards, effect.rewardId]);
         } else {

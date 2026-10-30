@@ -4,6 +4,7 @@ import {
   removeItem,
   type InventoryState,
 } from "../inventory/inventory";
+import { getItem } from "../items/items";
 import {
   RECIPES,
   STATION_MAX_INPUTS,
@@ -167,6 +168,17 @@ export function craft(
 
   for (const { itemId, quantity } of recipe.inputs) {
     next = next ? removeItem(next, itemId, quantity) : null;
+  }
+
+  // A vessel comes back when the last unit it held is used up: a flask of
+  // water gives two uses, and the empty flask returns with the second. It is
+  // part of the same transaction, so it needs room like the output does.
+  for (const { itemId } of recipe.inputs) {
+    const container = getItem(itemId)?.container;
+
+    if (next && container && countItem(next, itemId) === 0) {
+      next = addItem(next, container, 1);
+    }
   }
 
   // Inputs are consumed first on the working copy, so the space they free can

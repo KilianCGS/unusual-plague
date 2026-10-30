@@ -512,7 +512,7 @@ test("the merchant's pickup is generic (cloth is just what he provides)", () => 
 });
 
 // ------------------------------------------------------------------------ WATER
-test("water: the river gives one unit per use, only with the flask and while a known need lacks water", () => {
+test("water: the river fills the flask once (2 units, the flask is used up), only with the flask and while a known need lacks water", () => {
   const FLASK = [["empty-flask", 1]];
   const decide = (status, pairs) =>
     story.getGatherDecision("gather.water", facts(status, pairs));
@@ -535,7 +535,7 @@ test("water: the river gives one unit per use, only with the flask and while a k
         height,
       }),
     ),
-    [{ interactionId: "gather.water", x: 408, y: 553, width: 77, height: 94 }],
+    [{ interactionId: "gather.water", x: 474, y: 656, width: 39, height: 69 }],
   );
   assert.equal(
     story.getGatherDecision("craft.fire", facts("examined", FLASK)),
@@ -553,42 +553,73 @@ test("water: the river gives one unit per use, only with the flask and while a k
   assert.ok(water("examined", []).notice.includes("recipiente"));
   assert.equal(water("examined", []).conversation, null);
 
-  // need Water x2: E #1 and E #2 give water, E #3 does not
-  const give = { type: "give-item", itemId: "water", quantity: 1 };
-  let state = stock(FLASK);
-  for (const expected of [1, 2]) {
-    const out = story.resolveStoryInteraction(
-      "gather.water",
-      { patients: withStatus("examined"), inventory: state },
-      "es",
-      "river",
-    );
-    assert.deepEqual(out.effects, [give]);
-    assert.equal(out.conversation, null);
-    state = inv.addItem(state, "water", 1);
-    assert.equal(inv.countItem(state, "water"), expected);
-  }
-  const third = story.resolveStoryInteraction(
+  // need Water x2: ONE filling gives both units and uses up the empty flask
+  const filling = [
+    { type: "take-item", itemId: "empty-flask", quantity: 1 },
+    { type: "give-item", itemId: "water", quantity: 2 },
+  ];
+  const first = story.resolveStoryInteraction(
+    "gather.water",
+    { patients: withStatus("examined"), inventory: stock(FLASK) },
+    "es",
+    "river",
+  );
+  assert.deepEqual(first.effects, filling);
+  assert.equal(first.conversation, null);
+  // what the game does with those effects
+  let state = inv.removeItem(stock(FLASK), "empty-flask", 1);
+  state = inv.addItem(state, "water", 2);
+  assert.equal(inv.countItem(state, "water"), 2);
+  assert.equal(inv.countItem(state, "empty-flask"), 0, "the flask is now full");
+  // only the missing amount: with one unit already carried, one more is enough
+  const topUp = story.resolveStoryInteraction(
+    "gather.water",
+    {
+      patients: withStatus("examined"),
+      inventory: inv.addItem(stock(FLASK), "water", 1),
+    },
+    "es",
+    "river",
+  );
+  assert.deepEqual(topUp.effects[1], {
+    type: "give-item",
+    itemId: "water",
+    quantity: 1,
+  });
+  // water for both treatments is carried: the river says enough
+  const second = story.resolveStoryInteraction(
     "gather.water",
     { patients: withStatus("examined"), inventory: state },
     "es",
     "river",
   );
-  assert.deepEqual(third.effects, []);
-  assert.ok(third.notice.includes("suficiente"));
+  assert.deepEqual(second.effects, []);
+  assert.ok(
+    second.notice.includes("recipiente") ||
+      second.notice.includes("suficiente"),
+  );
+  // (no flask: it is in use) with a second flask the river still refuses
+  const spare = inv.addItem(state, "empty-flask", 1);
+  assert.deepEqual(
+    story.resolveStoryInteraction(
+      "gather.water",
+      { patients: withStatus("examined"), inventory: spare },
+      "es",
+      "river",
+    ).effects,
+    [],
+  );
   assert.equal(
     story.resolveStoryInteraction(
       "gather.water",
-      { patients: withStatus("examined"), inventory: state },
+      { patients: withStatus("examined"), inventory: spare },
       "en",
       "river",
     ).notice,
     "I already have enough water.",
   );
-
-  // the flask is never consumed and nothing is stored: it is just there
-  assert.equal(inv.countItem(state, "empty-flask"), 1);
   assert.equal(story.GATHER_SOURCES["gather.water"].requires, "empty-flask");
+  assert.equal(story.GATHER_SOURCES["gather.water"].quantity, 2);
 
   // a future open case that needs more water re-enables the river by itself
   // (nothing was stored about the river)
@@ -601,14 +632,14 @@ test("water: the river gives one unit per use, only with the flask and while a k
     assert.equal(
       story.getGatherDecision("gather.water", {
         patients: both,
-        inventory: state,
+        inventory: spare,
       }),
       "gather", // Water x2 carried, x3 now needed
     );
     assert.equal(
       story.getGatherDecision("gather.water", {
         patients: { [HUSBAND]: "examined" },
-        inventory: state,
+        inventory: spare,
       }),
       "not-needed",
     );
@@ -665,8 +696,13 @@ test("baker: EXAMINED with both preparations > delivery that consumes exactly bo
     "es",
     "baker",
   );
-  assert.equal(out.conversation.id, "chapter1.bakery.baker.delivery");
-  assert.deepEqual(out.effects, [{ type: "treat", patientId: HUSBAND }]);
+  // the thank-you is part of the delivery: Salt x1 in the same scene
+  assert.equal(out.conversation.id, "chapter1.bakery.baker.deliveryWithReward");
+  assert.deepEqual(out.effects, [
+    { type: "treat", patientId: HUSBAND },
+    { type: "give-item", itemId: "salt", quantity: 1 },
+    { type: "claim-reward", rewardId: ch1.BAKER_SALT_REWARD_ID },
+  ]);
   const result = pc.treatPatient(withStatus("examined"), DEF, start);
   assert.equal(pc.getPatientStatus(result.state, HUSBAND), "treated");
   assert.equal(inv.countItem(result.inventory, "medicinal-infusion"), 0);
@@ -683,6 +719,93 @@ test("baker: EXAMINED with both preparations > delivery that consumes exactly bo
   );
   assert.equal(inv.countItem(extra.inventory, "medicinal-infusion"), 1);
   assert.equal(inv.countItem(extra.inventory, "cold-cloth"), 2);
+});
+
+test("baker: the Salt comes automatically with the delivery; with no room the case is still treated and the gift waits (never lost, never twice)", () => {
+  const both = [
+    ["medicinal-infusion", 1],
+    ["cold-cloth", 1],
+  ];
+  // what GameWorld does: the effects in order, on the carried inventory
+  const apply = (inventory, effects) => {
+    let state = inventory;
+    let claimed = new Set();
+    let patients = withStatus("examined");
+    for (const effect of effects) {
+      if (effect.type === "treat") {
+        const result = pc.treatPatient(patients, DEF, state);
+        patients = result.state;
+        state = result.inventory;
+      } else if (effect.type === "give-item") {
+        state = inv.addItem(state, effect.itemId, effect.quantity);
+      } else if (effect.type === "claim-reward") {
+        claimed = new Set([...claimed, effect.rewardId]);
+      }
+    }
+    return { state, claimed, patients };
+  };
+  const talk = (inventory, claimedRewards = new Set(), status = "examined") =>
+    story.resolveStoryInteraction(
+      BAKER,
+      { patients: withStatus(status), inventory, claimedRewards },
+      "es",
+      "baker",
+    );
+
+  // room (the treatments free their own slots): treated + Salt x1 + claimed, no "!"
+  const roomy = apply(stock(both), talk(stock(both)).effects);
+  assert.equal(pc.getPatientStatus(roomy.patients, HUSBAND), "treated");
+  assert.equal(inv.countItem(roomy.state, "salt"), 1);
+  assert.ok(roomy.claimed.has(ch1.BAKER_SALT_REWARD_ID));
+  assert.deepEqual(
+    [...ch1.getAttentionInstanceIds(roomy.patients, roomy.claimed)],
+    [],
+    "no second ! just to collect the salt",
+  );
+  // a later visit gives nothing more: no second Salt
+  assert.equal(
+    talk(roomy.state, roomy.claimed, "treated").conversation.id,
+    "chapter1.bakery.baker.after",
+  );
+  assert.deepEqual(talk(roomy.state, roomy.claimed, "treated").effects, []);
+
+  // full even after the handing-over (spare copies keep their slots): the case
+  // is treated, nothing is lost and the existing pending-gift mechanism takes over
+  const crowded = stock([
+    ["medicinal-infusion", 2],
+    ["cold-cloth", 2],
+    ["cloth", 1],
+    ["alcohol", 1],
+    ["coal", 1],
+    ["honey", 1],
+  ]);
+  assert.equal(inv.countOccupiedSlots(crowded), 6);
+  const noRoom = talk(crowded);
+  assert.equal(noRoom.conversation.id, "chapter1.bakery.baker.delivery");
+  assert.deepEqual(noRoom.effects, [{ type: "treat", patientId: HUSBAND }]);
+  const handed = apply(crowded, noRoom.effects);
+  assert.equal(pc.getPatientStatus(handed.patients, HUSBAND), "treated");
+  assert.equal(inv.countItem(handed.state, "salt"), 0);
+  assert.equal(handed.claimed.size, 0, "the reward is NOT recorded as given");
+  assert.deepEqual(
+    [...ch1.getAttentionInstanceIds(handed.patients, handed.claimed)],
+    ["bakery-interior-baker-01"],
+    "the ! stays while the gift is pending",
+  );
+  // still no room on the next visit: she asks him to come back (nothing changes)
+  const retryFull = talk(handed.state, handed.claimed, "treated");
+  assert.equal(retryFull.conversation.id, "chapter1.bakery.baker.rewardNoRoom");
+  assert.deepEqual(retryFull.effects, []);
+  // with room: the gift comes once, and only once
+  const room = inv.removeItem(handed.state, "honey", 1);
+  const retry = talk(room, handed.claimed, "treated");
+  assert.equal(retry.conversation.id, "chapter1.bakery.baker.reward");
+  const after = apply(room, retry.effects);
+  assert.equal(inv.countItem(after.state, "salt"), 1);
+  assert.equal(
+    talk(after.state, after.claimed, "treated").conversation.id,
+    "chapter1.bakery.baker.after",
+  );
 });
 
 test("baker: a failed delivery consumes nothing (no partial treatment)", () => {
@@ -952,14 +1075,15 @@ test("Bakers Bedroom: ONE source of truth, the composition exported from the Dec
   );
   assert.ok(!/bedroom/i.test(indexSource));
 
-  // the three instances, positions and scales as exported
+  // the three instances, positions and scales as exported (the final composition
+  // authored by hand in the Decorator for the new room)
   assert.deepEqual(composition.instances, [
     {
       instanceId: "bakers-bedroom-bakers-husband-sick-01",
       assetId: "bakers-husband-sick",
-      x: 156,
-      y: 160,
-      scale: 0.97,
+      x: 184,
+      y: 248,
+      scale: 1.3,
       flipX: false,
       colliderEnabled: false,
       zOffset: 0,
@@ -967,9 +1091,9 @@ test("Bakers Bedroom: ONE source of truth, the composition exported from the Dec
     {
       instanceId: "bakers-bedroom-doctor-narrative-01",
       assetId: "doctor-narrative",
-      x: 182,
-      y: 150,
-      scale: 0.95,
+      x: 209,
+      y: 230,
+      scale: 1.21,
       flipX: false,
       colliderEnabled: false,
       zOffset: 0,
@@ -977,9 +1101,9 @@ test("Bakers Bedroom: ONE source of truth, the composition exported from the Dec
     {
       instanceId: "bakers-bedroom-baker-standing-01",
       assetId: "baker-standing",
-      x: 149,
-      y: 155,
-      scale: 1.14,
+      x: 171,
+      y: 241,
+      scale: 1.52,
       flipX: false,
       colliderEnabled: false,
       zOffset: 0,
@@ -1101,7 +1225,7 @@ const talkToBaker = (status, pairs = [], claimed = []) =>
     "baker",
   );
 
-test("baker's Salt: nothing is given before Patient 1 is treated", () => {
+test("baker's Salt: nothing is given before the treatment is delivered (it comes with the delivery)", () => {
   for (const status of ["hidden", "discovered", "examined"]) {
     const out = talkToBaker(status);
     const effects = out ? out.effects : [];
@@ -1111,12 +1235,17 @@ test("baker's Salt: nothing is given before Patient 1 is treated", () => {
     );
     assert.ok(!effects.some((e) => e.type === "claim-reward"), status);
   }
-  // delivering the treatment only treats: no Salt comes with it
+  // delivering the treatment treats AND thanks: the Salt comes with it, in order
+  // (treat first, so the handed-over slots are free), no second visit
   const delivery = talkToBaker("examined", [
     ["medicinal-infusion", 1],
     ["cold-cloth", 1],
   ]);
-  assert.deepEqual(delivery.effects, [{ type: "treat", patientId: HUSBAND }]);
+  assert.deepEqual(delivery.effects, [
+    { type: "treat", patientId: HUSBAND },
+    SALT,
+    CLAIM,
+  ]);
 });
 
 test("baker's Salt: the first talk after the treatment gives Salt x1 and claims the reward, together", () => {

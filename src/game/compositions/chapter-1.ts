@@ -27,9 +27,9 @@ export const chapter1Compositions: DecorComposition[] = [
       {
         "instanceId": "bakers-bedroom-bakers-husband-sick-01",
         "assetId": "bakers-husband-sick",
-        "x": 156,
-        "y": 160,
-        "scale": 0.97,
+        "x": 184,
+        "y": 248,
+        "scale": 1.3,
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0
@@ -37,9 +37,9 @@ export const chapter1Compositions: DecorComposition[] = [
       {
         "instanceId": "bakers-bedroom-doctor-narrative-01",
         "assetId": "doctor-narrative",
-        "x": 182,
-        "y": 150,
-        "scale": 0.95,
+        "x": 209,
+        "y": 230,
+        "scale": 1.21,
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0
@@ -47,9 +47,9 @@ export const chapter1Compositions: DecorComposition[] = [
       {
         "instanceId": "bakers-bedroom-baker-standing-01",
         "assetId": "baker-standing",
-        "x": 149,
-        "y": 155,
-        "scale": 1.14,
+        "x": 171,
+        "y": 241,
+        "scale": 1.52,
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0

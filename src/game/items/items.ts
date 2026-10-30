@@ -50,6 +50,10 @@ export type ItemDefinition = {
   // item names its art: the inventory, the storage and the crafting interface
   // all read it from here. An item without one is drawn by its name only.
   icon?: string;
+  // The empty vessel this item is carried in (a flask of water): filling the
+  // vessel turns it into the item, and when the LAST unit of the item is used
+  // up the vessel comes back (see craft()).
+  container?: ItemId;
 };
 
 const RESOURCE_ICONS = "/game/items/inventory-icons";
@@ -83,6 +87,7 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     id: "water",
     name: { es: "Agua", en: "Water" },
     icon: `${RESOURCE_ICONS}/water.png`,
+    container: "empty-flask",
     sourceHint: {
       es: "Debería recoger algo de agua del río.",
       en: "I should fetch some water from the river.",

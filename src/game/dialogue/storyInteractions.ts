@@ -10,6 +10,7 @@ import { getItem } from "../items/items";
 import {
   getPatientStatus,
   isTreatable,
+  treatPatient,
   type PatientCasesState,
 } from "../patients/patientCases";
 import {
@@ -23,6 +24,7 @@ import { getActiveMissingIngredients } from "../patients/patientNeeds";
 import {
   bakerAfter,
   bakerDelivery,
+  bakerDeliveryWithReward,
   bakerReward,
   bakerRewardNoRoom,
   bakerIntro,
@@ -47,7 +49,9 @@ export type StoryEffect =
   // Marks a one-time reward as received. Applied together with its item or not
   // at all, so a reward that did not fit is never recorded as given.
   | { type: "claim-reward"; rewardId: string }
-  | { type: "give-item"; itemId: string; quantity: number };
+  | { type: "give-item"; itemId: string; quantity: number }
+  // Takes items out of the carried inventory (all or nothing, with the rest).
+  | { type: "take-item"; itemId: string; quantity: number };
 
 export type StoryOutcome = {
   // Null for light interactions (the river): only effects and a short notice.
@@ -80,13 +84,16 @@ export const NPC_PROVIDES: Record<string, string[]> = {
 };
 
 // A source the Doctor can take from while he needs it (not a tap that never
-// runs dry). `requires` is a tool he must carry (it is never consumed). The
-// river's zone is placed by hand in the Outskirts.
+// runs dry). `requires` is the empty vessel he must carry: filling it USES UP
+// the vessel (the item comes in it, see ItemDefinition.container) and gives
+// `quantity` units at once, enough for the treatments that need it; the
+// vessel comes back when the last unit is used (craft()). The river's zone is
+// placed by hand in the Outskirts.
 export const GATHER_SOURCES: Record<
   string,
-  { itemId: string; requires: string }
+  { itemId: string; requires: string; quantity: number }
 > = {
-  "gather.water": { itemId: "water", requires: "empty-flask" },
+  "gather.water": { itemId: "water", requires: "empty-flask", quantity: 2 },
 };
 
 export type GatherDecision = "gather" | "no-container" | "not-needed";
@@ -154,10 +161,38 @@ export function resolveStoryInteraction(
       status === "examined" &&
       isTreatable(facts.patients, definition, facts.inventory)
     ) {
-      return {
-        conversation: localize(bakerDelivery, language, subjectId),
-        effects: [{ type: "treat", patientId }],
-      };
+      // The thank-you is part of the delivery: Salt x1, in the same moment,
+      // as long as it fits once the treatments are handed over (they free
+      // their slots). If it does not fit, the case is still treated and the
+      // gift waits for the next visit (the "treated" branch below), so it is
+      // never lost, never given twice and never blocks the treatment.
+      const treated = treatPatient(facts.patients, definition, facts.inventory);
+      const giftFits =
+        treated !== null &&
+        !facts.claimedRewards?.has(BAKER_SALT_REWARD_ID) &&
+        canAddItem(treated.inventory, BAKER_SALT_REWARD.itemId);
+
+      return giftFits
+        ? {
+            conversation: localize(
+              bakerDeliveryWithReward,
+              language,
+              subjectId,
+            ),
+            effects: [
+              { type: "treat", patientId },
+              {
+                type: "give-item",
+                itemId: BAKER_SALT_REWARD.itemId,
+                quantity: BAKER_SALT_REWARD.quantity,
+              },
+              { type: "claim-reward", rewardId: BAKER_SALT_REWARD_ID },
+            ],
+          }
+        : {
+            conversation: localize(bakerDelivery, language, subjectId),
+            effects: [{ type: "treat", patientId }],
+          };
     }
 
     if (status === "examined") {
@@ -223,13 +258,21 @@ export function resolveStoryInteraction(
     const copy = gatherCopy[language];
 
     if (decision === "gather") {
+      const source = GATHER_SOURCES[interactionId];
+
+      // The empty vessel is filled (used up) and gives what is still missing,
+      // at most `quantity` units: one filling serves both treatments.
       return {
         conversation: null,
         effects: [
+          { type: "take-item", itemId: source.requires, quantity: 1 },
           {
             type: "give-item",
-            itemId: GATHER_SOURCES[interactionId].itemId,
-            quantity: 1,
+            itemId: source.itemId,
+            quantity: Math.min(
+              source.quantity,
+              missingOf(missing, source.itemId),
+            ),
           },
         ],
       };

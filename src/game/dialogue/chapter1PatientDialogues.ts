@@ -73,6 +73,21 @@ export const bakerDelivery: LocalizedConversation = {
   ],
 };
 
+// The delivery with the thank-you inside it: the same handing-over, then her
+// gift (Salt x1) in the same scene. No second visit is needed to collect it.
+export const bakerDeliveryWithReward: LocalizedConversation = {
+  id: "chapter1.bakery.baker.deliveryWithReward",
+  lines: [
+    ...bakerDelivery.lines,
+    subject(
+      "Gracias, Doctor. No es mucho, pero llévese esto.",
+      "Thank you, Doctor. It isn't much, but please take this.",
+    ),
+    doctor("¿Sal?", "Salt?"),
+    subject("Siempre hace falta.", "One always needs some."),
+  ],
+};
+
 export const bakerAfter: LocalizedConversation = {
   id: "chapter1.bakery.baker.after",
   lines: [

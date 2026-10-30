@@ -574,15 +574,201 @@ test("21. craft.manual and craft.fire are the two stations of the game, each wit
   ]);
 });
 
-test("22. the Apothecary places them: two table zones and one stove zone (details in apothecary.test.mjs)", () => {
+test("22. the Apothecary places them: one stove zone and one table zone (details in apothecary.test.mjs)", () => {
   const ids = getSceneInteractionZones("apothecary-interior").map(
     (z) => z.interactionId,
   );
-  assert.deepEqual(ids, ["craft.manual", "craft.manual", "craft.fire"]);
+  assert.deepEqual(ids, ["craft.fire", "craft.manual"]);
   assert.ok(
     !Object.values(chapter1Interactions).some((i) =>
       i.interactionId.startsWith("craft."),
     ),
+  );
+});
+
+// ------------------------------------------------- THE FLASK OF WATER (2 USES)
+// One filling of the flask is water for both of Patient 1's treatments. It is
+// plain "Water x2" in the inventory: the filling used up the empty flask, and
+// the craft that uses the LAST unit gives the empty flask back.
+const story = at("src/game/dialogue/storyInteractions.ts");
+const { CHAPTER1_PATIENTS, BAKER_HUSBAND_ID } = at(
+  "src/game/patients/chapter1Patients.ts",
+);
+const count = (state, id) => inv.countItem(state, id);
+const INFUSION = ["fire", ["medicinal-herb", "water", null]];
+const COLD_CLOTH = ["manual", ["cloth", "water"]];
+const make = (state, [station, selection]) =>
+  cr.combine(state, station, selection);
+const EXAMINED = { [BAKER_HUSBAND_ID]: "examined" };
+const river = (inventory) =>
+  story.resolveStoryInteraction(
+    "gather.water",
+    { patients: EXAMINED, inventory },
+    "es",
+    "river",
+  );
+
+// the river: take the empty flask, give both units (what GameWorld applies)
+function fillFlask(state) {
+  let next = state;
+  for (const effect of river(state).effects) {
+    next =
+      effect.type === "take-item"
+        ? inv.removeItem(next, effect.itemId, effect.quantity)
+        : inv.addItem(next, effect.itemId, effect.quantity);
+  }
+  return next;
+}
+
+test("filling the empty flask gives two uses of water and uses the flask up", () => {
+  const filled = fillFlask(stock([["empty-flask", 1]]));
+  assert.equal(count(filled, "water"), 2);
+  assert.equal(count(filled, "empty-flask"), 0);
+  // the river gives nothing more while both uses are carried (no extra water)
+  assert.deepEqual(river(filled).effects, []);
+  // not even with a second flask: it never creates flasks or water out of nothing
+  assert.deepEqual(river(inv.addItem(filled, "empty-flask", 1)).effects, []);
+  // without the flask the river does nothing
+  assert.deepEqual(river(stock([])).effects, []);
+});
+
+for (const [name, order] of [
+  ["Infusion, then Cold cloth", [INFUSION, COLD_CLOTH]],
+  ["Cold cloth, then Infusion", [COLD_CLOTH, INFUSION]],
+]) {
+  test(`${name}: water remains after the first craft and the empty flask returns with the second`, () => {
+    let state = fillFlask(
+      stock([
+        ["empty-flask", 1],
+        ["medicinal-herb", 1],
+        ["cloth", 1],
+      ]),
+    );
+    assert.equal(count(state, "water"), 2);
+
+    const first = make(state, order[0]);
+    assert.equal(first.kind, "success");
+    state = first.inventory;
+    // one use left, no flask yet
+    assert.equal(count(state, "water"), 1);
+    assert.equal(count(state, "empty-flask"), 0);
+
+    const second = make(state, order[1]);
+    assert.equal(second.kind, "success");
+    state = second.inventory;
+    // both treatments are made, the water is gone and the empty flask is back
+    assert.equal(count(state, "water"), 0);
+    assert.equal(count(state, "empty-flask"), 1);
+    assert.equal(count(state, "medicinal-infusion"), 1);
+    assert.equal(count(state, "cold-cloth"), 1);
+    assert.ok(inv.isValidInventory(state));
+  });
+}
+
+test("both orders end exactly the same", () => {
+  const run = (order) => {
+    let state = fillFlask(
+      stock([
+        ["empty-flask", 1],
+        ["medicinal-herb", 1],
+        ["cloth", 1],
+      ]),
+    );
+    for (const step of order) state = make(state, step).inventory;
+    return JSON.stringify(
+      state.slots
+        .filter(Boolean)
+        .map((slot) => [slot.itemId, slot.quantity])
+        .sort(),
+    );
+  };
+  assert.equal(run([INFUSION, COLD_CLOTH]), run([COLD_CLOTH, INFUSION]));
+});
+
+test("only a successful craft uses the water: an invalid recipe, the wrong station or no space change nothing", () => {
+  const state = fillFlask(
+    stock([
+      ["empty-flask", 1],
+      ["medicinal-herb", 1],
+      ["cloth", 1],
+    ]),
+  );
+  const snapshot = JSON.stringify(state);
+  // no such recipe (water + water), and recipes at the wrong station
+  assert.equal(
+    cr.combine(state, "fire", ["water", "water", null]).kind,
+    "no-recipe",
+  );
+  assert.equal(
+    cr.combine(state, "manual", ["medicinal-herb", "water"]).kind,
+    "no-recipe",
+  );
+  assert.equal(
+    cr.combine(state, "fire", ["cloth", "water", null]).kind,
+    "no-recipe",
+  );
+  assert.equal(JSON.stringify(state), snapshot);
+  assert.equal(count(state, "water"), 2);
+
+  // NO SPACE: the last water would free its slot, but the empty flask AND the
+  // result both need one and only one is free: nothing is consumed
+  const crowded = stock([
+    ["water", 1],
+    ["cloth", 2],
+    ["alcohol", 1],
+    ["coal", 1],
+    ["honey", 1],
+    ["salt", 1],
+  ]);
+  assert.equal(inv.countOccupiedSlots(crowded), 6);
+  const crowdedSnapshot = JSON.stringify(crowded);
+  assert.equal(make(crowded, COLD_CLOTH).kind, "no-space");
+  assert.equal(JSON.stringify(crowded), crowdedSnapshot);
+  assert.equal(count(crowded, "water"), 1);
+  assert.equal(count(crowded, "empty-flask"), 0);
+  // with one more free slot the same craft works and the flask comes back
+  const roomy = stock([
+    ["water", 1],
+    ["cloth", 2],
+    ["alcohol", 1],
+    ["coal", 1],
+    ["honey", 1],
+  ]);
+  const done = make(roomy, COLD_CLOTH);
+  assert.equal(done.kind, "success");
+  assert.equal(count(done.inventory, "empty-flask"), 1);
+});
+
+test("the flask only comes back with the LAST water; nothing else has a vessel", () => {
+  const three = stock([
+    ["water", 3],
+    ["cloth", 1],
+  ]);
+  const out = make(three, COLD_CLOTH);
+  assert.equal(count(out.inventory, "water"), 2);
+  assert.equal(count(out.inventory, "empty-flask"), 0);
+  // crafting without water never produces a flask
+  const bandage = cr.combine(
+    stock([
+      ["cloth", 1],
+      ["alcohol", 1],
+    ]),
+    "manual",
+    ["cloth", "alcohol"],
+  );
+  assert.equal(count(bandage.inventory, "empty-flask"), 0);
+  assert.deepEqual(
+    Object.values(ITEMS)
+      .filter((item) => item.container)
+      .map((item) => [item.id, item.container]),
+    [["water", "empty-flask"]],
+  );
+  // Patient 1 needs exactly these two treatments, one water each
+  assert.deepEqual(
+    CHAPTER1_PATIENTS[BAKER_HUSBAND_ID].requiredTreatments
+      .map((t) => t.itemId)
+      .sort(),
+    ["cold-cloth", "medicinal-infusion"],
   );
 });
 
