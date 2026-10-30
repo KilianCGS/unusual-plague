@@ -16,6 +16,7 @@ import {
 } from "./useDirectionInput";
 import {
   MAX_FRAME_DELTA_SECONDS,
+  PROTAGONIST_RUN_FRAME_COUNT,
   PROTAGONIST_RUN_FRAME_DURATION,
   PROTAGONIST_RUN_SPEED,
   PROTAGONIST_WALK_FRAME_DURATION,
@@ -25,14 +26,15 @@ import {
 } from "./protagonistRun";
 
 export type { Direction };
-export type WalkFrame = 0 | 1 | 2 | 3;
+// 0..3 walking (4 frames), 0..7 running (8 frames).
+export type AnimationFrame = number;
 
 export type ProtagonistState = {
   x: number;
   y: number;
   direction: Direction;
   isWalking: boolean;
-  frame: WalkFrame;
+  frame: AnimationFrame;
   // Running (Space armed, see runInput.ts). Only ever true while isWalking.
   isRunning: boolean;
 };
@@ -209,10 +211,22 @@ export function useProtagonistController({
             walkFrameElapsedRef.current = 0;
           }
 
-          let nextFrame: WalkFrame = 0;
+          // Walking has 4 frames and running 8: when the Doctor switches
+          // between them the animation keeps its phase (walk frame n is run
+          // frame 2n), so it never reads a frame that does not exist.
+          const frameCount = running
+            ? PROTAGONIST_RUN_FRAME_COUNT
+            : protagonistWalkSprites[activeDirection].length;
+          const currentFrame =
+            currentPlayer.isRunning === running
+              ? currentPlayer.frame
+              : running
+                ? currentPlayer.frame * 2
+                : Math.floor(currentPlayer.frame / 2);
+          let nextFrame: AnimationFrame = 0;
 
           if (didMove) {
-            nextFrame = currentPlayer.frame;
+            nextFrame = currentFrame;
 
             if (walkFrameElapsedRef.current >= frameDuration) {
               const framesToAdvance = Math.floor(
@@ -220,8 +234,7 @@ export function useProtagonistController({
               );
 
               walkFrameElapsedRef.current -= framesToAdvance * frameDuration;
-              nextFrame = ((currentPlayer.frame + framesToAdvance) %
-                protagonistWalkSprites[activeDirection].length) as WalkFrame;
+              nextFrame = (currentFrame + framesToAdvance) % frameCount;
             }
           }
 

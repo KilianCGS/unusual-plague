@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { ApothecaryScene } from "../apothecary/ApothecaryScene";
 import { BookOverlay } from "../book/BookOverlay";
@@ -202,6 +209,19 @@ export function GameWorld({ language }: { language: Language }) {
     craftingStation === null &&
     !storageOpen &&
     !inNarrativeScene;
+
+  // A scene change takes the input away for a moment. Tell the run key that
+  // THIS pause is a transition (so whoever was running and keeps Space held
+  // gets the run back when control returns, with no new press); a dialogue or
+  // an interface is any other pause and drops the run as before. It is a
+  // layout effect so the mark is set before the scenes report "no input".
+  useLayoutEffect(() => {
+    if (phase === "playing") {
+      input.run?.endTransition(isPlaying);
+    } else {
+      input.run?.beginTransition();
+    }
+  }, [phase, isPlaying, input]);
 
   // The Doctor's remarks while he keeps running: not a conversation, they
   // never block anything and go away the moment plain play stops.

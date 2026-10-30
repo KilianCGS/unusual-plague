@@ -74,12 +74,18 @@ function seeded(seed) {
 
 // ---------------------------------------------------------------- RUN
 
-test("walk is 160 units/s at 120 ms per frame; run is 240 (+50%) at 90 ms", () => {
+test("walk is 160 units/s at 120 ms per frame (4 frames); run is 240 (+50%) at 60 ms per frame (8 frames)", () => {
   assert.equal(run.PROTAGONIST_WALK_SPEED, 160);
   assert.equal(run.PROTAGONIST_RUN_SPEED, 240);
   assert.equal(run.PROTAGONIST_RUN_SPEED / run.PROTAGONIST_WALK_SPEED, 1.5);
   assert.equal(run.PROTAGONIST_WALK_FRAME_DURATION, 120);
-  assert.equal(run.PROTAGONIST_RUN_FRAME_DURATION, 90);
+  assert.equal(run.PROTAGONIST_RUN_FRAME_DURATION, 60);
+  assert.equal(run.PROTAGONIST_RUN_FRAME_COUNT, 8);
+  // the run cycle lasts as long as the walk cycle (8 x 60 = 4 x 120 = 480 ms)
+  assert.equal(
+    run.PROTAGONIST_RUN_FRAME_COUNT * run.PROTAGONIST_RUN_FRAME_DURATION,
+    480,
+  );
   // a slow frame can never move the Doctor further than his 12px feet hitbox
   assert.equal(run.MAX_FRAME_DELTA_SECONDS, 1 / 30);
   assert.ok(run.PROTAGONIST_RUN_SPEED * run.MAX_FRAME_DELTA_SECONDS < 12);
@@ -94,22 +100,22 @@ test("walk is 160 units/s at 120 ms per frame; run is 240 (+50%) at 90 ms", () =
 
 test("south, north and east run with their own frames; west runs with the east ones, mirrored", () => {
   for (const direction of ["south", "north", "east"]) {
-    for (let frame = 0; frame < 4; frame++) {
+    for (let frame = 0; frame < 8; frame++) {
       assert.deepEqual(run.getRunSprite(direction, frame), {
         src: `/game/characters/protagonist/run/${direction}/${frame}.png`,
         mirrored: false,
       });
     }
   }
-  for (let frame = 0; frame < 4; frame++) {
+  for (let frame = 0; frame < 8; frame++) {
     assert.deepEqual(run.getRunSprite("west", frame), {
       src: `/game/characters/protagonist/run/east/${frame}.png`,
       mirrored: true,
     });
   }
-  // the 12 real frames exist; west has none of its own
+  // the 24 real frames exist; west has none of its own
   for (const direction of ["south", "north", "east"]) {
-    for (let frame = 0; frame < 4; frame++) {
+    for (let frame = 0; frame < 8; frame++) {
       assert.ok(
         fs.existsSync(
           path.join(
@@ -130,9 +136,9 @@ test("south, north and east run with their own frames; west runs with the east o
   assert.equal(Object.keys(run.PROTAGONIST_RUN_SPRITES).length, 3);
 });
 
-test("the 12 run frames are 96x96 RGBA PNGs", () => {
+test("the 24 run frames are 96x96 RGBA PNGs, and the old 4-frame set is gone (no 8.png)", () => {
   for (const direction of ["south", "north", "east"]) {
-    for (let frame = 0; frame < 4; frame++) {
+    for (let frame = 0; frame < 8; frame++) {
       const png = fs.readFileSync(
         path.join(
           root,
@@ -145,6 +151,64 @@ test("the 12 run frames are 96x96 RGBA PNGs", () => {
       assert.equal(png.readUInt32BE(20), 96);
       assert.equal(png[25], 6, "RGBA");
     }
+    assert.ok(
+      !fs.existsSync(
+        path.join(
+          root,
+          "public/game/characters/protagonist/run",
+          direction,
+          "8.png",
+        ),
+      ),
+    );
+  }
+});
+
+test("walking is untouched: 4 frames per direction at 120 ms", () => {
+  const controller = read("src/game/protagonist/useProtagonistController.ts");
+  for (const direction of ["south", "north", "east", "west"]) {
+    for (let frame = 0; frame < 4; frame++) {
+      assert.ok(
+        fs.existsSync(
+          path.join(
+            root,
+            `public/game/characters/protagonist/walk/${direction}/${frame}.png`,
+          ),
+        ),
+      );
+      assert.ok(
+        controller.includes(`/walk/${direction}/${frame}.png`),
+        `${direction} ${frame}`,
+      );
+    }
+    assert.ok(
+      !controller.includes(`/walk/${direction}/4.png`),
+      "walk has no 5th frame",
+    );
+  }
+  assert.ok(
+    controller.includes(
+      "DEFAULT_WALK_FRAME_DURATION = PROTAGONIST_WALK_FRAME_DURATION",
+    ),
+  );
+});
+
+test("switching between walking (4 frames) and running (8) keeps the phase and never reads a missing frame", () => {
+  const controller = read("src/game/protagonist/useProtagonistController.ts");
+  // the run frame count is the run constant, never a hard-coded 4
+  assert.ok(controller.includes("PROTAGONIST_RUN_FRAME_COUNT"));
+  assert.ok(controller.includes("currentPlayer.frame * 2"));
+  assert.ok(controller.includes("Math.floor(currentPlayer.frame / 2)"));
+  assert.ok(controller.includes("% frameCount"));
+  assert.ok(!/% 4/.test(controller));
+  // the same mapping as a pure check: every walk frame maps inside the run cycle and back
+  for (let walkFrame = 0; walkFrame < 4; walkFrame++) {
+    const asRun = walkFrame * 2;
+    assert.ok(asRun < run.PROTAGONIST_RUN_FRAME_COUNT);
+    assert.equal(Math.floor(asRun / 2), walkFrame);
+  }
+  for (let runFrame = 0; runFrame < 8; runFrame++) {
+    assert.ok(Math.floor(runFrame / 2) < 4);
   }
 });
 
@@ -202,6 +266,94 @@ test("closing a dialogue while holding Space does not start a run", () => {
   key.keyUp();
   key.keyDown(false); // a deliberate new press
   assert.equal(key.isArmed(), true);
+});
+
+test("a transition keeps the run intent: still holding Space when control returns, the run resumes with no new press", () => {
+  const key = createRunInput();
+  key.setEnabled(true);
+  key.keyDown(false); // running, Space held
+  assert.equal(key.isArmed(), true);
+  key.beginTransition(); // the fade starts
+  key.setEnabled(false); // the old scene reports no input
+  assert.equal(key.isArmed(), false, "no running while the screen fades");
+  key.setEnabled(false); // the new scene mounts, also with no input
+  key.keyDown(true); // the key repeats while held (ignored)
+  key.endTransition(true); // control returns
+  key.setEnabled(true);
+  assert.equal(key.isArmed(), true, "the run comes back by itself");
+});
+
+test("a transition does not keep an intent that was not there: a Space held only for a dialogue never runs", () => {
+  const key = createRunInput();
+  key.setEnabled(true);
+  // a dialogue opens (no transition): input off, the run intent is dropped
+  key.setEnabled(false);
+  key.keyDown(false); // the Space that advances / closes the dialogue
+  key.setEnabled(true);
+  assert.equal(key.isArmed(), false);
+  // ...and then a scene change while that same Space is still held
+  key.beginTransition();
+  key.setEnabled(false);
+  key.setEnabled(false);
+  key.endTransition(true);
+  key.setEnabled(true);
+  assert.equal(key.isArmed(), false, "holding Space is not an intent to run");
+});
+
+test("releasing Space during a transition cancels the intent", () => {
+  const key = createRunInput();
+  key.setEnabled(true);
+  key.keyDown(false);
+  key.beginTransition();
+  key.setEnabled(false);
+  key.keyUp(); // released while the screen is black
+  key.endTransition(true);
+  key.setEnabled(true);
+  assert.equal(key.isArmed(), false);
+  // pressing it again after control returns arms it as usual
+  key.keyDown(false);
+  assert.equal(key.isArmed(), true);
+});
+
+test("the run intent is only given back when control really returns (not into a dialogue, not after a reset)", () => {
+  const key = createRunInput();
+  key.setEnabled(true);
+  key.keyDown(false);
+  key.beginTransition();
+  key.setEnabled(false);
+  // the transition ends but a dialogue starts on arrival: input is not back
+  key.endTransition(false);
+  key.setEnabled(true); // the dialogue closes later
+  assert.equal(key.isArmed(), false);
+  // losing the window while the screen fades drops it too
+  const other = createRunInput();
+  other.setEnabled(true);
+  other.keyDown(false);
+  other.beginTransition();
+  other.setEnabled(false);
+  other.reset();
+  other.endTransition(true);
+  other.setEnabled(true);
+  assert.equal(other.isArmed(), false);
+});
+
+test("normal interfaces (Book, Map, Storage, Crafting) never turn Space into a run", () => {
+  const key = createRunInput();
+  key.setEnabled(true);
+  key.setEnabled(false); // an interface opens: no transition mark
+  assert.equal(key.keyDown(false), false, "Space stays with the interface");
+  assert.equal(key.keyDown(true), false);
+  key.setEnabled(true); // it closes with Space still held
+  assert.equal(key.isArmed(), false);
+});
+
+test("GameWorld marks the scene changes for the run key (and only those)", () => {
+  const world = read("src/game/world/GameWorld.tsx");
+  assert.ok(world.includes("input.run?.beginTransition()"));
+  assert.ok(world.includes("input.run?.endTransition(isPlaying)"));
+  assert.ok(
+    /useLayoutEffect\(\(\) => \{\s*if \(phase === "playing"\)/.test(world),
+  );
 });
 
 test("Space alone does not move the Doctor; running changes only speed and animation", () => {
@@ -267,7 +419,7 @@ test("the west mirror is visual only: it flips the image around its centre and m
   }
 });
 
-test("the 12 run frames are preloaded, and nothing is preloaded for west", () => {
+test("the 24 run frames are preloaded (3 x 8), and nothing is preloaded for west", () => {
   const source = read("src/game/protagonist/protagonistRun.ts");
   assert.ok(source.includes("export function preloadRunSprites"));
   assert.ok(
@@ -280,8 +432,11 @@ test("the 12 run frames are preloaded, and nothing is preloaded for west", () =>
       (n, list) => n + list.length,
       0,
     ),
-    12,
+    24,
   );
+  for (const list of Object.values(run.PROTAGONIST_RUN_SPRITES)) {
+    assert.equal(list.length, 8);
+  }
 });
 
 // ---------------------------------------------------------------- SHUFFLE BAG

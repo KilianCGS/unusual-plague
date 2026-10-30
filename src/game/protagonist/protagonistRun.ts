@@ -7,7 +7,10 @@ export const PROTAGONIST_WALK_SPEED = 160;
 // +50% of the walk.
 export const PROTAGONIST_RUN_SPEED = 240;
 export const PROTAGONIST_WALK_FRAME_DURATION = 120;
-export const PROTAGONIST_RUN_FRAME_DURATION = 90;
+// The run is an 8-frame cycle (contact, absorption, push-off and flight, once
+// per leg): 8 x 60 ms = 480 ms, the same cadence as the 4 x 120 ms walk.
+export const PROTAGONIST_RUN_FRAME_DURATION = 60;
+export const PROTAGONIST_RUN_FRAME_COUNT = 8;
 // A slow frame must not move the Doctor further than his 12px feet hitbox
 // (run: 240 / 30 = 8px).
 export const MAX_FRAME_DELTA_SECONDS = 1 / 30;
@@ -24,8 +27,9 @@ export function getMovementState(
 type RunSpriteDirection = Exclude<Direction, "west">;
 
 function runFrames(direction: RunSpriteDirection): string[] {
-  return [0, 1, 2, 3].map(
-    (frame) => `/game/characters/protagonist/run/${direction}/${frame}.png`,
+  return Array.from(
+    { length: PROTAGONIST_RUN_FRAME_COUNT },
+    (_, frame) => `/game/characters/protagonist/run/${direction}/${frame}.png`,
   );
 }
 
@@ -50,7 +54,7 @@ export function getRunSprite(
 
 let runSpritesPreloaded = false;
 
-// Loads the 12 real run frames once, so the first run does not flash an empty
+// Loads the 24 real run frames (3 directions x 8) once, so the first run does not flash an empty
 // image (west needs none of its own).
 export function preloadRunSprites() {
   if (runSpritesPreloaded || typeof window === "undefined") {
