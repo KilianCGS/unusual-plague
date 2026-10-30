@@ -5,7 +5,7 @@ import type { PointerEvent as ReactPointerEvent } from "react";
 
 import type { InteractionZone } from "../../../game/interactions/interactionZone";
 import { findAvailableInteraction } from "../../../game/interactions/interactionZone";
-import { apothecaryInteriorColliders } from "../../../game/apothecary/apothecaryInteriorGeometry";
+import { apothecaryMainZoneColliders } from "../../../game/apothecary/apothecaryMainZoneGeometry";
 import { getNpcColliders } from "../../../game/npcs/sceneNpc";
 import { getSceneNpcs } from "../../../game/npcs/sceneNpcs";
 import { SceneNpcSprite } from "../../../game/npcs/SceneNpcSprite";
@@ -115,28 +115,30 @@ const NARRATIVE_PREVIEW_SCENE: DecoratorScene = {
   arrivals: {},
 };
 
-// The Botica is drawn by its own hard-wired scene in the game, so it is not in
-// WIRED_SCENES, but its background is a normal asset-driven visual: it can be
-// opened here to compose it. Its geometry file is empty while it is redrawn.
-const APOTHECARY_VISUAL = DEV_SCENES.find(
-  (candidate) => candidate.id === "apothecary-interior",
+// The Botica (Apothecary Main Zone) is drawn by its own hard-wired scene in the
+// game, so it is not in WIRED_SCENES, but its background is a normal
+// asset-driven visual: it can be opened here to compose it. Its geometry is
+// the one in play (apothecaryMainZoneGeometry.ts).
+const APOTHECARY_MAIN_ZONE_VISUAL = DEV_SCENES.find(
+  (candidate) => candidate.id === "apothecary-main-zone",
 );
-const APOTHECARY_AUTHORING_SCENES: DecoratorScene[] = APOTHECARY_VISUAL
-  ? [
-      {
-        id: "apothecary-interior",
-        kind: "exterior",
-        visual: APOTHECARY_VISUAL,
-        colliders: apothecaryInteriorColliders,
-        exits: [],
-        arrivals: {},
-      },
-    ]
-  : [];
+const APOTHECARY_MAIN_ZONE_SCENES: DecoratorScene[] =
+  APOTHECARY_MAIN_ZONE_VISUAL
+    ? [
+        {
+          id: "apothecary-main-zone",
+          kind: "exterior",
+          visual: APOTHECARY_MAIN_ZONE_VISUAL,
+          colliders: apothecaryMainZoneColliders,
+          exits: [],
+          arrivals: {},
+        },
+      ]
+    : [];
 
 const SCENES: DecoratorScene[] = [
   ...WIRED_SCENES,
-  ...APOTHECARY_AUTHORING_SCENES,
+  ...APOTHECARY_MAIN_ZONE_SCENES,
   NARRATIVE_PREVIEW_SCENE,
 ];
 

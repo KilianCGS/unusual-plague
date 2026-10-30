@@ -163,7 +163,7 @@ test("exactly ONE initial Empty flask exists across the carried inventory and th
   assert.equal(st.STORAGE_CAPACITY, 24);
 });
 
-test("I/J. gather.water needs the flask CARRIED (not stored) and never consumes it", () => {
+test("I/J. gather.water needs the flask CARRIED (not stored); filling it uses it up", () => {
   const examined = { [ch1.BAKER_HUSBAND_ID]: "examined" };
   const decide = (inventory) =>
     story.getGatherDecision("gather.water", { patients: examined, inventory });
@@ -181,12 +181,22 @@ test("I/J. gather.water needs the flask CARRIED (not stored) and never consumes 
   assert.deepEqual(refusal.effects, []);
   assert.equal(refusal.notice, "I need a container to collect water.");
 
-  // once it is taken out, water can be gathered and the flask stays
+  // once it is taken out, the river can fill it (it is then used up)
   const taken = st.transferStack(chest, start, "empty-flask");
   assert.equal(decide(taken.destination), "gather");
-  const gathered = inv.addItem(taken.destination, "water", 1);
-  assert.equal(decide(gathered), "gather");
-  assert.equal(inv.countItem(gathered, "empty-flask"), 1);
+  const filled = story.resolveStoryInteraction(
+    "gather.water",
+    { patients: examined, inventory: taken.destination },
+    "en",
+    "river",
+  );
+  assert.deepEqual(
+    filled.effects.map((e) => [e.type, e.itemId, e.quantity]),
+    [
+      ["take-item", "empty-flask", 1],
+      ["give-item", "water", 2],
+    ],
+  );
 
   // left in the chest again: the Doctor carries none
   const left = st.transferStack(taken.destination, taken.source, "empty-flask");
@@ -206,11 +216,11 @@ test("the Doctor's Storage is reached ONLY from the chest in his room: exact zon
   assert.equal(st.STORAGE_INTERACTION_ID, "storage.doctor-room");
   assert.deepEqual(st.doctorRoomStorageInteractions, [
     {
-      id: "doctor-room-interaction-1",
-      x: 211,
-      y: 212,
-      width: 23,
-      height: 46,
+      id: "doctor-room-new-interaction-1",
+      x: 411,
+      y: 287,
+      width: 38,
+      height: 88,
       interactionId: "storage.doctor-room",
     },
   ]);
@@ -223,23 +233,23 @@ test("the Doctor's Storage is reached ONLY from the chest in his room: exact zon
     st.doctorRoomStorageInteractions,
   );
 
-  // the Apothecary keeps only its three crafting zones
+  // the Apothecary keeps only its two crafting zones
   const zones = getSceneInteractionZones("apothecary-interior");
   assert.deepEqual(
     zones.map((z) => z.interactionId),
-    ["craft.manual", "craft.manual", "craft.fire"],
+    ["craft.fire", "craft.manual"],
   );
   for (const zone of zones)
     assert.notEqual(zone.interactionId, "storage.apothecary");
   assert.equal(st.apothecaryStorageInteractions, undefined);
 
   // a zone, not a collider
-  const { doctorRoomColliders } = at(
-    "src/game/doctor-room/doctorRoomGeometry.ts",
+  const { doctorRoomNewColliders } = at(
+    "src/game/doctor-room/doctorRoomNewGeometry.ts",
   );
   assert.ok(
-    !doctorRoomColliders.some(
-      (c) => c.x === 211 && c.y === 212 && c.width === 23 && c.height === 46,
+    !doctorRoomNewColliders.some(
+      (c) => c.x === 411 && c.y === 287 && c.width === 38 && c.height === 88,
     ),
   );
 });
@@ -288,7 +298,9 @@ test("K. the baker's husband stays completable within 6 slots (gather > craft > 
     createChapter1Inventory(),
     "empty-flask",
   ).destination;
-  // gather 2 water, 1 herb, 1 cloth: flask + water + herb + cloth = 4 types
+  // fill the flask (it is used up, giving 2 water), take 1 herb and 1 cloth:
+  // water + herb + cloth = 3 types
+  doctor = inv.removeItem(doctor, "empty-flask", 1);
   doctor = stock(
     [
       ["water", 2],
@@ -310,7 +322,8 @@ test("K. the baker's husband stays completable within 6 slots (gather > craft > 
     pc.getPatientStatus(treated.state, ch1.BAKER_HUSBAND_ID),
     "treated",
   );
-  assert.equal(inv.countItem(treated.inventory, "empty-flask"), 1); // never consumed
+  // the empty flask came back with the last of the water
+  assert.equal(inv.countItem(treated.inventory, "empty-flask"), 1);
 });
 
 console.log(`\n${passed} tests passed`);

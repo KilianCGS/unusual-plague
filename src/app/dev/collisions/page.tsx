@@ -4,17 +4,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 
 import {
-  apothecaryInteriorColliders,
-  apothecaryInteriorSpawns,
-  apothecaryInteriorTransitions,
-} from "../../../game/apothecary/apothecaryInteriorGeometry";
+  apothecaryMainZoneColliders,
+  apothecaryMainZoneSpawns,
+  apothecaryMainZoneTransitions,
+} from "../../../game/apothecary/apothecaryMainZoneGeometry";
 import type { LogicalRect, SceneCollider } from "../../../game/collision";
 import { getSceneInteractionZones } from "../../../game/interactions/sceneInteractions";
 import {
-  doctorRoomColliders,
-  doctorRoomSpawns,
-  doctorRoomTransitions,
-} from "../../../game/doctor-room/doctorRoomGeometry";
+  doctorRoomNewColliders,
+  doctorRoomNewSpawns,
+  doctorRoomNewTransitions,
+} from "../../../game/doctor-room/doctorRoomNewGeometry";
 import {
   farmColliders,
   farmSpawns,
@@ -141,12 +141,12 @@ const EDITOR_SCENES: {
 }[] = [
   { sceneId: "plaza", idPrefix: "plaza", exportPrefix: "plaza" },
   {
-    // The Apothecary's own room, not the street. Its ids/export keep the
-    // "apothecary-interior" prefix already used by its geometry file
-    // (apothecaryInteriorGeometry.ts).
-    sceneId: "apothecary-interior",
-    idPrefix: "apothecary-interior",
-    exportPrefix: "apothecaryInterior",
+    // The Botica in play (Apothecary Main Zone), the Apothecary's own room, not
+    // the street. Its geometry file is apothecaryMainZoneGeometry.ts, which it
+    // preloads and whose ids/export names it writes.
+    sceneId: "apothecary-main-zone",
+    idPrefix: "apothecary-main-zone",
+    exportPrefix: "apothecaryMainZone",
   },
   {
     sceneId: "apothecary-street",
@@ -166,8 +166,8 @@ const EDITOR_SCENES: {
   { sceneId: "forest-v1", idPrefix: "forest", exportPrefix: "forest" },
   {
     sceneId: "doctor-room",
-    idPrefix: "doctor-room",
-    exportPrefix: "doctorRoom",
+    idPrefix: "doctor-room-new",
+    exportPrefix: "doctorRoomNew",
   },
   {
     sceneId: "tavern-interior",
@@ -293,15 +293,15 @@ const PERSISTED_GEOMETRY: Record<
     transitions: plazaTransitions,
     spawns: plazaSpawns,
   },
-  "apothecary-interior": {
-    colliders: apothecaryInteriorColliders,
-    transitions: apothecaryInteriorTransitions,
-    spawns: apothecaryInteriorSpawns,
+  "apothecary-main-zone": {
+    colliders: apothecaryMainZoneColliders,
+    transitions: apothecaryMainZoneTransitions,
+    spawns: apothecaryMainZoneSpawns,
   },
   "doctor-room": {
-    colliders: doctorRoomColliders,
-    transitions: doctorRoomTransitions,
-    spawns: doctorRoomSpawns,
+    colliders: doctorRoomNewColliders,
+    transitions: doctorRoomNewTransitions,
+    spawns: doctorRoomNewSpawns,
   },
   "smithy-street": {
     colliders: smithyStreetColliders,

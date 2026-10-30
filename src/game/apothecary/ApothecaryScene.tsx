@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { InteractionPrompt } from "../interactions/InteractionPrompt";
 import { getSceneInteractionZones } from "../interactions/sceneInteractions";
 import { useInteraction } from "../interactions/useInteraction";
-import { apothecaryInteriorColliders } from "./apothecaryInteriorGeometry";
+import { apothecaryMainZoneColliders } from "./apothecaryMainZoneGeometry";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
 import { useReportRunning } from "../protagonist/useReportRunning";
@@ -24,7 +24,7 @@ import type { SceneOverlayContext } from "../world/ExteriorScene";
 import styles from "./ApothecaryScene.module.css";
 
 const SCENE_WIDTH = 480;
-const SCENE_HEIGHT = 277;
+const SCENE_HEIGHT = 293;
 const SPRITE_SIZE = 96;
 // Transparent rows above the head in the 96 px character frames (same value
 // ExteriorScene uses for its speaker anchors).
@@ -33,7 +33,7 @@ const SCENE_PADDING = 48;
 const MAX_SCENE_SCALE = 4;
 const DEFAULT_SPAWN: { x: number; y: number; direction: Direction } = {
   x: 240,
-  y: 220,
+  y: 217,
   direction: "south",
 };
 const NO_EXITS: TransitionExit[] = [];
@@ -99,7 +99,7 @@ export function ApothecaryScene({
     initialY: spawn.y,
     initialDirection: spawn.direction,
     spriteSize: SPRITE_SIZE,
-    sceneColliders: apothecaryInteriorColliders,
+    sceneColliders: apothecaryMainZoneColliders,
     input,
     inputEnabled: isPlaying,
   });
@@ -180,7 +180,7 @@ export function ApothecaryScene({
             />
             {SHOW_COLLISION_DEBUG ? (
               <>
-                {apothecaryInteriorColliders.map((collider) => (
+                {apothecaryMainZoneColliders.map((collider) => (
                   <div
                     key={collider.id}
                     style={{

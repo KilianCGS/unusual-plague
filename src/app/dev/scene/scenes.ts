@@ -115,20 +115,19 @@ const OLD_DEV_SCENES: DevScene[] = [
   },
   {
     id: "doctor-room",
-    label: "Habitación del Doctor",
-    // Unmodified copy of art/references/doctor-room-v5.png (288x320), approved
-    // provisionally. Interior: 1 unit per asset pixel like the Apothecary, so
-    // the sprite keeps the interior scale. zoomMultiplier 602 / 270 gives the
-    // same zoom as the 480x270 interiors; the frame is then 288x270 of the
-    // 288x320 room and the camera only scrolls vertically.
-    backgroundSrc: "/game/areas/doctor-room/doctor-room-background.png",
-    assetWidth: 288,
-    assetHeight: 320,
-    // Provisional: on the floor just inside the bottom threshold.
-    initialAssetX: 144,
-    initialAssetY: 262,
-    logicalUnitsPerAssetPixel: 1,
-    zoomMultiplier: 602 / 270,
+    label: "Habitaci�n del Doctor",
+    // Unmodified copy of art/references/doctor-room-v6.png (1385x1136), the
+    // Doctor's Room in play. 0.375 unit per asset pixel like the other approved
+    // interiors, so the logical world is 519x426 (1385 x 1136 keeps its 1.219
+    // aspect ratio) and the whole room is in frame at zoomMultiplier 1.5.
+    backgroundSrc: "/game/areas/doctor-room/doctor-room-new-background.png",
+    assetWidth: 1385,
+    assetHeight: 1136,
+    // The middle of the room (only a neutral seed for the dev tools).
+    initialAssetX: 692,
+    initialAssetY: 568,
+    logicalUnitsPerAssetPixel: 0.375,
+    zoomMultiplier: 1.5,
   },
   {
     id: "tavern-interior",
@@ -160,18 +159,19 @@ const OLD_DEV_SCENES: DevScene[] = [
   {
     id: "bakers-bedroom",
     label: "Bakers Bedroom (narrativa)",
-    // Unmodified copy of art/locations/bakers-bedroom/bakers-bedroom-v3.png
-    // (400x224), 1 unit per asset pixel, same interior zoom as the other
-    // interiors. A narrative microscene: not part of the map, nothing to walk.
-    // Initial position: the centre of the room (only a neutral seed; nobody
-    // spawns here).
+    // Unmodified copy of art/locations/bakers-bedroom/bakers-bedroom-v4.png
+    // (1536x1024), the new room. Same 576x384 logical world and zoom as the
+    // tavern, smithy and bakery interiors (0.375 unit per asset pixel, whole
+    // room in frame, fixed camera). A narrative microscene: not part of the
+    // map, nothing to walk. Initial position: the centre of the room (only a
+    // neutral seed; nobody spawns here).
     backgroundSrc: "/game/areas/bakers-bedroom/bakers-bedroom-background.png",
-    assetWidth: 400,
-    assetHeight: 224,
-    initialAssetX: 200,
-    initialAssetY: 112,
-    logicalUnitsPerAssetPixel: 1,
-    zoomMultiplier: 602 / 270,
+    assetWidth: 1536,
+    assetHeight: 1024,
+    initialAssetX: 768,
+    initialAssetY: 512,
+    logicalUnitsPerAssetPixel: 0.375,
+    zoomMultiplier: 1.5,
   },
   {
     id: "bakery-interior",
@@ -266,22 +266,21 @@ const OLD_DEV_SCENES: DevScene[] = [
     zoomMultiplier: 1.5,
   },
   {
-    id: "apothecary-interior",
-    label: "Botica (interior)",
-    // Unmodified copy of art/references/apothecary-interior-v2.png
-    // (1652x952), the Botica's current art. The scene keeps the width of its
-    // 480-unit room, so one asset pixel is 480/1652 units and the logical
-    // world is 480x277 (952 * 480/1652 = 276.6); the image is drawn into it
-    // at 100% x 100% (a 0.15% vertical stretch, not a crop). The hard-wired
-    // ApothecaryScene uses the same 480x277 box. The previous art was
-    // 1586x992 squeezed with `cover` into 480x270.
-    backgroundSrc: "/game/areas/apothecary/apothecary-background.png",
-    assetWidth: 1652,
-    assetHeight: 952,
-    // The game's start position (the "start" arrival of the Botica).
-    initialAssetX: 826,
-    initialAssetY: 757,
-    logicalUnitsPerAssetPixel: 480 / 1652,
+    id: "apothecary-main-zone",
+    label: "Botica nueva (Apothecary Main Zone)",
+    // Unmodified copy of art/references/apothecary-interior-v3.png (1606x979),
+    // the Botica's art. The scene keeps the width of its 480-unit room, so one
+    // asset pixel is 480/1606 units and the logical world is 480x293 (979 *
+    // 480/1606 = 292.6); the image is drawn into it at 100% x 100% (a 0.14%
+    // vertical stretch, not a crop). The hard-wired ApothecaryScene uses the
+    // same 480x293 box. In the game it is the scene "apothecary-interior".
+    backgroundSrc: "/game/areas/apothecary/apothecary-main-zone-background.png",
+    assetWidth: 1606,
+    assetHeight: 979,
+    // The middle of the room (only a neutral seed).
+    initialAssetX: 803,
+    initialAssetY: 560,
+    logicalUnitsPerAssetPixel: 480 / 1606,
     zoomMultiplier: 602 / 270,
   },
   {

@@ -1,5 +1,5 @@
 import { newWorldOutskirtsInteractions } from "../new-world-map/newWorldInteractions";
-import { apothecaryInteriorInteractions } from "../apothecary/apothecaryInteriorGeometry";
+import { apothecaryMainZoneInteractions } from "../apothecary/apothecaryMainZoneGeometry";
 import { doctorRoomStorageInteractions } from "../storage/storage";
 import type { InteractionZone } from "./interactionZone";
 
@@ -9,7 +9,10 @@ import type { InteractionZone } from "./interactionZone";
 // the storage chest. Chapter 1's interactions come from its decor instances
 // (src/game/compositions/chapter-1.interactions.ts).
 const SCENE_INTERACTIONS: Record<string, InteractionZone[]> = {
-  "apothecary-interior": apothecaryInteriorInteractions,
+  "apothecary-interior": apothecaryMainZoneInteractions,
+  // The same zones under the name of the authoring scene, so /dev/collisions
+  // opens them (it is the Botica in play, not a second one).
+  "apothecary-main-zone": apothecaryMainZoneInteractions,
   // The Doctor's Storage: the chest in his room.
   "doctor-room": doctorRoomStorageInteractions,
   // The river bank, as adapted to the new world.

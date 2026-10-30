@@ -1,8 +1,8 @@
 import {
-  apothecaryInteriorColliders,
-  apothecaryInteriorSpawns,
-  apothecaryInteriorTransitions,
-} from "../apothecary/apothecaryInteriorGeometry";
+  apothecaryMainZoneColliders,
+  apothecaryMainZoneSpawns,
+  apothecaryMainZoneTransitions,
+} from "../apothecary/apothecaryMainZoneGeometry";
 import {
   apothecaryStreetColliders,
   apothecaryStreetSpawns,
@@ -20,10 +20,10 @@ import {
 } from "../bakery-street/bakeryStreetGeometry";
 import type { LogicalRect, SceneCollider } from "../collision";
 import {
-  doctorRoomColliders,
-  doctorRoomSpawns,
-  doctorRoomTransitions,
-} from "../doctor-room/doctorRoomGeometry";
+  doctorRoomNewColliders,
+  doctorRoomNewSpawns,
+  doctorRoomNewTransitions,
+} from "../doctor-room/doctorRoomNewGeometry";
 import {
   farmColliders,
   farmSpawns,
@@ -106,8 +106,8 @@ import { DEV_SCENES, type DevScene } from "../../app/dev/scene/scenes";
 //   mill-farmland-transition-1  (Barn door, future Barn interior)
 // Their reserved spawns are not registered as arrivals either:
 //   mill-farmland-spawn-2 (future barn exit).
-// doctor-room-spawn-1 is deliberately never used as an arrival either: it is
-// reserved for a future chapter-start / narrative wake, not a walk-in spawn.
+// doctor-room-new-spawn-2 is deliberately never used as a walk-in arrival: it
+// is the chapter-start / narrative wake spawn.
 
 export type SceneId =
   | "apothecary-interior"
@@ -191,14 +191,14 @@ export const OLD_WORLD_SCENES: Record<
   "apothecary-interior": {
     id: "apothecary-interior",
     kind: "interior",
-    colliders: apothecaryInteriorColliders,
+    colliders: apothecaryMainZoneColliders,
     exits: [
       {
-        // The door/gap on the right side: to the Doctor's Room.
+        // The arch at the top: to the Doctor's Room.
         name: "to-doctor-room",
         zone: pick(
-          apothecaryInteriorTransitions,
-          "apothecary-interior-transition-1",
+          apothecaryMainZoneTransitions,
+          "apothecary-main-zone-transition-2",
         ),
         targetScene: "doctor-room",
         targetSpawn: "from-apothecary-interior",
@@ -207,42 +207,38 @@ export const OLD_WORLD_SCENES: Record<
         // The bottom exit: to Calle Botica.
         name: "to-apothecary-street",
         zone: pick(
-          apothecaryInteriorTransitions,
-          "apothecary-interior-transition-2",
+          apothecaryMainZoneTransitions,
+          "apothecary-main-zone-transition-1",
         ),
         targetScene: "apothecary-street",
         targetSpawn: "from-apothecary-interior",
       },
     ],
     arrivals: {
-      // The game's boot position. The previous painted geometry had a
-      // dedicated "apothecary-interior-start" spawn; the new persisted
-      // geometry (repainted from scratch) no longer has one, so this keeps
-      // the exact same coordinates as a literal instead of a lookup.
-      start: { x: 240, y: 220, direction: "south" },
+      // The game's boot position: in front of the bottom exit, like arriving
+      // from the street.
+      start: spawnAt(apothecaryMainZoneSpawns, "apothecary-main-zone-spawn-1"),
       "from-apothecary-street": spawnAt(
-        apothecaryInteriorSpawns,
-        "apothecary-interior-spawn-2",
+        apothecaryMainZoneSpawns,
+        "apothecary-main-zone-spawn-1",
       ),
-      // Down from the Doctor's Room: the painted spawn point (same x, y), but
-      // the Doctor faces south into the room. The facing is set here, on this
-      // one arrival, so the painted spawn record and every other arrival keep
-      // their own direction.
-      "from-doctor-room": {
-        ...spawnAt(apothecaryInteriorSpawns, "apothecary-interior-spawn-1"),
-        direction: "south",
-      },
+      // Down from the Doctor's Room: below the arch, facing south into the
+      // room.
+      "from-doctor-room": spawnAt(
+        apothecaryMainZoneSpawns,
+        "apothecary-main-zone-spawn-2",
+      ),
     },
   },
   "doctor-room": {
     id: "doctor-room",
     kind: "exterior",
     visual: visualOf("doctor-room"),
-    colliders: doctorRoomColliders,
+    colliders: doctorRoomNewColliders,
     exits: [
       {
         name: "to-apothecary-interior",
-        zone: pick(doctorRoomTransitions, "doctor-room-transition-1"),
+        zone: pick(doctorRoomNewTransitions, "doctor-room-new-transition-1"),
         targetScene: "apothecary-interior",
         targetSpawn: "from-doctor-room",
       },
@@ -250,13 +246,13 @@ export const OLD_WORLD_SCENES: Record<
     arrivals: {
       // Physical arrival from the Botica, facing into the room.
       "from-apothecary-interior": spawnAt(
-        doctorRoomSpawns,
-        "doctor-room-spawn-2",
+        doctorRoomNewSpawns,
+        "doctor-room-new-spawn-1",
       ),
-      // The start of a chapter: the Doctor has just got up and stands beside
-      // the bed, facing south. doctor-room-spawn-1 is deliberately NOT a
-      // walk-in arrival; only a chapter start (see chapterStart.ts) uses it.
-      "chapter-start": spawnAt(doctorRoomSpawns, "doctor-room-spawn-1"),
+      // The start of a chapter: the Doctor has just got up, facing south.
+      // doctor-room-new-spawn-2 is deliberately NOT a walk-in arrival; only a
+      // chapter start (see chapterStart.ts) uses it.
+      "chapter-start": spawnAt(doctorRoomNewSpawns, "doctor-room-new-spawn-2"),
     },
   },
   "apothecary-street": {

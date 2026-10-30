@@ -275,15 +275,15 @@ test("the seller's authored interaction rectangle is kept but INACTIVE: no [E] p
   }
 });
 
-test("Doctor Room chest: the larger authored rectangle replaces the old one; the id and behaviour are unchanged", () => {
+test("Doctor Room chest: the hand-drawn zone of the new room uses the existing Storage; id and behaviour are unchanged", () => {
   assert.equal(STORAGE_INTERACTION_ID, "storage.doctor-room");
   assert.deepEqual(doctorRoomStorageInteractions, [
     {
-      id: "doctor-room-interaction-1",
-      x: 211,
-      y: 212,
-      width: 23,
-      height: 46,
+      id: "doctor-room-new-interaction-1",
+      x: 411,
+      y: 287,
+      width: 38,
+      height: 88,
       interactionId: "storage.doctor-room",
     },
   ]);
@@ -292,27 +292,28 @@ test("Doctor Room chest: the larger authored rectangle replaces the old one; the
     getSceneInteractionZones("doctor-room"),
     doctorRoomStorageInteractions,
   );
-  // the old rectangle (x228, w9, h47) is no longer anywhere
+  // the old rectangle is no longer anywhere
   assert.ok(
-    !getSceneInteractionZones("doctor-room").some(
-      (z) => z.x === 228 || z.width === 9,
+    !/id: "doctor-room-interaction-1"/.test(
+      read("src/game/storage/storage.ts"),
     ),
   );
-  assert.ok(
-    !/x: 228,\s*y: 212,\s*width: 9/.test(read("src/game/storage/storage.ts")),
-  );
-  // more forgiving: the Doctor reaches it from further west, but not from the start spawn
   const zones = getSceneInteractionZones("doctor-room");
   assert.equal(
-    findAvailableInteraction(zones, feetAt(215, 240), "south")?.interactionId,
+    findAvailableInteraction(zones, feetAt(420, 340), "south")?.interactionId,
     "storage.doctor-room",
   );
   assert.equal(
-    findAvailableInteraction(zones, feetAt(224, 240), "west")?.interactionId,
+    findAvailableInteraction(zones, feetAt(425, 340), "west")?.interactionId,
     "storage.doctor-room",
   );
+  // neither the game-start spawn nor the Apothecary arrival is in range
   assert.equal(
-    findAvailableInteraction(zones, feetAt(173, 168), "south"),
+    findAvailableInteraction(zones, feetAt(262, 202), "south"),
+    null,
+  );
+  assert.equal(
+    findAvailableInteraction(zones, feetAt(261, 327), "south"),
     null,
   );
   // the tutorial and the Storage still target that same id; the Apothecary arrival is untouched
@@ -321,7 +322,7 @@ test("Doctor Room chest: the larger authored rectangle replaces the old one; the
   assert.ok(game.includes("interactionId === STORAGE_INTERACTION_ID"));
   assert.deepEqual(
     WORLD_SCENES["apothecary-interior"].arrivals["from-doctor-room"],
-    { x: 444, y: 147, direction: "south" },
+    { x: 240, y: 109, direction: "south" },
   );
 });
 

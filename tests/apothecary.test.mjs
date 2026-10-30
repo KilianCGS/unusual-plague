@@ -39,7 +39,7 @@ function load(file) {
 }
 const at = (rel) => load(path.join(root, rel));
 
-const geo = at("src/game/apothecary/apothecaryInteriorGeometry.ts");
+const geo = at("src/game/apothecary/apothecaryMainZoneGeometry.ts");
 const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
 const cr = at("src/game/crafting/crafting.ts");
 const { STATION_MAX_INPUTS, RECIPES } = at("src/game/crafting/recipes.ts");
@@ -64,131 +64,111 @@ const hit = (a, b) =>
   a.y < b.y + b.height &&
   a.y + a.height > b.y;
 
-test("1. 23 colliders, exactly as drawn", () => {
-  assert.equal(geo.apothecaryInteriorColliders.length, 23);
-  assert.deepEqual(geo.apothecaryInteriorColliders[0], {
-    id: "apothecary-interior-1",
-    x: 392,
-    y: 0,
-    width: 17,
-    height: 134,
-  });
-  assert.deepEqual(geo.apothecaryInteriorColliders[10], {
-    id: "apothecary-interior-11",
-    x: 48,
-    y: 87,
-    width: 31,
-    height: 7,
-  });
-  assert.deepEqual(geo.apothecaryInteriorColliders[22], {
-    id: "apothecary-interior-23",
-    x: 272,
-    y: 243,
-    width: 156,
-    height: 25,
-  });
+const EXPECTED_COLLIDERS = [
+  { id: "apothecary-main-zone-1", x: 281, y: 235, width: 189, height: 43 },
+  { id: "apothecary-main-zone-2", x: 381, y: 212, width: 83, height: 19 },
+  { id: "apothecary-main-zone-3", x: 416, y: 0, width: 64, height: 203 },
+  { id: "apothecary-main-zone-4", x: 323, y: 1, width: 117, height: 84 },
+  { id: "apothecary-main-zone-5", x: 265, y: 0, width: 83, height: 93 },
+  { id: "apothecary-main-zone-6", x: 6, y: 0, width: 208, height: 91 },
+  { id: "apothecary-main-zone-7", x: 17, y: 72, width: 97, height: 102 },
+  { id: "apothecary-main-zone-8", x: 79, y: 198, width: 53, height: 49 },
+  { id: "apothecary-main-zone-9", x: 11, y: 236, width: 189, height: 36 },
+  { id: "apothecary-main-zone-10", x: 48, y: 172, width: 32, height: 48 },
+  { id: "apothecary-main-zone-11", x: 394, y: 136, width: 25, height: 25 },
+  { id: "apothecary-main-zone-12", x: 408, y: 155, width: 11, height: 21 },
+  { id: "apothecary-main-zone-13", x: 410, y: 122, width: 15, height: 14 },
+  { id: "apothecary-main-zone-14", x: 319, y: 92, width: 5, height: 18 },
+  { id: "apothecary-main-zone-15", x: 325, y: 89, width: 91, height: 16 },
+];
+
+test("1. 15 colliders, exactly as drawn by hand", () => {
+  assert.deepEqual(geo.apothecaryMainZoneColliders, EXPECTED_COLLIDERS);
   assert.equal(
-    new Set(geo.apothecaryInteriorColliders.map((c) => c.id)).size,
-    23,
+    new Set(geo.apothecaryMainZoneColliders.map((c) => c.id)).size,
+    15,
   );
 });
 
-test("2. exactly 2 transitions", () => {
-  assert.deepEqual(geo.apothecaryInteriorTransitions, [
+test("2. exactly 2 transitions, as drawn", () => {
+  assert.deepEqual(geo.apothecaryMainZoneTransitions, [
     {
-      id: "apothecary-interior-transition-1",
-      x: 426,
-      y: 81,
-      width: 34,
-      height: 39,
+      id: "apothecary-main-zone-transition-1",
+      x: 201,
+      y: 245,
+      width: 80,
+      height: 20,
     },
     {
-      id: "apothecary-interior-transition-2",
-      x: 200,
-      y: 246,
-      width: 72,
-      height: 23,
+      id: "apothecary-main-zone-transition-2",
+      x: 214,
+      y: 71,
+      width: 51,
+      height: 15,
     },
   ]);
 });
 
-test("3-5. exactly 2 spawns: spawn-1 faces north, spawn-2 faces south", () => {
-  assert.equal(geo.apothecaryInteriorSpawns.length, 2);
-  assert.deepEqual(geo.apothecaryInteriorSpawns[0], {
-    id: "apothecary-interior-spawn-1",
-    x: 444,
-    y: 147,
-    direction: "north",
-  });
-  assert.deepEqual(geo.apothecaryInteriorSpawns[1], {
-    id: "apothecary-interior-spawn-2",
-    x: 235,
-    y: 219,
-    direction: "south",
-  });
+test("3-5. exactly 2 spawns, both facing south, as drawn", () => {
+  assert.deepEqual(geo.apothecaryMainZoneSpawns, [
+    { id: "apothecary-main-zone-spawn-1", x: 240, y: 217, direction: "south" },
+    { id: "apothecary-main-zone-spawn-2", x: 240, y: 109, direction: "south" },
+  ]);
 });
 
-test("6-10. exactly 3 interaction zones: two for the table, one for the stove", () => {
-  assert.equal(zones.length, 3);
-  // the Doctor's Storage moved to his room: the Apothecary has crafting only
-  assert.equal(zones, geo.apothecaryInteriorInteractions);
-  assert.deepEqual(
-    zones.map((z) => [z.id, z.interactionId]),
-    [
-      ["apothecary-interior-interaction-1", "craft.manual"],
-      ["apothecary-interior-interaction-2", "craft.manual"],
-      ["apothecary-interior-interaction-3", "craft.fire"],
-    ],
-  );
-  assert.deepEqual(zones[0], {
-    id: "apothecary-interior-interaction-1",
-    x: 99,
-    y: 173,
-    width: 22,
-    height: 36,
-    interactionId: "craft.manual",
-  });
-  assert.deepEqual(zones[1], {
-    id: "apothecary-interior-interaction-2",
-    x: 98,
-    y: 107,
-    width: 21,
-    height: 43,
-    interactionId: "craft.manual",
-  });
-  assert.deepEqual(zones[2], {
-    id: "apothecary-interior-interaction-3",
-    x: 315,
-    y: 95,
-    width: 74,
-    height: 7,
-    interactionId: "craft.fire",
-  });
+test("6-10. exactly 2 interaction zones: the stove (craft.fire) and the table (craft.manual), positions as drawn", () => {
+  assert.equal(zones.length, 2);
+  // the Doctor's Storage lives in his room: the Apothecary has crafting only
+  assert.equal(zones, geo.apothecaryMainZoneInteractions);
+  assert.deepEqual(zones, [
+    {
+      id: "apothecary-main-zone-interaction-1",
+      x: 325,
+      y: 106,
+      width: 90,
+      height: 17,
+      interactionId: "craft.fire",
+    },
+    {
+      id: "apothecary-main-zone-interaction-2",
+      x: 116,
+      y: 93,
+      width: 16,
+      height: 78,
+      interactionId: "craft.manual",
+    },
+  ]);
+  // the editor opens the same zones
+  assert.equal(getSceneInteractionZones("apothecary-main-zone"), zones);
 });
 
-test("9. the two table zones stay physically separate (never merged)", () => {
-  assert.ok(
-    !hit(zones[0], zones[1]),
-    "zone 1 (y173-209) and zone 2 (y107-150) do not overlap",
-  );
-  assert.ok(
-    zones[1].y + zones[1].height < zones[0].y,
-    "there is floor between them (the stool)",
-  );
+test("9. the two stations are apart and each has free floor for the Doctor to stand on", () => {
+  assert.ok(!hit(zones[0], zones[1]));
+  for (const zone of zones) {
+    let free = 0;
+    for (let x = zone.x; x <= zone.x + zone.width; x += 2) {
+      for (let y = zone.y; y <= zone.y + zone.height + 20; y += 2) {
+        const point = { x, y: y + 19 };
+        if (
+          hit(feet(point), zone) &&
+          !geo.apothecaryMainZoneColliders.some((c) => hit(feet(point), c))
+        ) {
+          free += 1;
+        }
+      }
+    }
+    assert.ok(free > 0, `${zone.id} has free floor to stand on`);
+  }
 });
 
 test("11-14. each interactionId opens its own station with the right capacity", () => {
   assert.equal(
     cr.CRAFT_STATION_BY_INTERACTION_ID[zones[0].interactionId],
-    "manual",
+    "fire",
   );
   assert.equal(
     cr.CRAFT_STATION_BY_INTERACTION_ID[zones[1].interactionId],
     "manual",
-  );
-  assert.equal(
-    cr.CRAFT_STATION_BY_INTERACTION_ID[zones[2].interactionId],
-    "fire",
   );
   assert.equal(STATION_MAX_INPUTS.manual, 2);
   assert.equal(STATION_MAX_INPUTS.fire, 3);
@@ -196,43 +176,47 @@ test("11-14. each interactionId opens its own station with the right capacity", 
   assert.equal(cr.createEmptySelection("fire").length, 3);
 });
 
-test("15-16. the transitions keep their destinations", () => {
+test("15-16. the transitions keep their destinations: the bottom one to the street, the arch to the Doctor's Room", () => {
   const byName = Object.fromEntries(botica.exits.map((e) => [e.name, e]));
   assert.equal(botica.exits.length, 2);
   assert.deepEqual(
-    byName["to-doctor-room"].zone,
-    geo.apothecaryInteriorTransitions[0],
-  );
-  assert.equal(byName["to-doctor-room"].targetScene, "doctor-room");
-  assert.equal(
-    byName["to-doctor-room"].targetSpawn,
-    "from-apothecary-interior",
-  );
-  assert.deepEqual(
     byName["to-apothecary-street"].zone,
-    geo.apothecaryInteriorTransitions[1],
+    geo.apothecaryMainZoneTransitions[0],
   );
   assert.equal(byName["to-apothecary-street"].targetScene, "apothecary-street");
   assert.equal(
     byName["to-apothecary-street"].targetSpawn,
     "from-apothecary-interior",
   );
+  assert.deepEqual(
+    byName["to-doctor-room"].zone,
+    geo.apothecaryMainZoneTransitions[1],
+  );
+  assert.equal(byName["to-doctor-room"].targetScene, "doctor-room");
+  assert.equal(
+    byName["to-doctor-room"].targetSpawn,
+    "from-apothecary-interior",
+  );
 });
 
 test("17. the neighbouring scenes arrive at the right Botica spawns", () => {
-  const [s1, s2] = geo.apothecaryInteriorSpawns;
-  // from the Doctor room: the right-hand door side (spawn-1); from the street: in front of the bottom exit (spawn-2)
-  // same spot as the painted spawn, but facing south into the room (the
-  // painted spawn itself still says north; see worldScenes.ts)
-  assert.deepEqual(botica.arrivals["from-doctor-room"], {
+  const [s1, s2] = geo.apothecaryMainZoneSpawns;
+  // from the street: in front of the bottom exit (spawn-1); from the Doctor's
+  // Room: below the arch (spawn-2); both facing south
+  assert.deepEqual(botica.arrivals["from-apothecary-street"], {
     x: s1.x,
     y: s1.y,
-    direction: "south",
+    direction: s1.direction,
   });
-  assert.deepEqual(botica.arrivals["from-apothecary-street"], {
+  assert.deepEqual(botica.arrivals["from-doctor-room"], {
     x: s2.x,
     y: s2.y,
     direction: s2.direction,
+  });
+  assert.deepEqual(botica.arrivals.start, {
+    x: s1.x,
+    y: s1.y,
+    direction: s1.direction,
   });
   const toBotica = (scene) =>
     WORLD_SCENES[scene].exits.find(
@@ -253,15 +237,105 @@ test("17. the neighbouring scenes arrive at the right Botica spawns", () => {
 
 test("spawns and the start position are free floor and not on an exit (no transition loop)", () => {
   const points = [
-    ...geo.apothecaryInteriorSpawns,
+    ...geo.apothecaryMainZoneSpawns,
     { id: "start", ...botica.arrivals.start },
   ];
   for (const p of points) {
-    for (const c of geo.apothecaryInteriorColliders)
+    for (const c of geo.apothecaryMainZoneColliders)
       assert.ok(!hit(feet(p), c), `${p.id} inside ${c.id}`);
-    for (const t of geo.apothecaryInteriorTransitions)
+    for (const t of geo.apothecaryMainZoneTransitions)
       assert.ok(!hit(feet(p), t), `${p.id} on ${t.id}`);
   }
+});
+
+test("everything in the Botica is reachable on foot from either arrival (no trapped spawn, no unreachable exit or station)", () => {
+  const W = 480;
+  const H = 293;
+  const free = (x, y) =>
+    x >= 6 &&
+    y >= 19 &&
+    x <= W - 6 &&
+    y <= H &&
+    !geo.apothecaryMainZoneColliders.some((c) => hit(feet({ x, y }), c));
+  const reach = (start) => {
+    const seen = new Set([`${start.x},${start.y}`]);
+    const queue = [[start.x, start.y]];
+    while (queue.length) {
+      const [x, y] = queue.shift();
+      for (const [dx, dy] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]) {
+        const key = `${x + dx},${y + dy}`;
+        if (!seen.has(key) && free(x + dx, y + dy)) {
+          seen.add(key);
+          queue.push([x + dx, y + dy]);
+        }
+      }
+    }
+    return [...seen].map((k) => k.split(",").map(Number));
+  };
+  for (const start of geo.apothecaryMainZoneSpawns) {
+    const floor = reach(start);
+    assert.ok(floor.length > 5000, "a meaningful walkable area");
+    const canTouch = (rect) =>
+      floor.some(([x, y]) => hit(feet({ x, y }), rect));
+    for (const t of geo.apothecaryMainZoneTransitions)
+      assert.ok(canTouch(t), `${t.id} from ${start.id}`);
+    for (const z of geo.apothecaryMainZoneInteractions)
+      assert.ok(canTouch(z), `${z.id} from ${start.id}`);
+    for (const other of geo.apothecaryMainZoneSpawns)
+      assert.ok(
+        floor.some(([x, y]) => x === other.x && y === other.y),
+        `${other.id} from ${start.id}`,
+      );
+  }
+});
+
+test("the Botica in play is the new one: its background, its 480x293 world, and no second runtime Botica", () => {
+  const css = fs.readFileSync(
+    path.join(root, "src/game/apothecary/ApothecaryScene.module.css"),
+    "utf8",
+  );
+  const scene = fs.readFileSync(
+    path.join(root, "src/game/apothecary/ApothecaryScene.tsx"),
+    "utf8",
+  );
+  assert.ok(css.includes("apothecary-main-zone-background.png"));
+  assert.ok(!css.includes("apothecary-background.png"));
+  assert.ok(
+    /SCENE_WIDTH = 480;/.test(scene) && /SCENE_HEIGHT = 293;/.test(scene),
+  );
+  assert.ok(css.includes("293px") && !css.includes("277px"));
+  assert.ok(scene.includes("apothecaryMainZoneColliders"));
+  // the background really is the unmodified 1606x979 image
+  const png = fs.readFileSync(
+    path.join(
+      root,
+      "public/game/areas/apothecary/apothecary-main-zone-background.png",
+    ),
+  );
+  assert.equal(png.readUInt32BE(16), 1606);
+  assert.equal(png.readUInt32BE(20), 979);
+  // the old Botica geometry and background are gone, not kept in parallel
+  assert.ok(
+    !fs.existsSync(
+      path.join(root, "src/game/apothecary/apothecaryInteriorGeometry.ts"),
+    ),
+  );
+  assert.ok(
+    !fs.existsSync(
+      path.join(root, "public/game/areas/apothecary/apothecary-background.png"),
+    ),
+  );
+  assert.deepEqual(
+    Object.keys(WORLD_SCENES).filter((id) =>
+      /apothecary-(interior|main)/.test(id),
+    ),
+    ["apothecary-interior"],
+  );
 });
 
 test("18. the original four recipes are untouched (two patient recipes were added after them)", () => {

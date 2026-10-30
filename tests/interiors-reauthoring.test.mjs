@@ -272,23 +272,56 @@ test("their conversations still exist (no orphan interaction)", () => {
   }
 });
 
-test("Bakery still connects to the Bakers Bedroom; the bedroom itself is untouched", () => {
+test("Bakery still connects to the Bakers Bedroom; the bedroom is the new room with its hand-authored composition", () => {
   const arrivals = WORLD_SCENES["bakery-interior"].arrivals;
   const back = arrivals["from-bakers-bedroom"];
   const door = arrivals["from-bakery-street"];
   assert.deepEqual({ x: back.x, y: back.y }, { x: door.x, y: door.y });
   assert.equal(back.direction, "south");
   const bedroom = DEV_SCENES.find((s) => s.id === "bakers-bedroom");
-  assert.equal(bedroom.assetWidth, 400);
-  assert.equal(bedroom.assetHeight, 224);
+  // the new 1536x1024 room (same world and zoom as the other interiors)
+  assert.equal(bedroom.assetWidth, 1536);
+  assert.equal(bedroom.assetHeight, 1024);
+  assert.equal(bedroom.logicalUnitsPerAssetPixel, 0.375);
+  assert.equal(bedroom.zoomMultiplier, 1.5);
   assert.deepEqual(pngSize("bakers-bedroom/bakers-bedroom-background.png"), {
-    width: 400,
-    height: 224,
+    width: 1536,
+    height: 1024,
   });
-  const husband = composition("bakers-bedroom").instances[0];
+  // the final composition authored by hand in the Decorator (source of truth):
+  // sick husband, narrative Doctor and standing Baker, exactly as exported
+  const placed = composition("bakers-bedroom").instances;
   assert.deepEqual(
-    [husband.instanceId, husband.x, husband.y, husband.scale],
-    ["bakers-bedroom-bakers-husband-sick-01", 156, 160, 0.97],
+    placed.map((i) => [i.instanceId, i.assetId, i.x, i.y, i.scale]),
+    [
+      [
+        "bakers-bedroom-bakers-husband-sick-01",
+        "bakers-husband-sick",
+        184,
+        248,
+        1.3,
+      ],
+      [
+        "bakers-bedroom-doctor-narrative-01",
+        "doctor-narrative",
+        209,
+        230,
+        1.21,
+      ],
+      ["bakers-bedroom-baker-standing-01", "baker-standing", 171, 241, 1.52],
+    ],
+  );
+  assert.ok(placed.every((i) => i.flipX === false && i.zOffset === 0));
+  // a narrative microscene: no collider, no geometry, nothing to walk
+  assert.ok(placed.every((i) => i.colliderEnabled === false));
+  const room = WORLD_SCENES["bakers-bedroom"];
+  assert.deepEqual(
+    [
+      room.colliders.length,
+      room.exits.length,
+      Object.keys(room.arrivals).length,
+    ],
+    [0, 0, 0],
   );
 });
 
