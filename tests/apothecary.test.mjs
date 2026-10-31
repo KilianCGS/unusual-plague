@@ -80,14 +80,22 @@ const EXPECTED_COLLIDERS = [
   { id: "apothecary-main-zone-13", x: 410, y: 122, width: 15, height: 14 },
   { id: "apothecary-main-zone-14", x: 319, y: 92, width: 5, height: 18 },
   { id: "apothecary-main-zone-15", x: 325, y: 89, width: 91, height: 16 },
+  { id: "apothecary-main-zone-16", x: 322, y: 105, width: 95, height: 10 },
 ];
 
-test("1. 15 colliders, exactly as drawn by hand", () => {
+test("1. 16 colliders, exactly as drawn by hand (#16 is intentional: it keeps the Doctor off the stove)", () => {
   assert.deepEqual(geo.apothecaryMainZoneColliders, EXPECTED_COLLIDERS);
   assert.equal(
     new Set(geo.apothecaryMainZoneColliders.map((c) => c.id)).size,
-    15,
+    16,
   );
+  assert.deepEqual(geo.apothecaryMainZoneColliders[15], {
+    id: "apothecary-main-zone-16",
+    x: 322,
+    y: 105,
+    width: 95,
+    height: 10,
+  });
 });
 
 test("2. exactly 2 transitions, as drawn", () => {
@@ -111,8 +119,8 @@ test("2. exactly 2 transitions, as drawn", () => {
 
 test("3-5. exactly 2 spawns, both facing south, as drawn", () => {
   assert.deepEqual(geo.apothecaryMainZoneSpawns, [
-    { id: "apothecary-main-zone-spawn-1", x: 240, y: 217, direction: "south" },
-    { id: "apothecary-main-zone-spawn-2", x: 240, y: 109, direction: "south" },
+    { id: "apothecary-main-zone-spawn-1", x: 240, y: 238, direction: "south" },
+    { id: "apothecary-main-zone-spawn-2", x: 240, y: 100, direction: "south" },
   ]);
 });
 
@@ -123,18 +131,18 @@ test("6-10. exactly 2 interaction zones: the stove (craft.fire) and the table (c
   assert.deepEqual(zones, [
     {
       id: "apothecary-main-zone-interaction-1",
-      x: 325,
-      y: 106,
-      width: 90,
-      height: 17,
+      x: 323,
+      y: 116,
+      width: 92,
+      height: 11,
       interactionId: "craft.fire",
     },
     {
       id: "apothecary-main-zone-interaction-2",
-      x: 116,
-      y: 93,
-      width: 16,
-      height: 78,
+      x: 115,
+      y: 98,
+      width: 19,
+      height: 70,
       interactionId: "craft.manual",
     },
   ]);
@@ -243,9 +251,35 @@ test("spawns and the start position are free floor and not on an exit (no transi
   for (const p of points) {
     for (const c of geo.apothecaryMainZoneColliders)
       assert.ok(!hit(feet(p), c), `${p.id} inside ${c.id}`);
-    for (const t of geo.apothecaryMainZoneTransitions)
+    for (const t of geo.apothecaryMainZoneTransitions) {
+      // The hand-placed arrival below the arch (240,100) overlaps the arch's
+      // zone by a few units. That is safe by design: a freshly mounted scene
+      // starts DISARMED and only arms once the feet are outside every zone, so
+      // arriving on a zone never triggers it (no transition loop).
+      if (
+        p.id === "apothecary-main-zone-spawn-2" &&
+        t.id === "apothecary-main-zone-transition-2"
+      ) {
+        assert.ok(hit(feet(p), t), "documented overlap");
+        continue;
+      }
       assert.ok(!hit(feet(p), t), `${p.id} on ${t.id}`);
+    }
   }
+  const trigger = fs.readFileSync(
+    path.join(root, "src/game/world/useTransitionTrigger.ts"),
+    "utf8",
+  );
+  assert.ok(trigger.includes("starts DISARMED"));
+  assert.ok(trigger.includes("armedRef.current && enabled"));
+  assert.ok(
+    fs
+      .readFileSync(
+        path.join(root, "src/game/apothecary/ApothecaryScene.tsx"),
+        "utf8",
+      )
+      .includes("useTransitionTrigger({"),
+  );
 });
 
 test("everything in the Botica is reachable on foot from either arrival (no trapped spawn, no unreachable exit or station)", () => {
@@ -338,8 +372,8 @@ test("the Botica in play is the new one: its background, its 480x293 world, and 
   );
 });
 
-test("18. the original four recipes are untouched (two patient recipes were added after them)", () => {
-  assert.equal(RECIPES.length, 6);
+test("18. the original four recipes are untouched (two patient recipes and Milk with honey were added after them)", () => {
+  assert.equal(RECIPES.length, 7);
   assert.deepEqual(
     RECIPES.slice(0, 4).map((r) => [
       r.id,

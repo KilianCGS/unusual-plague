@@ -208,7 +208,7 @@ export const newWorldChapter1Compositions: DecorComposition[] = [
       },
       {
         instanceId: "mill-farmland-orange-world-02",
-        assetId: "orange-world",
+        assetId: "orange-world-ambient",
         x: 1844,
         y: 872,
         scale: 1,

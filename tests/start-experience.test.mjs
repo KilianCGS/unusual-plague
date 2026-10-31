@@ -96,12 +96,12 @@ test("a fresh Chapter 1 begins with the writing interlude, then the Doctor's Roo
   );
 });
 
-test("the game starts at doctor-room-new-spawn-2 (262,202,south), clear of furniture and the exit; spawn-1 is the arrival from the Apothecary", () => {
+test("the game starts at doctor-room-new-spawn-2 (262,204,south), clear of furniture and the exit; spawn-1 is the arrival from the Apothecary", () => {
   const arrival = WORLD_SCENES["doctor-room"].arrivals["chapter-start"];
   const spawn1 = doctorRoomSpawns.find(
     (s) => s.id === "doctor-room-new-spawn-2",
   );
-  assert.deepEqual(arrival, { x: 262, y: 202, direction: "south" });
+  assert.deepEqual(arrival, { x: 262, y: 204, direction: "south" });
   assert.deepEqual(arrival, { x: spawn1.x, y: spawn1.y, direction: "south" });
   assert.equal(arrival.direction, "south");
   for (const collider of doctorRoomColliders) {
@@ -116,13 +116,13 @@ test("the game starts at doctor-room-new-spawn-2 (262,202,south), clear of furni
   // the walk-in arrival from the Apothecary and the exit are unchanged
   assert.deepEqual(
     WORLD_SCENES["doctor-room"].arrivals["from-apothecary-interior"],
-    { x: 261, y: 327, direction: "south" },
+    { x: 260, y: 371, direction: "north" },
   );
   assert.deepEqual(doctorRoomSpawns[0], {
     id: "doctor-room-new-spawn-1",
-    x: 261,
-    y: 327,
-    direction: "south",
+    x: 260,
+    y: 371,
+    direction: "north",
   });
   // the two are different spawns, not an alias
   assert.notDeepEqual(
@@ -151,7 +151,7 @@ test("leaving the Doctor's Room: the Doctor arrives in the Apothecary at the app
   // the hand-drawn spawn of the new Botica, facing south into the room
   assert.deepEqual(arrivals["from-doctor-room"], {
     x: 240,
-    y: 109,
+    y: 100,
     direction: "south",
   });
   assert.equal(arrivals["from-doctor-room"].x, painted.x);
@@ -160,7 +160,7 @@ test("leaving the Doctor's Room: the Doctor arrives in the Apothecary at the app
   // the other arrival: in front of the bottom exit
   assert.deepEqual(arrivals["from-apothecary-street"], {
     x: 240,
-    y: 217,
+    y: 238,
     direction: "south",
   });
   // nothing in the scene overrides the arrival's facing
@@ -305,6 +305,64 @@ test("Tutorial V2: open book > page > tab > close > map > move > approach chest 
   assert.equal(advanceTutorial("done", "book-opened"), "done");
 });
 
+test("the movement hint also teaches running (ES/EN) without a new phase or a new gate", () => {
+  assert.equal(
+    tutorialCopy.es.move.body,
+    "Recorre tu habitación. Mantén ESPACIO mientras te mueves para correr.",
+  );
+  assert.equal(
+    tutorialCopy.en.move.body,
+    "Look around your room. Hold SPACE while moving to run.",
+  );
+  // the title still names the movement keys; no run step exists in the flow
+  for (const lang of ["es", "en"]) {
+    assert.deepEqual(
+      tutorialCopy[lang].move.title.filter((p) => typeof p === "object"),
+      [{ key: "WASD" }],
+    );
+    assert.deepEqual(Object.keys(tutorialCopy[lang]), [
+      "book",
+      "book-page",
+      "book-tab",
+      "book-close",
+      "map",
+      "move",
+      "chest-approach",
+      "chest-interact",
+      "take-flask",
+    ]);
+  }
+  // moving is still the only thing "move" waits for: running is never required
+  assert.equal(advanceTutorial("move", "player-moved"), "chest-approach");
+  assert.equal(advanceTutorial("move", "run-started"), "move");
+});
+
+test("the Doctor is drawn ~40% larger in his room by a per-scene VISUAL scale only", () => {
+  assert.equal(WORLD_SCENES["doctor-room"].visual.protagonistScale, 1.4);
+  // no other scene changes size: the override is per sceneId, not global
+  for (const [id, scene] of Object.entries(WORLD_SCENES)) {
+    if (id !== "doctor-room") {
+      assert.equal(scene.visual?.protagonistScale, undefined, id);
+    }
+  }
+  // the scale reaches the sprite only as a CSS scale around the feet anchor
+  const sprite = read("src/game/protagonist/ProtagonistSprite.tsx");
+  assert.ok(sprite.includes('transformOrigin: "50% 100%"'));
+  assert.ok(
+    read("src/game/world/ExteriorScene.tsx").includes(
+      "scale={scene.visual.protagonistScale}",
+    ),
+  );
+  // physics never read it: hitbox, speed and collisions are unscaled
+  for (const file of [
+    "src/game/protagonist/useProtagonistController.ts",
+    "src/game/collision.ts",
+    "src/game/interactions/interactionZone.ts",
+  ]) {
+    assert.ok(!read(file).includes("protagonistScale"), file);
+  }
+});
+
 test("opening the book is NOT enough: the page must really change, then the tab, then it must close", () => {
   assert.equal(advanceTutorial("book-page", "book-opened"), "book-page");
   assert.equal(advanceTutorial("book-page", "book-tab-changed"), "book-page"); // out of order
@@ -425,7 +483,7 @@ test("the chest: proximity comes from the real interaction zone; opening reports
     feetAt(zone.x + 4, zone.y + 40),
     "west",
   );
-  const far = findAvailableInteraction(zones, feetAt(262, 202), "south");
+  const far = findAvailableInteraction(zones, feetAt(262, 204), "south");
   assert.equal(near?.interactionId, "storage.doctor-room");
   assert.equal(far, null);
   const game = read("src/game/world/GameWorld.tsx");
@@ -537,7 +595,11 @@ test("starting the game unlocks nothing: only the baker's husband is known, no r
     ch1.CHAPTER1_INITIAL_PATIENTS[ch1.BAKER_HUSBAND_ID],
     "discovered",
   );
-  assert.deepEqual(Object.keys(ch1.CHAPTER1_PATIENTS), [ch1.BAKER_HUSBAND_ID]);
+  // the tavern man exists as a case but starts HIDDEN (the bartender points him out)
+  assert.deepEqual(Object.keys(ch1.CHAPTER1_PATIENTS), [
+    ch1.BAKER_HUSBAND_ID,
+    ch1.TAVERN_PATIENT_ID,
+  ]);
   const game = read("src/game/world/GameWorld.tsx");
   assert.ok(
     /useState<ReadonlySet<string>>\(\s*new Set\(\)/.test(game),

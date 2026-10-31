@@ -35,7 +35,11 @@ import {
   resolveInteractionConversation,
 } from "../dialogue/interactionDialogues";
 import { useDialogue } from "../dialogue/useDialogue";
-import { formatObtainedNotice, itemFeedbackCopy } from "../i18n/items";
+import {
+  collectBarkCopy,
+  formatObtainedNotice,
+  itemFeedbackCopy,
+} from "../i18n/items";
 import { tutorialCopy } from "../i18n/tutorial";
 import type { Language } from "../i18n/types";
 import {
@@ -158,6 +162,14 @@ export function GameWorld({ language }: { language: Language }) {
     "go-to-examination" | "examination-finished" | "leave-bedroom" | null
   >(null);
   const examinationStartedRef = useRef(false);
+  // The case whose examination is under way (the baker's husband unless a
+  // conversation says otherwise).
+  const examiningPatientRef = useRef<string>(BAKER_HUSBAND_ID);
+  // A one-off remark of the Doctor after a pick-up (not a conversation).
+  const [pickupBark, setPickupBark] = useState<{
+    id: number;
+    text: string;
+  } | null>(null);
   // What the Doctor carries and which world collectibles he has picked up.
   // Both live here, above the scenes, so they survive scene changes; they last
   // for the session (no saving yet). The ref mirrors the inventory so two
@@ -311,6 +323,12 @@ export function GameWorld({ language }: { language: Language }) {
           nextInventory = removed;
         } else if (effect.type === "claim-reward") {
           nextRewards = new Set([...nextRewards, effect.rewardId]);
+        } else if (effect.type === "advance-patient") {
+          nextPatients = advancePatient(
+            nextPatients,
+            effect.patientId,
+            effect.to,
+          );
         } else {
           const definition = CHAPTER1_PATIENTS[effect.patientId];
           const treated = treatPatient(nextPatients, definition, nextInventory);
@@ -389,7 +407,7 @@ export function GameWorld({ language }: { language: Language }) {
   const handleInteract = useCallback(
     (
       interactionId: string,
-      source: { instanceId?: string; itemId?: string },
+      source: { instanceId?: string; itemId?: string; quantity?: number },
     ) => {
       if (phaseRef.current !== "playing") {
         return;
@@ -411,8 +429,9 @@ export function GameWorld({ language }: { language: Language }) {
 
       // A collectible: pick it up if it fits, otherwise leave it where it is.
       if (source.itemId && source.instanceId) {
+        const quantity = source.quantity ?? 1;
         const next = canAddItem(inventoryRef.current, source.itemId)
-          ? addItem(inventoryRef.current, source.itemId)
+          ? addItem(inventoryRef.current, source.itemId, quantity)
           : null;
         const copy = itemFeedbackCopy[language];
         const showNotice = (text: string) =>
@@ -426,9 +445,20 @@ export function GameWorld({ language }: { language: Language }) {
             formatObtainedNotice(
               language,
               getItemName(source.itemId, language),
-              1,
+              quantity,
             ),
           );
+
+          // A group (a branch of oranges) earns a remark; a single one does not.
+          const bark =
+            quantity > 1 ? collectBarkCopy[language][source.itemId] : undefined;
+
+          if (bark) {
+            setPickupBark((current) => ({
+              id: (current?.id ?? 0) + 1,
+              text: bark,
+            }));
+          }
         } else {
           showNotice(copy.inventoryFull);
         }
@@ -463,8 +493,16 @@ export function GameWorld({ language }: { language: Language }) {
       }
 
       if (outcome?.conversation && applyStoryEffects(outcome.effects)) {
+        if (outcome.patientId) {
+          examiningPatientRef.current = outcome.patientId;
+        }
+
         afterDialogueRef.current =
-          outcome.after === "go-to-examination" ? "go-to-examination" : null;
+          outcome.after === "go-to-examination"
+            ? "go-to-examination"
+            : outcome.after === "examine-in-place"
+              ? "examination-finished"
+              : null;
         startDialogue(outcome.conversation);
         return;
       }
@@ -568,12 +606,16 @@ export function GameWorld({ language }: { language: Language }) {
   // conversation: the baker's invitation > fade to the bedroom > examination >
   // (Doctor's thoughts about what he still lacks) > fade back to the bakery.
   const finishExamination = useCallback(() => {
-    const definition = CHAPTER1_PATIENTS[BAKER_HUSBAND_ID];
-    const examined = advancePatient(
+    const patientId = examiningPatientRef.current;
+    const definition = CHAPTER1_PATIENTS[patientId];
+    const inPlace = definition.examination === "in-place";
+    // A case that was never announced is noticed by looking at him.
+    const noticed = advancePatient(
       patientsRef.current,
-      BAKER_HUSBAND_ID,
-      "examined",
+      patientId,
+      "discovered",
     );
+    const examined = advancePatient(noticed, patientId, "examined");
 
     patientsRef.current = examined;
     setPatients(examined);
@@ -581,15 +623,19 @@ export function GameWorld({ language }: { language: Language }) {
       (current) => new Set([...current, ...definition.revealsRecipeIds]),
     );
 
-    const thoughts = buildMissingIngredientConversation(
-      getPatientMissingIngredients(definition, inventoryRef.current),
-      language,
-    );
+    // An in-place examination already said everything in its own conversation
+    // and stays in the scene; the narrative one thinks out loud and goes back.
+    const thoughts = inPlace
+      ? null
+      : buildMissingIngredientConversation(
+          getPatientMissingIngredients(definition, inventoryRef.current),
+          language,
+        );
 
     if (thoughts) {
       afterDialogueRef.current = "leave-bedroom";
       startDialogue(thoughts);
-    } else {
+    } else if (!inPlace) {
       startTransition("bakery-interior", "from-bakers-bedroom");
     }
   }, [language, startDialogue, startTransition]);
@@ -623,7 +669,10 @@ export function GameWorld({ language }: { language: Language }) {
       return;
     }
 
-    const examination = getExaminationConversation(BAKER_HUSBAND_ID, language);
+    const examination = getExaminationConversation(
+      examiningPatientRef.current,
+      language,
+    );
 
     if (examination) {
       examinationStartedRef.current = true;
@@ -709,8 +758,27 @@ export function GameWorld({ language }: { language: Language }) {
     craftingOpen: craftingStation !== null,
     mapVisible,
   });
+  // A pick-up remark does not outlive plain play either.
+  if (!isPlaying && pickupBark !== null) {
+    setPickupBark(null);
+  }
+
   const renderRunBark = (context: SceneOverlayContext) => {
     const anchor = context.getSpeakerAnchor(DOCTOR_SPEAKER);
+
+    if (pickupBark && anchor) {
+      return (
+        <PlayerBark
+          key={`pickup-${pickupBark.id}`}
+          text={pickupBark.text}
+          anchorX={anchor.x}
+          anchorY={anchor.y}
+          frameWidth={context.frameWidth}
+          frameHeight={context.frameHeight}
+          onDone={() => setPickupBark(null)}
+        />
+      );
+    }
 
     return runBark.phraseIndex !== null && anchor ? (
       <PlayerBark
@@ -738,8 +806,8 @@ export function GameWorld({ language }: { language: Language }) {
   // that is only discovered still waits for its visit, a treated one may still
   // owe its thank-you).
   const attentionInstanceIds = useMemo(
-    () => getAttentionInstanceIds(patients, claimedRewards),
-    [patients, claimedRewards],
+    () => getAttentionInstanceIds(patients, claimedRewards, inventory),
+    [patients, claimedRewards, inventory],
   );
 
   // The hint of the current step. The interaction hint only shows while the

@@ -1,12 +1,15 @@
+import { countItem, type InventoryState } from "../inventory/inventory";
 import {
   getPatientStatus,
+  hasRequiredTreatments,
   type PatientCaseDefinition,
   type PatientCasesState,
 } from "./patientCases";
 
-// Chapter 1 patients. Only the baker's husband exists for now; the tavern
-// patient and the injured miner are not cases yet.
+// Chapter 1 patients: the baker's husband and the man on the tavern floor. The
+// injured miner is not a case yet.
 export const BAKER_HUSBAND_ID = "baker-husband";
+export const TAVERN_PATIENT_ID = "tavern-patient";
 
 export const CHAPTER1_PATIENTS: Record<string, PatientCaseDefinition> = {
   [BAKER_HUSBAND_ID]: {
@@ -27,10 +30,31 @@ export const CHAPTER1_PATIENTS: Record<string, PatientCaseDefinition> = {
     ],
     revealsRecipeIds: ["fire.medicinal-infusion", "manual.cold-cloth"],
   },
+  [TAVERN_PATIENT_ID]: {
+    id: TAVERN_PATIENT_ID,
+    name: { es: "HOMBRE DE LA TABERNA", en: "THE MAN IN THE TAVERN" },
+    ailmentId: "stomach-ailment",
+    discovered: {
+      es: "El tabernero dice que un hombre lleva un buen rato en el suelo, quejándose.",
+      en: "The bartender says a man has been groaning on the floor for a good while.",
+    },
+    observation: {
+      es: "Dolor de vientre, náuseas y pesadez tras beber de más.",
+      en: "Stomach pain, nausea and heaviness after drinking too much.",
+    },
+    requiredTreatments: [
+      { itemId: "mushroom-soup", quantity: 1 },
+      { itemId: "milk-with-honey", quantity: 1 },
+    ],
+    revealsRecipeIds: ["fire.mushroom-soup", "fire.milk-with-honey"],
+    // He is examined where he lies: no scene of his own.
+    examination: "in-place",
+  },
 };
 
 // Chapter 1 starts with the baker's husband already known: the baker asked for
-// the visit. Cases that are not listed are hidden.
+// the visit. Cases that are not listed are hidden (the tavern man is found out
+// by the bartender, or by looking at him).
 export const CHAPTER1_INITIAL_PATIENTS: PatientCasesState = {
   [BAKER_HUSBAND_ID]: "discovered",
 };
@@ -48,22 +72,46 @@ export const CHAPTER1_PATIENT_NPC_INSTANCES: Record<string, string> = {
 export const BAKER_SALT_REWARD_ID = "chapter1.baker.salt";
 export const BAKER_SALT_REWARD = { itemId: "salt", quantity: 1 } as const;
 
+// The one-time trades of the tavern case (claimed-reward flags, session only):
+// the jar from the bartender, the milk from the farm woman, the honey of the
+// beekeeper. See npcTrades.ts.
+export const TAVERN_JAR_REWARD_ID = "chapter1.tavern.emptyJar";
+export const FARM_MILK_REWARD_ID = "chapter1.farm.milk";
+// Not a reward: the memory that the farm woman already PRESENTED the milk deal
+// (so her first conversation about it is an introduction, told once).
+export const FARM_WOMAN_INTRO_ID = "chapter1.farm.womanIntro";
+export const BEEKEEPER_HONEY_REWARD_ID = "chapter1.beekeeper.honey";
+
 // The one-time thank-you each case may still owe the Doctor.
 export const CHAPTER1_PATIENT_REWARDS: Record<string, string> = {
   [BAKER_HUSBAND_ID]: BAKER_SALT_REWARD_ID,
 };
 
-// The placed characters that show the "!": the person attached to each case
-// that either still has its visit pending (DISCOVERED) or, once TREATED, still
-// has a thank-you waiting that was not received yet. Derived from the statuses
-// and the claimed rewards, so it is never stored: it vanishes by itself after
-// the visit, and again the moment the reward is really received (a reward that
-// did not fit in the inventory is not received, so the "!" stays).
+// The placed characters of the tavern case (the man on the floor and the
+// bartender who points him out) and of the trades that feed it.
+export const TAVERN_PATIENT_INSTANCE_ID =
+  "tavern-interior-tavern-patient-sick-01";
+export const TAVERN_BARTENDER_INSTANCE_ID = "tavern-interior-bartender-01";
+export const FARM_WOMAN_INSTANCE_ID = "farm-villager-woman-01-01";
+export const BEEKEEPER_INSTANCE_ID = "mill-farmland-beekeeper-01";
+
+// The placed characters that show the "!". Derived from the cases, the claimed
+// rewards and the inventory, so it is never stored: it vanishes by itself once
+// the character has nothing left to give or to say that moves a case forward.
+//   The baker: her visit is pending (DISCOVERED), or her thank-you was not
+//   received yet once her husband is TREATED (a reward that did not fit is not
+//   received, so the "!" stays).
+//   The bartender: the tavern case has not been noticed yet (HIDDEN).
+//   The man on the floor: noticed but not examined, or examined and the Doctor
+//   carries both treatments.
+//   The farm woman: the case is examined, the milk was not traded yet and the
+//   Doctor carries what she asks for. The beekeeper: examined, honey pending.
 export function getAttentionInstanceIds(
   state: PatientCasesState,
   claimedRewards: ReadonlySet<string> = new Set(),
+  inventory?: InventoryState,
 ): ReadonlySet<string> {
-  return new Set(
+  const instances = new Set(
     Object.entries(CHAPTER1_PATIENT_NPC_INSTANCES)
       .filter(([patientId]) => {
         const status = getPatientStatus(state, patientId);
@@ -78,6 +126,40 @@ export function getAttentionInstanceIds(
       })
       .map(([, instanceId]) => instanceId),
   );
+  const tavern = getPatientStatus(state, TAVERN_PATIENT_ID);
+
+  if (tavern === "hidden") {
+    instances.add(TAVERN_BARTENDER_INSTANCE_ID);
+  } else if (tavern === "discovered") {
+    instances.add(TAVERN_PATIENT_INSTANCE_ID);
+  } else if (tavern === "examined") {
+    if (
+      inventory &&
+      hasRequiredTreatments(CHAPTER1_PATIENTS[TAVERN_PATIENT_ID], inventory)
+    ) {
+      instances.add(TAVERN_PATIENT_INSTANCE_ID);
+    }
+
+    if (
+      inventory &&
+      !claimedRewards.has(FARM_MILK_REWARD_ID) &&
+      countItem(inventory, "orange") >= 3 &&
+      countItem(inventory, "empty-jar") >= 1
+    ) {
+      instances.add(FARM_WOMAN_INSTANCE_ID);
+    }
+
+    // the bartender still has the jar for the milk
+    if (!claimedRewards.has(TAVERN_JAR_REWARD_ID)) {
+      instances.add(TAVERN_BARTENDER_INSTANCE_ID);
+    }
+
+    if (!claimedRewards.has(BEEKEEPER_HONEY_REWARD_ID)) {
+      instances.add(BEEKEEPER_INSTANCE_ID);
+    }
+  }
+
+  return instances;
 }
 
 // The conversation partner during the examination (the sick husband, placed

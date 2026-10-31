@@ -72,6 +72,10 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.mill.youngVillager",
     zone: { offsetX: -37, offsetY: -97, width: 68, height: 113 },
   },
+  "mill-farmland-beekeeper-01": {
+    interactionId: "chapter1.mill.beekeeper",
+    zone: { offsetX: -44, offsetY: -100, width: 72, height: 116 },
+  },
   "mine-interior-injured-miner-01": {
     interactionId: "chapter1.mine.injuredMiner",
     zone: { offsetX: -48, offsetY: -68, width: 95, height: 84 },

@@ -87,6 +87,8 @@ export type ResolvedDecor = {
   zoneInstanceIds: Map<string, string>;
   // For the zones of collectibles: the item each one gives (by zone id).
   zoneItemIds: Map<string, string>;
+  // How many units each of those collectibles gives (by zone id).
+  zoneItemQuantities: Map<string, number>;
 };
 
 export function resolveDecorInstances(
@@ -102,6 +104,7 @@ export function resolveDecorInstances(
     zones: [],
     zoneInstanceIds: new Map(),
     zoneItemIds: new Map(),
+    zoneItemQuantities: new Map(),
   };
 
   for (const instance of withInteractions(instances, interactions)) {
@@ -126,6 +129,7 @@ export function resolveDecorInstances(
 
     if (zone && itemId) {
       resolved.zoneItemIds.set(zone.id, itemId);
+      resolved.zoneItemQuantities.set(zone.id, asset.collectibleQuantity ?? 1);
     }
 
     if (zone) {

@@ -115,10 +115,10 @@ export function ExteriorScene({
   isPlaying: boolean;
   onExit: (exitName: string) => void;
   // `instanceId` is set when the interaction belongs to a decor instance, and
-  // `itemId` when that instance is a collectible.
+  // `itemId` (and `quantity`) when that instance is a collectible.
   onInteract: (
     interactionId: string,
-    source: { instanceId?: string; itemId?: string },
+    source: { instanceId?: string; itemId?: string; quantity?: number },
   ) => void;
   // Optional screen-space layer drawn above the camera frame content.
   renderOverlay?: (context: SceneOverlayContext) => ReactNode;
@@ -198,6 +198,7 @@ export function ExteriorScene({
       onInteract(interactionId, {
         instanceId: decor.zoneInstanceIds.get(zone.id),
         itemId: decor.zoneItemIds.get(zone.id),
+        quantity: decor.zoneItemQuantities.get(zone.id),
       }),
   });
 

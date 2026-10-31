@@ -784,6 +784,24 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     anchor: { x: 0.46, y: 0.5 },
     defaultScale: 1,
     collectibleItemId: "orange",
+    // The sprite is a branch with THREE fallen oranges: one pick-up gives all.
+    collectibleQuantity: 3,
+  },
+  {
+    id: "orange-world-ambient",
+    label: "Orange (world, on branch) - decoration only",
+    category: "resources",
+    // The same art as orange-world, but NOT collectible: the second branch of
+    // Mill Farmland stays in the scene without giving any more oranges.
+    sprite: {
+      frames: ["/game/resources/orange/world.png"],
+      frameWidth: 48,
+      frameHeight: 48,
+      fps: 0,
+      loop: false,
+    },
+    anchor: { x: 0.46, y: 0.5 },
+    defaultScale: 1,
   },
   // Reusable town population, PixelLab, style-matched to the existing NPCs.
   // Available in the Decorator only: none of them is placed in a chapter.

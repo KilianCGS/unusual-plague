@@ -37,7 +37,8 @@ export type ItemId =
   | "crushed-coal"
   | "charcoal-suspension"
   | "citrus-drink"
-  | "empty-flask";
+  | "empty-flask"
+  | "empty-jar";
 
 export type ItemDefinition = {
   id: ItemId;
@@ -124,7 +125,7 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
   },
   "mushroom-soup": {
     id: "mushroom-soup",
-    name: { es: "Sopa de hongos", en: "Mushroom soup" },
+    name: { es: "Sopa ligera", en: "Light soup" },
     icon: `${PREPARED_ICONS}/mushroom-soup.png`,
   },
   "medicinal-ointment": {
@@ -147,6 +148,13 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     id: "empty-flask",
     name: { es: "Frasco vacío", en: "Empty flask" },
     icon: `${RESOURCE_ICONS}/empty-flask.png`,
+  },
+  // The jar of the tavern: a normal physical item (no container logic). Patient
+  // 2 trades it, with three oranges, for milk (see npcTrades.ts).
+  "empty-jar": {
+    id: "empty-jar",
+    name: { es: "Jarra vacía", en: "Empty jar" },
+    icon: `${RESOURCE_ICONS}/empty-jar.png`,
   },
   // CATALOGUED, NOT IMPLEMENTED: these items have their final name and icon so
   // the catalog is complete, but no recipe makes or uses them, no patient asks

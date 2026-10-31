@@ -1,9 +1,11 @@
 import type { ItemNeed } from "../crafting/needs";
-import { gatherCopy } from "../i18n/items";
+import { gatherCopy, itemFeedbackCopy } from "../i18n/items";
 import type { Language } from "../i18n/types";
 import {
+  addItem,
   canAddItem,
   countItem,
+  removeItem,
   type InventoryState,
 } from "../inventory/inventory";
 import { getItem } from "../items/items";
@@ -12,6 +14,7 @@ import {
   isTreatable,
   treatPatient,
   type PatientCasesState,
+  type PatientStatus,
 } from "../patients/patientCases";
 import {
   BAKER_SALT_REWARD,
@@ -19,6 +22,8 @@ import {
   BAKER_HUSBAND_ID,
   BAKER_HUSBAND_INSTANCE_ID,
   CHAPTER1_PATIENTS,
+  FARM_WOMAN_INTRO_ID,
+  TAVERN_PATIENT_ID,
 } from "../patients/chapter1Patients";
 import { getActiveMissingIngredients } from "../patients/patientNeeds";
 import {
@@ -32,12 +37,25 @@ import {
   husbandExam,
   merchantCloth,
 } from "./chapter1PatientDialogues";
+import {
+  bartenderAfter,
+  bartenderDuring,
+  bartenderIntro,
+  bartenderWaiting,
+  farmWomanIntro,
+  farmWomanIntroWithJar,
+  tavernPatientAfter,
+  tavernPatientCure,
+  tavernPatientExam,
+  tavernPatientWaiting,
+} from "./chapter1TavernDialogues";
 import type { Conversation } from "./dialogueTypes";
 import { DOCTOR_SPEAKER } from "./dialogueTypes";
 import {
   localizeConversation,
   type LocalizedConversation,
 } from "./localizedConversation";
+import { BARTENDER_JAR_TRADE_ID, NPC_TRADES, type NpcTrade } from "./npcTrades";
 
 // STORY INTERACTIONS: interactions whose result depends on the story state and
 // on what the Doctor carries, so they cannot be a fixed ambient conversation.
@@ -46,6 +64,8 @@ import {
 
 export type StoryEffect =
   | { type: "treat"; patientId: string }
+  // Moves a case one step forward (the bartender noticing the tavern man).
+  | { type: "advance-patient"; patientId: string; to: PatientStatus }
   // Marks a one-time reward as received. Applied together with its item or not
   // at all, so a reward that did not fit is never recorded as given.
   | { type: "claim-reward"; rewardId: string }
@@ -59,8 +79,12 @@ export type StoryOutcome = {
   // Short feedback shown as a notice (ItemFeedback), without a dialogue.
   notice?: string;
   effects: StoryEffect[];
-  // What the game does when the conversation ends.
-  after?: "go-to-examination";
+  // What the game does when the conversation ends: "go-to-examination" moves
+  // the story to the patient's own scene; "examine-in-place" means THIS
+  // conversation is the examination, so the case is examined when it ends.
+  after?: "go-to-examination" | "examine-in-place";
+  // The case that `after` is about.
+  patientId?: string;
 };
 
 export type StoryFacts = {
@@ -136,12 +160,267 @@ function localize(
   return localizeConversation(conversation, language, subjectId);
 }
 
+// The treatments of a case the Doctor does not carry yet.
+function lackingTreatments(
+  patientId: string,
+  inventory: InventoryState,
+): string[] {
+  return CHAPTER1_PATIENTS[patientId].requiredTreatments
+    .filter(({ itemId, quantity }) => countItem(inventory, itemId) < quantity)
+    .map(({ itemId }) => itemId);
+}
+
+// The bartender of the tavern: he points the sick man out, then follows the
+// case.
+function resolveBartender(
+  facts: StoryFacts,
+  language: Language,
+  subjectId: string,
+): StoryOutcome {
+  const status = getPatientStatus(facts.patients, TAVERN_PATIENT_ID);
+
+  if (status === "hidden") {
+    return {
+      conversation: localize(bartenderIntro, language, subjectId),
+      effects: [
+        {
+          type: "advance-patient",
+          patientId: TAVERN_PATIENT_ID,
+          to: "discovered",
+        },
+      ],
+    };
+  }
+
+  // Once the man is examined he hands over the jar for the milk, one time.
+  if (
+    status === "examined" &&
+    !facts.claimedRewards?.has(NPC_TRADES[BARTENDER_JAR_TRADE_ID].rewardId)
+  ) {
+    const jar = resolveTrade(
+      NPC_TRADES[BARTENDER_JAR_TRADE_ID],
+      facts,
+      language,
+      subjectId,
+    );
+
+    if (jar) {
+      return jar;
+    }
+  }
+
+  const conversation =
+    status === "discovered"
+      ? bartenderWaiting
+      : status === "examined"
+        ? bartenderDuring
+        : bartenderAfter;
+
+  return {
+    conversation: localize(conversation, language, subjectId),
+    effects: [],
+  };
+}
+
+// The man on the tavern floor: examined where he lies, then treated with both
+// preparations.
+function resolveTavernPatient(
+  facts: StoryFacts,
+  language: Language,
+  subjectId: string,
+): StoryOutcome {
+  const definition = CHAPTER1_PATIENTS[TAVERN_PATIENT_ID];
+  const status = getPatientStatus(facts.patients, TAVERN_PATIENT_ID);
+
+  if (status === "hidden" || status === "discovered") {
+    return {
+      conversation: localize(tavernPatientExam, language, subjectId),
+      effects: [],
+      after: "examine-in-place",
+      patientId: TAVERN_PATIENT_ID,
+    };
+  }
+
+  if (
+    status === "examined" &&
+    isTreatable(facts.patients, definition, facts.inventory)
+  ) {
+    return {
+      conversation: localize(tavernPatientCure, language, subjectId),
+      effects: [{ type: "treat", patientId: TAVERN_PATIENT_ID }],
+    };
+  }
+
+  if (status === "examined") {
+    const lacking = lackingTreatments(TAVERN_PATIENT_ID, facts.inventory);
+    const waiting =
+      (lacking.length === 1
+        ? (tavernPatientWaiting as Record<string, LocalizedConversation>)[
+            lacking[0]
+          ]
+        : undefined) ?? tavernPatientWaiting.all;
+
+    return {
+      conversation: localize(waiting, language, subjectId),
+      effects: [],
+    };
+  }
+
+  return {
+    conversation: localize(tavernPatientAfter, language, subjectId),
+    effects: [],
+  };
+}
+
+// A trade, all or nothing. Pure: it only DECIDES; GameWorld applies the
+// effects together or not at all. The payment is taken BEFORE the goods are
+// counted into the inventory, so the freed slots count, and a trade that does
+// not fit changes nothing and is not marked as done.
+export function resolveTrade(
+  trade: NpcTrade,
+  facts: StoryFacts,
+  language: Language,
+  subjectId: string,
+): StoryOutcome | null {
+  if (facts.claimedRewards?.has(trade.rewardId)) {
+    return trade.done
+      ? { conversation: localize(trade.done, language, subjectId), effects: [] }
+      : {
+          conversation: null,
+          effects: [],
+          notice: trade.doneNotice?.[language],
+        };
+  }
+
+  if (
+    trade.requiresPatient &&
+    getPatientStatus(facts.patients, trade.requiresPatient.patientId) !==
+      trade.requiresPatient.status
+  ) {
+    return null;
+  }
+
+  const lacking = trade.consumes
+    .filter(
+      ({ itemId, quantity }) => countItem(facts.inventory, itemId) < quantity,
+    )
+    .map(({ itemId }) => itemId);
+
+  if (lacking.length > 0) {
+    const missing = trade.missing;
+    const conversation = missing
+      ? ((lacking.length === 1 ? missing[lacking[0]] : undefined) ??
+        missing.all)
+      : null;
+
+    return {
+      conversation: conversation
+        ? localize(conversation, language, subjectId)
+        : null,
+      effects: [],
+    };
+  }
+
+  let after: InventoryState | null = facts.inventory;
+
+  for (const { itemId, quantity } of trade.consumes) {
+    after = after ? removeItem(after, itemId, quantity) : null;
+  }
+
+  for (const { itemId, quantity } of trade.grants) {
+    after = after ? addItem(after, itemId, quantity) : null;
+  }
+
+  if (!after) {
+    return {
+      conversation: trade.noRoom
+        ? localize(trade.noRoom, language, subjectId)
+        : null,
+      effects: [],
+      notice: trade.noRoom
+        ? undefined
+        : itemFeedbackCopy[language].inventoryFull,
+    };
+  }
+
+  return {
+    conversation: trade.ready
+      ? localize(trade.ready, language, subjectId)
+      : null,
+    effects: [
+      ...trade.consumes.map(({ itemId, quantity }) => ({
+        type: "take-item" as const,
+        itemId,
+        quantity,
+      })),
+      ...trade.grants.map(({ itemId, quantity }) => ({
+        type: "give-item" as const,
+        itemId,
+        quantity,
+      })),
+      { type: "claim-reward" as const, rewardId: trade.rewardId },
+    ],
+  };
+}
+
+// The farm woman. Until the sick man is examined she keeps her ambient talk
+// (null). The FIRST conversation after that is an introduction, whatever the
+// Doctor carries: she is a person presenting a deal, not a reading of the
+// inventory. It is remembered with a claimed flag; from then on the trade
+// answers by what is missing, ready or done.
+function resolveFarmWoman(
+  facts: StoryFacts,
+  language: Language,
+  subjectId: string,
+): StoryOutcome | null {
+  const trade = NPC_TRADES["chapter1.farm.woman"];
+  const examined =
+    getPatientStatus(facts.patients, TAVERN_PATIENT_ID) === "examined";
+  const introduced = facts.claimedRewards?.has(FARM_WOMAN_INTRO_ID) ?? false;
+
+  if (!examined || introduced || facts.claimedRewards?.has(trade.rewardId)) {
+    return resolveTrade(trade, facts, language, subjectId);
+  }
+
+  return {
+    conversation: localize(
+      countItem(facts.inventory, "empty-jar") > 0
+        ? farmWomanIntroWithJar
+        : farmWomanIntro,
+      language,
+      subjectId,
+    ),
+    effects: [{ type: "claim-reward", rewardId: FARM_WOMAN_INTRO_ID }],
+  };
+}
+
 export function resolveStoryInteraction(
   interactionId: string,
   facts: StoryFacts,
   language: Language,
   subjectId: string,
 ): StoryOutcome | null {
+  // The tavern case.
+  if (interactionId === "chapter1.tavern.bartender") {
+    return resolveBartender(facts, language, subjectId);
+  }
+
+  if (interactionId === "chapter1.tavern.sickPatient") {
+    return resolveTavernPatient(facts, language, subjectId);
+  }
+
+  // The farm woman presents the milk deal before she trades.
+  if (interactionId === "chapter1.farm.woman") {
+    return resolveFarmWoman(facts, language, subjectId);
+  }
+
+  // A character or shelf that hands something over (once).
+  const trade = NPC_TRADES[interactionId];
+
+  if (trade) {
+    return resolveTrade(trade, facts, language, subjectId);
+  }
+
   // The people who carry a patient case.
   const patientId = PATIENT_INTERACTION_IDS[interactionId];
 
@@ -154,6 +433,7 @@ export function resolveStoryInteraction(
         conversation: localize(bakerIntro, language, subjectId),
         effects: [],
         after: "go-to-examination",
+        patientId: BAKER_HUSBAND_ID,
       };
     }
 

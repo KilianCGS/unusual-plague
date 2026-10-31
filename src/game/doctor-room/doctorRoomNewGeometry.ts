@@ -34,8 +34,8 @@ export const doctorRoomNewSpawns: {
   y: number;
   direction: Direction;
 }[] = [
-  { id: "doctor-room-new-spawn-1", x: 261, y: 327, direction: "south" },
-  { id: "doctor-room-new-spawn-2", x: 262, y: 202, direction: "south" },
+  { id: "doctor-room-new-spawn-1", x: 260, y: 371, direction: "north" },
+  { id: "doctor-room-new-spawn-2", x: 262, y: 204, direction: "south" },
 ];
 
 // INTERACTIONS (green): interaction-1 is the Doctor's Storage chest (the

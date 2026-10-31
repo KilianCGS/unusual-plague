@@ -128,6 +128,9 @@ const OLD_DEV_SCENES: DevScene[] = [
     initialAssetY: 568,
     logicalUnitsPerAssetPixel: 0.375,
     zoomMultiplier: 1.5,
+    // The Doctor reads about 40% too small against this furniture: a VISUAL
+    // scale only (around the feet), hitbox and movement are untouched.
+    protagonistScale: 1.4,
   },
   {
     id: "tavern-interior",

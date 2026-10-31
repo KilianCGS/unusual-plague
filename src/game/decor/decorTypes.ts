@@ -49,6 +49,9 @@ export type DecorAsset = {
   // Set on assets that are WORLD COLLECTIBLES: every instance of this asset can
   // be picked up with E and gives this item (an id of src/game/items).
   collectibleItemId?: string;
+  // How many units one pick-up gives (1 when absent): a branch of fallen
+  // oranges is ONE interaction that gives all of them.
+  collectibleQuantity?: number;
 };
 
 export type DecorInteraction = {

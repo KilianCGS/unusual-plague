@@ -74,8 +74,8 @@ const permutations = (list) =>
         ]),
       );
 
-test("the V1 recipes and the two patient recipes exist with the right stations and sizes", () => {
-  assert.equal(RECIPES.length, 6);
+test("the V1 recipes, the two patient recipes and Milk with honey exist with the right stations and sizes", () => {
+  assert.equal(RECIPES.length, 7);
   assert.deepEqual(STATION_MAX_INPUTS, { manual: 2, fire: 3 });
   assert.equal(recipeById("manual.disinfected-bandage").inputs.length, 2);
   assert.equal(recipeById("fire.mushroom-soup").inputs.length, 3);

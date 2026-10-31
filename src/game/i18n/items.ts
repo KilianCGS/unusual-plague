@@ -44,3 +44,14 @@ export const gatherCopy: Record<
     enough: "I already have enough water.",
   },
 };
+
+// What the Doctor mutters after picking up a GROUP of items at once (more than
+// one unit), by item id. Not a conversation: it only shows as a bark.
+export const collectBarkCopy: Record<Language, Record<string, string>> = {
+  es: {
+    orange: "Tres de una vez. Me ahorro unas palabras con el agricultor.",
+  },
+  en: {
+    orange: "Three at once. Saves me a few words with the farmer.",
+  },
+};

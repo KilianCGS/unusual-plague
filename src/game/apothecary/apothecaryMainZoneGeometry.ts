@@ -23,6 +23,8 @@ export const apothecaryMainZoneColliders: SceneCollider[] = [
   { id: "apothecary-main-zone-13", x: 410, y: 122, width: 15, height: 14 },
   { id: "apothecary-main-zone-14", x: 319, y: 92, width: 5, height: 18 },
   { id: "apothecary-main-zone-15", x: 325, y: 89, width: 91, height: 16 },
+  // INTENTIONAL: keeps the Doctor from stepping visually onto the stove.
+  { id: "apothecary-main-zone-16", x: 322, y: 105, width: 95, height: 10 },
 ];
 
 // TRANSITIONS (yellow): activation zones.
@@ -54,8 +56,8 @@ export const apothecaryMainZoneSpawns: {
   y: number;
   direction: Direction;
 }[] = [
-  { id: "apothecary-main-zone-spawn-1", x: 240, y: 217, direction: "south" },
-  { id: "apothecary-main-zone-spawn-2", x: 240, y: 109, direction: "south" },
+  { id: "apothecary-main-zone-spawn-1", x: 240, y: 238, direction: "south" },
+  { id: "apothecary-main-zone-spawn-2", x: 240, y: 100, direction: "south" },
 ];
 
 // INTERACTIONS (green). The zones are the hand-drawn ones; the hand export left
@@ -65,18 +67,18 @@ export const apothecaryMainZoneSpawns: {
 export const apothecaryMainZoneInteractions: InteractionZone[] = [
   {
     id: "apothecary-main-zone-interaction-1",
-    x: 325,
-    y: 106,
-    width: 90,
-    height: 17,
+    x: 323,
+    y: 116,
+    width: 92,
+    height: 11,
     interactionId: "craft.fire",
   },
   {
     id: "apothecary-main-zone-interaction-2",
-    x: 116,
-    y: 93,
-    width: 16,
-    height: 78,
+    x: 115,
+    y: 98,
+    width: 19,
+    height: 70,
     interactionId: "craft.manual",
   },
 ];

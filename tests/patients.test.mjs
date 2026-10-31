@@ -45,6 +45,20 @@ const readFileSync = (rel, encoding) =>
 const inv = at("src/game/inventory/inventory.ts");
 const pc = at("src/game/patients/patientCases.ts");
 const ch1 = at("src/game/patients/chapter1Patients.ts");
+// The "!" as Patient 1 sees it: the tavern case (Patient 2) adds its own
+// markers, which these tests are not about (see tavern-patient.test.mjs).
+const p1Attention = (...args) =>
+  new Set(
+    [...ch1.getAttentionInstanceIds(...args)].filter(
+      (id) =>
+        ![
+          ch1.TAVERN_BARTENDER_INSTANCE_ID,
+          ch1.TAVERN_PATIENT_INSTANCE_ID,
+          ch1.FARM_WOMAN_INSTANCE_ID,
+          ch1.BEEKEEPER_INSTANCE_ID,
+        ].includes(id),
+    ),
+  );
 const needs = at("src/game/crafting/needs.ts");
 const cr = at("src/game/crafting/crafting.ts");
 const { STATION_MAX_INPUTS } = at("src/game/crafting/recipes.ts");
@@ -758,7 +772,7 @@ test("baker: the Salt comes automatically with the delivery; with no room the ca
   assert.equal(inv.countItem(roomy.state, "salt"), 1);
   assert.ok(roomy.claimed.has(ch1.BAKER_SALT_REWARD_ID));
   assert.deepEqual(
-    [...ch1.getAttentionInstanceIds(roomy.patients, roomy.claimed)],
+    [...p1Attention(roomy.patients, roomy.claimed)],
     [],
     "no second ! just to collect the salt",
   );
@@ -788,7 +802,7 @@ test("baker: the Salt comes automatically with the delivery; with no room the ca
   assert.equal(inv.countItem(handed.state, "salt"), 0);
   assert.equal(handed.claimed.size, 0, "the reward is NOT recorded as given");
   assert.deepEqual(
-    [...ch1.getAttentionInstanceIds(handed.patients, handed.claimed)],
+    [...p1Attention(handed.patients, handed.claimed)],
     ["bakery-interior-baker-01"],
     "the ! stays while the gift is pending",
   );
@@ -865,7 +879,7 @@ test("baker and husband dialogues exist in ES and EN", () => {
 // ---------------------------------------------------------- ATTENTION INDICATOR
 test('the "!" is derived from the case: baker while DISCOVERED, never stored', () => {
   const ids = (status, claimed = []) => [
-    ...ch1.getAttentionInstanceIds(withStatus(status), new Set(claimed)),
+    ...p1Attention(withStatus(status), new Set(claimed)),
   ];
   const BAKER_NPC = "bakery-interior-baker-01";
   // before the treatment: exactly as it always was
@@ -873,7 +887,7 @@ test('the "!" is derived from the case: baker while DISCOVERED, never stored', (
   assert.deepEqual(ids("examined"), []);
   assert.deepEqual(ids("hidden"), []);
   assert.deepEqual(
-    [...ch1.getAttentionInstanceIds(ch1.CHAPTER1_INITIAL_PATIENTS)],
+    [...p1Attention(ch1.CHAPTER1_INITIAL_PATIENTS)],
     [BAKER_NPC],
   );
   // a claimed reward changes nothing before the treatment
@@ -886,14 +900,11 @@ test('the "!" is derived from the case: baker while DISCOVERED, never stored', (
 test('the "!" while the baker\'s Salt is pending: treated and unclaimed shows it; claimed hides it', () => {
   const BAKER_NPC = "bakery-interior-baker-01";
   const mark = (claimed) => [
-    ...ch1.getAttentionInstanceIds(withStatus("treated"), new Set(claimed)),
+    ...p1Attention(withStatus("treated"), new Set(claimed)),
   ];
   // treated + reward pending => the mark (also when no claimed set is given)
   assert.deepEqual(mark([]), [BAKER_NPC]);
-  assert.deepEqual(
-    [...ch1.getAttentionInstanceIds(withStatus("treated"))],
-    [BAKER_NPC],
-  );
+  assert.deepEqual([...p1Attention(withStatus("treated"))], [BAKER_NPC]);
   // treated + reward claimed => no mark
   assert.deepEqual(mark([ch1.BAKER_SALT_REWARD_ID]), []);
   // an unrelated claimed reward does not hide it
@@ -905,9 +916,7 @@ test('the "!" while the baker\'s Salt is pending: treated and unclaimed shows it
 test('the "!" follows the real reward: a full inventory keeps it, a successful retry removes it', () => {
   const BAKER_NPC = "bakery-interior-baker-01";
   let claimed = new Set();
-  const marked = () => [
-    ...ch1.getAttentionInstanceIds(withStatus("treated"), claimed),
-  ];
+  const marked = () => [...p1Attention(withStatus("treated"), claimed)];
   // what GameWorld does with an outcome: only if its effects applied does it claim
   const talk = (pairs) => {
     const out = story.resolveStoryInteraction(
@@ -937,8 +946,12 @@ test('the "!" follows the real reward: a full inventory keeps it, a successful r
 
   // GameWorld feeds the real claimed set to the one marker system
   const game = readFileSync("src/game/world/GameWorld.tsx", "utf8");
-  assert.ok(game.includes("getAttentionInstanceIds(patients, claimedRewards)"));
-  assert.ok(game.includes("[patients, claimedRewards]"));
+  assert.ok(
+    game.includes(
+      "getAttentionInstanceIds(patients, claimedRewards, inventory)",
+    ),
+  );
+  assert.ok(game.includes("[patients, claimedRewards, inventory]"));
   // no second marker component and no new status
   assert.ok(!/RewardMark|SaltMark|PendingMark/.test(game));
   assert.ok(
@@ -1153,7 +1166,7 @@ test("only the baker's husband is known at the start: PACIENTES lists just him, 
     HUSBAND,
   ]);
   assert.deepEqual(
-    [...ch1.getAttentionInstanceIds(ch1.CHAPTER1_INITIAL_PATIENTS)],
+    [...p1Attention(ch1.CHAPTER1_INITIAL_PATIENTS)],
     ["bakery-interior-baker-01"],
   );
   const texts = book
@@ -1366,9 +1379,14 @@ test("baker's Salt: Patient 1's treatment is unchanged and no other patient or r
     { itemId: "medicinal-infusion", quantity: 1 },
     { itemId: "cold-cloth", quantity: 1 },
   ]);
-  assert.deepEqual(Object.keys(ch1.CHAPTER1_PATIENTS), [HUSBAND]);
+  // (the tavern case was added after this: it starts hidden, so only the
+  // baker's husband is known at the start)
+  assert.deepEqual(Object.keys(ch1.CHAPTER1_PATIENTS), [
+    HUSBAND,
+    ch1.TAVERN_PATIENT_ID,
+  ]);
   assert.deepEqual(Object.keys(ch1.CHAPTER1_INITIAL_PATIENTS), [HUSBAND]);
-  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 6);
+  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 7);
   // the reward conversations say nothing about patients, soup or recipes
   for (const lang of ["es", "en"]) {
     for (const key of ["bakerReward", "bakerRewardNoRoom"]) {

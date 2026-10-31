@@ -88,6 +88,16 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "And wake up tomorrow? No, thank you.",
       ),
     ]),
+    // Ambient until the tavern case is examined; then the beekeeper trades
+    // (npcTrades.ts) and this is what he says the rest of the time.
+    conversation("chapter1.mill.beekeeper", [
+      subject(
+        "Las abejas y yo tenemos un acuerdo: yo no las molesto.",
+        "The bees and I have an arrangement: I don't bother them.",
+      ),
+      doctor("¿Y ellas?", "And them?"),
+      subject("Ellas deciden si se cumple.", "They decide whether it holds."),
+    ]),
     conversation("chapter1.mill.youngVillager", [
       subject(
         "El viejo dice que el molino escucha.",

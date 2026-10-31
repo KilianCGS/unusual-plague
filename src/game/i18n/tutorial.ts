@@ -45,7 +45,7 @@ export const tutorialCopy: Record<
     },
     move: {
       title: ["Usa ", { key: "WASD" }, " o las flechas para moverte."],
-      body: "Recorre tu habitación.",
+      body: "Recorre tu habitación. Mantén ESPACIO mientras te mueves para correr.",
     },
     "chest-approach": {
       title: ["Acércate al cofre."],
@@ -89,7 +89,7 @@ export const tutorialCopy: Record<
     },
     move: {
       title: ["Use ", { key: "WASD" }, " or the arrow keys to move."],
-      body: "Look around your room.",
+      body: "Look around your room. Hold SPACE while moving to run.",
     },
     "chest-approach": {
       title: ["Approach the chest."],

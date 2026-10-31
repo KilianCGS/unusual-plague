@@ -165,16 +165,21 @@ test("all 30 approved art entries are catalog items with bilingual names", () =>
   }
   // no duplicated ids in the catalog (the key is the id)
   for (const [key, item] of Object.entries(ITEMS)) assert.equal(item.id, key);
-  // 15 existing items + the 17 promoted ones
-  assert.equal(Object.keys(ITEMS).length, 32);
+  // 15 existing items + the 17 promoted ones + the Empty jar of Patient 2
+  assert.equal(Object.keys(ITEMS).length, 33);
 });
 
-test("catalogued is NOT implemented: promoted items have no recipe, patient need or source", () => {
+test("catalogued is NOT implemented: promoted items have no recipe, patient need or source (except what Patient 2 uses)", () => {
   const recipeItemIds = new Set(
     RECIPES.flatMap((r) => [r.output.itemId, ...r.inputs.map((i) => i.itemId)]),
   );
+  // Patient 2 (the tavern man) is the first case to use these
+  const USED_BY_PATIENT_2 = ["milk", "honey", "orange", "milk-with-honey"];
   for (const id of PROMOTED_ITEMS) {
     assert.ok(getItem(id), id);
+    if (USED_BY_PATIENT_2.includes(id)) {
+      continue;
+    }
     assert.ok(!recipeItemIds.has(id), `${id} must not be in a recipe yet`);
     assert.equal(
       getItem(id).sourceHint,
@@ -188,8 +193,8 @@ test("catalogued is NOT implemented: promoted items have no recipe, patient need
       );
     }
   }
-  // the recipes are exactly the ones that existed before this pass
-  assert.equal(RECIPES.length, 6);
+  // the six earlier recipes plus Milk with honey
+  assert.equal(RECIPES.length, 7);
   // the first patient still needs only the two prepared items
   assert.deepEqual(CHAPTER1_PATIENTS[BAKER_HUSBAND_ID].requiredTreatments, [
     { itemId: "medicinal-infusion", quantity: 1 },
@@ -440,6 +445,7 @@ test("world Mint, Mushroom, Resin and Orange: registered resources; only the Mus
     "mint-world",
     "mushroom-world",
     "orange-world",
+    "orange-world-ambient",
     "resin-world",
   ]);
 });

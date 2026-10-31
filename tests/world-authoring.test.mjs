@@ -220,15 +220,15 @@ test("Mill Farmland: the authored Beekeeper, Farmer (hoeing) and Orange, with no
   pin("mill-farmland-beekeeper-01", "beekeeper", 1190, 555, 1.08, true);
   pin("mill-farmland-farmer-hoeing-01", "farmer-hoeing", 1226, 428, 1.17, true);
   pin("mill-farmland-orange-world-01", "orange-world", 860, 483, 1, false);
-  // no dialogue or interaction for the two NPCs, and the Orange is collected by
-  // the generic path only (the asset's collectibleItemId)
-  for (const id of [
-    "mill-farmland-beekeeper-01",
-    "mill-farmland-farmer-hoeing-01",
-  ]) {
-    assert.equal(chapter1Interactions[id], undefined, id);
-  }
+  // the farmer has no interaction (the beekeeper got his for Patient 2), and the
+  // Orange is collected by the generic path only (the asset's
+  // collectibleItemId), three at a time
+  assert.equal(
+    chapter1Interactions["mill-farmland-farmer-hoeing-01"],
+    undefined,
+  );
   assert.equal(getDecorAsset("orange-world").collectibleItemId, "orange");
+  assert.equal(getDecorAsset("orange-world").collectibleQuantity, 3);
 });
 
 test("the seller's authored interaction rectangle is kept but INACTIVE: no [E] prompt that does nothing", () => {
@@ -309,11 +309,11 @@ test("Doctor Room chest: the hand-drawn zone of the new room uses the existing S
   );
   // neither the game-start spawn nor the Apothecary arrival is in range
   assert.equal(
-    findAvailableInteraction(zones, feetAt(262, 202), "south"),
+    findAvailableInteraction(zones, feetAt(262, 204), "south"),
     null,
   );
   assert.equal(
-    findAvailableInteraction(zones, feetAt(261, 327), "south"),
+    findAvailableInteraction(zones, feetAt(260, 371), "north"),
     null,
   );
   // the tutorial and the Storage still target that same id; the Apothecary arrival is untouched
@@ -322,7 +322,7 @@ test("Doctor Room chest: the hand-drawn zone of the new room uses the existing S
   assert.ok(game.includes("interactionId === STORAGE_INTERACTION_ID"));
   assert.deepEqual(
     WORLD_SCENES["apothecary-interior"].arrivals["from-doctor-room"],
-    { x: 240, y: 109, direction: "south" },
+    { x: 240, y: 100, direction: "south" },
   );
 });
 
@@ -482,9 +482,12 @@ test("collecting respects the inventory: with room it adds the item; when full t
   );
 });
 
-test("this pass adds no Patient 2, no Honey or Milk acquisition, no new recipe and no NPC behaviour", () => {
-  assert.deepEqual(Object.keys(ch1.CHAPTER1_PATIENTS), [ch1.BAKER_HUSBAND_ID]);
-  assert.equal(RECIPES.length, 6);
+test("Patient 2 adds no gather source, no provider and no collectible Honey or Milk: they come from trades", () => {
+  assert.deepEqual(Object.keys(ch1.CHAPTER1_PATIENTS), [
+    ch1.BAKER_HUSBAND_ID,
+    ch1.TAVERN_PATIENT_ID,
+  ]);
+  assert.equal(RECIPES.length, 7);
   assert.deepEqual(Object.keys(GATHER_SOURCES), ["gather.water"]);
   assert.deepEqual(NPC_PROVIDES, { "chapter1.plaza.merchant": ["cloth"] });
   for (const asset of DECOR_ASSETS) {
@@ -493,18 +496,19 @@ test("this pass adds no Patient 2, no Honey or Milk acquisition, no new recipe a
       `${asset.id} gives no honey/milk`,
     );
   }
-  // the two new NPCs and the seller have no interaction, dialogue or placement by code
-  // (the Beekeeper and Farmer are placed in Mill Farmland, with no behaviour)
+  // the farmer and the seller still have no interaction; the Beekeeper gained
+  // his own for Patient 2 (honey, once, through a trade)
   for (const [instanceId, entry] of Object.entries(chapter1Interactions)) {
+    assert.ok(!/farmer-hoeing|fruit-vegetable/.test(instanceId), instanceId);
     assert.ok(
-      !/beekeeper|farmer-hoeing|fruit-vegetable/.test(instanceId),
-      instanceId,
-    );
-    assert.ok(
-      !/honey|milk|beekeeper|seller/i.test(entry.interactionId),
+      !/honey|milk|seller/i.test(entry.interactionId),
       entry.interactionId,
     );
   }
+  assert.equal(
+    chapter1Interactions["mill-farmland-beekeeper-01"].interactionId,
+    "chapter1.mill.beekeeper",
+  );
 });
 
 console.log(`\n${passed} tests passed`);
