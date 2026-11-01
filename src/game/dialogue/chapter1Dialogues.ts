@@ -112,23 +112,29 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
     conversation("chapter1.mine.injuredMiner", [
       subject("Ah... despacio. La pierna.", "Ah... easy. My leg."),
       doctor("Déjeme verla.", "Let me see it."),
-      // Where the miner's case will formally begin later; for now it is only
-      // the conversation (no patient state, mission or item is created).
+      // Shadowed by his case (storyInteractions.ts), which starts the first
+      // time the Doctor talks to him; kept as the ambient fallback.
       doctor(
         "Aguante. Volveré enseguida con algo para tratarla.",
         "Hold on. I'll be back soon with something to treat it.",
       ),
     ]),
+    // A miner at work: no quest of his own. He has a piece of coal for the
+    // injured miner's case (storyInteractions.ts) once that case is examined.
     conversation("chapter1.mountainPath.miner", [
       subject(
-        "¡Doctor! Mi compañero está dentro. Se hizo daño en la pierna y apenas puede moverse.",
-        "Doctor! My partner's inside. He hurt his leg and can barely move.",
+        "Si viene buscando trabajo, ha elegido mal la ropa.",
+        "If you're here looking for work, you picked the wrong clothes.",
       ),
-      doctor("¿Dónde?", "Where?"),
+      doctor("No vengo buscando trabajo.", "I'm not here looking for work."),
       subject(
-        "Siga el túnel. Lo verá enseguida.",
-        "Follow the tunnel. You'll see him soon enough.",
+        "Entonces ha elegido muy bien la ropa.",
+        "Then you picked exactly the right clothes.",
       ),
+    ]),
+    // Witch at the bar: her real conversations live in storyInteractions.ts.
+    conversation("chapter1.tavern.witch", [
+      subject("Vaya. Tú otra vez.", "Well. You again."),
     ]),
     conversation("chapter1.outskirts.fisherman", [
       subject("Hoy no pican.", "They're not biting today."),

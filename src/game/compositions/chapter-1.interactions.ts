@@ -128,6 +128,13 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.tavern.sickPatient",
     zone: { offsetX: -44, offsetY: -48, width: 88, height: 64 },
   },
+  // Witch, sitting at the bar. Her silhouette grown by 16 and 16 units in front
+  // of her boots. Her cat (tavern-interior-witch-cat-sitting-01) has no
+  // interaction: it is only seen.
+  "tavern-interior-witch-tavern-sitting-01": {
+    interactionId: "chapter1.tavern.witch",
+    zone: { offsetX: -41, offsetY: -91, width: 82, height: 107 },
+  },
   "tavern-street-villager-woman-02-01": {
     interactionId: "chapter1.tavernStreet.woman",
     zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },

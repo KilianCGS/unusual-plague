@@ -23,7 +23,10 @@ import {
   BAKER_HUSBAND_INSTANCE_ID,
   CHAPTER1_PATIENTS,
   FARM_WOMAN_INTRO_ID,
+  INJURED_MINER_ID,
   TAVERN_PATIENT_ID,
+  WITCH_MET_ID,
+  WITCH_WAITED_ID,
 } from "../patients/chapter1Patients";
 import { getActiveMissingIngredients } from "../patients/patientNeeds";
 import {
@@ -37,6 +40,20 @@ import {
   husbandExam,
   merchantCloth,
 } from "./chapter1PatientDialogues";
+import {
+  injuredMinerAfter,
+  injuredMinerCure,
+  injuredMinerExam,
+  injuredMinerWaiting,
+} from "./chapter1Patient3Dialogues";
+import {
+  WITCH_QUOTES,
+  pickWitchQuote,
+  witchFirst,
+  witchFirstWithMushroom,
+  witchFirstWithMushroomNoRoom,
+  witchWaiting,
+} from "./chapter1WitchDialogues";
 import {
   bartenderAfter,
   bartenderDuring,
@@ -55,7 +72,13 @@ import {
   localizeConversation,
   type LocalizedConversation,
 } from "./localizedConversation";
-import { BARTENDER_JAR_TRADE_ID, NPC_TRADES, type NpcTrade } from "./npcTrades";
+import {
+  BARTENDER_ALCOHOL_TRADE_ID,
+  BARTENDER_JAR_TRADE_ID,
+  NPC_TRADES,
+  WITCH_HERB_TRADE_ID,
+  type NpcTrade,
+} from "./npcTrades";
 
 // STORY INTERACTIONS: interactions whose result depends on the story state and
 // on what the Doctor carries, so they cannot be a fixed ambient conversation.
@@ -179,6 +202,15 @@ function resolveBartender(
 ): StoryOutcome {
   const status = getPatientStatus(facts.patients, TAVERN_PATIENT_ID);
 
+  // The injured miner's wound needs alcohol, whatever the tavern case is doing.
+  // The trade only answers once that case is examined and the alcohol was not
+  // given yet.
+  const alcohol = resolveAlcohol(facts, language, subjectId);
+
+  if (alcohol) {
+    return alcohol;
+  }
+
   if (status === "hidden") {
     return {
       conversation: localize(bartenderIntro, language, subjectId),
@@ -220,6 +252,143 @@ function resolveBartender(
     conversation: localize(conversation, language, subjectId),
     effects: [],
   };
+}
+
+function resolveAlcohol(
+  facts: StoryFacts,
+  language: Language,
+  subjectId: string,
+): StoryOutcome | null {
+  const trade = NPC_TRADES[BARTENDER_ALCOHOL_TRADE_ID];
+
+  return facts.claimedRewards?.has(trade.rewardId)
+    ? null
+    : resolveTrade(trade, facts, language, subjectId);
+}
+
+// The injured miner: examined where he sits, then treated with both
+// preparations. It starts when the Doctor walks up to him, never because of
+// any other case or conversation.
+function resolveInjuredMiner(
+  facts: StoryFacts,
+  language: Language,
+  subjectId: string,
+): StoryOutcome {
+  const definition = CHAPTER1_PATIENTS[INJURED_MINER_ID];
+  const status = getPatientStatus(facts.patients, INJURED_MINER_ID);
+
+  if (status === "hidden" || status === "discovered") {
+    return {
+      conversation: localize(injuredMinerExam, language, subjectId),
+      effects: [],
+      after: "examine-in-place",
+      patientId: INJURED_MINER_ID,
+    };
+  }
+
+  if (
+    status === "examined" &&
+    isTreatable(facts.patients, definition, facts.inventory)
+  ) {
+    return {
+      conversation: localize(injuredMinerCure, language, subjectId),
+      effects: [{ type: "treat", patientId: INJURED_MINER_ID }],
+    };
+  }
+
+  return {
+    conversation: localize(
+      status === "examined" ? injuredMinerWaiting : injuredMinerAfter,
+      language,
+      subjectId,
+    ),
+    effects: [],
+  };
+}
+
+// The last small-talk quote Witch told, so that the next one is another one.
+// A convenience of the voice only: nothing depends on it.
+let lastWitchQuote = -1;
+
+// Test hook: forget the last quote Witch told.
+export function resetWitchQuoteHistory() {
+  lastWitchQuote = -1;
+}
+
+// Witch. She asks the Doctor for a mushroom (once), swaps it for a medicinal
+// herb (once) and from then on only talks. None of it depends on a case, on
+// another conversation or on the order: if he already carries the mushroom
+// when they first talk, the favour is settled in that same conversation.
+function resolveWitch(
+  facts: StoryFacts,
+  language: Language,
+  subjectId: string,
+): StoryOutcome {
+  const trade = NPC_TRADES[WITCH_HERB_TRADE_ID];
+  const claimed = facts.claimedRewards ?? new Set<string>();
+  const carriesMushroom = countItem(facts.inventory, "mushroom") >= 1;
+  const met = claimed.has(WITCH_MET_ID);
+  const smallTalk = (): StoryOutcome => {
+    lastWitchQuote = pickWitchQuote(lastWitchQuote);
+
+    return {
+      conversation: localize(WITCH_QUOTES[lastWitchQuote], language, subjectId),
+      effects: [],
+    };
+  };
+
+  if (claimed.has(trade.rewardId)) {
+    return smallTalk();
+  }
+
+  // The trade as it would happen right now (atomic: payment first, goods
+  // after, so the freed slot counts). Empty effects = it does not fit.
+  const swap = carriesMushroom
+    ? resolveTrade(trade, facts, language, subjectId)
+    : null;
+  const fits = swap !== null && swap.effects.length > 0;
+
+  if (!met) {
+    const remember: StoryEffect = {
+      type: "claim-reward",
+      rewardId: WITCH_MET_ID,
+    };
+
+    if (!carriesMushroom) {
+      return {
+        conversation: localize(witchFirst, language, subjectId),
+        effects: [remember],
+      };
+    }
+
+    return fits
+      ? {
+          conversation: localize(witchFirstWithMushroom, language, subjectId),
+          effects: [remember, ...swap.effects],
+        }
+      : {
+          conversation: localize(
+            witchFirstWithMushroomNoRoom,
+            language,
+            subjectId,
+          ),
+          effects: [remember],
+        };
+  }
+
+  if (swap) {
+    return swap;
+  }
+
+  // Still waiting for the mushroom: a short reminder once, then small talk.
+  if (!claimed.has(WITCH_WAITED_ID)) {
+    return {
+      conversation: localize(witchWaiting, language, subjectId),
+      effects: [{ type: "claim-reward", rewardId: WITCH_WAITED_ID }],
+    };
+  }
+
+  return smallTalk();
 }
 
 // The man on the tavern floor: examined where he lies, then treated with both
@@ -407,6 +576,15 @@ export function resolveStoryInteraction(
 
   if (interactionId === "chapter1.tavern.sickPatient") {
     return resolveTavernPatient(facts, language, subjectId);
+  }
+
+  // The injured miner and Witch (the tavern's guest).
+  if (interactionId === "chapter1.mine.injuredMiner") {
+    return resolveInjuredMiner(facts, language, subjectId);
+  }
+
+  if (interactionId === "chapter1.tavern.witch") {
+    return resolveWitch(facts, language, subjectId);
   }
 
   // The farm woman presents the milk deal before she trades.

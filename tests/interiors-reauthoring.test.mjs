@@ -73,6 +73,10 @@ const ROOMS = {
     npcs: {
       "tavern-interior-bartender-01": "chapter1.tavern.bartender",
       "tavern-interior-tavern-patient-sick-01": "chapter1.tavern.sickPatient",
+      // Witch sits at the bar and her cat beside her (the cat has no
+      // interaction; both are placed by hand over the stool of the background).
+      "tavern-interior-witch-tavern-sitting-01": "chapter1.tavern.witch",
+      "tavern-interior-witch-cat-sitting-01": null,
     },
   },
   "smithy-interior": {
@@ -206,6 +210,8 @@ test("the exit and every NPC conversation are reachable from the spawn", () => {
     );
     for (const instId of Object.keys(room.npcs)) {
       const inst = comp.instances.find((i) => i.instanceId === instId);
+      // (Witch's cat is only seen: it has no zone)
+      if (!chapter1Interactions[instId]) continue;
       const z = chapter1Interactions[instId].zone;
       assert.ok(
         touches({
@@ -231,11 +237,19 @@ test("NPCs keep instance ids, assets and interaction ids; none stands inside a w
     for (const inst of comp.instances) {
       assert.ok(getDecorAsset(inst.assetId), inst.assetId);
       assert.equal(
-        chapter1Interactions[inst.instanceId].interactionId,
+        chapter1Interactions[inst.instanceId]?.interactionId ?? null,
         room.npcs[inst.instanceId],
       );
-      // The bartender stands behind the bar counter on purpose (as before).
-      if (inst.instanceId !== "tavern-interior-bartender-01") {
+      // The bartender stands behind the bar counter on purpose (as before) and
+      // Witch and her cat sit over the stools of the background, whose own
+      // colliders are under them.
+      if (
+        ![
+          "tavern-interior-bartender-01",
+          "tavern-interior-witch-tavern-sitting-01",
+          "tavern-interior-witch-cat-sitting-01",
+        ].includes(inst.instanceId)
+      ) {
         assert.ok(
           !collidesWithScene(
             feetRect(inst.x, inst.y),
@@ -251,7 +265,12 @@ test("NPCs keep instance ids, assets and interaction ids; none stands inside a w
   }
   assert.deepEqual(
     composition("tavern-interior").instances.map((i) => i.assetId),
-    ["bartender", "tavern-patient-sick"],
+    [
+      "bartender",
+      "tavern-patient-sick",
+      "witch-tavern-sitting",
+      "witch-cat-sitting",
+    ],
   );
   assert.equal(
     composition("smithy-interior").instances[0].assetId,
@@ -265,7 +284,7 @@ test("their conversations still exist (no orphan interaction)", () => {
     for (const interactionId of Object.values(room.npcs)) {
       // Patient interactions (Baker, Tavern patient) run the patient flow;
       // everyone else has an ambient conversation.
-      if (PATIENT_INTERACTION_IDS[interactionId]) continue;
+      if (!interactionId || PATIENT_INTERACTION_IDS[interactionId]) continue;
       const c = resolveInteractionConversation(interactionId, "es", "x");
       assert.ok(c && c.lines.length > 0, interactionId);
     }

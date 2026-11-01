@@ -326,13 +326,13 @@ test("Doctor Room chest: the hand-drawn zone of the new room uses the existing S
   );
 });
 
-test("Mine Interior: exactly the authored miner and Mushroom; Natural Cave has no Mushroom", () => {
+test("Mine Interior: exactly the authored miner and the two Mushrooms; Natural Cave has no Mushroom", () => {
   assert.deepEqual(placed("mine-interior"), [
     {
       instanceId: "mine-interior-injured-miner-01",
       assetId: "injured-miner",
-      x: 167,
-      y: 248,
+      x: 148,
+      y: 263,
       scale: 0.72,
       flipX: false,
       colliderEnabled: false,
@@ -343,6 +343,16 @@ test("Mine Interior: exactly the authored miner and Mushroom; Natural Cave has n
       assetId: "mushroom-world",
       x: 365,
       y: 108,
+      scale: 0.75,
+      flipX: false,
+      colliderEnabled: false,
+      zOffset: 0,
+    },
+    {
+      instanceId: "mine-interior-mushroom-world-01",
+      assetId: "mushroom-world",
+      x: 430,
+      y: 238,
       scale: 0.75,
       flipX: false,
       colliderEnabled: false,
@@ -486,6 +496,7 @@ test("Patient 2 adds no gather source, no provider and no collectible Honey or M
   assert.deepEqual(Object.keys(ch1.CHAPTER1_PATIENTS), [
     ch1.BAKER_HUSBAND_ID,
     ch1.TAVERN_PATIENT_ID,
+    ch1.INJURED_MINER_ID,
   ]);
   assert.equal(RECIPES.length, 7);
   assert.deepEqual(Object.keys(GATHER_SOURCES), ["gather.water"]);

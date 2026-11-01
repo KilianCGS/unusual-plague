@@ -306,10 +306,20 @@ test("14. the chained recipe works with no special logic", () => {
       .sort(),
     ["coal", "medicinal-paste"],
   );
-  result = cr.combine(state, "manual", ["coal", "medicinal-paste"]); // any order
-  assert.equal(result.kind, "success");
-  assert.equal(result.recipe.output.itemId, "medicinal-ointment");
-  assert.deepEqual(result.inventory.slots.filter(Boolean), [
+  // the paste is no longer a step of the ointment: herb + coal make it
+  result = cr.combine(state, "manual", ["coal", "medicinal-paste"]);
+  assert.equal(result.kind, "no-recipe");
+  const direct = cr.combine(
+    stock([
+      ["medicinal-herb", 1],
+      ["coal", 1],
+    ]),
+    "manual",
+    ["coal", "medicinal-herb"], // any order
+  );
+  assert.equal(direct.kind, "success");
+  assert.equal(direct.recipe.output.itemId, "medicinal-ointment");
+  assert.deepEqual(direct.inventory.slots.filter(Boolean), [
     { itemId: "medicinal-ointment", quantity: 1 },
   ]);
 });

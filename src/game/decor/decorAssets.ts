@@ -941,6 +941,58 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     // to y87 below his feet.
     defaultCollider: { offsetX: -18, offsetY: -80, width: 30, height: 63 },
   },
+  {
+    // Witch, seated at the bar of the tavern (PixelLab, approved). The stool is
+    // NOT part of the sprite: it is already in the background, so the figure
+    // is placed over it by hand. Three-quarter view facing screen-left, cloak
+    // down behind her, a small mug in hand, hood shadowing the whole upper
+    // face. Very slow breathing loop (the four files are already ordered so the
+    // cycle has no jump).
+    // Authoring asset: no collider and no interaction until she is placed.
+    id: "witch-tavern-sitting",
+    label: "Witch (sitting, drinking)",
+    category: "people",
+    sprite: {
+      // The files already hold the loop: 0, 1, 2, then 1 again.
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/characters/witch/sit/tavern/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      // ~550 ms per frame.
+      fps: 1.8,
+      loop: true,
+    },
+    // Union silhouette x20-70 y11-86 of the 96x96 frame: bottom-center of the
+    // figure (the boots), like the other seated character.
+    anchor: { x: 0.469, y: 0.896 },
+    headHeight: 75,
+    defaultScale: 1,
+  },
+  {
+    // Witch's black cat, sitting. An asset of its own, independent of Witch:
+    // it can be placed next to her, alone or elsewhere. Drawn facing screen-
+    // right; use flipX on the instance to make it face left (the anchor is the
+    // silhouette centre, so flipping does not move it).
+    id: "witch-cat-sitting",
+    label: "Witch's cat (sitting)",
+    category: "animals",
+    sprite: {
+      // The files already hold the loop: 0, 1, 2, then 1 again.
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/characters/witch-cat/sit-idle/east/${i}.png`,
+      ),
+      frameWidth: 64,
+      frameHeight: 64,
+      // ~550 ms per frame.
+      fps: 1.8,
+      loop: true,
+    },
+    // Union silhouette x7-44 y9-50 of the 64x64 frame.
+    anchor: { x: 0.398, y: 0.781 },
+    headHeight: 41,
+    defaultScale: 1,
+  },
 ];
 
 // FINAL-DAY (smartphone) VARIANTS of existing characters. They are ASSETS ONLY:

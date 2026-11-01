@@ -599,6 +599,7 @@ test("starting the game unlocks nothing: only the baker's husband is known, no r
   assert.deepEqual(Object.keys(ch1.CHAPTER1_PATIENTS), [
     ch1.BAKER_HUSBAND_ID,
     ch1.TAVERN_PATIENT_ID,
+    ch1.INJURED_MINER_ID,
   ]);
   const game = read("src/game/world/GameWorld.tsx");
   assert.ok(

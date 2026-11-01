@@ -273,8 +273,8 @@ export const chapter1Compositions: DecorComposition[] = [
       {
         "instanceId": "mine-interior-injured-miner-01",
         "assetId": "injured-miner",
-        "x": 167,
-        "y": 248,
+        "x": 148,
+        "y": 263,
         "scale": 0.72,
         "flipX": false,
         "colliderEnabled": false,
@@ -285,6 +285,16 @@ export const chapter1Compositions: DecorComposition[] = [
         "assetId": "mushroom-world",
         "x": 365,
         "y": 108,
+        "scale": 0.75,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "mine-interior-mushroom-world-01",
+        "assetId": "mushroom-world",
+        "x": 430,
+        "y": 238,
         "scale": 0.75,
         "flipX": false,
         "colliderEnabled": false,
@@ -462,6 +472,26 @@ export const chapter1Compositions: DecorComposition[] = [
         "x": 375,
         "y": 180,
         "scale": 0.69,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "tavern-interior-witch-tavern-sitting-01",
+        "assetId": "witch-tavern-sitting",
+        "x": 246,
+        "y": 175,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "tavern-interior-witch-cat-sitting-01",
+        "assetId": "witch-cat-sitting",
+        "x": 272,
+        "y": 130,
+        "scale": 0.77,
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0

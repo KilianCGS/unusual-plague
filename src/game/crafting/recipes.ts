@@ -49,11 +49,12 @@ export const RECIPES: Recipe[] = [
     output: { itemId: "medicinal-paste", quantity: 1 },
   },
   {
-    // Uses the output of the previous recipe: Medicinal paste is just an item.
+    // Herb + coal. (Medicinal paste above is no longer a step of this one: it
+    // stays as a recipe of its own, unused by any case.)
     id: "manual.medicinal-ointment",
     station: "manual",
     inputs: [
-      { itemId: "medicinal-paste", quantity: 1 },
+      { itemId: "medicinal-herb", quantity: 1 },
       { itemId: "coal", quantity: 1 },
     ],
     output: { itemId: "medicinal-ointment", quantity: 1 },

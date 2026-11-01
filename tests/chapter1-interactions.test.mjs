@@ -90,11 +90,11 @@ const NOT_INTERACTABLE = [
   "plaza-merchant-table-01",
 ];
 
-test("28 interactable instances, all of them real chapter-1 instances", () => {
+test("29 interactable instances, all of them real chapter-1 instances", () => {
   const ids = Object.keys(chapter1Interactions);
   // (the fruit seller has no interaction yet; the Tavern Street woman keeps hers;
-  // the beekeeper joined for Patient 2)
-  assert.equal(ids.length, 28);
+  // the beekeeper joined for Patient 2, Witch for Patient 3)
+  assert.equal(ids.length, 29);
   for (const id of ids) assert.ok(byId.has(id), `${id} is not in chapter-1.ts`);
 });
 

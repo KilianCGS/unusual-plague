@@ -901,7 +901,14 @@ test('25. the "!" follows what can progress and then goes away', () => {
         ]),
         stock(pairs),
       ),
-    ].sort();
+    ]
+      // (the injured miner's markers belong to Patient 3: patient3.test.mjs)
+      .filter(
+        (id) =>
+          id !== ch1.INJURED_MINER_INSTANCE_ID &&
+          id !== ch1.MOUNTAIN_MINER_INSTANCE_ID,
+      )
+      .sort();
   const BART = ch1.TAVERN_BARTENDER_INSTANCE_ID;
   const MAN = ch1.TAVERN_PATIENT_INSTANCE_ID;
   const WOMAN = ch1.FARM_WOMAN_INSTANCE_ID;
@@ -969,7 +976,11 @@ test('25. the "!" follows what can progress and then goes away', () => {
     new Set(),
     stock([]),
   );
-  assert.deepEqual([...baker], ["bakery-interior-baker-01"]);
+  // (the injured miner has his own "!" while he is not examined: Patient 3)
+  assert.deepEqual(
+    [...baker].filter((id) => id !== ch1.INJURED_MINER_INSTANCE_ID),
+    ["bakery-interior-baker-01"],
+  );
   // the world draws these ids as they are: the placed instances
   for (const [scene, id] of [
     ["tavern-interior", BART],

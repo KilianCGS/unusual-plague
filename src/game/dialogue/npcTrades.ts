@@ -1,10 +1,14 @@
 import type { ItemNeed } from "../crafting/needs";
 import type { Language } from "../i18n/types";
 import {
+  BARTENDER_ALCOHOL_REWARD_ID,
   BEEKEEPER_HONEY_REWARD_ID,
   FARM_MILK_REWARD_ID,
+  INJURED_MINER_ID,
+  MOUNTAIN_MINER_COAL_REWARD_ID,
   TAVERN_JAR_REWARD_ID,
   TAVERN_PATIENT_ID,
+  WITCH_HERB_REWARD_ID,
 } from "../patients/chapter1Patients";
 import type { PatientStatus } from "../patients/patientCases";
 import {
@@ -18,6 +22,14 @@ import {
   farmWomanNoRoom,
   farmWomanReady,
 } from "./chapter1TavernDialogues";
+import {
+  bartenderAlcoholNoRoom,
+  bartenderAlcoholReady,
+  mountainMinerCoalDone,
+  mountainMinerCoalNoRoom,
+  mountainMinerCoalReady,
+} from "./chapter1Patient3Dialogues";
+import { witchTrade, witchTradeNoRoom } from "./chapter1WitchDialogues";
 import type { LocalizedConversation } from "./localizedConversation";
 
 // NPC TRADES: "consume X, receive Y", once. One small data shape for what a
@@ -48,8 +60,12 @@ export type NpcTrade = {
   doneNotice?: Record<Language, string>;
 };
 
-// The key of the bartender's jar in NPC_TRADES.
+// The keys of the trades that are NOT reached by interactionId (their character
+// has story states of his own and asks for them): the bartender's jar and
+// alcohol, and Witch's herb.
 export const BARTENDER_JAR_TRADE_ID = "chapter1.tavern.bartender.jar";
+export const BARTENDER_ALCOHOL_TRADE_ID = "chapter1.tavern.bartender.alcohol";
+export const WITCH_HERB_TRADE_ID = "chapter1.witch.herb";
 
 export const NPC_TRADES: Record<string, NpcTrade> = {
   // The farm woman gives milk for three oranges and a jar to put it in.
@@ -89,5 +105,40 @@ export const NPC_TRADES: Record<string, NpcTrade> = {
     grants: [{ itemId: "empty-jar", quantity: 1 }],
     ready: bartenderJarReady,
     noRoom: bartenderJarNoRoom,
+  },
+  // The bartender gives alcohol for the injured miner's wound, free, once,
+  // as soon as that case is examined (whatever the other cases are doing).
+  [BARTENDER_ALCOHOL_TRADE_ID]: {
+    interactionId: "chapter1.tavern.bartender",
+    rewardId: BARTENDER_ALCOHOL_REWARD_ID,
+    requiresPatient: { patientId: INJURED_MINER_ID, status: "examined" },
+    consumes: [],
+    grants: [{ itemId: "alcohol", quantity: 1 }],
+    ready: bartenderAlcoholReady,
+    noRoom: bartenderAlcoholNoRoom,
+  },
+  // The miner of the Mountain Path has a small piece of clean coal for the
+  // injured one's ointment. He is not a quest giver: until the case is
+  // examined he is only the ambient miner (resolver returns null).
+  "chapter1.mountainPath.miner": {
+    interactionId: "chapter1.mountainPath.miner",
+    rewardId: MOUNTAIN_MINER_COAL_REWARD_ID,
+    requiresPatient: { patientId: INJURED_MINER_ID, status: "examined" },
+    consumes: [],
+    grants: [{ itemId: "coal", quantity: 1 }],
+    ready: mountainMinerCoalReady,
+    noRoom: mountainMinerCoalNoRoom,
+    done: mountainMinerCoalDone,
+  },
+  // Witch swaps a mushroom for a medicinal herb because she feels like it.
+  // Not tied to any case, and only offered once she has asked (the resolver
+  // decides when): she is not a shop.
+  [WITCH_HERB_TRADE_ID]: {
+    interactionId: "chapter1.tavern.witch",
+    rewardId: WITCH_HERB_REWARD_ID,
+    consumes: [{ itemId: "mushroom", quantity: 1 }],
+    grants: [{ itemId: "medicinal-herb", quantity: 1 }],
+    ready: witchTrade,
+    noRoom: witchTradeNoRoom,
   },
 };

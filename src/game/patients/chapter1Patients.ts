@@ -6,10 +6,12 @@ import {
   type PatientCasesState,
 } from "./patientCases";
 
-// Chapter 1 patients: the baker's husband and the man on the tavern floor. The
-// injured miner is not a case yet.
+// Chapter 1 patients: the baker's husband, the man on the tavern floor and the
+// injured miner. None of them depends on another: each is found by walking up
+// to him.
 export const BAKER_HUSBAND_ID = "baker-husband";
 export const TAVERN_PATIENT_ID = "tavern-patient";
+export const INJURED_MINER_ID = "injured-miner";
 
 export const CHAPTER1_PATIENTS: Record<string, PatientCaseDefinition> = {
   [BAKER_HUSBAND_ID]: {
@@ -50,6 +52,29 @@ export const CHAPTER1_PATIENTS: Record<string, PatientCaseDefinition> = {
     // He is examined where he lies: no scene of his own.
     examination: "in-place",
   },
+  [INJURED_MINER_ID]: {
+    id: INJURED_MINER_ID,
+    name: { es: "MINERO HERIDO", en: "THE INJURED MINER" },
+    ailmentId: "infected-wound",
+    discovered: {
+      es: "Un minero herido espera sentado dentro de la mina.",
+      en: "An injured miner sits waiting inside the mine.",
+    },
+    observation: {
+      es: "Herida profunda en la pierna, con inflamación, enrojecimiento y supuración.",
+      en: "Deep wound in the leg, with swelling, redness and discharge.",
+    },
+    requiredTreatments: [
+      { itemId: "disinfected-bandage", quantity: 1 },
+      { itemId: "medicinal-ointment", quantity: 1 },
+    ],
+    revealsRecipeIds: [
+      "manual.disinfected-bandage",
+      "manual.medicinal-ointment",
+    ],
+    // He is examined where he sits: no scene of his own.
+    examination: "in-place",
+  },
 };
 
 // Chapter 1 starts with the baker's husband already known: the baker asked for
@@ -82,6 +107,16 @@ export const FARM_MILK_REWARD_ID = "chapter1.farm.milk";
 export const FARM_WOMAN_INTRO_ID = "chapter1.farm.womanIntro";
 export const BEEKEEPER_HONEY_REWARD_ID = "chapter1.beekeeper.honey";
 
+// Witch and the injured miner's case (claimed flags, session only). The first
+// two are memory of what was SAID, not rewards; the herb, the alcohol and the
+// coal are one-time deliveries. None of them depends on a case being examined
+// except the alcohol and the coal (the miner's needs). See npcTrades.ts.
+export const WITCH_MET_ID = "chapter1.witch.met";
+export const WITCH_WAITED_ID = "chapter1.witch.waited";
+export const WITCH_HERB_REWARD_ID = "chapter1.witch.herb";
+export const BARTENDER_ALCOHOL_REWARD_ID = "chapter1.tavern.alcohol";
+export const MOUNTAIN_MINER_COAL_REWARD_ID = "chapter1.mountainPath.coal";
+
 // The one-time thank-you each case may still owe the Doctor.
 export const CHAPTER1_PATIENT_REWARDS: Record<string, string> = {
   [BAKER_HUSBAND_ID]: BAKER_SALT_REWARD_ID,
@@ -94,6 +129,11 @@ export const TAVERN_PATIENT_INSTANCE_ID =
 export const TAVERN_BARTENDER_INSTANCE_ID = "tavern-interior-bartender-01";
 export const FARM_WOMAN_INSTANCE_ID = "farm-villager-woman-01-01";
 export const BEEKEEPER_INSTANCE_ID = "mill-farmland-beekeeper-01";
+// The injured miner inside the mine, the miner on the Mountain Path who has
+// the coal, and Witch at the bar.
+export const INJURED_MINER_INSTANCE_ID = "mine-interior-injured-miner-01";
+export const MOUNTAIN_MINER_INSTANCE_ID = "mountain-path-miner-01";
+export const WITCH_INSTANCE_ID = "tavern-interior-witch-tavern-sitting-01";
 
 // The placed characters that show the "!". Derived from the cases, the claimed
 // rewards and the inventory, so it is never stored: it vanishes by itself once
@@ -156,6 +196,30 @@ export function getAttentionInstanceIds(
 
     if (!claimedRewards.has(BEEKEEPER_HONEY_REWARD_ID)) {
       instances.add(BEEKEEPER_INSTANCE_ID);
+    }
+  }
+
+  // The injured miner: not examined yet, or examined and both preparations
+  // are in hand. The bartender and the miner of the Mountain Path have what
+  // his case needs (alcohol, coal) once it is examined.
+  const miner = getPatientStatus(state, INJURED_MINER_ID);
+
+  if (miner === "hidden" || miner === "discovered") {
+    instances.add(INJURED_MINER_INSTANCE_ID);
+  } else if (miner === "examined") {
+    if (
+      inventory &&
+      hasRequiredTreatments(CHAPTER1_PATIENTS[INJURED_MINER_ID], inventory)
+    ) {
+      instances.add(INJURED_MINER_INSTANCE_ID);
+    }
+
+    if (!claimedRewards.has(BARTENDER_ALCOHOL_REWARD_ID)) {
+      instances.add(TAVERN_BARTENDER_INSTANCE_ID);
+    }
+
+    if (!claimedRewards.has(MOUNTAIN_MINER_COAL_REWARD_ID)) {
+      instances.add(MOUNTAIN_MINER_INSTANCE_ID);
     }
   }
 
