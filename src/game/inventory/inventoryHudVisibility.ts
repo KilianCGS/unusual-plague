@@ -11,7 +11,7 @@
 // on screen (the black veil is just fading away over it), so the bar is there
 // on the first visible frame instead of waiting for "playing".
 export type InventoryHudContext = {
-  // "playing" | "fading-out" | "fading-in"
+  // "playing" | "fading-out" | "holding" | "fading-in"
   phase: string;
   openingActive: boolean;
   inNarrativeScene: boolean;
@@ -25,6 +25,7 @@ export type InventoryHudContext = {
 export function isInventoryHudVisible(context: InventoryHudContext): boolean {
   return (
     context.phase !== "fading-out" &&
+    context.phase !== "holding" &&
     !context.openingActive &&
     !context.inNarrativeScene &&
     context.tutorialDone &&

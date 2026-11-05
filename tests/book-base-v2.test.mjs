@@ -1,0 +1,245 @@
+// Medical Book V2: PACIENTES, DOLENCIAS and PREPARADOS share ONE empty base
+// (the same in every language); the painted INGREDIENTES spreads take none.
+//   node tests/book-base-v2.test.mjs
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import Module, { createRequire } from "node:module";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const require = createRequire(import.meta.url);
+const ts = require("typescript");
+
+const cache = new Map();
+function load(file) {
+  if (cache.has(file)) return cache.get(file).exports;
+  const src = fs.readFileSync(file, "utf8");
+  const js = ts.transpileModule(src, {
+    compilerOptions: { module: "commonjs", target: "es2022" },
+  }).outputText;
+  const mod = new Module(file);
+  mod.paths = Module._nodeModulePaths(root);
+  cache.set(file, mod);
+  mod.require = (id) => {
+    if (id.startsWith(".")) {
+      const base = path.resolve(path.dirname(file), id);
+      for (const candidate of [base + ".ts", path.join(base, "index.ts")]) {
+        if (fs.existsSync(candidate)) return load(candidate);
+      }
+      throw new Error(`Cannot resolve ${id} from ${file}`);
+    }
+    if (id.includes("useProtagonistController"))
+      return { PROTAGONIST_FEET_HITBOX: {} };
+    return require(id);
+  };
+  mod._compile(js, file);
+  return mod.exports;
+}
+const at = (rel) => load(path.join(root, rel));
+const read = (rel) => fs.readFileSync(path.join(root, rel), "utf8");
+
+const {
+  buildBookSections,
+  BOOK_SECTIONS,
+  BOOK_WIDTH,
+  BOOK_HEIGHT,
+  BOOK_BASE_V2_SRC,
+  PLAIN_BASE_LAYER,
+} = at("src/game/book/bookPages.ts");
+const ch1 = at("src/game/patients/chapter1Patients.ts");
+const { AILMENTS } = at("src/game/book/ailments.ts");
+const inv = at("src/game/inventory/inventory.ts");
+
+let passed = 0;
+const test = (name, fn) => {
+  fn();
+  passed++;
+  console.log("ok -", name);
+};
+
+const BASE = "/game/ui/book/medical-book-base-v2.png";
+const context = (language, patients, known = []) => ({
+  language,
+  patients,
+  inventory: inv.createEmptyInventory(),
+  knownRecipeIds: new Set(known),
+});
+const ALL_KNOWN = [
+  "fire.medicinal-infusion",
+  "manual.cold-cloth",
+  "fire.mushroom-soup",
+  "manual.disinfected-bandage",
+  "manual.medicinal-ointment",
+];
+const ALL_PATIENTS = {
+  [ch1.BAKER_HUSBAND_ID]: "examined",
+  [ch1.TAVERN_PATIENT_ID]: "treated",
+  [ch1.INJURED_MINER_ID]: "examined",
+};
+const sections = (language) =>
+  Object.fromEntries(
+    buildBookSections(context(language, ALL_PATIENTS, ALL_KNOWN)).map((s) => [
+      s.id,
+      s,
+    ]),
+  );
+const baseOf = (spread) => spread.layers.filter((l) => l.src === BASE);
+
+test("the V2 base exists, is the full 1.79 spread and is drawn at the book size", () => {
+  const file = path.join(root, "public", BASE);
+  assert.ok(fs.existsSync(file));
+  const buffer = fs.readFileSync(file);
+  const width = buffer.readUInt32BE(16);
+  const height = buffer.readUInt32BE(20);
+  assert.ok(width >= 1600 && height >= 900, `${width}x${height}`);
+  assert.ok(Math.abs(width / height - BOOK_WIDTH / BOOK_HEIGHT) < 0.005);
+  assert.equal(BOOK_BASE_V2_SRC, BASE);
+  assert.deepEqual(
+    [
+      PLAIN_BASE_LAYER.x,
+      PLAIN_BASE_LAYER.y,
+      PLAIN_BASE_LAYER.width,
+      PLAIN_BASE_LAYER.height,
+    ],
+    [0, 0, BOOK_WIDTH, BOOK_HEIGHT],
+  );
+  // smooth, never pixel-art nearest-neighbour, never cropped
+  assert.equal(PLAIN_BASE_LAYER.smooth, true);
+});
+
+test("PACIENTES, DOLENCIAS and PREPARADOS draw on the V2 base; INGREDIENTES gets none", () => {
+  for (const language of ["es", "en"]) {
+    const s = sections(language);
+    for (const id of ["patients", "ailments", "preparations"]) {
+      assert.ok(s[id].spreads.length >= 1, `${language} ${id}`);
+      for (const spread of s[id].spreads) {
+        assert.equal(baseOf(spread).length, 1, `${language} ${spread.id}`);
+        assert.equal(
+          spread.layers[0].src,
+          BASE,
+          "the base is the bottom layer",
+        );
+      }
+    }
+    for (const spread of s.ingredients.spreads) {
+      assert.equal(
+        baseOf(spread).length,
+        0,
+        "no base behind the painted pages",
+      );
+      assert.equal(spread.layers.length, 1);
+      assert.ok(spread.layers[0].src.includes(`/ingredients/${language}/`));
+    }
+  }
+  // the empty states (no patients, no recipes) use it too
+  const empty = buildBookSections(context("es", {}));
+  assert.equal(empty[0].spreads[0].layers[0].src, BASE);
+  assert.equal(empty[3].spreads[0].layers[0].src, BASE);
+  assert.equal(BOOK_SECTIONS[0].spreads[0].layers[0].src, BASE);
+});
+
+test("one single base for every language and every section: the React text is what changes", () => {
+  const bases = new Set();
+  for (const language of ["es", "en"]) {
+    const s = sections(language);
+    for (const id of ["patients", "ailments", "preparations"])
+      for (const spread of s[id].spreads) bases.add(spread.layers[0].src);
+  }
+  assert.deepEqual([...bases], [BASE]);
+  const files = fs.readdirSync(path.join(root, "public/game/ui/book"));
+  assert.deepEqual(files.sort(), [
+    "ailments",
+    "ingredients",
+    "medical-book-base-v2.png",
+  ]);
+  // the text IS dynamic and in the chosen language
+  const text = (language, id) =>
+    sections(language)
+      [id].spreads.flatMap((x) => x.texts ?? [])
+      .map((t) => t.content.join(""))
+      .join(" | ");
+  assert.ok(text("es", "patients").includes("MINERO HERIDO"));
+  assert.ok(text("en", "patients").includes("INJURED MINER"));
+  assert.ok(text("es", "preparations").includes("Hierba medicinal + Carbón"));
+  assert.ok(text("en", "preparations").includes("Medicinal herb + Coal"));
+});
+
+test("the content stays dynamic and grows by itself: pages follow the patients, ailments and recipes", () => {
+  const onlyBaker = buildBookSections(
+    context("es", { [ch1.BAKER_HUSBAND_ID]: "discovered" }),
+  );
+  const all = buildBookSections(context("es", ALL_PATIENTS, ALL_KNOWN));
+  assert.ok(all[0].spreads.length > onlyBaker[0].spreads.length);
+  assert.equal(all[0].spreads.length, 3, "one spread per known patient");
+  assert.ok(all[3].spreads.length >= 2, "recipes paginate two per spread");
+  assert.equal(
+    all[1].spreads.length,
+    AILMENTS.length,
+    "one spread per ailment",
+  );
+  // recipes that are not known do not appear
+  const none = buildBookSections(context("es", ALL_PATIENTS, []));
+  assert.equal(none[3].spreads.length, 1);
+  // the layout is not tied to the current patients: it reads the data
+  const src = read("src/game/book/dynamicPages.ts");
+  assert.ok(
+    src.includes("CHAPTER1_PATIENTS") || src.includes("getVisiblePatientIds"),
+  );
+  assert.ok(!/baker-husband|tavern-patient|injured-miner/.test(src));
+});
+
+test("the overlay draws the base smooth and keeps the outer size of the book on every tab", () => {
+  const css = read("src/game/book/BookOverlay.module.css");
+  assert.ok(/\.smooth\s*\{\s*image-rendering:\s*auto;/.test(css));
+  assert.ok(!/object-fit:\s*cover/.test(css));
+  assert.ok(!/filter\s*:/.test(css));
+  const overlay = read("src/game/book/BookOverlay.tsx");
+  assert.ok(overlay.includes("layer.smooth ? styles.smooth"));
+  // one stage for every section: its size comes from the book, not the section
+  assert.ok(/BOOK_WIDTH/.test(overlay) && /BOOK_HEIGHT/.test(overlay));
+  // the page text uses the handwritten font the project already ships
+  assert.ok(css.includes("Patrick Hand"));
+  assert.ok(
+    fs.existsSync(
+      path.join(root, "public/fonts/patrick-hand/PatrickHand-Regular.ttf"),
+    ),
+  );
+});
+
+test("the old bases are gone and nothing at runtime points at them", () => {
+  for (const old of ["book-base.png", "book-base-plain.png"]) {
+    assert.ok(!fs.existsSync(path.join(root, "public/game/ui/book", old)), old);
+  }
+  const walk = (dir) =>
+    fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+      const p = path.join(dir, e.name);
+      return e.isDirectory() ? walk(p) : [p];
+    });
+  for (const file of [
+    ...walk(path.join(root, "src")),
+    ...walk(path.join(root, "tests")),
+  ]) {
+    if (/book-base-v2\.test\.mjs$/.test(file)) continue;
+    const text = fs.readFileSync(file, "utf8");
+    assert.ok(!/book-base\.png|book-base-plain/.test(text), file);
+    assert.ok(!text.includes("AILMENT_BASE_LAYER"), file);
+  }
+  // the source art stays under art/
+  assert.ok(
+    fs.existsSync(path.join(root, "art/medical-book/medical-book-base.png")),
+  );
+});
+
+test("the tutorial Book is untouched: it still opens on INGREDIENTES, which keeps several pages", () => {
+  const game = read("src/game/world/GameWorld.tsx");
+  assert.ok(
+    /initialSectionId=\{[\s\S]*"ingredients"[\s\S]*undefined/.test(game),
+  );
+  const book = read("src/game/book/BookOverlay.tsx");
+  assert.ok(book.includes("onPageChange") && book.includes("onSectionChange"));
+  assert.equal(sections("es").ingredients.spreads.length, 4);
+  assert.equal(sections("en").ingredients.spreads.length, 4);
+});
+
+console.log(`\n${passed} tests passed`);

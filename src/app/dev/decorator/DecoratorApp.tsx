@@ -19,6 +19,7 @@ import {
   type ExteriorWorldScene,
 } from "../../../game/world/worldScenes";
 import { clientToWorld } from "../collisions/geometry";
+import { GRANARY_INTERIOR_VISUAL } from "../../../game/new-world-map/newWorldVisuals";
 import { DEV_SCENES, getSceneWorld } from "../scene/scenes";
 import {
   CHAPTER_IDS,
@@ -136,9 +137,21 @@ const APOTHECARY_MAIN_ZONE_SCENES: DecoratorScene[] =
       ]
     : [];
 
+// The granary interior (Day 2): authoring only. Its background is open here to
+// place the population; it has no geometry and is not in WORLD_SCENES.
+const GRANARY_INTERIOR_SCENE: DecoratorScene = {
+  id: "granary-interior",
+  kind: "exterior",
+  visual: GRANARY_INTERIOR_VISUAL,
+  colliders: [],
+  exits: [],
+  arrivals: {},
+};
+
 const SCENES: DecoratorScene[] = [
   ...WIRED_SCENES,
   ...APOTHECARY_MAIN_ZONE_SCENES,
+  GRANARY_INTERIOR_SCENE,
   NARRATIVE_PREVIEW_SCENE,
 ];
 
@@ -701,7 +714,7 @@ function Workspace({
               }
             />
             <label className={styles.field}>
-              flipX
+              Mirror (flipX)
               <input
                 type="checkbox"
                 checked={selected.flipX}

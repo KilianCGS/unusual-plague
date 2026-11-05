@@ -226,9 +226,9 @@ function SpreadView({ spread }: { spread: BookSpread }) {
         <img
           key={layer.src}
           src={layer.src}
-          alt=""
+          alt={layer.alt ?? ""}
           draggable={false}
-          className={styles.layer}
+          className={`${styles.layer} ${layer.smooth ? styles.smooth : ""}`}
           style={{
             left: layer.x,
             top: BOOK_TOP + layer.y,

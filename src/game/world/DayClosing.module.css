@@ -1,0 +1,14 @@
+/* The closing picture of the day fades in OVER the game (the opening does not:
+   it starts from black). */
+.fadeIn {
+  animation: day-closing-in 700ms ease both;
+}
+
+@keyframes day-closing-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

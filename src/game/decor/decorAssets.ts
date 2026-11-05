@@ -993,6 +993,159 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     headHeight: 41,
     defaultScale: 1,
   },
+  // DAY 2 POSES (PixelLab, same identities as their Day 1 sprites). Authoring
+  // assets: no collider, no interaction, not placed in any scene yet. Each is
+  // drawn facing ONE side; use flipX on the instance for the other. The idles
+  // are 1-px shifts of the approved pose (the file order 0,1,2,3 is the loop),
+  // so the identity is the exact one of the still.
+  {
+    // The woodcutter, exhausted on a stump, axe on the ground. The stump and
+    // the axe are part of the pose. Faces screen-right. Breathing + a tired
+    // nod.
+    id: "woodcutter-day2-tired",
+    label: "Woodcutter (Day 2, tired on stump)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/woodcutter-day2-tired/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      // ~500 ms per frame.
+      fps: 2,
+      loop: true,
+    },
+    // Union silhouette x18-71 y25-80 of the 96x96 frame.
+    anchor: { x: 0.469, y: 0.844 },
+    headHeight: 55,
+    defaultScale: 1,
+  },
+  {
+    // The blacksmith, seated on a stool, holding his hurt hand. The stool is
+    // part of the pose. Three-quarter front view, symmetric enough for flipX.
+    // Breathing + a slight tremor of the held hand.
+    id: "blacksmith-day2-hurt-hand",
+    label: "Blacksmith (Day 2, seated, hurt hand)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/blacksmith-day2-hurt-hand/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 2,
+      loop: true,
+    },
+    // Union silhouette x25-69 y20-84 of the 96x96 frame.
+    anchor: { x: 0.495, y: 0.885 },
+    headHeight: 64,
+    defaultScale: 1,
+  },
+  {
+    // The hoeing farmer, gravely ill, lying flat on his back seen from above:
+    // head at the top of the frame, feet at the bottom, to lie along the
+    // vertical bed of the granary. NO bed, straw or pillow: it goes over the
+    // bed drawn in the background. Barefoot, legs relaxed and not symmetric,
+    // one hand on his abdomen, head slightly tilted. Very slight breathing
+    // (head and chest only; the legs never move).
+    id: "farmer-hoeing-sick-lying",
+    label: "Farmer (Day 2, sick, lying on his back)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/farmer-hoeing-sick-lying/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 128,
+      // ~670 ms per frame: almost motionless.
+      fps: 1.5,
+      loop: true,
+    },
+    // Union silhouette x32-66 y9-118 of the 96x128 frame; the anchor is the
+    // centre of the body.
+    anchor: { x: 0.516, y: 0.5 },
+    defaultScale: 1,
+  },
+  {
+    // Witch in the Natural Cave: standing, pensive, a lit lantern in hand.
+    // Side view facing screen-right, hood shadowing the whole face. Breathing,
+    // a barely moving cloak and a lantern that sways one pixel.
+    id: "witch-cave-lantern",
+    label: "Witch (cave, lantern)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/characters/witch/cave-lantern/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 2,
+      loop: true,
+    },
+    // Union silhouette x30-58 y13-82 of the 96x96 frame.
+    anchor: { x: 0.464, y: 0.865 },
+    headHeight: 69,
+    defaultScale: 1,
+  },
+  {
+    // The same child as villager-child-01, sitting on the ground and playing
+    // with a small cloth doll (the doll is part of the pose). Breathing + a
+    // nod over the doll.
+    id: "villager-child-01-doll",
+    label: "Villager child (1), sitting with a doll",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/villager-child-01-doll/idle/${i}.png`,
+      ),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 2,
+      loop: true,
+    },
+    // Union silhouette x29-64 y24-78 of the 96x96 frame.
+    anchor: { x: 0.49, y: 0.823 },
+    headHeight: 55,
+    defaultScale: 1,
+  },
+  {
+    // The miner of Day 1 (injured-miner: headband, grey shirt, dark trousers),
+    // recovered and back at work with the pickaxe. The bandage on his lower
+    // leg is kept on purpose: the continuity between days. Loop: rest, raise,
+    // strike, rest. Feet planted at y90 in every frame.
+    id: "miner-recovering-working",
+    label: "Miner (recovering, working, bandaged leg)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3].map(
+        (i) => `/game/npcs/miner-recovering-working/idle/${i}.png`,
+      ),
+      frameWidth: 128,
+      frameHeight: 96,
+      fps: 5,
+      loop: true,
+    },
+    // Boots of the resting frame: x33-80, bottom y90 of the 128x96 frame.
+    anchor: { x: 0.445, y: 0.948 },
+    headHeight: 87,
+    defaultScale: 1,
+  },
+  {
+    // A wooden bucket full of fish, a prop for the fisherman. Static.
+    id: "wooden-fish-bucket",
+    label: "Wooden bucket with fish",
+    category: "ambient",
+    sprite: {
+      frames: ["/game/npcs/wooden-fish-bucket/idle/0.png"],
+      frameWidth: 48,
+      frameHeight: 48,
+      fps: 1,
+      loop: false,
+    },
+    // Silhouette x14-34 y11-37 of the 48x48 frame.
+    anchor: { x: 0.51, y: 0.79 },
+    defaultScale: 1,
+  },
 ];
 
 // FINAL-DAY (smartphone) VARIANTS of existing characters. They are ASSETS ONLY:

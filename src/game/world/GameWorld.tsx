@@ -29,7 +29,9 @@ import {
   resolveStoryInteraction,
   type StoryEffect,
 } from "../dialogue/storyInteractions";
+import { day1Closing, day1WorkDone } from "../dialogue/chapter1Day1Dialogues";
 import { DOCTOR_SPEAKER } from "../dialogue/dialogueTypes";
+import { localizeConversation } from "../dialogue/localizedConversation";
 import {
   resolveChapterIntro,
   resolveInteractionConversation,
@@ -80,9 +82,23 @@ import { NarrativeInterlude } from "../narrative/NarrativeInterlude";
 import { NARRATIVE_ILLUSTRATIONS } from "../narrative/illustrations";
 import { TutorialHint } from "../tutorial/TutorialHint";
 import { useTutorial } from "../tutorial/useTutorial";
+import { fastTravelCopy } from "../i18n/fastTravel";
+import { FastTravelButton, TravelCaption } from "../ui/FastTravelButton";
 import { ItemFeedback } from "../ui/ItemFeedback";
+import {
+  DAY1_COMPLETED_ID,
+  DAY1_WORK_DONE_ID,
+  shouldAnnounceDay1WorkDone,
+  shouldCloseDay1,
+} from "../patients/day1";
 import { INITIAL_CHAPTER_ID } from "./currentChapter";
+import dayClosingStyles from "./DayClosing.module.css";
 import { ExteriorScene, type SceneOverlayContext } from "./ExteriorScene";
+import {
+  FAST_TRAVEL_CAPTION_MS,
+  FAST_TRAVEL_DESTINATION,
+  canFastTravel,
+} from "./fastTravel";
 import { getChapterStart } from "./chapterStart";
 import { WORLD_SCENES } from "./worldScenes";
 import type { SceneId } from "./worldScenes";
@@ -97,7 +113,9 @@ const ITEM_NOTICE_MS = 2600;
 // Where the chapter begins: its first scene and, if it has one, its opening.
 const CHAPTER_START = getChapterStart(INITIAL_CHAPTER_ID);
 
-type Phase = "playing" | "fading-out" | "fading-in";
+// "holding" is the black screen of a trip that shows a line (fast travel): the
+// scene change waits there, fully covered, until the line has been read.
+type Phase = "playing" | "fading-out" | "holding" | "fading-in";
 type WorldState = { sceneId: SceneId; spawnName: string; arrival: number };
 // Owns the current scene, the navigation and the fade. The keyboard input
 // lives here (not in the scenes), so keys that stay physically held survive a
@@ -126,6 +144,10 @@ export function GameWorld({ language }: { language: Language }) {
   const [openingActive, setOpeningActive] = useState(
     () => CHAPTER_START.opening !== undefined && openingConversation !== null,
   );
+  // The closing of Day 1 (a narrative interlude, like the opening) blocks the
+  // world exactly as the opening does.
+  const [closingActive, setClosingActive] = useState(false);
+  const interludeActive = openingActive || closingActive;
 
   // Main interfaces. They never open on top of each other, of a conversation
   // or during a scene fade, and each one blocks the Doctor while it is up.
@@ -200,22 +222,26 @@ export function GameWorld({ language }: { language: Language }) {
   const inNarrativeScene = world.sceneId === "bakers-bedroom";
   const canOpenInterface =
     phase === "playing" &&
-    !openingActive &&
+    !interludeActive &&
     !dialogue.active &&
     craftingStation === null &&
     !storageOpen &&
     !inNarrativeScene;
   const mapVisible = mapHeld && canOpenInterface && !bookOpen;
-  const pendingRef = useRef<{ sceneId: SceneId; spawnName: string } | null>(
-    null,
-  );
+  const pendingRef = useRef<{
+    sceneId: SceneId;
+    spawnName: string;
+    // A line to show over the black screen before arriving (fast travel).
+    caption?: string;
+  } | null>(null);
+  const [travelCaption, setTravelCaption] = useState<string | null>(null);
   const scene = WORLD_SCENES[world.sceneId];
   const spawn = scene.arrivals[world.spawnName];
   // The Doctor is blocked (and nothing else can trigger) during a fade and
   // while a conversation is open; control returns when its last line closes.
   const isPlaying =
     phase === "playing" &&
-    !openingActive &&
+    !interludeActive &&
     !dialogue.active &&
     !bookOpen &&
     !mapVisible &&
@@ -259,16 +285,43 @@ export function GameWorld({ language }: { language: Language }) {
   // A transition only starts while the game is playable; while a fade or a
   // scene change is running nothing else can trigger.
   const startTransition = useCallback(
-    (sceneId: SceneId, spawnName: string) => {
+    (sceneId: SceneId, spawnName: string, caption?: string) => {
       if (phaseRef.current !== "playing") {
         return;
       }
 
-      pendingRef.current = { sceneId, spawnName };
+      pendingRef.current = { sceneId, spawnName, caption };
       changePhase("fading-out");
     },
     [changePhase],
   );
+
+  // Fast travel to the apothecary: only while plain exploration is available
+  // (a pure rule), through the very same fade and the arrival of the street
+  // door. It moves the Doctor and nothing else.
+  const fastTravelAvailable = canFastTravel({
+    sceneId: world.sceneId,
+    phase,
+    openingActive: interludeActive,
+    tutorialStep: tutorial.step,
+    dialogueActive: dialogue.active,
+    bookOpen,
+    mapVisible,
+    storageOpen,
+    craftingOpen: craftingStation !== null,
+    inNarrativeScene,
+  });
+  const handleFastTravel = useCallback(() => {
+    if (!fastTravelAvailable) {
+      return;
+    }
+
+    startTransition(
+      FAST_TRAVEL_DESTINATION.sceneId,
+      FAST_TRAVEL_DESTINATION.spawnName,
+      fastTravelCopy[language].caption,
+    );
+  }, [fastTravelAvailable, language, startTransition]);
 
   const handleExit = useCallback(
     (exitName: string) => {
@@ -538,6 +591,55 @@ export function GameWorld({ language }: { language: Language }) {
     notifyTutorial("intro-finished");
   }, [notifyTutorial]);
 
+  // THE END OF DAY 1, derived from the cases and two claimed flags (see
+  // patients/day1.ts). Both effects read the refs, never a stale render, so a
+  // remount or a double effect cannot say or close anything twice.
+  const claimFlag = useCallback((flag: string) => {
+    const next = new Set([...claimedRewardsRef.current, flag]);
+
+    claimedRewardsRef.current = next;
+    setClaimedRewards(next);
+  }, []);
+
+  // 1) The third case was treated, whichever: the Doctor says it once, in the
+  //    world, and keeps his control afterwards. Nothing moves him.
+  useEffect(() => {
+    if (
+      isPlaying &&
+      shouldAnnounceDay1WorkDone(patientsRef.current, claimedRewardsRef.current)
+    ) {
+      claimFlag(DAY1_WORK_DONE_ID);
+      startDialogue(
+        localizeConversation(day1WorkDone, language, DOCTOR_SPEAKER),
+      );
+    }
+  }, [isPlaying, patients, claimedRewards, language, claimFlag, startDialogue]);
+
+  // 2) Being in the Botica with the work done closes the day. It only looks at
+  //    the state and the scene: walking in and fast travel arrive at the same
+  //    place and are the same thing to it.
+  useEffect(() => {
+    if (
+      isPlaying &&
+      shouldCloseDay1({
+        patients: patientsRef.current,
+        claimedRewards: claimedRewardsRef.current,
+        sceneId: world.sceneId,
+      })
+    ) {
+      setClosingActive(true);
+    }
+  }, [isPlaying, patients, claimedRewards, world.sceneId]);
+
+  const finishClosing = useCallback(() => {
+    claimFlag(DAY1_COMPLETED_ID);
+    setClosingActive(false);
+  }, [claimFlag]);
+  const closingConversation = useMemo(
+    () => localizeConversation(day1Closing, language, DOCTOR_SPEAKER),
+    [language],
+  );
+
   // Real events for the tutorial: the Book was opened / closed, the Map was
   // actually shown.
   const bookWasOpenRef = useRef(false);
@@ -686,6 +788,13 @@ export function GameWorld({ language }: { language: Language }) {
       const timeoutId = window.setTimeout(() => {
         const pending = pendingRef.current;
 
+        // A trip with a line waits on the black screen until it is read.
+        if (pending?.caption) {
+          setTravelCaption(pending.caption);
+          changePhase("holding");
+          return;
+        }
+
         pendingRef.current = null;
 
         if (!pending) {
@@ -700,6 +809,31 @@ export function GameWorld({ language }: { language: Language }) {
         }));
         changePhase("fading-in");
       }, SCENE_FADE_MS + COVER_MARGIN_MS);
+
+      return () => {
+        window.clearTimeout(timeoutId);
+      };
+    }
+
+    if (phase === "holding") {
+      const timeoutId = window.setTimeout(() => {
+        const pending = pendingRef.current;
+
+        pendingRef.current = null;
+        setTravelCaption(null);
+
+        if (!pending) {
+          changePhase("playing");
+          return;
+        }
+
+        setWorld((current) => ({
+          sceneId: pending.sceneId,
+          spawnName: pending.spawnName,
+          arrival: current.arrival + 1,
+        }));
+        changePhase("fading-in");
+      }, FAST_TRAVEL_CAPTION_MS);
 
       return () => {
         window.clearTimeout(timeoutId);
@@ -750,7 +884,7 @@ export function GameWorld({ language }: { language: Language }) {
   // is a pure rule (inventoryHudVisibility.ts).
   const inventoryHudVisible = isInventoryHudVisible({
     phase,
-    openingActive,
+    openingActive: interludeActive,
     inNarrativeScene,
     tutorialDone: tutorial.step === "done",
     bookOpen,
@@ -838,7 +972,7 @@ export function GameWorld({ language }: { language: Language }) {
   const showHint =
     hintCopy !== null &&
     phase === "playing" &&
-    !openingActive &&
+    !interludeActive &&
     !dialogue.active &&
     (!bookOpen || hintOverBook) &&
     !mapVisible &&
@@ -929,16 +1063,35 @@ export function GameWorld({ language }: { language: Language }) {
         />
       ) : null}
       {notice ? <ItemFeedback text={notice.text} /> : null}
+      {fastTravelAvailable ? (
+        <FastTravelButton
+          label={fastTravelCopy[language].label}
+          onTravel={handleFastTravel}
+        />
+      ) : null}
+      {phase === "holding" && travelCaption ? (
+        <TravelCaption text={travelCaption} />
+      ) : null}
       <div
         className="title-screen-fade"
         data-scene={world.sceneId}
         data-phase={phase}
         style={{
-          opacity: phase === "fading-out" ? 1 : 0,
+          opacity: phase === "fading-out" || phase === "holding" ? 1 : 0,
           pointerEvents: isPlaying ? "none" : "auto",
           transitionDuration: `${SCENE_FADE_MS}ms`,
         }}
       />
+      {closingActive ? (
+        <div className={dayClosingStyles.fadeIn}>
+          <NarrativeInterlude
+            illustration={NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]}
+            conversation={closingConversation}
+            language={language}
+            onFinished={finishClosing}
+          />
+        </div>
+      ) : null}
       {openingActive && openingConversation && CHAPTER_START.opening ? (
         <NarrativeInterlude
           illustration={

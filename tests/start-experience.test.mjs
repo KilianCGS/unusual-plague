@@ -171,7 +171,7 @@ test("leaving the Doctor's Room: the Doctor arrives in the Apothecary at the app
   );
 });
 
-test("the opening uses the writing illustration only; the other two stay available, unused", () => {
+test("the opening uses the writing illustration; the fireplace one closes Day 1; the eating one stays available, unused", () => {
   for (const [id, illustration] of Object.entries(NARRATIVE_ILLUSTRATIONS)) {
     const file = path.join(root, "public", illustration.src);
     assert.ok(fs.existsSync(file), id);
@@ -186,7 +186,8 @@ test("the opening uses the writing illustration only; the other two stay availab
     "doctor-writing",
   ]);
   const gameWorld = read("src/game/world/GameWorld.tsx");
-  assert.ok(!/doctor-eating|doctor-fireplace/.test(gameWorld));
+  assert.ok(!/doctor-eating/.test(gameWorld));
+  assert.ok(gameWorld.includes('NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]'));
   assert.ok(
     !/doctor-eating|doctor-fireplace/.test(
       read("src/game/world/chapterStart.ts"),
@@ -253,8 +254,12 @@ test("gameplay is blocked while the opening runs, and its end starts the tutoria
     source.indexOf("const isPlaying ="),
     source.indexOf("useBookHotkeys({"),
   );
-  assert.ok(canOpen.includes("!openingActive"));
-  assert.ok(playing.includes("!openingActive"));
+  // (the opening and the closing of the day are both "interludes")
+  assert.ok(
+    source.includes("const interludeActive = openingActive || closingActive;"),
+  );
+  assert.ok(canOpen.includes("!interludeActive"));
+  assert.ok(playing.includes("!interludeActive"));
   assert.ok(source.includes('notifyTutorial("intro-finished")'));
   // the old world-space monologue is gone
   assert.ok(!/introPlayedRef|introActiveRef|INTRO_DELAY_MS/.test(source));

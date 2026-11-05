@@ -169,16 +169,20 @@ export default function Home() {
             />
           </button>
         </div>
-        <h1 className="title">{copy.title}</h1>
-        <p className="subtitle">{copy.subtitle}</p>
-        <button
-          className="begin-button"
-          type="button"
-          disabled={isInteractionLocked}
-          onClick={handleBegin}
-        >
-          {copy.beginButton}
-        </button>
+        <div className="title-block">
+          <h1 className="title">{copy.title}</h1>
+          <p className="subtitle">{copy.subtitle}</p>
+        </div>
+        <div className="title-start">
+          <button
+            className="begin-button"
+            type="button"
+            disabled={isInteractionLocked}
+            onClick={handleBegin}
+          >
+            {copy.beginButton}
+          </button>
+        </div>
         <button
           className="begin-button secondary-title-button"
           type="button"

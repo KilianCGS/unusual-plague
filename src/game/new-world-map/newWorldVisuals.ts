@@ -151,6 +151,25 @@ export const FOREST_COTTAGE_INTERIOR_VISUAL: DevScene = {
   zoomMultiplier: 1.5,
 };
 
+// The inside of the granary: unmodified copy of the approved 1254x1254 image
+// (dark border included). AUTHORING ONLY for now: the Decorator opens it to
+// place the Day 2 population; it is not a runtime scene (no exits, arrivals or
+// colliders, and it is not in WORLD_SCENES). 0.36 unit per asset pixel and
+// zoomMultiplier 1.5 follow the cottage interior as STARTING values: compare
+// the Doctor with the bed, the door and the sacks in /dev/decorator and adjust.
+export const GRANARY_INTERIOR_VISUAL: DevScene = {
+  id: "granary-interior",
+  label: "Granero (interior)",
+  backgroundSrc: "/game/areas/granary-interior/granary-interior-background.png",
+  assetWidth: 1254,
+  assetHeight: 1254,
+  // Preview start only: centred on the opening of the south wall.
+  initialAssetX: 627,
+  initialAssetY: 1050,
+  logicalUnitsPerAssetPixel: 0.36,
+  zoomMultiplier: 1.5,
+};
+
 // The one scene that did not exist before. Also listed in the old world's
 // scene table (nothing links to it there), so the type of the table stays
 // complete and the Decorator can open it.

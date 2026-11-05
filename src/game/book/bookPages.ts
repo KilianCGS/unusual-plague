@@ -8,6 +8,7 @@
 // placeholders), and never duplicate text that an image already contains.
 
 import { bookCopy } from "../i18n/book";
+import type { Language } from "../i18n/types";
 import { AILMENTS, type Ailment } from "./ailments";
 import {
   buildPatientSpreads,
@@ -27,6 +28,11 @@ export type BookLayer = {
   y: number;
   width: number;
   height: number;
+  // Short description for assistive technology (decorative layers have none).
+  alt?: string;
+  // A high-resolution picture shown smaller than it is (the Ingredientes
+  // spreads): scaled smoothly instead of the pixel-art nearest-neighbour.
+  smooth?: boolean;
 };
 
 export type BookSpread = {
@@ -44,21 +50,16 @@ export type BookSection = {
   spreads: BookSpread[];
 };
 
-// The physical open book, shared by every section: plain paper pages, nothing
-// printed inside. Sections that do not paint their own pages start from this.
-export const PLAIN_BASE_LAYER: BookLayer = {
-  src: `${UI_DIR}/book-base-plain.png`,
-  x: 0,
-  y: 0,
-  width: BOOK_WIDTH,
-  height: BOOK_HEIGHT,
-};
+// The physical open book, shared by PACIENTES, DOLENCIAS and PREPARADOS (the
+// same one in every language: the React text on top is what changes): empty
+// paper pages, nothing printed inside. It is the empty counterpart of the
+// painted INGREDIENTES spreads, which bring their own paper and take no base.
+// A high-resolution picture shown smaller than it is, so it is scaled smoothly.
+export const BOOK_BASE_V2_SRC = `${UI_DIR}/medical-book-base-v2.png`;
 
-// The same book WITH the ruled ornaments on the right page. That decoration is
-// specific to DOLENCIAS (it separates the future SÍNTOMAS / TRATAMIENTO text);
-// it is not a template of the Compendium, so only the ailment spreads use it.
-const AILMENT_BASE_LAYER: BookLayer = {
-  src: `${UI_DIR}/book-base.png`,
+export const PLAIN_BASE_LAYER: BookLayer = {
+  src: BOOK_BASE_V2_SRC,
+  smooth: true,
   x: 0,
   y: 0,
   width: BOOK_WIDTH,
@@ -101,10 +102,8 @@ function placeholderSpread(
 
 // DOLENCIAS layout (specific to this section, not a template for the others):
 //   left page  -> the illustration and, under it, the ailment's name;
-//   right page -> SÍNTOMAS, its text, the book's own ruled line, TRATAMIENTO,
-//                 its text. The ornaments of the right page are part of
-//                 AILMENT_BASE_LAYER (they sit at y 23-39 and y 192, between
-//                 x 375 and 609), so the text column follows them.
+//   right page -> SÍNTOMAS, its text, TRATAMIENTO, its text, in one column
+//                 (x 375-609) on the empty page of the shared base.
 const AILMENT_NAME_Y = 224;
 const RIGHT_COLUMN_X = 375;
 const RIGHT_COLUMN_WIDTH = 234;
@@ -119,7 +118,7 @@ function ailmentSpread(ailment: Ailment): BookSpread {
   return {
     id: `ailment-${id}`,
     layers: [
-      AILMENT_BASE_LAYER,
+      PLAIN_BASE_LAYER,
       {
         src: `${UI_DIR}/ailments/${illustration.file}.png`,
         x: illustration.x,
@@ -174,13 +173,39 @@ function ailmentSpread(ailment: Ailment): BookSpread {
   };
 }
 
+// The four INGREDIENTES spreads, as complete hand-painted images that already
+// hold the paper, the edges, the drawings and the writing: one per language and
+// in the same conceptual order in both, so the page the Doctor is on stays the
+// same when the language changes:
+//   1 Milk / Medicinal herb / Mushroom / Water
+//   2 Alcohol / Flour / Charcoal / Cloth
+//   3 Orange / Mint / Honey / Resin
+//   4 Animal fat / Garlic / Salt / Leech
+const INGREDIENT_SPREAD_COUNT = 4;
+
+function ingredientSpreads(language: Language): BookSpread[] {
+  const alts = bookCopy[language].ingredientSpreadAlts;
+
+  return Array.from({ length: INGREDIENT_SPREAD_COUNT }, (_, index) => {
+    const number = String(index + 1).padStart(2, "0");
+
+    return fullSpread(
+      `ingredients-${index + 1}`,
+      `${UI_DIR}/ingredients/${language}/ingredients-${number}.png`,
+      alts[index],
+    );
+  });
+}
+
 // A spread that is one complete hand-painted image, shown as-is (Ingredientes).
-function fullSpread(id: string, file: string): BookSpread {
+function fullSpread(id: string, src: string, alt: string): BookSpread {
   return {
     id,
     layers: [
       {
-        src: `${UI_DIR}/resources/${file}.png`,
+        src,
+        alt,
+        smooth: true,
         x: 0,
         y: 0,
         width: BOOK_WIDTH,
@@ -210,12 +235,8 @@ export const BOOK_SECTIONS: BookSection[] = [
   {
     id: "ingredients",
     label: "INGREDIENTES",
-    spreads: [
-      fullSpread("ingredients-1", "resources-spread-1-v1"),
-      fullSpread("ingredients-2", "resources-spread-2-v1"),
-      fullSpread("ingredients-3", "resources-spread-3-v1"),
-      fullSpread("ingredients-4", "resources-spread-4-v1"),
-    ],
+    // (Spanish here; buildBookSections picks the language of the game.)
+    spreads: ingredientSpreads("es"),
   },
   {
     id: "preparations",
@@ -244,7 +265,11 @@ export function buildBookSections(context: BookContext): BookSection[] {
       spreads: buildPatientSpreads(context),
     },
     { ...ailments, label: tabs.ailments },
-    { ...ingredients, label: tabs.ingredients },
+    {
+      ...ingredients,
+      label: tabs.ingredients,
+      spreads: ingredientSpreads(context.language),
+    },
     {
       id: "preparations",
       label: tabs.preparations,

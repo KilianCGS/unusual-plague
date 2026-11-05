@@ -1,9 +1,10 @@
 import type { CraftStation } from "../crafting/recipes";
 import type { Language } from "./types";
 
-// Texts of the Compendium that depend on the language. The Dolencias and
-// Ingredientes pages are painted / written in Spanish and are not translated
-// here yet; the tabs, the cover and the PACIENTES / PREPARADOS pages are.
+// Texts of the Compendium that depend on the language. The Ingredientes pages
+// are painted once per language (see bookPages.ts) and the Dolencias pages are
+// written in Spanish and not translated here yet; the tabs, the cover and the
+// PACIENTES / PREPARADOS pages are.
 type BookCopy = {
   tabs: {
     patients: string;
@@ -21,6 +22,8 @@ type BookCopy = {
   treatment: string;
   treated: string;
   noRecipes: { title: string; note: string };
+  // One short description per INGREDIENTES spread (the image holds the text).
+  ingredientSpreadAlts: [string, string, string, string];
   station: string;
   stations: Record<CraftStation, string>;
 };
@@ -46,6 +49,12 @@ export const bookCopy: Record<Language, BookCopy> = {
       title: "Preparados",
       note: "Todavía no hay recetas conocidas.",
     },
+    ingredientSpreadAlts: [
+      "Ingredientes: leche, hierba medicinal, hongo y agua",
+      "Ingredientes: alcohol, harina, carbón y tela",
+      "Ingredientes: naranja, menta, miel y resina",
+      "Ingredientes: grasa animal, ajo, sal y sanguijuela",
+    ],
     station: "Estación",
     stations: { manual: "Mesa", fire: "Cocina" },
   },
@@ -66,6 +75,12 @@ export const bookCopy: Record<Language, BookCopy> = {
     treatment: "TREATMENT",
     treated: "✓ TREATED",
     noRecipes: { title: "Remedies", note: "No known recipes yet." },
+    ingredientSpreadAlts: [
+      "Ingredients: milk, medicinal herb, mushroom and water",
+      "Ingredients: alcohol, flour, charcoal and cloth",
+      "Ingredients: orange, mint, honey and resin",
+      "Ingredients: animal fat, garlic, salt and leech",
+    ],
     station: "Station",
     stations: { manual: "Work table", fire: "Stove" },
   },

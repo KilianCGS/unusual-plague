@@ -1,0 +1,81 @@
+/* Fast travel chip: the same paper-and-dark-outline family as the Book tabs,
+   small, top-right, below every interface and the black screen of a scene
+   change. */
+.button {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 20;
+  padding: 2px;
+  border: 0;
+  border-radius: 0;
+  font-family: var(--ui-font);
+  background: #2b1a14;
+  cursor: pointer;
+  clip-path: polygon(
+    0 4px,
+    2px 4px,
+    2px 2px,
+    4px 2px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 2px,
+    calc(100% - 2px) 2px,
+    calc(100% - 2px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 4px),
+    calc(100% - 2px) calc(100% - 2px),
+    calc(100% - 4px) calc(100% - 2px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 2px),
+    2px calc(100% - 2px),
+    2px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+}
+
+.face {
+  display: block;
+  padding: 3px 10px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 16px;
+  color: #1c1009;
+  background: #d8c89e;
+}
+
+.button:hover .face,
+.button:focus-visible .face {
+  background: #f4e9c8;
+}
+
+/* The line shown on the black screen: above the black veil (z 30). */
+.caption {
+  position: fixed;
+  inset: 0;
+  z-index: 31;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  font-family: var(--ui-font);
+  font-size: 18px;
+  line-height: 1.4;
+  letter-spacing: 0.03em;
+  text-align: center;
+  color: #f4ead5;
+  pointer-events: none;
+  animation: caption-in 350ms ease both;
+}
+
+@keyframes caption-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

@@ -52,6 +52,12 @@
   pointer-events: none;
 }
 
+/* A hand-painted high-resolution spread (Ingredientes) is scaled down smoothly:
+   the nearest-neighbour above is for pixel art. */
+.smooth {
+  image-rendering: auto;
+}
+
 /* ---- page text (Dolencias, placeholders): Patrick Hand ------------------- */
 .text {
   position: absolute;
@@ -62,15 +68,23 @@
   pointer-events: none;
 }
 
+/* Names and headings are underlined with a plain ink line, like the titles of
+   the painted Ingredientes pages. */
 .name {
   font-size: 28px;
   line-height: 1.1;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
 }
 
 .heading {
   font-size: 20px;
   line-height: 1.1;
   letter-spacing: 0.1em;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
 }
 
 .body {
