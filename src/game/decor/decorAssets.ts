@@ -1146,6 +1146,139 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     anchor: { x: 0.51, y: 0.79 },
     defaultScale: 1,
   },
+  // AMBIENT LIFE PACK (PixelLab, art/ambient-life-pack). Registered so they can
+  // be composed in the Decorator; NOTHING is placed in any composition. None has
+  // a defaultCollider on purpose: collisions are authored later, and a visual
+  // rectangle is not a physical one. Frames are listed in PLAYBACK order and may
+  // repeat a file (one PNG per distinct pose).
+  {
+    // Seated man drinking, BUST ONLY (waist up): meant to sit behind a table
+    // placed by the Decorator, which hides the cut. No table/stool drawn.
+    // Review status: bucle v2 pending Kilian's final visual approval.
+    id: "seated-man-tankard-bust",
+    label: "Seated man with tankard (bust, behind a table)",
+    category: "people",
+    sprite: {
+      // idle x5, blink, idle x4, tankard half way, up, drinking x2, down, idle.
+      // Head and lower torso are identical in every frame.
+      frames: [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 2, 3, 4, 4, 3, 2, 0, 0].map(
+        (i) => `/game/npcs/seated-man-tankard-bust/idle/${i}.png`,
+      ),
+      frameWidth: 48,
+      frameHeight: 36,
+      fps: 4,
+      loop: true,
+    },
+    // Bottom edge = the waist cut; the body is centred on x22 of the 48 px frame.
+    anchor: { x: 0.46, y: 1 },
+    defaultScale: 1,
+    // Head top is 33 px above the waist cut.
+    headHeight: 33,
+  },
+  {
+    // Adult woman mending a garment on a stool (stool and cloth are part of the
+    // pose). Alternative to villager-sitting, which stays as it is. Only the
+    // needle hand moves; head, torso, stool and cloth are identical per frame.
+    id: "seamstress-sitting",
+    label: "Seamstress (sitting, mending)",
+    category: "people",
+    sprite: {
+      // rest x3, pull, pull, rest x2, push, push, rest x3
+      frames: [0, 0, 0, 1, 1, 0, 0, 2, 2, 0, 0, 0].map(
+        (i) => `/game/npcs/seamstress-sitting/idle/${i}.png`,
+      ),
+      frameWidth: 48,
+      frameHeight: 72,
+      fps: 3,
+      loop: true,
+    },
+    // Feet / stool legs at y70 of the 72 px frame, body centred on x24.5.
+    anchor: { x: 0.51, y: 0.97 },
+    defaultScale: 1,
+    headHeight: 67,
+  },
+  {
+    // A small field mouse, static for now (idle sniffing is a later variant).
+    id: "field-mouse",
+    label: "Field mouse",
+    category: "animals",
+    sprite: {
+      frames: ["/game/npcs/field-mouse/idle/0.png"],
+      frameWidth: 48,
+      frameHeight: 48,
+      fps: 0,
+      loop: false,
+    },
+    // Silhouette x11-37 y13-39 of the 48x48 frame (feet at y39).
+    anchor: { x: 0.5, y: 0.81 },
+    defaultScale: 1,
+  },
+  // Wind-swayed vegetation: 3 frames played 0,1,0,2. The lower ~40% of every
+  // frame is pixel-identical, so the roots never move; only the upper leaves
+  // shift by 1-2 px. Default scales keep them near the vegetation of the scene
+  // backgrounds (a 60 px bush at 1:1 is almost as tall as a villager); change
+  // the scale per instance in the Decorator if needed.
+  {
+    id: "bush-round",
+    label: "Bush (round, wind)",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 0, 2].map((i) => `/game/ambient/bush-round/${i}.png`),
+      frameWidth: 64,
+      frameHeight: 64,
+      fps: 2,
+      loop: true,
+    },
+    // Silhouette x2-62 y5-62 of the 64x64 frame.
+    anchor: { x: 0.5, y: 0.97 },
+    defaultScale: 0.6,
+  },
+  {
+    id: "bush-tall",
+    label: "Bush (tall, wind)",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 0, 2].map((i) => `/game/ambient/bush-tall/${i}.png`),
+      frameWidth: 64,
+      frameHeight: 64,
+      fps: 2,
+      loop: true,
+    },
+    // Silhouette x15-48 of the 64x64 frame; it reaches both the top and bottom
+    // edges (a known trait of this first version).
+    anchor: { x: 0.49, y: 1 },
+    defaultScale: 0.75,
+  },
+  {
+    id: "grass-tuft",
+    label: "Grass tuft (wind)",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 0, 2].map((i) => `/game/ambient/grass-tuft/${i}.png`),
+      frameWidth: 32,
+      frameHeight: 32,
+      fps: 2,
+      loop: true,
+    },
+    // Silhouette x3-28 y5-29 of the 32x32 frame.
+    anchor: { x: 0.48, y: 0.9 },
+    defaultScale: 1,
+  },
+  {
+    id: "fern-weed",
+    label: "Fern (wind)",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 0, 2].map((i) => `/game/ambient/fern-weed/${i}.png`),
+      frameWidth: 32,
+      frameHeight: 32,
+      fps: 2,
+      loop: true,
+    },
+    // Silhouette x1-31 y3-31 of the 32x32 frame; rooted in the lower middle.
+    anchor: { x: 0.5, y: 0.88 },
+    defaultScale: 1,
+  },
 ];
 
 // FINAL-DAY (smartphone) VARIANTS of existing characters. They are ASSETS ONLY:
