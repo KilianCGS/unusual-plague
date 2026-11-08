@@ -1321,6 +1321,112 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     anchor: { x: 0.44, y: 0.88 },
     defaultScale: 1,
   },
+  // NPC PASS (art/npc-pass, approved by Kilian). New ids: the originals
+  // (blacksmith, miner, merchant, merchant-table, miner-recovering-working)
+  // are untouched. No colliders and no placements: both are authored in the
+  // Decorator.
+  {
+    // Blacksmith bust WITHOUT anvil (the anvil is scenery). Hammer up, strike
+    // down in front of the apron, back up: [high, high, up, strike, strike, up].
+    id: "blacksmith-hammer",
+    label: "Blacksmith - hammer (no anvil)",
+    category: "people",
+    sprite: {
+      frames: [0, 0, 1, 2, 2, 1].map((i) => `/game/npcs/blacksmith-hammer/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 64,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+  },
+  {
+    // Miner swing that ends at knee height (no rock, no ground hit): the
+    // rock is placed separately. Ready, wind-up, up, up, strike, strike, wind-up.
+    id: "miner-pick-swing",
+    label: "Miner - pick swing (knee height)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 2, 3, 3, 1].map((i) => `/game/npcs/miner-pick-swing/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    // Boots at y80/81 of the 96x96 frame, like the original miner.
+    anchor: { x: 0.5, y: 0.85 },
+    defaultScale: 1,
+  },
+  {
+    // The recovering miner (grey headband and shirt, bandaged lower leg)
+    // seated on a three-legged stool with the pickaxe on his shoulder. Two
+    // frames only: slow breathing, [0,0,0,1,1].
+    id: "miner-recovering-seated-stool",
+    label: "Miner (recovering, seated on stool, pick on shoulder)",
+    category: "people",
+    sprite: {
+      frames: [0, 0, 0, 1, 1].map(
+        (i) => `/game/npcs/miner-recovering-seated-stool/idle/${i}.png`,
+      ),
+      frameWidth: 128,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    // Stool/boots of the 128x96 frame (silhouette x19-90 y11-91).
+    anchor: { x: 0.4, y: 0.94 },
+    defaultScale: 1,
+  },
+  {
+    // Humbler merchant: cloth cap, brown wool vest, linen shirt, no gold.
+    // Same face and pose as the original; 7-frame gesture loop.
+    id: "merchant-humble",
+    label: "Merchant - humble",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6].map((i) => `/game/npcs/merchant-humble/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+  },
+  {
+    // Draper's table: folded linen and wool, bolt of cloth, thread basket,
+    // measuring stick. Static.
+    id: "merchant-table-draper",
+    label: "Merchant table - draper",
+    category: "ambient",
+    sprite: {
+      frames: ["/game/npcs/merchant-table-draper/static.png"],
+      frameWidth: 96,
+      frameHeight: 64,
+      fps: 0,
+      loop: false,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+  },
+  {
+    // Village girl flying a kite. ONE composite on purpose: the string, kite
+    // and tail are drawn from her hands (hand-built over the girl, 8 frames).
+    id: "kite-girl",
+    label: "Girl with a kite",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `/game/npcs/kite-girl/idle/${i}.png`),
+      frameWidth: 120,
+      frameHeight: 136,
+      fps: 6,
+      loop: true,
+    },
+    // Her shoes: about x28, y120 of the 120x136 frame.
+    anchor: { x: 0.24, y: 0.88 },
+    defaultScale: 1,
+  },
 ];
 
 // FINAL-DAY (smartphone) VARIANTS of existing characters. They are ASSETS ONLY:
