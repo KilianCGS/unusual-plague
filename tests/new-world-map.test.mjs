@@ -297,7 +297,7 @@ test("the Casita del bosque is fully walkable from its entrance and has no NPC o
 
   assert.ok(floor.length > 400, "a meaningful walkable area");
   assert.equal(scene.visual.label, "Casita del bosque");
-  assert.equal(getComposition("forest-cottage", "chapter-1"), undefined);
+  assert.deepEqual(getComposition("forest-cottage", "chapter-1").instances.map(i=>i.assetId), ["candle-flame"]);
   assert.deepEqual(getSceneInteractionZones("forest-cottage"), []);
 });
 
@@ -310,11 +310,13 @@ test("the water interaction survives in the new Outskirts, on reachable floor", 
   assert.ok(floor.some(([x, y]) => rectsIntersect(feetRect(x, y), zones[0])));
 });
 
-test("the new world population: same instances as the old one, valid assets, kept interactions, forest-cottage empty", () => {
+test("the new world population keeps authored instances and shared ambient decor without cottage NPCs", () => {
   const { getChapterInteractions } = newWorld("src/game/compositions/index.ts");
   const { getDecorAsset } = newWorld("src/game/decor/decorAssets.ts");
   const { resolveDecorInstances } = newWorld("src/game/decor/decorRuntime.ts");
   const interactions = getChapterInteractions("chapter-1");
+  const sharedById = new Map(newWorld("src/game/compositions/shared-environment.ts")
+    .sharedEnvironmentCompositions.flatMap(c => c.instances).map(i => [i.instanceId, i]));
   let total = 0;
   const unreachableZones = [];
 
@@ -323,7 +325,8 @@ test("the new world population: same instances as the old one, valid assets, kep
     const before = OLD_COMPOSITIONS.getComposition(id, "chapter-1");
 
     if (id === "forest-cottage") {
-      assert.equal(fresh, undefined, "the cottage stays empty");
+      assert.deepEqual(fresh.instances, newWorld("src/game/compositions/shared-environment.ts").getSharedEnvironmentInstances(id),
+        "the cottage only inherits its approved ambient flame");
       continue;
     }
 
@@ -342,6 +345,10 @@ test("the new world population: same instances as the old one, valid assets, kep
           i.instanceId,
         );
       } else {
+        if (sharedById.has(i.instanceId)) {
+          assert.deepEqual(i, sharedById.get(i.instanceId));
+          continue;
+        }
         assert.ok(
           EXPECTED_ADDED.includes(i.instanceId),
           `unexpected new ${i.instanceId}`,
@@ -437,7 +444,8 @@ test("the new world population: same instances as the old one, valid assets, kep
   // exact list: a new gap fails, and so does one that gets fixed (update it).
   assert.deepEqual(unreachableZones.sort(), KNOWN_UNREACHABLE_ZONES);
 
-  assert.equal(total, 32);
+  assert.equal(total, 32 + NEW_IDS.filter(id=>id!=='forest-cottage').reduce((n,id)=>n+
+    newWorld("src/game/compositions/shared-environment.ts").getSharedEnvironmentInstances(id).length,0));
 
   // interactions are keyed by instanceId and untouched: every interactive
   // instance of the old world is still interactive here
@@ -450,7 +458,7 @@ test("the new world population: same instances as the old one, valid assets, kep
     }
   }
 
-  // interiors keep their populations
+  // Interiors keep their populations, plus the explicitly authored shared fire.
   for (const id of [
     "bakery-interior",
     "smithy-interior",
@@ -460,7 +468,8 @@ test("the new world population: same instances as the old one, valid assets, kep
   ]) {
     assert.deepEqual(
       getComposition(id, "chapter-1").instances,
-      OLD_COMPOSITIONS.getComposition(id, "chapter-1").instances,
+      newWorld("src/game/compositions/shared-environment.ts").mergeSharedEnvironmentInstances(
+        id, OLD_COMPOSITIONS.getComposition(id, "chapter-1").instances),
       id,
     );
   }
@@ -726,9 +735,9 @@ test("Forest <-> Forest Cottage <-> Forest Cottage Interior: wired both ways to 
   assert.equal(cottage.colliders.length, 25);
   assert.equal(inside.colliders.length, 11);
   assert.equal(inside.exits.length, 1);
-  assert.equal(
-    getComposition("forest-cottage-interior", "chapter-1"),
-    undefined,
+  assert.deepEqual(
+    getComposition("forest-cottage-interior", "chapter-1").instances.map(i=>i.assetId),
+    Array(4).fill("candle-flame"),
   );
   assert.deepEqual(getSceneInteractionZones("forest-cottage-interior"), []);
 

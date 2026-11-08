@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { getSharedEnvironmentInstances } from "../compositions/shared-environment";
+import { resolveDecorInstances } from "../decor/decorRuntime";
+import { DecorSprite } from "../decor/DecorSprite";
 
 import { InteractionPrompt } from "../interactions/InteractionPrompt";
 import { getSceneInteractionZones } from "../interactions/sceneInteractions";
@@ -37,6 +40,9 @@ const DEFAULT_SPAWN: { x: number; y: number; direction: Direction } = {
   direction: "south",
 };
 const NO_EXITS: TransitionExit[] = [];
+const SHARED_AMBIENT_SPRITES = resolveDecorInstances(
+  getSharedEnvironmentInstances("apothecary-interior"),
+).sprites;
 
 function getSceneScale() {
   if (typeof window === "undefined") {
@@ -169,6 +175,9 @@ export function ApothecaryScene({
           }}
         >
           <div className={styles.logicalScene}>
+            {SHARED_AMBIENT_SPRITES.map(({ asset, instance }) => (
+              <DecorSprite key={instance.instanceId} asset={asset} instance={instance} />
+            ))}
             <ProtagonistSprite
               x={player.x}
               y={player.y}

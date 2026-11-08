@@ -77,7 +77,7 @@ export function DecorSprite({
       {frames.map((src, index) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          key={src}
+          key={`${index}-${src}`}
           src={src}
           alt=""
           draggable={false}

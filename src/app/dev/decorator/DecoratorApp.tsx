@@ -41,6 +41,7 @@ import {
 } from "../../../game/decor/decorAssets";
 import type { DecorInstance } from "../../../game/decor/decorTypes";
 import { DecorSprite, getSpriteBox } from "../../../game/decor/DecorSprite";
+import { getSharedEnvironmentInstances } from "../../../game/compositions/shared-environment";
 import {
   getInstanceInteractionZone,
   withInteractions,
@@ -240,6 +241,11 @@ function Workspace({
   onClear,
 }: WorkspaceProps) {
   const world = getSceneWorld(scene.visual);
+  // Read-only shared backdrop. Local draft instances remain editable, and
+  // their ids suppress the preview so the author never sees two copies.
+  const sharedBackdrop = getSharedEnvironmentInstances(scene.id).filter(
+    shared => !instances.some(instance => instance.instanceId === shared.instanceId),
+  );
   const layerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ id: string; dx: number; dy: number } | null>(null);
   const [scale, setScale] = useState(1);
@@ -847,6 +853,9 @@ function Workspace({
           spellCheck={false}
         />
         <div className={styles.hint}>{copyStatus}</div>
+        {sharedBackdrop.length ? <div className={styles.hint}>
+          Ambiente compartido: {sharedBackdrop.length} elementos de fondo, presentes en todos los capítulos. No se incluyen en este export.
+        </div> : null}
         {chapterExportText ? (
           <textarea
             className={styles.exportText}
@@ -1000,6 +1009,10 @@ function Workspace({
                     instance={instance}
                   />
                 ) : null;
+              })}
+              {sharedBackdrop.map((instance) => {
+                const asset = getDecorAsset(instance.assetId);
+                return asset ? <DecorSprite key={`shared-${instance.instanceId}`} asset={asset} instance={instance} /> : null;
               })}
               {doctorOn ? (
                 <div style={{ pointerEvents: "none" }}>

@@ -5,6 +5,7 @@ import { chapter1Compositions } from "./chapter-1";
 import { chapter2Compositions } from "./chapter-2";
 import { chapter1Interactions } from "./chapter-1.interactions";
 import { chapter2Interactions } from "./chapter-2.interactions";
+import { mergeSharedEnvironmentInstances } from "./shared-environment";
 
 // VERSIONED scene populations, one file per chapter, each produced by
 // "COPY CHAPTER" in /dev/decorator. The runtime reads only these files; the
@@ -50,7 +51,10 @@ export function getComposition(
   sceneId: string,
   chapterId: string,
 ): DecorComposition | undefined {
-  return BY_SCENE_AND_CHAPTER.get(`${sceneId}::${chapterId}`);
+  const composition = BY_SCENE_AND_CHAPTER.get(`${sceneId}::${chapterId}`);
+  const instances = mergeSharedEnvironmentInstances(sceneId, composition?.instances ?? []);
+  if (!composition && instances.length === 0) return undefined;
+  return { ...composition, sceneId, chapterId, instances };
 }
 
 // Which instances can be interacted with in a chapter, keyed by instanceId.
