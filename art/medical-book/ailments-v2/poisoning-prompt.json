@@ -1,0 +1,7 @@
+{
+  "tool": "built-in image_gen",
+  "output": "public/game/ui/book/ailments/poisoning-v2.png",
+  "reference": "public/game/ui/book/ailments/exhaustion-v2.png",
+  "transparent_background": false,
+  "prompt": "One illustration for the fictional historical medical compendium Unusual Plague, representing poisoning symptoms: an adult in a simple historical shirt, seated and leaning forward slightly, one hand holding the upper abdomen, the other resting on a knee, a few beads of cold sweat at the temple, tired nauseated expression. Calm non-graphic clinical study, adult proportions. Match the reference image's warm dark brown pen-and-ink contour and sparse antique engraving hatching. Centered square composition with 12 percent blank margin, readable at 176 pixels. Pure solid opaque white background, no transparency. Brown ink only, no colors, no glow, no gradients, no lettering, no text, no symbols, no labels, no border, no whole book, no scenery, no vomiting, no bottles, no substance or source of poisoning. Single subject, fully clothed."
+}
