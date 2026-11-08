@@ -1279,6 +1279,48 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     anchor: { x: 0.5, y: 0.88 },
     defaultScale: 1,
   },
+  // FIRE (art/ambient-life-pack/L-fire). Colours sampled from the tavern's own
+  // fireplace and candles. Neither blocks the Doctor (no defaultCollider) and
+  // neither emits light: any glow is authored separately.
+  {
+    // Small campfire: stones and logs are identical in every frame (rows >= 31),
+    // only the flame moves. 7 frames, played in order.
+    id: "campfire",
+    label: "Campfire (animated)",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6].map(
+        (i) => `/game/ambient/campfire/${i}.png`,
+      ),
+      frameWidth: 48,
+      frameHeight: 48,
+      fps: 8,
+      loop: true,
+    },
+    // Silhouette x9-39 y5-42 of the 48x48 frame; anchored at the stone ring.
+    anchor: { x: 0.5, y: 0.88 },
+    defaultScale: 1,
+  },
+  {
+    // Candle flame ONLY (the candle itself is part of the scene or of another
+    // prop): 8x8, 4 shapes played upright, left, upright, tall, right, upright,
+    // tall, left. Anchored on the wick.
+    id: "candle-flame",
+    label: "Candle flame (animated)",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 0, 2, 3, 0, 2, 1].map(
+        (i) => `/game/ambient/candle-flame/${i}.png`,
+      ),
+      frameWidth: 8,
+      frameHeight: 8,
+      fps: 8,
+      loop: true,
+    },
+    // The flame is x2-4 y0-6 of the 8x8 frame; the wick is just below it.
+    anchor: { x: 0.44, y: 0.88 },
+    defaultScale: 1,
+  },
 ];
 
 // FINAL-DAY (smartphone) VARIANTS of existing characters. They are ASSETS ONLY:
