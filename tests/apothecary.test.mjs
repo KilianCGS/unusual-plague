@@ -373,7 +373,7 @@ test("the Botica in play is the new one: its background, its 480x293 world, and 
 });
 
 test("18. the original four recipes are untouched (two patient recipes and Milk with honey were added after them)", () => {
-  assert.equal(RECIPES.length, 7);
+  assert.equal(RECIPES.length, 15);
   assert.deepEqual(
     RECIPES.slice(0, 4).map((r) => [
       r.id,

@@ -103,6 +103,7 @@ export function ExteriorScene({
   onRunningChange,
   onInteractionAvailable,
   collectedInstanceIds,
+  hiddenInstanceIds,
   attentionInstanceIds,
 }: {
   scene: ExteriorWorldScene;
@@ -132,6 +133,9 @@ export function ExteriorScene({
   // Collectibles already picked up this session; they are not drawn, do not
   // block and give no prompt.
   collectedInstanceIds?: CollectedInstanceIds;
+  // Instances the story keeps out of the scene (not pick-ups): not drawn, no
+  // collider, no interaction.
+  hiddenInstanceIds?: ReadonlySet<string>;
   // Placed characters that show the "!" (they have news for the Doctor).
   attentionInstanceIds?: ReadonlySet<string>;
 }) {
@@ -145,15 +149,20 @@ export function ExteriorScene({
   const npcColliders = useMemo(() => getNpcColliders(npcs), [npcs]);
   // Decor instances placed in the Decorator and versioned for this chapter:
   // sprites, colliders (colliderEnabled) and interaction zones.
-  const decor = useMemo(
-    () =>
-      resolveDecorInstances(
-        (chapterId && getComposition(scene.id, chapterId)?.instances) || [],
-        chapterId ? getChapterInteractions(chapterId) : {},
-        collectedInstanceIds,
-      ),
-    [scene.id, chapterId, collectedInstanceIds],
-  );
+  const decor = useMemo(() => {
+    const placed =
+      (chapterId && getComposition(scene.id, chapterId)?.instances) || [];
+
+    return resolveDecorInstances(
+      hiddenInstanceIds?.size
+        ? placed.filter(
+            (instance) => !hiddenInstanceIds.has(instance.instanceId),
+          )
+        : placed,
+      chapterId ? getChapterInteractions(chapterId) : {},
+      collectedInstanceIds,
+    );
+  }, [scene.id, chapterId, collectedInstanceIds, hiddenInstanceIds]);
   const blockingColliders = useMemo(
     () => [...scene.colliders, ...npcColliders, ...decor.colliders],
     [scene.colliders, npcColliders, decor.colliders],

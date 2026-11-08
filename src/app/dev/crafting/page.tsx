@@ -38,12 +38,16 @@ const PRESETS: Record<string, [string, number][]> = {
     ["honey", 1],
     ["coal", 1],
   ],
-  // Exactly the chained recipe: herb + honey -> paste, paste + coal -> ointment.
+  // Existing paste is now an intermediate for the poultice.
   "chain set": [
     ["medicinal-herb", 1],
     ["honey", 1],
-    ["coal", 1],
+    ["flour", 1],
   ],
+  "syrup chain": [["water", 1], ["mint", 1], ["honey", 1], ["garlic", 1]],
+  "compress chain": [["animal-fat", 1], ["resin", 1], ["cloth", 1]],
+  "charcoal chain": [["coal", 1], ["water", 1]],
+  "citrus drink": [["orange", 1], ["water", 1]],
 };
 
 function buildInventory(preset: string): InventoryState {

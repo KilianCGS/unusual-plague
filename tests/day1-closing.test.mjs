@@ -1,6 +1,7 @@
-// The end of Day 1: three cases treated in ANY order, the Doctor says it is
-// enough (once), keeps exploring, and getting back to the Botica (walking or by
-// fast travel) closes the day.
+// The end of Day 1 (approved design): the three cases are treated in ANY order;
+// when the LAST treatment's conversation is over the day closes by itself (one
+// narrative sequence over the fireplace picture) and Day 2 begins in the
+// Doctor's Room. There is no "go home" step.
 //   node tests/day1-closing.test.mjs
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -48,11 +49,12 @@ const talk = at("src/game/dialogue/chapter1Day1Dialogues.ts");
 const { localizeConversation } = at(
   "src/game/dialogue/localizedConversation.ts",
 );
-const { canFastTravel, FAST_TRAVEL_DESTINATION } = at(
-  "src/game/world/fastTravel.ts",
+const { getChapterStart, getNextChapterId } = at(
+  "src/game/world/chapterStart.ts",
 );
 const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
 const { NARRATIVE_ILLUSTRATIONS } = at("src/game/narrative/illustrations.ts");
+const { getComposition } = at("src/game/compositions/index.ts");
 
 let passed = 0;
 const test = (name, fn) => {
@@ -92,56 +94,55 @@ const permutations = (items) =>
         ),
       );
 
-// What GameWorld wires, as a tiny pure loop: each "tick" is a moment of plain
-// play (control with the Doctor) in a scene.
+// What GameWorld wires, as a tiny pure loop. A treatment happens at the START
+// of its conversation (patients change, the dialogue opens); the day may close
+// only at a later "tick" of plain play, once nothing is open.
 function newGame() {
   return {
     patients: START,
     claimed: new Set(),
+    chapterId: "chapter-1",
     sceneId: "plaza",
+    dialogueOpen: false,
     log: [],
   };
 }
+function treatAndTalk(game, id) {
+  game.patients = treat(game.patients, id);
+  game.dialogueOpen = true; // the treatment conversation is on screen
+  return game;
+}
+function closeDialogue(game) {
+  game.dialogueOpen = false;
+  return game;
+}
 function tick(game, { playing = true } = {}) {
-  if (!playing) return game;
-  if (day1.shouldAnnounceDay1WorkDone(game.patients, game.claimed)) {
-    game.claimed = new Set([...game.claimed, day1.DAY1_WORK_DONE_ID]);
-    game.log.push("remark");
-  }
+  if (!playing || game.dialogueOpen) return game;
   if (
-    day1.shouldCloseDay1({
-      patients: game.patients,
-      claimedRewards: game.claimed,
-      sceneId: game.sceneId,
-    })
+    getNextChapterId(game.chapterId) !== null &&
+    day1.shouldCloseDay1(game.patients, game.claimed)
   ) {
+    game.claimed = new Set([...game.claimed, day1.DAY1_COMPLETED_ID]); // flagged first
     game.log.push("closing");
-    game.claimed = new Set([...game.claimed, day1.DAY1_COMPLETED_ID]); // the interlude ended
+    // the closing swaps the world while the picture covers it
+    const next = getNextChapterId(game.chapterId);
+    const start = getChapterStart(next);
+    game.chapterId = next;
+    game.sceneId = start.sceneId;
+    game.log.push(`start:${next}`);
   }
   return game;
 }
-const arriveWalking = (game) => {
-  const exit = WORLD_SCENES["apothecary-street"].exits.find(
-    (e) => e.targetScene === "apothecary-interior",
-  );
-  game.sceneId = exit.targetScene;
-  return tick(game);
-};
-const arriveByFastTravel = (game) => {
-  game.sceneId = FAST_TRAVEL_DESTINATION.sceneId;
-  return tick(game);
-};
 
 test("the three cases of the day are exactly the ones Chapter 1 defines, and the state is derived from them", () => {
   assert.deepEqual([...day1.DAY1_PATIENT_IDS].sort(), [...IDS].sort());
   assert.equal(day1.areAllDay1PatientsTreated(START), false);
-  assert.equal(day1.getDay1Status(START, new Set()), "in-progress");
+  assert.equal(day1.getDay1Status(new Set()), "in-progress");
   let all = START;
   for (const id of IDS) all = treat(all, id);
   assert.equal(day1.areAllDay1PatientsTreated(all), true);
-  assert.equal(day1.getDay1Status(all, new Set()), "work-done");
   assert.equal(
-    day1.getDay1Status(all, new Set([day1.DAY1_COMPLETED_ID])),
+    day1.getDay1Status(new Set([day1.DAY1_COMPLETED_ID])),
     "completed",
   );
   // a hidden / undiscovered case is NOT treated
@@ -151,192 +152,112 @@ test("the three cases of the day are exactly the ones Chapter 1 defines, and the
   );
 });
 
-test("any incomplete combination (none, one, two cases) never ends the day", () => {
+test("any incomplete combination (none, one, two cases) never closes the day", () => {
   const subsets = [[], ...IDS.map((id) => [id])];
   for (const a of IDS) for (const b of IDS) if (a < b) subsets.push([a, b]);
   assert.equal(subsets.length, 7);
   for (const subset of subsets) {
     const state = subset.reduce(treat, START);
     assert.equal(
-      day1.areAllDay1PatientsTreated(state),
+      day1.shouldCloseDay1(state, new Set()),
       false,
       subset.join("+"),
     );
-    assert.equal(day1.shouldAnnounceDay1WorkDone(state, new Set()), false);
     const game = { ...newGame(), patients: state };
-    arriveWalking(game);
-    arriveByFastTravel(game);
+    tick(game);
     assert.deepEqual(game.log, [], `${subset.join("+")} never closes`);
-    assert.equal(day1.getDay1Status(state, game.claimed), "in-progress");
+    assert.equal(game.chapterId, "chapter-1");
   }
 });
 
-test("the order does not matter: all six orders end the same way", () => {
+test("the order does not matter: all six orders close the day the same way, only with the third", () => {
   const perms = permutations(IDS);
   assert.equal(perms.length, 6);
   for (const order of perms) {
     const game = newGame();
     order.forEach((id, i) => {
-      game.patients = treat(game.patients, id);
+      treatAndTalk(game, id);
+      closeDialogue(game);
       tick(game);
-      // the remark appears only with the THIRD, whichever it is
-      assert.equal(game.log.includes("remark"), i === 2, order.join(">"));
+      assert.equal(game.log.includes("closing"), i === 2, order.join(">"));
     });
-    assert.deepEqual(game.log, ["remark"], order.join(">"));
-    arriveWalking(game);
-    assert.deepEqual(game.log, ["remark", "closing"], order.join(">"));
-    assert.equal(day1.getDay1Status(game.patients, game.claimed), "completed");
+    assert.deepEqual(game.log, ["closing", "start:chapter-2"], order.join(">"));
+    assert.equal(game.chapterId, "chapter-2");
   }
 });
 
-test("the Doctor's remark is said ONCE: later ticks, scene changes and trips never repeat it", () => {
+test("the closing waits for the whole conversation of the last case: nothing happens while it is open", () => {
   const game = newGame();
-  for (const id of IDS) game.patients = treat(game.patients, id);
+  game.patients = IDS.slice(0, 2).reduce(treat, START);
+  treatAndTalk(game, IDS[2]); // all treated, the thank-you is still being said
   tick(game);
-  for (const scene of ["plaza", "forest", "tavern-interior", "plaza"]) {
-    game.sceneId = scene;
-    tick(game);
-    tick(game);
-  }
-  assert.deepEqual(game.log, ["remark"]);
-  // a re-render with the flag claimed asks for nothing
-  assert.equal(
-    day1.shouldAnnounceDay1WorkDone(game.patients, game.claimed),
-    false,
+  tick(game);
+  assert.deepEqual(game.log, [], "still in the conversation");
+  tick(game, { playing: false }); // a fade or an interface
+  assert.deepEqual(game.log, []);
+  closeDialogue(game); // the last line (and its effects) is over
+  tick(game);
+  assert.deepEqual(game.log, ["closing", "start:chapter-2"]);
+
+  // and in the game it only fires at a moment of plain play, not over another flow
+  const source = read("src/game/world/GameWorld.tsx");
+  const trigger = source.slice(
+    source.indexOf("const closingChapterAvailable"),
+    source.indexOf("const closingChapterAvailable") + 900,
   );
-  // not while the Doctor has no control (dialogue, fade, interface)
-  const busy = { ...newGame(), patients: IDS.reduce(treat, START) };
-  tick(busy, { playing: false });
-  assert.deepEqual(busy.log, []);
-  tick(busy);
-  assert.deepEqual(busy.log, ["remark"]);
+  assert.ok(trigger.includes("isPlaying &&"));
+  assert.ok(trigger.includes('phaseRef.current === "playing"'));
+  assert.ok(trigger.includes("afterDialogueRef.current === null"));
+  assert.ok(trigger.includes("shouldCloseDay1(patientsRef.current"));
+  // declared after the effect that runs the after-dialogue steps
+  assert.ok(
+    source.indexOf("const closingChapterAvailable") >
+      source.indexOf(
+        "}, [dialogue.active, startTransition, finishExamination]",
+      ),
+  );
 });
 
-test("nothing moves the Doctor when the third case is treated: no transition, no lock, no countdown", () => {
-  const game = GameWorldSource();
-  const remark = game.slice(
-    game.indexOf("// 1) The third case was treated"),
-    game.indexOf("// 2) Being in the Botica"),
+test("it fires ONCE: the flag is claimed before the closing starts and Day 2 never reuses it", () => {
+  const game = newGame();
+  for (const id of IDS) treatAndTalk(game, id);
+  closeDialogue(game);
+  tick(game);
+  for (let i = 0; i < 5; i++) tick(game);
+  assert.deepEqual(game.log, ["closing", "start:chapter-2"]);
+  assert.equal(day1.getDay1Status(game.claimed), "completed");
+  // even back in chapter-1 terms, a re-render with the flag asks for nothing
+  assert.equal(day1.shouldCloseDay1(game.patients, game.claimed), false);
+  // and in chapter-2 there is no next chapter: the rule can never start again
+  assert.equal(getNextChapterId("chapter-2"), null);
+  const source = read("src/game/world/GameWorld.tsx");
+  const trigger = source.slice(
+    source.indexOf("const closingChapterAvailable"),
+    source.indexOf("const closingChapterAvailable") + 900,
   );
-  assert.ok(remark.includes("shouldAnnounceDay1WorkDone"));
-  assert.ok(remark.includes("claimFlag(DAY1_WORK_DONE_ID)"));
-  assert.ok(remark.includes("startDialogue("));
-  for (const forbidden of [
-    "startTransition",
-    "setWorld",
-    "setTimeout",
-    "setClosingActive",
-  ]) {
-    assert.ok(!remark.includes(forbidden), forbidden);
-  }
-  // the remark is flagged BEFORE it is said and reads the refs: no double effect
-  assert.ok(remark.indexOf("claimFlag") < remark.indexOf("startDialogue"));
-  assert.ok(remark.includes("claimedRewardsRef.current"));
+  assert.ok(
+    trigger.indexOf("claimFlag(DAY1_COMPLETED_ID)") <
+      trigger.indexOf("setClosingActive(true)"),
+  );
+  assert.ok(trigger.includes("claimedRewardsRef.current"));
 });
 
-test("after the remark the Doctor keeps full freedom: fast travel, Book, Map, Crafting and exploration are as before", () => {
-  const base = {
-    sceneId: "forest",
-    phase: "playing",
-    openingActive: false,
-    tutorialStep: "done",
-    dialogueActive: false,
-    bookOpen: false,
-    mapVisible: false,
-    storageOpen: false,
-    craftingOpen: false,
-    inNarrativeScene: false,
-  };
-  assert.equal(canFastTravel(base), true, "fast travel stays on offer");
-  // the day status takes no part in the rules of fast travel
+test("there is no 'go home' step any more: no work-done remark, no arrival condition, fast travel is unrelated to the closing", () => {
+  const dayCode = read("src/game/patients/day1.ts").replace(/\/\/.*$/gm, "");
+  assert.ok(
+    !/WORK_DONE|workDone|sceneId|apothecary|Fast|travel/i.test(dayCode),
+  );
+  assert.equal(talk.day1WorkDone, undefined);
+  const source = read("src/game/world/GameWorld.tsx");
+  assert.ok(
+    !/day1WorkDone|DAY1_WORK_DONE|shouldAnnounceDay1WorkDone/.test(source),
+  );
+  assert.ok(!/DAY1_HOME_SCENE|world\.sceneId,\s*\n?\s*\}\)/.test(source));
   const rule = read("src/game/world/fastTravel.ts");
   assert.ok(!/day1|Day1|DAY1/.test(rule));
-  // and the day never closes anywhere but at home
-  const game = newGame();
-  for (const id of IDS) game.patients = treat(game.patients, id);
-  tick(game);
-  for (const scene of [
-    "forest",
-    "mine-interior",
-    "tavern-interior",
-    "plaza",
-    "doctor-room",
-  ]) {
-    game.sceneId = scene;
-    tick(game);
-  }
-  assert.deepEqual(game.log, ["remark"]);
 });
 
-test("coming home on foot closes the day; the street door is the Botica's own arrival", () => {
-  const game = newGame();
-  for (const id of IDS) game.patients = treat(game.patients, id);
-  tick(game);
-  game.sceneId = "apothecary-street"; // walks to the Apothecary Street
-  tick(game);
-  assert.deepEqual(game.log, ["remark"]);
-  arriveWalking(game);
-  assert.deepEqual(game.log, ["remark", "closing"]);
-  assert.equal(day1.getDay1Status(game.patients, game.claimed), "completed");
-});
-
-test("fast travel closes the day exactly like walking: both arrive at the same Botica and the code never asks how", () => {
-  const walk = newGame();
-  const fast = newGame();
-  for (const g of [walk, fast]) {
-    for (const id of IDS) g.patients = treat(g.patients, id);
-    tick(g);
-  }
-  arriveWalking(walk);
-  arriveByFastTravel(fast);
-  assert.deepEqual(walk.log, fast.log);
-  assert.deepEqual(fast.log, ["remark", "closing"]);
-  assert.deepEqual([...walk.claimed].sort(), [...fast.claimed].sort());
-  // the same arrival: scene and spawn
-  const street = WORLD_SCENES["apothecary-street"].exits.find(
-    (e) => e.targetScene === "apothecary-interior",
-  );
-  assert.equal(street.targetScene, FAST_TRAVEL_DESTINATION.sceneId);
-  assert.equal(street.targetSpawn, FAST_TRAVEL_DESTINATION.spawnName);
-  // the rule looks at the state and the scene only
-  const src = read("src/game/patients/day1.ts");
-  assert.ok(!/fast|travel/i.test(src.replace(/\/\/.*$/gm, "")));
-  const game = GameWorldSource();
-  const closing = game.slice(
-    game.indexOf("// 2) Being in the Botica"),
-    game.indexOf("const finishClosing"),
-  );
-  assert.ok(closing.includes("shouldCloseDay1"));
-  assert.ok(closing.includes("world.sceneId"));
-  assert.ok(!/fastTravel|handleFastTravel|caption/i.test(closing));
-});
-
-test("entering the Botica or fast travelling before the three are treated does not close the day, and fast travel keeps working", () => {
-  for (const treated of [[], [IDS[0]], [IDS[0], IDS[1]], [IDS[2], IDS[1]]]) {
-    const game = { ...newGame(), patients: treated.reduce(treat, START) };
-    arriveWalking(game);
-    arriveByFastTravel(game);
-    assert.deepEqual(game.log, [], treated.join("+"));
-  }
-  // and the trip itself is unchanged by the day: still on offer outside home
-  assert.equal(
-    canFastTravel({
-      sceneId: "plaza",
-      phase: "playing",
-      openingActive: false,
-      tutorialStep: "done",
-      dialogueActive: false,
-      bookOpen: false,
-      mapVisible: false,
-      storageOpen: false,
-      craftingOpen: false,
-      inNarrativeScene: false,
-    }),
-    true,
-  );
-});
-
-test("the closing is the existing narrative interlude over the fireplace picture, and blocks the world like the opening", () => {
+test("the closing is ONE sequence: the existing fireplace interlude whose first line is the caption", () => {
   assert.ok(NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]);
   assert.ok(
     fs.existsSync(
@@ -347,81 +268,127 @@ test("the closing is the existing narrative interlude over the fireplace picture
       ),
     ),
   );
-  const game = GameWorldSource();
-  assert.ok(game.includes('NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]'));
-  assert.ok(game.includes("<NarrativeInterlude"));
-  assert.ok(game.includes("onFinished={finishClosing}"));
-  // one flag marks the day as completed, once the interlude is over
-  const finish = game.slice(
-    game.indexOf("const finishClosing"),
-    game.indexOf("const closingConversation"),
-  );
-  assert.ok(finish.includes("claimFlag(DAY1_COMPLETED_ID)"));
-  assert.ok(finish.includes("setClosingActive(false)"));
-  // it blocks movement and every interface exactly as the opening does
+  const source = read("src/game/world/GameWorld.tsx");
+  assert.equal((source.match(/<NarrativeInterlude/g) ?? []).length, 2); // opening + closing
+  assert.ok(source.includes('NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]'));
+  assert.ok(source.includes("onCovered={startNextChapter}"));
+  assert.ok(source.includes("onFinished={finishClosing}"));
+  // blocks movement and every interface exactly as the opening does
   assert.ok(
-    game.includes("const interludeActive = openingActive || closingActive;"),
+    source.includes("const interludeActive = openingActive || closingActive;"),
   );
-  assert.ok(!/!openingActive &&/.test(game.replace(/!interludeActive/g, "")));
+  // the caption is the first line of the closing; there is no second fade/message
+  const es = localizeConversation(talk.day1Closing, "es", "doctor").lines;
+  const en = localizeConversation(talk.day1Closing, "en", "doctor").lines;
+  assert.equal(
+    es[0].text,
+    "Con los pacientes atendidos, regresas a casa para descansar.",
+  );
+  assert.equal(
+    en[0].text,
+    "With your patients cared for, you return home to rest.",
+  );
+  assert.ok(es.length >= 2 && es.length === en.length);
+  assert.ok(!/regresas a casa|return home to rest/.test(source));
+  // the interlude tells its owner when the picture covers the game
+  const interlude = read("src/game/narrative/NarrativeInterlude.tsx");
+  assert.ok(interlude.includes("onCovered?: () => void"));
+  assert.ok(interlude.includes('phase !== "fade-in" && !coveredRef.current'));
 });
 
-test("ES and EN: the remark and the closing, with no text written in GameWorld", () => {
-  const es = localizeConversation(talk.day1WorkDone, "es", "doctor").lines.map(
-    (l) => l.text,
+test("Day 2 begins in the Doctor's Room on an EXISTING spawn, with no opening, and the story keeps everything of Day 1", () => {
+  assert.equal(getNextChapterId("chapter-1"), "chapter-2");
+  const start = getChapterStart("chapter-2");
+  assert.equal(start.sceneId, "doctor-room");
+  assert.equal(
+    start.opening,
+    undefined,
+    "Day 1's introduction is not repeated",
   );
-  const en = localizeConversation(talk.day1WorkDone, "en", "doctor").lines.map(
-    (l) => l.text,
+  assert.ok(
+    WORLD_SCENES[start.sceneId].arrivals[start.spawnName],
+    "the spawn exists in the scene",
   );
-  assert.deepEqual(es, [
-    "Creo que por hoy ha sido suficiente.",
-    "Debería volver a la botica.",
-  ]);
-  assert.deepEqual(en, [
-    "I think that's enough for today.",
-    "I should head back to the apothecary.",
-  ]);
+  // the same existing spawn Day 1 starts on
+  assert.equal(start.spawnName, getChapterStart("chapter-1").spawnName);
+  assert.equal(start.sceneId, getChapterStart("chapter-1").sceneId);
+  // the active chapter is state now, and the swap touches only chapter + world
+  const source = read("src/game/world/GameWorld.tsx");
+  assert.ok(source.includes("const [chapterId, setChapterId] = useState("));
+  const swap = source.slice(
+    source.indexOf("const startNextChapter"),
+    source.indexOf("const finishClosing"),
+  );
+  assert.ok(swap.includes("setChapterId(nextChapterId)"));
+  assert.ok(swap.includes("setWorld("));
+  assert.ok(swap.includes("chapterAdvancedRef"));
+  for (const forbidden of [
+    "setInventory",
+    "setStorage",
+    "setKnownRecipeIds",
+    "setPatients",
+    "setClaimedRewards",
+    "setCollected",
+    "claimFlag",
+  ]) {
+    assert.ok(!swap.includes(forbidden), `${forbidden} is not reset`);
+  }
+  // no saving and no daily reset were added
+  assert.ok(!/localStorage|sessionStorage/.test(source));
+  // the opening runs once per session and reads the initial chapter only
+  assert.ok(
+    source.includes("resolveChapterIntro(INITIAL_CHAPTER_ID, language)"),
+  );
+});
+
+test("chapter-2 composition: the runtime has its slot; nothing is invented or copied from Day 1", () => {
+  const slot = read("src/game/compositions/chapter-2.ts");
+  assert.ok(slot.includes("export const chapter2Compositions"));
+  // the slot is either still the pending placeholder or Kilian's real export
+  assert.ok(slot.includes("PENDING EXPORT") || slot.includes("Exported from"));
+  const index = read("src/game/compositions/index.ts");
+  assert.ok(index.includes("...chapter2Compositions"));
+  // nothing of chapter-1 is read for chapter-2
+  for (const scene of ["plaza", "apothecary-street", "doctor-room"]) {
+    const day2 = getComposition(scene, "chapter-2");
+    assert.ok(
+      !day2 || day2.instances.every((i) => !/chapter-1/.test(i.instanceId)),
+      scene,
+    );
+    if (getComposition(scene, "chapter-1")) {
+      assert.notEqual(getComposition(scene, "chapter-1"), day2);
+    }
+  }
+  // no chapter-2 interactions or story were invented
+  assert.ok(
+    !/chapter-2/.test(read("src/game/compositions/chapter-1.interactions.ts")),
+  );
+});
+
+test("ES and EN: the closing lines come from the data, with no text written in GameWorld", () => {
   for (const language of ["es", "en"]) {
     const closing = localizeConversation(talk.day1Closing, language, "doctor");
     assert.ok(closing.lines.length >= 2);
-    assert.ok(
-      closing.lines.every((l) => l.speaker === "doctor" && l.text.trim()),
-    );
+    assert.ok(closing.lines.every((l) => l.text.trim()));
   }
-  const game = GameWorldSource();
+  const source = read("src/game/world/GameWorld.tsx");
   assert.ok(
-    !/Creo que por hoy|I think that's enough|Tres enfermos|Three patients seen/.test(
-      game,
-    ),
+    !/Tres enfermos|Three patients seen|Con los pacientes/.test(source),
   );
 });
 
-test("the final state is Day 1 completed and nothing of Day 2 starts", () => {
+test("the cases are untouched by the closing and nothing else of Day 2 starts", () => {
   const game = newGame();
-  for (const id of IDS) game.patients = treat(game.patients, id);
+  for (const id of IDS) treatAndTalk(game, id);
+  closeDialogue(game);
   tick(game);
-  arriveWalking(game);
-  assert.equal(day1.getDay1Status(game.patients, game.claimed), "completed");
-  // closed once: later arrivals do not close it again
-  arriveWalking(game);
-  arriveByFastTravel(game);
-  assert.deepEqual(game.log, ["remark", "closing"]);
-  // no other chapter or day exists in the code or the new files
-  const chapters = read("src/game/world/chapterStart.ts");
-  assert.ok(!/chapter-2|day-2|day2/i.test(chapters));
-  for (const file of [
-    "src/game/patients/day1.ts",
-    "src/game/dialogue/chapter1Day1Dialogues.ts",
-  ]) {
-    assert.ok(!/chapter-2|day-?2/i.test(read(file)), file);
-  }
-  // the cases themselves are untouched by the closing
   for (const id of IDS) {
     assert.equal(pc.getPatientStatus(game.patients, id), "treated");
   }
+  // out of scope: Day 2 patients or Days 3-4 (the Day 2 opening encounter
+  // exists since its own task and does not touch the closing)
+  const source = read("src/game/world/GameWorld.tsx");
+  assert.ok(!/chapter-3|chapter-4/i.test(source));
 });
-
-function GameWorldSource() {
-  return read("src/game/world/GameWorld.tsx");
-}
 
 console.log(`\n${passed} tests passed`);

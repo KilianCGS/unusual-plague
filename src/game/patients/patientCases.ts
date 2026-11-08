@@ -40,6 +40,8 @@ export type PatientCaseDefinition = {
   // a scene of its own (the Baker's Bedroom); "in-place" examines the patient
   // right where he lies, in the current scene.
   examination?: "narrative" | "in-place";
+  // An unresolved investigation has no deliverable treatment yet.
+  investigation?: Record<Language, string>;
 };
 
 // Only the cases that are not hidden are stored: a missing entry IS hidden.
@@ -107,6 +109,7 @@ export function isTreatable(
   inventory: InventoryState,
 ): boolean {
   return (
+    !definition.investigation &&
     getPatientStatus(state, definition.id) === "examined" &&
     hasRequiredTreatments(definition, inventory)
   );

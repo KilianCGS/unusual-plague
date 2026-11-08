@@ -169,7 +169,7 @@ test("all 30 approved art entries are catalog items with bilingual names", () =>
   assert.equal(Object.keys(ITEMS).length, 33);
 });
 
-test("catalogued is NOT implemented: promoted items have no recipe, patient need or source (except what Patient 2 uses)", () => {
+test("prepared catalog now has recipes, without changing Chapter 1 needs or adding material sources", () => {
   const recipeItemIds = new Set(
     RECIPES.flatMap((r) => [r.output.itemId, ...r.inputs.map((i) => i.itemId)]),
   );
@@ -180,7 +180,7 @@ test("catalogued is NOT implemented: promoted items have no recipe, patient need
     if (USED_BY_PATIENT_2.includes(id)) {
       continue;
     }
-    assert.ok(!recipeItemIds.has(id), `${id} must not be in a recipe yet`);
+    assert.equal(recipeItemIds.has(id), id !== "leech", `${id}: existing prepared catalog now has recipes; leech stays an investigation item`);
     assert.equal(
       getItem(id).sourceHint,
       undefined,
@@ -194,7 +194,7 @@ test("catalogued is NOT implemented: promoted items have no recipe, patient need
     }
   }
   // the six earlier recipes plus Milk with honey
-  assert.equal(RECIPES.length, 7);
+  assert.equal(RECIPES.length, 15);
   // the first patient still needs only the two prepared items
   assert.deepEqual(CHAPTER1_PATIENTS[BAKER_HUSBAND_ID].requiredTreatments, [
     { itemId: "medicinal-infusion", quantity: 1 },

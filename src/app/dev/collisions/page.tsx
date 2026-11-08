@@ -10,6 +10,7 @@ import {
 } from "../../../game/apothecary/apothecaryMainZoneGeometry";
 import type { LogicalRect, SceneCollider } from "../../../game/collision";
 import { getSceneInteractionZones } from "../../../game/interactions/sceneInteractions";
+import { ENVIRONMENT_INTERACTIONS } from "../../../game/interactions/environmentCatalog";
 import {
   doctorRoomNewColliders,
   doctorRoomNewSpawns,
@@ -120,6 +121,12 @@ import {
   smithyStreetTransitions as nwSmithyStreetTransitions,
 } from "../../../game/new-world-map/geometry/smithyStreetGeometry";
 import { DEV_SCENES, getSceneWorld, type DevScene } from "../scene/scenes";
+import { GRANARY_INTERIOR_VISUAL } from "../../../game/new-world-map/newWorldVisuals";
+import {
+  granaryInteriorColliders,
+  granaryInteriorSpawns,
+  granaryInteriorTransitions,
+} from "../../../game/granary-interior/granaryInteriorGeometry";
 import {
   clientToWorld,
   formatSceneExport,
@@ -139,6 +146,11 @@ const EDITOR_SCENES: {
   idPrefix: string;
   exportPrefix: string;
 }[] = [
+  {
+    sceneId: "granary-interior",
+    idPrefix: "granary-interior",
+    exportPrefix: "granaryInterior",
+  },
   { sceneId: "plaza", idPrefix: "plaza", exportPrefix: "plaza" },
   {
     // The Botica in play (Apothecary Main Zone), the Apothecary's own room, not
@@ -288,6 +300,11 @@ const PERSISTED_GEOMETRY: Record<
     spawns: { id: string; x: number; y: number; direction: Direction }[];
   }
 > = {
+  "granary-interior": {
+    colliders: granaryInteriorColliders,
+    transitions: granaryInteriorTransitions,
+    spawns: granaryInteriorSpawns,
+  },
   plaza: {
     colliders: plazaColliders,
     transitions: plazaTransitions,
@@ -1091,6 +1108,7 @@ function SceneGeometryEditor({
               interactionId
               <input
                 type="text"
+                list="environment-interaction-ids"
                 value={selectedInteraction.interactionId}
                 spellCheck={false}
                 onChange={(event) =>
@@ -1100,6 +1118,12 @@ function SceneGeometryEditor({
                 }
               />
             </label>
+            <datalist id="environment-interaction-ids">
+              {ENVIRONMENT_INTERACTIONS.filter((entry) => entry.sceneId === scene.id).map((entry) => (
+                <option key={entry.interactionId} value={entry.interactionId}>{entry.label}</option>
+              ))}
+            </datalist>
+            <p>Dibuja la zona en suelo accesible junto al objeto. Elige su interactionId y usa Copy export. El juego lee la exportación integrada, no este borrador.</p>
             <label className={styles.formRow}>
               requiredDirection
               <select
@@ -1159,7 +1183,9 @@ export default function CollisionsDevPage() {
     ),
   );
   const config = EDITOR_SCENES.find((entry) => entry.sceneId === sceneId);
-  const scene = DEV_SCENES.find((candidate) => candidate.id === sceneId);
+  const scene = [GRANARY_INTERIOR_VISUAL, ...DEV_SCENES].find(
+    (candidate) => candidate.id === sceneId,
+  );
   const data = store[sceneId];
 
   const updateSceneData = useCallback(
@@ -1175,7 +1201,9 @@ export default function CollisionsDevPage() {
   const sceneOptions = EDITOR_SCENES.map((entry) => ({
     sceneId: entry.sceneId,
     label:
-      DEV_SCENES.find((candidate) => candidate.id === entry.sceneId)?.label ??
+      [GRANARY_INTERIOR_VISUAL, ...DEV_SCENES].find(
+        (candidate) => candidate.id === entry.sceneId,
+      )?.label ??
       entry.sceneId,
   }));
 

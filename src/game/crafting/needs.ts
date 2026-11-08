@@ -19,25 +19,46 @@ export function getRequiredIngredients(
   inventory: InventoryState,
   recipes: readonly Recipe[] = RECIPES,
 ): ItemNeed[] {
+  const demands = new Map<string, number>();
   const totals = new Map<string, number>();
+  const ordered: string[] = [];
+  const visited = new Set<string>();
+  const visiting = new Set<string>();
+  const byOutput = new Map(recipes.map(recipe => [recipe.output.itemId as string, recipe]));
 
-  for (const { itemId, quantity } of treatments) {
-    const shortfall = Math.max(0, quantity - countItem(inventory, itemId));
-    const recipe = recipes.find(({ output }) => output.itemId === itemId);
-
-    if (!recipe || shortfall === 0) {
-      continue;
-    }
-
-    // Each craft makes `output.quantity`; round up to whole crafts.
-    const crafts = Math.ceil(shortfall / recipe.output.quantity);
-
-    for (const input of recipe.inputs) {
-      addNeed(totals, input.itemId, input.quantity * crafts);
-    }
+  function visit(itemId: string) {
+    if (visiting.has(itemId)) throw new Error(`Cyclic crafting recipe: ${itemId}`);
+    if (visited.has(itemId)) return;
+    visiting.add(itemId);
+    for (const input of byOutput.get(itemId)?.inputs ?? []) visit(input.itemId);
+    visiting.delete(itemId);
+    visited.add(itemId);
+    ordered.push(itemId);
+  }
+  for (const treatment of treatments) {
+    addNeed(demands, treatment.itemId, treatment.quantity);
+    visit(treatment.itemId);
   }
 
-  return [...totals].map(([itemId, quantity]) => ({ itemId, quantity }));
+  // Process all parents before a shared ingredient, aggregating demand BEFORE
+  // using its carried stock or rounding batches. No intermediate is counted twice.
+  for (const itemId of [...ordered].reverse()) {
+    const quantity = demands.get(itemId) ?? 0;
+    const recipe = byOutput.get(itemId);
+    if (!recipe) {
+      if (quantity > 0) addNeed(totals, itemId, quantity);
+      continue;
+    }
+    const shortfall = Math.max(0, quantity - countItem(inventory, itemId));
+    const crafts = Math.ceil(shortfall / recipe.output.quantity);
+    for (const input of recipe.inputs) {
+      if (crafts > 0) addNeed(demands, input.itemId, input.quantity * crafts);
+    }
+  }
+  // Preserve the original first-seen ingredient order for existing dialogue.
+  return ordered.filter(itemId => totals.has(itemId)).map(itemId => ({
+    itemId, quantity: totals.get(itemId)!,
+  }));
 }
 
 // The ingredients the Doctor still lacks, with the MISSING quantity: needed

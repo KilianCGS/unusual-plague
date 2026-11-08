@@ -2,6 +2,7 @@ import { newWorldOutskirtsInteractions } from "../new-world-map/newWorldInteract
 import { apothecaryMainZoneInteractions } from "../apothecary/apothecaryMainZoneGeometry";
 import { doctorRoomStorageInteractions } from "../storage/storage";
 import type { InteractionZone } from "./interactionZone";
+import { environmentZonesByScene } from "./environmentZones";
 
 // Interaction zones painted per scene in /dev/collisions (keyed by the same
 // scene ids as DEV_SCENES / WORLD_SCENES), kept apart from the colliders.
@@ -22,5 +23,9 @@ const SCENE_INTERACTIONS: Record<string, InteractionZone[]> = {
 const NO_INTERACTIONS: InteractionZone[] = [];
 
 export function getSceneInteractionZones(sceneId: string): InteractionZone[] {
+  const environment = environmentZonesByScene[sceneId];
+  if (environment?.length) {
+    return [...(SCENE_INTERACTIONS[sceneId] ?? NO_INTERACTIONS), ...environment];
+  }
   return SCENE_INTERACTIONS[sceneId] ?? NO_INTERACTIONS;
 }

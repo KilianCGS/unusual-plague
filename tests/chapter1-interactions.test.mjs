@@ -310,7 +310,9 @@ test("chapter 1 opening monologue: seven Doctor lines, ES and EN", () => {
 
 test("the old pilot villager and its Plaza interaction zones are gone", () => {
   assert.deepEqual(getSceneNpcs("plaza"), []);
-  assert.deepEqual(getSceneInteractionZones("plaza"), []);
+  assert.deepEqual(getSceneInteractionZones("plaza").map(zone => zone.interactionId), [
+    "world.plaza.noticeboard", "world.plaza.well", "world.plaza.statue",
+  ]);
 });
 
 // --- Tavern transition geometry -------------------------------------------

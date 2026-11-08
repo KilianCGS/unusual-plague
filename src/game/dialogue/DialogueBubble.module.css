@@ -1,5 +1,5 @@
 /* Pixel parchment bubble: hard 2px dark border, stepped (not rounded) corners,
-   flat cream paper, no soft shadows. Colours come from the book paper. */
+   flat soft-yellow parchment (NPCs), no soft shadows. */
 .bubble {
   position: absolute;
   z-index: 20;
@@ -45,7 +45,7 @@
 .paper {
   position: relative;
   padding: 8px 12px 10px;
-  background: #e9dbb9;
+  background: #f2dfa0;
   color: #1c1009;
   clip-path: polygon(
     0 4px,
@@ -123,7 +123,7 @@
   top: 0;
   width: 8px;
   height: 7px;
-  background: #e9dbb9;
+  background: #f2dfa0;
   clip-path: polygon(0 0, 100% 0, 50% 100%);
 }
 

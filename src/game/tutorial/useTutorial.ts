@@ -12,11 +12,14 @@ import {
 // Owns the tutorial step for the whole game session (in memory only). The
 // reducer returns the same state for events that do not apply, so reporting
 // every movement frame costs no re-render.
-export function useTutorial(): {
+export function useTutorial(initialStep?: TutorialStep): {
   step: TutorialStep;
   notify: (event: TutorialEvent) => void;
 } {
-  const [step, dispatch] = useReducer(advanceTutorial, INITIAL_TUTORIAL_STEP);
+  const [step, dispatch] = useReducer(
+    advanceTutorial,
+    initialStep ?? INITIAL_TUTORIAL_STEP,
+  );
   const notify = useCallback((event: TutorialEvent) => dispatch(event), []);
 
   return { step, notify };

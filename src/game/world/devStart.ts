@@ -1,0 +1,98 @@
+import { getComposition } from "../compositions";
+import { getDecorAsset } from "../decor/decorAssets";
+import { createChapter1Inventory } from "../inventory/initialInventory";
+import { addItem, type InventoryState } from "../inventory/inventory";
+import {
+  BARTENDER_ALCOHOL_REWARD_ID,
+  BAKER_SALT_REWARD_ID,
+  BEEKEEPER_HONEY_REWARD_ID,
+  CHAPTER1_PATIENTS,
+  FARM_MILK_REWARD_ID,
+  FARM_WOMAN_INTRO_ID,
+  MOUNTAIN_MINER_COAL_REWARD_ID,
+  TAVERN_JAR_REWARD_ID,
+  WITCH_HERB_REWARD_ID,
+  WITCH_MET_ID,
+  WITCH_WAITED_ID,
+} from "../patients/chapter1Patients";
+import type { PatientCasesState } from "../patients/patientCases";
+import { DAY1_COMPLETED_ID } from "../patients/day1";
+import { createEmptyStorage } from "../storage/storage";
+import type { TutorialStep } from "../tutorial/tutorialFlow";
+import { WORLD_SCENES } from "./worldScenes";
+
+// A DEVELOPMENT start: the state GameWorld begins with when it is handed one
+// (see /dev/day2). The real game never passes it, so a normal game starts as
+// always. Everything below is TEST DATA that reproduces what a finished Day 1
+// leaves behind; none of it is a decision about how the real chapter begins.
+export type GameDevStart = {
+  chapterId: string;
+  patients: PatientCasesState;
+  claimedRewards: ReadonlySet<string>;
+  knownRecipeIds: ReadonlySet<string>;
+  inventory: InventoryState;
+  storage: InventoryState;
+  collected: ReadonlySet<string>;
+  tutorialStep: TutorialStep;
+};
+
+// The resources Day 1's treatments consume: taken, so their instances are in
+// the collected set exactly as after a real Day 1 (this is what makes an
+// instance id shared with Day 2 visible during tests).
+const DAY1_CONSUMED_ITEM_IDS = ["medicinal-herb", "mushroom", "orange"];
+
+function getDay1CollectedInstanceIds(): ReadonlySet<string> {
+  const ids = new Set<string>();
+
+  for (const sceneId of Object.keys(WORLD_SCENES)) {
+    for (const instance of getComposition(sceneId, "chapter-1")?.instances ??
+      []) {
+      const itemId = getDecorAsset(instance.assetId)?.collectibleItemId;
+
+      if (itemId && DAY1_CONSUMED_ITEM_IDS.includes(itemId)) {
+        ids.add(instance.instanceId);
+      }
+    }
+  }
+
+  return ids;
+}
+
+// TEST DATA: Day 1 completed. All three cases treated, every one-time exchange
+// of Day 1 received, every recipe shown, the closing already played. The
+// Doctor carries his empty flask (TEST FIXTURE) and the chest is empty.
+export function createDay2DevStart(): GameDevStart {
+  const patients: PatientCasesState = Object.fromEntries(
+    Object.keys(CHAPTER1_PATIENTS).map((patientId) => [patientId, "treated"]),
+  );
+
+  return {
+    chapterId: "chapter-2",
+    patients,
+    claimedRewards: new Set([
+      DAY1_COMPLETED_ID,
+      BAKER_SALT_REWARD_ID,
+      TAVERN_JAR_REWARD_ID,
+      FARM_MILK_REWARD_ID,
+      FARM_WOMAN_INTRO_ID,
+      BEEKEEPER_HONEY_REWARD_ID,
+      BARTENDER_ALCOHOL_REWARD_ID,
+      MOUNTAIN_MINER_COAL_REWARD_ID,
+      WITCH_MET_ID,
+      WITCH_WAITED_ID,
+      WITCH_HERB_REWARD_ID,
+    ]),
+    knownRecipeIds: new Set(
+      Object.values(CHAPTER1_PATIENTS).flatMap(
+        (definition) => definition.revealsRecipeIds,
+      ),
+    ),
+    inventory:
+      addItem(createChapter1Inventory(), "empty-flask", 1) ??
+      createChapter1Inventory(),
+    storage: createEmptyStorage(),
+    collected: getDay1CollectedInstanceIds(),
+    // The tutorial of the first morning is over.
+    tutorialStep: "done",
+  };
+}

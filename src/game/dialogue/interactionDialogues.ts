@@ -1,5 +1,7 @@
 import type { Language } from "../i18n/types";
 import { chapter1AmbientDialogues } from "./chapter1Dialogues";
+import { chapter2AmbientDialogues } from "./chapter2AmbientDialogues";
+import { environmentDialogues } from "./environmentDialogues";
 import { chapter1Intro } from "./chapter1Intro";
 import { DOCTOR_SPEAKER, type Conversation } from "./dialogueTypes";
 import {
@@ -12,6 +14,8 @@ import {
 // entry does nothing (that is how an interactable stays "pending").
 const CONVERSATIONS: Record<string, LocalizedConversation> = {
   ...chapter1AmbientDialogues,
+  ...chapter2AmbientDialogues,
+  ...environmentDialogues,
 };
 
 // The Doctor's opening lines of each chapter, by chapterId.

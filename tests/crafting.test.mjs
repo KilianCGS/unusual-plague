@@ -75,7 +75,7 @@ const permutations = (list) =>
       );
 
 test("the V1 recipes, the two patient recipes and Milk with honey exist with the right stations and sizes", () => {
-  assert.equal(RECIPES.length, 7);
+  assert.equal(RECIPES.length, 15);
   assert.deepEqual(STATION_MAX_INPUTS, { manual: 2, fire: 3 });
   assert.equal(recipeById("manual.disinfected-bandage").inputs.length, 2);
   assert.equal(recipeById("fire.mushroom-soup").inputs.length, 3);
@@ -780,6 +780,114 @@ test("the flask only comes back with the LAST water; nothing else has a vessel",
       .sort(),
     ["cold-cloth", "medicinal-infusion"],
   );
+});
+
+test("all 15 catalog preparations have unique recipes; every recipe fits its actual station", () => {
+  assert.equal(new Set(RECIPES.map(r => r.output.itemId)).size, 15);
+  assert.equal(new Set(RECIPES.map(r => r.id)).size, 15);
+  for (const recipe of RECIPES) {
+    assert.ok(recipe.inputs.reduce((sum,input)=>sum+input.quantity,0)<=STATION_MAX_INPUTS[recipe.station]);
+    assert.ok(ITEMS[recipe.output.itemId]);
+  }
+});
+
+test("single coal processing is enabled only at the manual table and crafts atomically", () => {
+  assert.equal(cr.canAttemptCombine(["coal",null],"manual"),true);
+  assert.equal(cr.canAttemptCombine(["coal",null,null],"fire"),false);
+  assert.equal(cr.canAttemptCombine(["cloth",null],"manual"),false);
+  assert.equal(cr.canAttemptCombine([null,null],"manual"),false);
+  const before=stock([["coal",1]]);
+  const after=cr.combine(before,"manual",["coal",null]);
+  assert.equal(after.kind,"success");
+  assert.equal(inv.countItem(before,"coal"),1);
+  assert.equal(inv.countItem(after.inventory,"crushed-coal"),1);
+});
+
+test("four real two-step chains consume their intermediates and produce the catalog result", () => {
+  const chains=[
+    [[['water',1],['mint',1],['honey',1],['garlic',1]],'fire.mint-infusion','fire.balsamic-syrup'],
+    [[['medicinal-herb',1],['honey',1],['flour',1]],'manual.medicinal-paste','manual.poultice'],
+    [[['animal-fat',1],['resin',1],['cloth',1]],'fire.ointment-base','manual.medicinal-compress'],
+    [[['coal',1],['water',1]],'manual.crushed-coal','manual.charcoal-suspension'],
+  ];
+  for(const [inputs,firstId,lastId] of chains){
+    const first=recipeById(firstId),last=recipeById(lastId);
+    const middle=cr.craft(stock(inputs),first);assert.ok(middle,firstId);
+    const final=cr.craft(middle,last);assert.ok(final,lastId);
+    assert.equal(inv.countItem(final,first.output.itemId),0);
+    assert.equal(inv.countItem(final,last.output.itemId),1);
+  }
+});
+
+test("recursive needs use carried intermediates once and aggregate shared batch outputs", () => {
+  const {getMissingIngredients}=at("src/game/crafting/needs.ts");
+  const needs=[{itemId:'balsamic-syrup',quantity:1},{itemId:'mint-infusion',quantity:1}];
+  const missing=getMissingIngredients(needs,stock([['mint-infusion',1],['water',1]]));
+  assert.deepEqual(new Map(missing.map(n=>[n.itemId,n.quantity])),new Map([['mint',1],['honey',1],['garlic',1]]));
+  const recipes=[
+    {id:'a',station:'manual',inputs:[{itemId:'middle',quantity:1}],output:{itemId:'a',quantity:1}},
+    {id:'b',station:'manual',inputs:[{itemId:'middle',quantity:1}],output:{itemId:'b',quantity:1}},
+    {id:'m',station:'manual',inputs:[{itemId:'coal',quantity:1}],output:{itemId:'middle',quantity:2}},
+  ];
+  const demand=[{itemId:'a',quantity:1},{itemId:'b',quantity:1}];
+  assert.deepEqual(getMissingIngredients(demand,stock([]),recipes),[{itemId:'coal',quantity:1}]);
+  assert.deepEqual(getMissingIngredients(demand,stock([['middle',2]]),recipes),[]);
+  const cycle=[{id:'loop',station:'manual',inputs:[{itemId:'loop',quantity:1}],output:{itemId:'loop',quantity:1}}];
+  assert.throws(()=>getMissingIngredients([{itemId:'loop',quantity:1}],stock([]),cycle),/Cyclic/);
+});
+
+test("knowing a chained recipe reveals intermediate preparation pages without revealing unrelated recipes", () => {
+  const {expandKnownRecipeIds}=at("src/game/crafting/recipes.ts");
+  const known=new Set(['manual.medicinal-compress']);
+  assert.deepEqual([...expandKnownRecipeIds(known)].sort(),['fire.ointment-base','manual.medicinal-compress']);
+  assert.deepEqual([...known],['manual.medicinal-compress']);
+  const {buildPreparationSpreads}=at("src/game/book/dynamicPages.ts");
+  for(const language of ['es','en']){
+    const spreads=buildPreparationSpreads({language,patients:{},inventory:stock([]),knownRecipeIds:known});
+    assert.equal(spreads.length,1);
+    assert.ok(spreads[0].texts.some(t=>t.id==='manual.medicinal-compress-steps'));
+  }
+});
+
+test("ingredient discovery teaches specific recipes permanently, including their intermediates", () => {
+  const {learnRecipesFromItems,RECIPE_DISCOVERY_ITEMS}=at("src/game/crafting/recipeDiscovery.ts");
+  const empty=new Set();
+  assert.equal(learnRecipesFromItems(empty,['water','empty-flask','leech']),empty);
+  const herb=learnRecipesFromItems(empty,['medicinal-herb']);
+  assert.ok(herb.has('fire.medicinal-infusion') && herb.has('manual.medicinal-paste'));
+  assert.equal(empty.size,0);
+  assert.equal(learnRecipesFromItems(herb,[]),herb,'consuming or storing items never erases knowledge');
+  assert.equal(learnRecipesFromItems(herb,['medicinal-herb']),herb,'repeat pickups do not rediscover recipes');
+  const flour=learnRecipesFromItems(empty,['flour']);
+  assert.ok(flour.has('manual.poultice') && flour.has('manual.medicinal-paste'));
+  assert.ok(!flour.has('fire.balsamic-syrup'));
+  for(const ids of Object.values(RECIPE_DISCOVERY_ITEMS)) for(const id of ids)assert.ok(recipeById(id));
+  const all=learnRecipesFromItems(empty,Object.keys(RECIPE_DISCOVERY_ITEMS));
+  assert.equal(all.size,15,'existing ingredients can eventually reveal the whole catalog');
+});
+
+test("receiving or crafting a preparation teaches its recipe and prerequisite without a patient gate", () => {
+  const {learnRecipesFromItems}=at("src/game/crafting/recipeDiscovery.ts");
+  const learned=learnRecipesFromItems(new Set(),['charcoal-suspension']);
+  assert.deepEqual([...learned].sort(),['manual.charcoal-suspension','manual.crushed-coal']);
+  const game=fs.readFileSync(path.join(root,'src/game/world/GameWorld.tsx'),'utf8');
+  assert.ok(game.includes('nextInventory !== inventoryRef.current && rememberRecipes(nextInventory)'), 'atomic story acquisition learns only after validation');
+  assert.ok(game.includes('!toStorage && rememberRecipes(nextInventory)'), 'taking from the chest learns without treating chest contents as carried');
+  assert.ok(game.includes('const recipesDiscovered = rememberRecipes(next);'), 'successful world pickups learn');
+  assert.ok(game.includes('if (rememberRecipes(next)) showNotice(recipeDiscoveryCopy[language]);'), 'successful craft learns its result');
+});
+
+test("Book recipe availability tracks carried stock without deleting learned recipes", () => {
+  const {buildPreparationSpreads}=at("src/game/book/dynamicPages.ts");
+  for(const language of ['es','en']){
+    const context={language,patients:{},inventory:stock([['water',1],['mint',1]]),knownRecipeIds:new Set(['fire.mint-infusion'])};
+    const availability=ctx=>buildPreparationSpreads(ctx)[0].texts.find(t=>t.id==='fire.mint-infusion-availability').content[0];
+    assert.match(availability(context),language==='es'?/disponibles/:/available/);
+    const spent={...context,inventory:stock([])};
+    assert.match(availability(spent),language==='es'?/Faltan/:/missing/);
+    assert.equal(buildPreparationSpreads(spent)[0].texts[0].id,'fire.mint-infusion-name');
+    assert.ok(at('src/game/i18n/recipeDiscovery.ts').recipeDiscoveryCopy[language].includes('(Q)'));
+  }
 });
 
 console.log(`\n${passed} tests passed`);

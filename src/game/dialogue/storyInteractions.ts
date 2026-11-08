@@ -1,4 +1,7 @@
 import type { ItemNeed } from "../crafting/needs";
+import { resolveGranaryInteraction } from "./chapter2GranaryDialogues";
+import { resolveChapter2StoryInteraction } from "./chapter2StoryInteractions";
+import { PATIENT_CASES } from "../patients/patientRegistry";
 import { gatherCopy, itemFeedbackCopy } from "../i18n/items";
 import type { Language } from "../i18n/types";
 import {
@@ -164,7 +167,7 @@ export function getGatherDecision(
 
   const missing = getActiveMissingIngredients(
     facts.patients,
-    CHAPTER1_PATIENTS,
+    PATIENT_CASES,
     facts.inventory,
   );
 
@@ -569,6 +572,10 @@ export function resolveStoryInteraction(
   language: Language,
   subjectId: string,
 ): StoryOutcome | null {
+  const granary = resolveGranaryInteraction(interactionId, facts, language, subjectId);
+  if (granary) return granary;
+  const chapter2 = resolveChapter2StoryInteraction(interactionId, facts, language, subjectId);
+  if (chapter2) return chapter2;
   // The tavern case.
   if (interactionId === "chapter1.tavern.bartender") {
     return resolveBartender(facts, language, subjectId);

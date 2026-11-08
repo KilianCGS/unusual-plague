@@ -88,5 +88,8 @@ export const bookCopy: Record<Language, BookCopy> = {
 
 // Names of the ailments the PACIENTES pages mention.
 export const ailmentNames: Record<string, Record<Language, string>> = {
+  "exhaustion": { es: "Agotamiento", en: "Exhaustion" },
+  "infected-wound": { es: "Herida infectada", en: "Infected wound" },
+  "suspected-poisoning": { es: "Posible envenenamiento", en: "Suspected poisoning" },
   "common-fever": { es: "Fiebre común", en: "Common fever" },
 };

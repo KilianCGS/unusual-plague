@@ -96,4 +96,70 @@ export const RECIPES: Recipe[] = [
     ],
     output: { itemId: "cold-cloth", quantity: 1 },
   },
+  {
+    id: "fire.mint-infusion",
+    station: "fire",
+    inputs: [{ itemId: "water", quantity: 1 }, { itemId: "mint", quantity: 1 }],
+    output: { itemId: "mint-infusion", quantity: 1 },
+  },
+  {
+    id: "fire.balsamic-syrup",
+    station: "fire",
+    inputs: [{ itemId: "mint-infusion", quantity: 1 }, { itemId: "honey", quantity: 1 }, { itemId: "garlic", quantity: 1 }],
+    output: { itemId: "balsamic-syrup", quantity: 1 },
+  },
+  {
+    id: "fire.ointment-base",
+    station: "fire",
+    inputs: [{ itemId: "animal-fat", quantity: 1 }, { itemId: "resin", quantity: 1 }],
+    output: { itemId: "ointment-base", quantity: 1 },
+  },
+  {
+    id: "manual.poultice",
+    station: "manual",
+    inputs: [{ itemId: "medicinal-paste", quantity: 1 }, { itemId: "flour", quantity: 1 }],
+    output: { itemId: "poultice", quantity: 1 },
+  },
+  {
+    id: "manual.medicinal-compress",
+    station: "manual",
+    inputs: [{ itemId: "ointment-base", quantity: 1 }, { itemId: "cloth", quantity: 1 }],
+    output: { itemId: "medicinal-compress", quantity: 1 },
+  },
+  {
+    id: "manual.crushed-coal",
+    station: "manual",
+    inputs: [{ itemId: "coal", quantity: 1 }],
+    output: { itemId: "crushed-coal", quantity: 1 },
+  },
+  {
+    id: "manual.charcoal-suspension",
+    station: "manual",
+    inputs: [{ itemId: "crushed-coal", quantity: 1 }, { itemId: "water", quantity: 1 }],
+    output: { itemId: "charcoal-suspension", quantity: 1 },
+  },
+  {
+    id: "fire.citrus-drink",
+    station: "fire",
+    inputs: [{ itemId: "orange", quantity: 1 }, { itemId: "water", quantity: 1 }],
+    output: { itemId: "citrus-drink", quantity: 1 },
+  },
 ];
+
+// Knowing a final preparation also reveals the steps needed to make its inputs.
+export function expandKnownRecipeIds(
+  known: ReadonlySet<string>, recipes: readonly Recipe[] = RECIPES,
+): ReadonlySet<string> {
+  const expanded = new Set(known);
+  function visit(recipe: Recipe) {
+    for (const input of recipe.inputs) {
+      const dependency = recipes.find(r => r.output.itemId === input.itemId);
+      if (dependency && !expanded.has(dependency.id)) {
+        expanded.add(dependency.id);
+        visit(dependency);
+      }
+    }
+  }
+  for (const recipe of recipes) if (known.has(recipe.id)) visit(recipe);
+  return expanded;
+}

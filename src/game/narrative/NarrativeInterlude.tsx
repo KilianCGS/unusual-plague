@@ -32,11 +32,16 @@ export function NarrativeInterlude({
   conversation,
   language,
   onFinished,
+  onCovered,
 }: {
   illustration: NarrativeIllustration;
   conversation: Conversation;
   language: Language;
   onFinished: () => void;
+  // Called once, when the picture covers the game behind it (the moment text
+  // starts, or the fade-in was skipped). The closing of a day swaps the world
+  // here, unseen.
+  onCovered?: () => void;
 }) {
   const copy = narrativeCopy[language];
   const dialogue = useDialogue();
@@ -51,9 +56,12 @@ export function NarrativeInterlude({
   const textStartedRef = useRef(false);
   const textSeenRef = useRef(false);
   const onFinishedRef = useRef(onFinished);
+  const onCoveredRef = useRef(onCovered);
+  const coveredRef = useRef(false);
 
   useEffect(() => {
     onFinishedRef.current = onFinished;
+    onCoveredRef.current = onCovered;
   });
 
   // Black first, then the illustration fades in.
@@ -72,6 +80,12 @@ export function NarrativeInterlude({
 
   // The monologue starts when the illustration is fully there, once.
   useEffect(() => {
+    // Covered = past the fade-in (also when Esc skipped it).
+    if (phase !== "fade-in" && !coveredRef.current) {
+      coveredRef.current = true;
+      onCoveredRef.current?.();
+    }
+
     if (phase === "reading" && !textStartedRef.current) {
       textStartedRef.current = true;
       startDialogue(conversation);

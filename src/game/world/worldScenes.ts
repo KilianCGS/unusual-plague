@@ -119,6 +119,7 @@ export type SceneId =
   | "forest"
   | "forest-cottage"
   | "forest-cottage-interior"
+  | "granary-interior"
   | "farm"
   | "mill-farmland"
   | "bakery-street"
@@ -185,7 +186,7 @@ function visualOf(devSceneId: string): DevScene {
 
 // The OLD exterior world (default). The new one lives in src/game/new-world-map.
 export const OLD_WORLD_SCENES: Record<
-  Exclude<SceneId, "forest-cottage" | "forest-cottage-interior">,
+  Exclude<SceneId, "forest-cottage" | "forest-cottage-interior" | "granary-interior">,
   WorldScene
 > = {
   "apothecary-interior": {

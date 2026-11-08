@@ -86,9 +86,12 @@ export function deselectSlot(
 // 3), not how many a recipe needs: a fire recipe may use only two. COMBINE can
 // be pressed once at least MIN_COMBINE_INPUTS units are selected. That only
 // means "there are enough ingredients to try", not that a recipe exists.
+// A matching single-input processing recipe is the station-specific exception.
 export const MIN_COMBINE_INPUTS = 2;
 
-export function canAttemptCombine(selection: CraftSelection): boolean {
+export function canAttemptCombine(selection: CraftSelection, station?: CraftStation): boolean {
+  // Single-item processing is allowed only for an actual recipe at this station.
+  if (station && findMatchingRecipe(station, selectionToIngredients(selection))) return true;
   return (
     selection.filter((selected) => selected !== null).length >=
     MIN_COMBINE_INPUTS

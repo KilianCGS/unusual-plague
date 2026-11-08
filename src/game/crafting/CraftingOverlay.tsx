@@ -183,7 +183,7 @@ export function CraftingOverlay({
             type="button"
             className={styles.action}
             data-crafting-combine
-            disabled={!canAttemptCombine(selection)}
+          disabled={!canAttemptCombine(selection, station)}
             onClick={handleCombine}
           >
             {copy.action[station]}

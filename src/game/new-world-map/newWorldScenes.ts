@@ -1,4 +1,9 @@
 import type { LogicalRect } from "../collision";
+import {
+  granaryInteriorColliders,
+  granaryInteriorSpawns,
+  granaryInteriorTransitions,
+} from "../granary-interior/granaryInteriorGeometry";
 import type { Direction } from "../protagonist/useProtagonistController";
 import type {
   ExteriorWorldScene,
@@ -67,6 +72,7 @@ import {
 } from "../forest-cottage-interior/forestCottageInteriorGeometry";
 import {
   FOREST_COTTAGE_INTERIOR_VISUAL,
+  GRANARY_INTERIOR_VISUAL,
   FOREST_COTTAGE_VISUAL,
   NEW_WORLD_VISUALS,
 } from "./newWorldVisuals";
@@ -128,11 +134,23 @@ export const NEW_WORLD_SCENES: Record<
   | "forest"
   | "forest-cottage"
   | "forest-cottage-interior"
+  | "granary-interior"
   | "farm"
   | "mill-farmland"
   | "mountain-path",
   ExteriorWorldScene
 > = {
+  "granary-interior": {
+    id: "granary-interior",
+    kind: "exterior",
+    visual: GRANARY_INTERIOR_VISUAL,
+    colliders: granaryInteriorColliders,
+    exits: [exit("to-mill-farmland", granaryInteriorTransitions,
+      "granary-interior-transition-1", "mill-farmland", "from-granary-interior")],
+    arrivals: {
+      "from-mill-farmland": spawnAt(granaryInteriorSpawns, "granary-interior-spawn-1"),
+    },
+  },
   plaza: {
     id: "plaza",
     kind: "exterior",
@@ -459,6 +477,8 @@ export const NEW_WORLD_SCENES: Record<
     visual: visual("mill-farmland"),
     colliders: millFarmlandColliders,
     exits: [
+      exit("to-granary-interior", millFarmlandTransitions,
+        "mill-farmland-transition-2", "granary-interior", "from-mill-farmland"),
       exit(
         "to-farm",
         millFarmlandTransitions,
@@ -469,6 +489,7 @@ export const NEW_WORLD_SCENES: Record<
     ],
     arrivals: {
       "from-farm": spawnAt(millFarmlandSpawns, "mill-farmland-spawn-1"),
+      "from-granary-interior": spawnAt(millFarmlandSpawns, "mill-farmland-spawn-2"),
     },
   },
   "mountain-path": {

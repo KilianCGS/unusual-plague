@@ -137,8 +137,10 @@ const APOTHECARY_MAIN_ZONE_SCENES: DecoratorScene[] =
       ]
     : [];
 
-// The granary interior (Day 2): authoring only. Its background is open here to
-// place the population; it has no geometry and is not in WORLD_SCENES.
+// The granary interior (Day 2). It used to be authoring only (no geometry, not
+// in WORLD_SCENES); now WORLD_SCENES has it with its real geometry, so it comes
+// in through WIRED_SCENES. This geometry-less fallback is only added while the
+// real scene is missing, so the selector never gets two "granary-interior".
 const GRANARY_INTERIOR_SCENE: DecoratorScene = {
   id: "granary-interior",
   kind: "exterior",
@@ -147,11 +149,16 @@ const GRANARY_INTERIOR_SCENE: DecoratorScene = {
   exits: [],
   arrivals: {},
 };
+const GRANARY_INTERIOR_FALLBACK: DecoratorScene[] = WIRED_SCENES.some(
+  (scene) => scene.id === GRANARY_INTERIOR_SCENE.id,
+)
+  ? []
+  : [GRANARY_INTERIOR_SCENE];
 
 const SCENES: DecoratorScene[] = [
   ...WIRED_SCENES,
   ...APOTHECARY_MAIN_ZONE_SCENES,
-  GRANARY_INTERIOR_SCENE,
+  ...GRANARY_INTERIOR_FALLBACK,
   NARRATIVE_PREVIEW_SCENE,
 ];
 

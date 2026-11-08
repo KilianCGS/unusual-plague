@@ -1,9 +1,9 @@
-import { RECIPES } from "../crafting/recipes";
+import { RECIPES, expandKnownRecipeIds } from "../crafting/recipes";
 import { ailmentNames, bookCopy } from "../i18n/book";
 import type { Language } from "../i18n/types";
 import { countItem, type InventoryState } from "../inventory/inventory";
 import { getItemName } from "../items/items";
-import { CHAPTER1_PATIENTS } from "../patients/chapter1Patients";
+import { PATIENT_CASES } from "../patients/patientRegistry";
 import {
   getPatientStatus,
   getVisiblePatientIds,
@@ -65,7 +65,7 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
   const { language, patients, inventory } = context;
   const copy = bookCopy[language];
   const ids = getVisiblePatientIds(patients).filter(
-    (id) => CHAPTER1_PATIENTS[id],
+    (id) => PATIENT_CASES[id],
   );
 
   if (ids.length === 0) {
@@ -79,7 +79,7 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
   }
 
   return ids.map((id) => {
-    const definition = CHAPTER1_PATIENTS[id];
+    const definition = PATIENT_CASES[id];
     const status = getPatientStatus(patients, id);
     const texts: BookTextBlock[] = [
       text(`${id}-name`, "heading", LEFT, NAME_Y, definition.name[language]),
@@ -112,8 +112,14 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
           DETAIL_Y,
           definition.observation[language],
         ),
-        text(`${id}-treatment`, "heading", RIGHT, 46, copy.treatment),
+        text(`${id}-treatment`, "heading", RIGHT, 46,
+          definition.investigation ? (language === "es" ? "INVESTIGACIÓN" : "INVESTIGATION") : copy.treatment),
       );
+
+      if (definition.investigation) {
+        texts.push(text(`${id}-investigation`, "body", RIGHT, LINES_Y,
+          definition.investigation[language]));
+      }
 
       definition.requiredTreatments.forEach(({ itemId, quantity }, index) => {
         // The boxes are DERIVED from the inventory while the case is open; a
@@ -153,7 +159,8 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
 export function buildPreparationSpreads(context: BookContext): BookSpread[] {
   const { language, knownRecipeIds } = context;
   const copy = bookCopy[language];
-  const known = RECIPES.filter((recipe) => knownRecipeIds.has(recipe.id));
+  const expanded = expandKnownRecipeIds(knownRecipeIds);
+  const known = RECIPES.filter((recipe) => expanded.has(recipe.id));
 
   if (known.length === 0) {
     return [
@@ -192,10 +199,22 @@ export function buildPreparationSpreads(context: BookContext): BookSpread[] {
           `${recipe.id}-station`,
           "body",
           column,
-          DETAIL_Y,
+          190,
           `${copy.station}: ${copy.stations[recipe.station]}`,
         ),
       );
+      const ingredientsReady = recipe.inputs.every(input =>
+        countItem(context.inventory, input.itemId) >= input.quantity);
+      texts.push(text(`${recipe.id}-availability`, "note", column, 296,
+        ingredientsReady
+          ? (language === "es" ? "Ingredientes disponibles en la bolsa." : "Ingredients available in your bag.")
+          : (language === "es" ? "Faltan ingredientes en la bolsa." : "Some ingredients are missing from your bag.")));
+      const intermediates = recipe.inputs.filter(input =>
+        RECIPES.some(candidate => candidate.output.itemId === input.itemId));
+      if (intermediates.length) {
+        texts.push(text(`${recipe.id}-steps`, "body", column, 232,
+          `${language === "es" ? "Preparar antes" : "Prepare first"}: ${intermediates.map(input => getItemName(input.itemId, language)).join(", ")}.`));
+      }
     });
 
     spreads.push({

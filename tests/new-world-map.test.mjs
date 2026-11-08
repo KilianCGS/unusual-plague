@@ -142,6 +142,7 @@ test("the topology of the old world is kept, plus Forest <-> Casita del bosque",
     const expected = targets(OLD, id);
 
     if (id === "forest") expected.push("forest-cottage");
+    if (id === "mill-farmland") expected.push("granary-interior");
 
     assert.deepEqual(targets(WORLD_SCENES, id), expected.sort(), id);
   }

@@ -2,7 +2,9 @@ import { NEW_WORLD_SCENE_IDS } from "../new-world-map/worldVariant";
 import { newWorldChapter1Compositions } from "../new-world-map/newWorldCompositions";
 import type { DecorComposition, DecorInteraction } from "../decor/decorTypes";
 import { chapter1Compositions } from "./chapter-1";
+import { chapter2Compositions } from "./chapter-2";
 import { chapter1Interactions } from "./chapter-1.interactions";
+import { chapter2Interactions } from "./chapter-2.interactions";
 
 // VERSIONED scene populations, one file per chapter, each produced by
 // "COPY CHAPTER" in /dev/decorator. The runtime reads only these files; the
@@ -20,6 +22,8 @@ const ALL_COMPOSITIONS: DecorComposition[] = [
       !(NEW_WORLD_SCENE_IDS as readonly string[]).includes(composition.sceneId),
   ),
   ...newWorldChapter1Compositions,
+  // Day 2 has no legacy placements to exclude: its export is read as it is.
+  ...chapter2Compositions,
 ];
 
 // A scene + chapter can be listed more than once; their instances are merged.
@@ -56,6 +60,7 @@ const INTERACTIONS_BY_CHAPTER: Record<
   Record<string, DecorInteraction>
 > = {
   "chapter-1": chapter1Interactions,
+  "chapter-2": chapter2Interactions,
 };
 
 const NO_INTERACTIONS: Record<string, DecorInteraction> = {};

@@ -1,5 +1,137 @@
 # Unusual Plague: AI Project Context
 
+## Latest Day 2 placement update
+
+RECIPE DISCOVERY ACTIVE: `crafting/recipeDiscovery.ts` maps existing recognizable
+ingredients to recipe ids (water, vessels and leech are excluded). Successful
+world pickups, story gifts/trades, chest withdrawals and crafting results call
+the same pure learner. Receiving a preparation reveals its recipe too. Knowledge
+is monotonic for the session and prerequisite recipes are included. Patient
+examination updates the same remembered recipe set; dev known recipes are retained.
+Failed transactions teach nothing. A bilingual obtained/recipe notice directs
+the player to the Compendium (Q); learned preparation pages now report whether
+their immediate ingredients are carried (not chest stock or raw substitutes).
+This supersedes the earlier pending-discovery notes; new Day 2 ingredient
+sources and patient treatments still remain pending. No changes to the seven
+new decor assets, their colliders, or placements were made in this task.
+
+CRAFTING CATALOG UPDATE: following Kilian's instruction to use existing items,
+all 15 catalog preparations now have recipes (seven previous recipes unchanged,
+eight added). Four chains use intermediate items: mint infusion -> syrup,
+medicinal paste -> poultice, ointment base -> compress, crushed coal -> suspension.
+Manual remains two slots; fire three. Single-input processing is enabled only
+for an actual matching recipe at its station (coal grinding), not arbitrary
+single items. Ingredient needs now expand recursively, aggregate shared demands
+before allocating carried intermediates/batch rounding, and reject cyclic data.
+The Book reveals intermediate recipes when their final recipe is known and
+shows a bilingual "Prepare first" note. This does NOT implement learning on
+pickup, new material sources, new patient treatments or a blood-analysis cure.
+See `docs/CRAFTING_CATALOG.md` for all exact ingredients and dev presets.
+
+PLAZA ENVIRONMENT ACTIVE: Kilian supplied three interaction rectangles, now
+integrated verbatim in `environmentZones.ts`: noticeboard (967,254,103,21),
+well (399,403,97,21), statue (718,607,109,25). Assigned the corresponding
+`world.plaza.*` text ids to the blank exported interactionIds. Statue adds two
+brief ES/EN Doctor observations. No colliders, transitions or spawns changed.
+These three zones are shared between chapters and preload in the editor;
+the other environment objects still await manually painted zones.
+
+DAY 2 AMBIENT UPDATE: Kilian authorized adding NPC/environment writing.
+15 additional bilingual conversations are now connected to the supplied human
+placements (including woodcutter/blacksmith introductions, not their treatment
+mechanics). The bartender reuses the Day 1 interaction reach across the counter.
+Tests check separate reachable interaction floor for every connected NPC using
+actual scene and decor colliders; this is not browser validation of E input.
+Farm woman dialogue changes after the farmer's examination. Witch dialogue
+also responds to that knowledge; she gives the existing leech item once, before
+or after discovering the case, using atomic give-item/claim-reward effects and
+`chapter2.witch.leech`. Full inventory consumes neither item nor reward flag.
+Sample extraction, analysis and treatment remain unimplemented.
+
+Six everyday-object conversations are available in ES/EN, with Doctor-only
+speakers: noticeboard, well, mill tools, granary sacks, tavern hearth and anvil.
+`/dev/collisions` suggests their scene-specific ids. Their geometry has NOT been
+guessed: `environmentZones.ts` is empty pending Kilian's painted exports, so
+these object interactions are not yet active in runtime. See
+`docs/ENVIRONMENT_INTERACTIONS.md` for the authoring workflow. Environment zones
+merge with existing interactions; they never replace water, crafting or storage.
+
+Reported issues: Kilian did not see interactions in play; previously only the
+two granary characters had Day 2 interaction definitions, and now the remaining
+15 humans are wired too. Root cause of the reported granary input issue is not
+verified in browser. The doll child is intentionally nonblocking in the supplied
+export and has no asset defaultCollider, explaining why the Doctor crosses her.
+No manual collision geometry has been invented to change that.
+
+GRANARY RUNTIME UPDATE: Kilian supplied 12 colliders, one exit zone and one
+arrival (228, 340, south), preserved in `granaryInteriorGeometry.ts`.
+`granary-interior` is now a runtime scene connected bidirectionally to the V2
+mill barn door (mill-farmland-transition-2), returning at mill-farmland-spawn-2.
+The collision editor preloads this geometry; the map groups it with the mill.
+This supersedes earlier authoring-only notes.
+
+GRANARY FIRST PLAYABLE SCENE: under Kilian's instruction to build the scene,
+`chapter2GranaryDialogues.ts` adds bilingual carer introduction/revisits and
+the farmer's in-place examination/revisits. Either person can be approached
+first. The carer introduces the case but does not examine it; the farmer's
+medical status advances only after his examination conversation fully closes.
+These authored lines are implemented for Kilian's next play review; no separate
+approval of their exact wording or browser validation is implied.
+The examination suggests poisoning without assigning a cause or culprit and
+opens the blood-sample investigation. The next step is recorded in the Book.
+`patientRegistry.ts` combines the two chapters for GameWorld and Book; Day 1
+closing continues to read only its three cases. An optional `investigation`
+note on a case prevents treating an unresolved investigation with an empty
+treatment list. No sample extraction, new recipe or antidote is implemented.
+Carer dialogue remembers the introduction and responds to examination status;
+farmer revisit dialogue also recognizes a leech already carried, without
+consuming it. Chapter 2 interaction zones derive from the approved sprites'
+scaled bounds plus reach; placements/colliders remain unchanged. Tests check
+that both conversations are separately reachable with scene/decor colliders.
+
+Dialogue direction reaffirmed: ambient conversations are a core part of the
+experience, not filler. Give them character, immersive village detail and
+meaningful observations; retain occasional character-led humor like Day 1.
+
+### Updated Day 2 direction (Kilian, 2026-11-08)
+
+The full supplied COPY CHAPTER export is now integrated unchanged (14 scenes,
+including the existing messenger). Granary placements are active in runtime.
+Other characters do not gain dialogue merely from being present in this export.
+
+The three Day 2 patients are the poisoned farmer, exhausted woodcutter and
+injured-hand blacksmith. Kilian now assigns the Witch's leech and blood-sample
+investigation to the FARMER, superseding the earlier blacksmith investigation
+concept below. Cases should be approachable without a forced order. The Witch
+is available in the cave independently of case discovery. Exact sample analysis,
+whether an antidote is crafted, recipes, materials and the leech handover dialogue
+are still proposals to settle, not implemented or approved details. Prefer the
+existing crafting model, with a small number of new items where useful. Ambient
+NPC dialogue should reflect the supplied population and relevant story state;
+future dialogue wording still needs review; the granary scene was subsequently
+authorized for implementation as described above.
+
+Kilian visually approved the opening transition pacing in browser. The granary
+is now selectable in `/dev/collisions`, using the same visual as Decorator and
+export prefix `granaryInterior`. It now preloads Kilian's supplied geometry.
+
+Kilian supplied the messenger placement: instance
+`apothecary-street-villager-woman-01-01`, asset `villager-woman-01`, at (327, 438),
+scale 1, flipX false, collider enabled, zOffset 0. This supersedes the earlier
+empty-export and no-collider notes below. Chapter 2 now contains this instance.
+The first Botica-door arrival in Day 2 keeps the Doctor's authored arrival X,
+aligns his Y with her (438), and faces west, without changing manual geometry
+or Chapter 1. Later arrivals after the encounter use the normal spawn.
+Kilian approved the revised opening dialogue on 2026-11-08; the encounter is active.
+The opening caption now holds for 4000 ms, independently of fast-travel timing.
+This latest update supersedes older pending-approval notes below.
+The first exit through the Botica door shows an approved ES/EN caption over
+black before revealing the pair: "Nada mas salir, encuentras a la granjera
+preocupada y agitada." (accented in the actual localized text). It reuses the
+existing transition caption with its own 4000 ms reading duration. `chapter2.messenger.captionShown`
+prevents repeats independently of dialogue approval and never consumes the
+encounter's met/left flags. No caption is shown without the messenger placement.
+
 This is a living project context document. Update it when architecture or explicitly
 approved design decisions materially change. `AGENTS.md` defines agent rules.
 Implementation observations below describe the current repository, including
@@ -120,6 +252,10 @@ and prevents a second transition while one is active. `useTransitionTrigger.ts`
 uses feet-hitbox/exit-zone intersection and disarms on arrival until outside all
 exit zones to avoid immediate bounce-back. `world/fastTravel.ts` defines fast
 travel rules; GameWorld routes travel through the shared transition mechanism.
+A fade can also STAY in the scene (`startStayFade` in GameWorld): nothing is
+swapped or re-mounted, the Doctor keeps his place, and an action runs while the
+screen is black. GameWorld remembers the last arrival a transition completed
+(`arrivalRef`) so that something can belong to THAT arrival.
 Preserve manually authored scene geometry, transition zones, and spawn positions.
 
 ## Localization
@@ -163,17 +299,62 @@ separately from manual browser checks, including any skipped or blocked validati
 ## Current chapter/day architecture
 
 `src/game/world/currentChapter.ts` sets `INITIAL_CHAPTER_ID` to `chapter-1`.
-`chapterStart.ts` currently defines only that chapter's start: Doctor's Room,
-`chapter-start` spawn, with the doctor-writing opening interlude. GameWorld keeps
-the chapter ID fixed at its initial value; this is not a general day progression
+`chapterStart.ts` defines each chapter's start (Doctor's Room, `chapter-start`
+spawn; only Chapter 1 has the doctor-writing opening interlude) and the successor
+of each chapter (`getNextChapterId`: `chapter-1` -> `chapter-2`, nothing after).
+GameWorld keeps the ACTIVE chapter ID in state: it starts at the initial one and
+moves only when the Day 1 closing says so. This is not a general day progression
 system. Compositions are keyed by scene and chapter.
 
-The current working tree includes `src/game/patients/day1.ts` and Day 1 closing
-integration in GameWorld. Completion is derived from Chapter 1 patient statuses
-and claimed flags: all cases treated marks work done; after the announcement,
-arrival at the apothecary interior closes the day. Cases have no required ordering
-in that rule. Decorator chapter options or assets named for Day 2 do not establish
-implemented Day 2 progression or approved future story content.
+IMPLEMENTED (approved design, replaces the earlier "go home yourself" flow):
+`src/game/patients/day1.ts` derives the closing from Chapter 1 patient statuses
+and one claimed flag, `chapter1.day1.completed`. When all three cases are treated
+and the conversation of the last treatment has fully closed (GameWorld only asks
+at a moment of plain play: no dialogue, interface or fade), the day closes by
+itself. The flag is claimed as the closing starts, so it cannot fire twice and is
+never reused for Day 2. The closing is ONE sequence: the existing narrative
+interlude over `doctor-fireplace`, whose first line is the caption ("Con los
+pacientes atendidos, regresas a casa para descansar." / "With your patients cared
+for, you return home to rest.") followed by the Doctor's three lines
+(`chapter1Day1Dialogues.ts`). While the picture covers the game, the active
+chapter becomes `chapter-2` and the Doctor appears in the Doctor's Room on the
+existing `chapter-start` spawn, with no opening; control returns when the interlude
+ends. Inventory, storage, known recipes, patient states, flags and collected items
+are kept and nothing is saved or reset. There is no walking home, no night scene
+and no hour simulation. Cases have no required ordering in that rule.
+
+DAY 2 OPENING ENCOUNTER (implemented and prepared, INACTIVE until its data
+exists; `src/game/world/day2Opening.ts`, `GameWorld.tsx`): a farm woman reusing
+`villager-woman-01` waits outside the Botica in `apothecary-street`. When the
+arrival through the Botica's street door (`from-apothecary-interior`) in
+`chapter-2` is over and control is back, a conversation starts by itself; when it
+closes, a short stay-fade removes only her instance and the Doctor keeps scene
+and place. It happens once per session: `chapter2.messenger.met` is claimed before
+the dialogue starts and `chapter2.messenger.left` hides her instance afterwards
+(narrative flags; the collected-objects set is not used). The instance is hidden
+through `hiddenInstanceIds` of `ExteriorScene`. With no placement or no approved
+text it does nothing, claims nothing and breaks nothing.
+Two pieces of data are PENDING and live as constants in `day2Opening.ts`:
+`MESSENGER_INSTANCE_ID` (null until Kilian's chapter-2 Decorator export contains
+her, no collider) and `MESSENGER_DIALOGUE_APPROVED` (false). The text in
+`dialogue/chapter2OpeningDialogues.ts` is a PROPOSAL: no explicit approval was
+found, so it is not canon and stays out of play until approved.
+Instance ids: the collected set lasts the whole game, so a Day 2 collectible
+reusing the id of a Day 1 pick-up would never show up. `tests/day2-opening.test.mjs`
+fails if the chapter-2 export contains such an id (the export is empty today).
+DEV ACCESS: `/dev/day2` (also available at `/dev/testChapter2`) mounts the real GameWorld through an optional `devStart`
+(`src/game/world/devStart.ts`): chapter-2, Doctor's Room, finished Day 1,
+tutorial done, encounter pending. Everything in that start (flags, recipes,
+carried flask, empty chest, collected ids) is TEST DATA, not a decision about the
+real chapter. The normal game never passes a start. Nothing is saved.
+
+PENDING DEPENDENCY: `src/game/compositions/chapter-2.ts` is only a slot (an empty
+list marked PENDING EXPORT). Until Kilian provides the `/dev/decorator` export for
+chapter-2, Day 2 starts with no decor instances in any scene (no NPCs, collectibles
+or props) and no interactions table. The messenger encounter is implemented but
+inactive pending placement and text approval; other Day 2 dialogues and patient
+cases are not implemented. Decorator chapter options or assets named for Day 2 do
+not establish approved future story content.
 
 ## Narrative / Design Context
 
@@ -256,10 +437,10 @@ approved direction does not authorize implementing later-day behavior.
 
 Three patient cases may be completed in flexible order: the Baker's husband,
 the sick man associated with the Tavern, and the injured miner. Once all three
-are treated, the Doctor recognizes his work is finished and intends to return
-to the Apothecary. The player is not immediately teleported and may continue
-exploring. Returning to the Apothecary closes Day 1. Do not impose an order
-between the cases.
+are treated and the last treatment's conversation ends, Day 1 closes
+automatically: a narrative caption and the fireplace interlude show the Doctor
+returning home to rest, and Day 2 begins in the Doctor's Room. There is no
+playable night. Do not impose an order between the cases.
 
 ### Day 2 — approved direction, visual/pre-production
 
@@ -294,11 +475,14 @@ Do not invent quest logic before placements/dialogue are approved.
   the player may meet her before knowing its use. A later NPC clue about her
   heading to the cave is informational, never a systemic gate.
 
-Prepared static Day 2 assets currently include the tired woodcutter, blacksmith
-with hurt hand, sick farmer lying flat, and Witch with cave lantern. These are
-poses/states of existing identities, not new characters. Asset presence does not
-mean Day 2 gameplay logic exists. Placement must be performed/approved through
-Decorator.
+Prepared Day 2 assets currently include the tired woodcutter, blacksmith with
+hurt hand, sick farmer lying flat, Witch with cave lantern, the girl with a doll,
+the recovering miner and the fish bucket (animated idles where noted in
+`decorAssets.ts`). These are poses/states of existing identities, not new
+characters. Asset presence does not mean Day 2 gameplay logic exists. Day 2 can
+now be entered from the Day 1 closing (see "Current chapter/day architecture"),
+but its population still depends on the chapter-2 export. Placement must be
+performed/approved through Decorator.
 
 ### Canon discipline
 

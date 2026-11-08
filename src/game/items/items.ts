@@ -156,9 +156,8 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     name: { es: "Jarra vacía", en: "Empty jar" },
     icon: `${RESOURCE_ICONS}/empty-jar.png`,
   },
-  // CATALOGUED, NOT IMPLEMENTED: these items have their final name and icon so
-  // the catalog is complete, but no recipe makes or uses them, no patient asks
-  // for them and nothing gives them to the Doctor yet. Gameplay comes later.
+  // Additional catalog entries. All prepared items now have crafting recipes;
+  // world sources and patient uses are separate and may still be pending.
   milk: {
     id: "milk",
     name: { es: "Leche", en: "Milk" },

@@ -233,7 +233,9 @@ test("the trip reuses the scene fade: out, the line on black, the swap, in; the 
 test("it only moves the Doctor: no patient, reward, recipe, inventory or chapter state is touched", () => {
   const game = read("src/game/world/GameWorld.tsx");
   const from = game.indexOf("const fastTravelAvailable");
-  const handler = game.slice(from, game.indexOf("const handleExit"));
+  const end = game.indexOf("}, [fastTravelAvailable, language, startTransition]);", from);
+  assert.ok(end > from, "the fast-travel callback has an identifiable end");
+  const handler = game.slice(from, end);
   for (const forbidden of [
     "setPatients",
     "setClaimedRewards",

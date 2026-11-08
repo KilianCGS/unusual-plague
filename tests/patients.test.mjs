@@ -1389,7 +1389,7 @@ test("baker's Salt: Patient 1's treatment is unchanged and no other patient or r
     ch1.INJURED_MINER_ID,
   ]);
   assert.deepEqual(Object.keys(ch1.CHAPTER1_INITIAL_PATIENTS), [HUSBAND]);
-  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 7);
+  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 15);
   // the reward conversations say nothing about patients, soup or recipes
   for (const lang of ["es", "en"]) {
     for (const key of ["bakerReward", "bakerRewardNoRoom"]) {

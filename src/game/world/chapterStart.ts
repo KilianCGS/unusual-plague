@@ -19,7 +19,23 @@ const CHAPTER_STARTS: Record<string, ChapterStart> = {
     spawnName: "chapter-start",
     opening: { illustration: "doctor-writing" },
   },
+  // Day 2 begins in the Doctor's Room on the SAME existing spawn, with no
+  // opening: the closing of Day 1 already was the transition (see GameWorld).
+  "chapter-2": {
+    sceneId: "doctor-room",
+    spawnName: "chapter-start",
+  },
 };
+
+// The chapter that follows each chapter once its closing is over. Only Day 1
+// leads somewhere today; a chapter without an entry has no successor.
+const NEXT_CHAPTER_IDS: Record<string, string> = {
+  "chapter-1": "chapter-2",
+};
+
+export function getNextChapterId(chapterId: string): string | null {
+  return NEXT_CHAPTER_IDS[chapterId] ?? null;
+}
 
 export function getChapterStart(chapterId: string): ChapterStart {
   const start = CHAPTER_STARTS[chapterId];
