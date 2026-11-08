@@ -10,6 +10,7 @@
 import { bookCopy } from "../i18n/book";
 import type { Language } from "../i18n/types";
 import { AILMENTS, type Ailment } from "./ailments";
+import { AILMENTS_EN } from "./ailmentsEn";
 import {
   buildPatientSpreads,
   buildPreparationSpreads,
@@ -33,6 +34,8 @@ export type BookLayer = {
   // A high-resolution picture shown smaller than it is (the Ingredientes
   // spreads): scaled smoothly instead of the pixel-art nearest-neighbour.
   smooth?: boolean;
+  fit?: "contain";
+  blend?: "multiply";
 };
 
 export type BookSpread = {
@@ -112,7 +115,7 @@ const SYMPTOMS_BODY_Y = 68;
 const TREATMENT_HEADING_Y = 200;
 const TREATMENT_BODY_Y = 222;
 
-function ailmentSpread(ailment: Ailment): BookSpread {
+function ailmentSpread(ailment: Ailment, language: Language = "es"): BookSpread {
   const { id, name, illustration } = ailment;
 
   return {
@@ -125,6 +128,9 @@ function ailmentSpread(ailment: Ailment): BookSpread {
         y: illustration.y,
         width: 176,
         height: 176,
+        smooth: true,
+        fit: "contain",
+        blend: "multiply",
       },
     ],
     texts: [
@@ -143,7 +149,7 @@ function ailmentSpread(ailment: Ailment): BookSpread {
         x: RIGHT_COLUMN_X,
         y: SYMPTOMS_HEADING_Y,
         width: RIGHT_COLUMN_WIDTH,
-        content: ["SÍNTOMAS"],
+        content: [language === "es" ? "SÍNTOMAS" : "SYMPTOMS"],
       },
       {
         id: `${id}-symptoms`,
@@ -159,7 +165,7 @@ function ailmentSpread(ailment: Ailment): BookSpread {
         x: RIGHT_COLUMN_X,
         y: TREATMENT_HEADING_Y,
         width: RIGHT_COLUMN_WIDTH,
-        content: ["TRATAMIENTO"],
+        content: [language === "es" ? "TRATAMIENTO" : "TREATMENT"],
       },
       {
         id: `${id}-treatment`,
@@ -230,7 +236,7 @@ export const BOOK_SECTIONS: BookSection[] = [
   {
     id: "ailments",
     label: "DOLENCIAS",
-    spreads: AILMENTS.map(ailmentSpread),
+    spreads: AILMENTS.map(ailment => ailmentSpread(ailment)),
   },
   {
     id: "ingredients",
@@ -264,7 +270,8 @@ export function buildBookSections(context: BookContext): BookSection[] {
       label: tabs.patients,
       spreads: buildPatientSpreads(context),
     },
-    { ...ailments, label: tabs.ailments },
+    { ...ailments, label: tabs.ailments, spreads: AILMENTS.map(ailment =>
+      ailmentSpread(context.language === "en" ? { ...ailment, ...AILMENTS_EN[ailment.id] } : ailment, context.language)) },
     {
       ...ingredients,
       label: tabs.ingredients,

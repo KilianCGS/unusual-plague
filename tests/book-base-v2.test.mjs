@@ -152,6 +152,7 @@ test("one single base for every language and every section: the React text is wh
     "ailments",
     "ingredients",
     "medical-book-base-v2.png",
+    "preparations",
   ]);
   // the text IS dynamic and in the chosen language
   const text = (language, id) =>
@@ -172,7 +173,7 @@ test("the content stays dynamic and grows by itself: pages follow the patients, 
   const all = buildBookSections(context("es", ALL_PATIENTS, ALL_KNOWN));
   assert.ok(all[0].spreads.length > onlyBaker[0].spreads.length);
   assert.equal(all[0].spreads.length, 3, "one spread per known patient");
-  assert.ok(all[3].spreads.length >= 2, "recipes paginate two per spread");
+  assert.ok(all[3].spreads.length >= 2, "recipes have individual illustrated spreads");
   assert.equal(
     all[1].spreads.length,
     AILMENTS.length,
@@ -240,6 +241,59 @@ test("the tutorial Book is untouched: it still opens on INGREDIENTES, which keep
   assert.ok(book.includes("onPageChange") && book.includes("onSectionChange"));
   assert.equal(sections("es").ingredients.spreads.length, 4);
   assert.equal(sections("en").ingredients.spreads.length, 4);
+});
+
+test("all fifteen preparations occupy one localized leaf each, two per opening", () => {
+  const { RECIPES } = at("src/game/crafting/recipes.ts");
+  const known = RECIPES.map(recipe => recipe.id);
+  for (const language of ["es", "en"]) {
+    const preparations = buildBookSections(context(language, {}, known))[3];
+    assert.equal(preparations.spreads.length, 8);
+    preparations.spreads.forEach((spread, index) => {
+      const recipes = RECIPES.slice(index * 2, index * 2 + 2);
+      assert.equal(spread.layers.length, 1 + recipes.length);
+      recipes.forEach((recipe, side) => {
+        const illustration = spread.layers[side + 1];
+        assert.equal(illustration.src, `/game/ui/book/preparations/${recipe.output.itemId}.png`);
+        assert.equal(illustration.fit, "contain");
+        assert.equal(illustration.smooth, true);
+        assert.equal(illustration.blend, "multiply");
+        assert.ok(illustration.alt.length > 0);
+        const png = fs.readFileSync(path.join(root, "public", illustration.src));
+        assert.equal(png.subarray(1, 4).toString(), "PNG");
+        assert.ok(png.readUInt32BE(16) >= 512 && png.readUInt32BE(20) >= 512);
+        const blocks = spread.texts.filter(block => block.id.startsWith(recipe.id + "-"));
+        assert.ok(blocks.every(block => side === 0 ? block.x < 344 : block.x > 344));
+        const title = blocks.find(block => block.id.endsWith("-name"));
+        const description = blocks.find(block => block.id.endsWith("-description"));
+        const use = blocks.find(block => block.id.endsWith("-use"));
+        assert.ok(illustration.y + illustration.height <= title.y);
+        assert.ok(title.y < description.y && description.y < use.y);
+        assert.ok(description.content[0].length > 20 && use.content[0].length > 20);
+        assert.ok(blocks.some(block => block.id.endsWith("-inputs")));
+        assert.ok(blocks.some(block => block.id.endsWith("-station")));
+        assert.ok(blocks.some(block => block.id.endsWith("-availability")));
+      });
+    });
+    assert.ok(preparations.spreads.at(-1).texts.every(block => block.x < 344),
+      "the final unoccupied leaf has no copied recipe text");
+  }
+});
+
+test("preparation descriptions cover the catalog and indications follow existing game treatments", () => {
+  const { RECIPES } = at("src/game/crafting/recipes.ts");
+  const { PREPARATION_DESCRIPTIONS, getPreparationUse } = at("src/game/book/preparations.ts");
+  for (const language of ["es", "en"]) {
+    for (const recipe of RECIPES) {
+      assert.ok(PREPARATION_DESCRIPTIONS[recipe.output.itemId][language].length > 20);
+      assert.ok(getPreparationUse(recipe.output.itemId, language).length > 20);
+    }
+  }
+  assert.match(getPreparationUse("medicinal-infusion", "es"), /Fiebre común.*Envenenamiento/);
+  assert.match(getPreparationUse("mint-infusion", "en"), /Exhaustion/);
+  assert.match(getPreparationUse("medicinal-paste", "es"), /intermedio.*Cataplasma/);
+  assert.match(getPreparationUse("crushed-coal", "en"), /Intermediate.*Charcoal suspension/);
+  assert.match(getPreparationUse("balsamic-syrup", "es"), /aún no está registrada/);
 });
 
 console.log(`\n${passed} tests passed`);

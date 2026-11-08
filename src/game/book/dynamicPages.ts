@@ -3,7 +3,7 @@ import { ailmentNames, bookCopy } from "../i18n/book";
 import type { Language } from "../i18n/types";
 import { countItem, type InventoryState } from "../inventory/inventory";
 import { getItemName } from "../items/items";
-import { PATIENT_CASES } from "../patients/patientRegistry";
+import { getPatientDefinitions } from "../patients/patientRegistry";
 import {
   getPatientStatus,
   getVisiblePatientIds,
@@ -11,6 +11,8 @@ import {
 } from "../patients/patientCases";
 import { PLAIN_BASE_LAYER, type BookSpread } from "./bookPages";
 import type { BookTextBlock } from "./bookText";
+import { PREPARATION_DESCRIPTIONS, getPreparationUse } from "./preparations";
+import { DIAGNOSIS_SYMPTOMS } from "../patients/diagnosis";
 
 // The PACIENTES and PREPARADOS pages are not fixed content: they are drawn from
 // the patient cases, the inventory and the recipes the Doctor knows. Nothing
@@ -21,6 +23,8 @@ export type BookContext = {
   patients: PatientCasesState;
   inventory: InventoryState;
   knownRecipeIds: ReadonlySet<string>;
+  storyFlags?: ReadonlySet<string>;
+  diagnosisPatientId?: string;
 };
 
 // Text columns of the open book (art space 688x384): left page and right page.
@@ -64,8 +68,9 @@ function emptySpread(id: string, title: string, note: string): BookSpread {
 export function buildPatientSpreads(context: BookContext): BookSpread[] {
   const { language, patients, inventory } = context;
   const copy = bookCopy[language];
+  const definitions = getPatientDefinitions(context.storyFlags);
   const ids = getVisiblePatientIds(patients).filter(
-    (id) => PATIENT_CASES[id],
+    (id) => definitions[id],
   );
 
   if (ids.length === 0) {
@@ -79,7 +84,7 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
   }
 
   return ids.map((id) => {
-    const definition = PATIENT_CASES[id];
+    const definition = definitions[id];
     const status = getPatientStatus(patients, id);
     const texts: BookTextBlock[] = [
       text(`${id}-name`, "heading", LEFT, NAME_Y, definition.name[language]),
@@ -95,6 +100,15 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
           definition.discovered[language],
         ),
       );
+      if (context.diagnosisPatientId === id && DIAGNOSIS_SYMPTOMS[id]) {
+        texts.push(
+          text(`${id}-symptoms-title`, "heading", RIGHT, 46,
+            language === "es" ? "SÍNTOMAS OBSERVADOS" : "OBSERVED SYMPTOMS"),
+          text(`${id}-symptoms`, "body", RIGHT, LINES_Y, DIAGNOSIS_SYMPTOMS[id][language]),
+          text(`${id}-pending`, "note", RIGHT, 214,
+            language === "es" ? "Diagnóstico pendiente. Contrastar con Dolencias." : "Diagnosis pending. Compare with Ailments."),
+        );
+      }
     } else {
       texts.push(
         text(
@@ -155,74 +169,63 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
   });
 }
 
-// The recipes the Doctor knows, two per spread (left and right page).
+// One known preparation per physical leaf, two per opening.
 export function buildPreparationSpreads(context: BookContext): BookSpread[] {
   const { language, knownRecipeIds } = context;
   const copy = bookCopy[language];
   const expanded = expandKnownRecipeIds(knownRecipeIds);
-  const known = RECIPES.filter((recipe) => expanded.has(recipe.id));
+  const known = RECIPES.filter(recipe => expanded.has(recipe.id));
 
   if (known.length === 0) {
-    return [
-      emptySpread(
-        "preparations-empty",
-        copy.noRecipes.title,
-        copy.noRecipes.note,
-      ),
-    ];
+    return [emptySpread("preparations-empty", copy.noRecipes.title, copy.noRecipes.note)];
   }
 
   const spreads: BookSpread[] = [];
-
   for (let start = 0; start < known.length; start += 2) {
     const texts: BookTextBlock[] = [];
-
+    const layers: BookSpread["layers"] = [PLAIN_BASE_LAYER];
     known.slice(start, start + 2).forEach((recipe, side) => {
       const column = side === 0 ? LEFT : RIGHT;
-      const ingredients = recipe.inputs
-        .map(
-          ({ itemId, quantity }) =>
-            `${getItemName(itemId, language)}${quantity > 1 ? ` ×${quantity}` : ""}`,
-        )
-        .join(" + ");
-
-      texts.push(
-        text(
-          `${recipe.id}-name`,
-          "heading",
-          column,
-          NAME_Y,
-          getItemName(recipe.output.itemId, language).toUpperCase(),
-        ),
-        text(`${recipe.id}-inputs`, "body", column, SUBTITLE_Y, ingredients),
-        text(
-          `${recipe.id}-station`,
-          "body",
-          column,
-          190,
-          `${copy.station}: ${copy.stations[recipe.station]}`,
-        ),
-      );
+      const ingredients = recipe.inputs.map(({ itemId, quantity }) =>
+        `${getItemName(itemId, language)}${quantity > 1 ? ` ?${quantity}` : ""}`
+      ).join(" + ");
       const ingredientsReady = recipe.inputs.every(input =>
         countItem(context.inventory, input.itemId) >= input.quantity);
-      texts.push(text(`${recipe.id}-availability`, "note", column, 296,
-        ingredientsReady
-          ? (language === "es" ? "Ingredientes disponibles en la bolsa." : "Ingredients available in your bag.")
-          : (language === "es" ? "Faltan ingredientes en la bolsa." : "Some ingredients are missing from your bag.")));
       const intermediates = recipe.inputs.filter(input =>
         RECIPES.some(candidate => candidate.output.itemId === input.itemId));
+
+      layers.push({
+        src: `/game/ui/book/preparations/${recipe.output.itemId}.png`,
+        x: column.x + (column.width - 220) / 2,
+        y: 26,
+        width: 220,
+        height: 110,
+        smooth: true,
+        fit: "contain",
+        blend: "multiply",
+        alt: getItemName(recipe.output.itemId, language),
+      });
+      texts.push(
+        text(`${recipe.id}-name`, "preparationTitle", column, 144,
+          getItemName(recipe.output.itemId, language).toUpperCase(), "center"),
+        text(`${recipe.id}-description`, "preparationBody", column, 190,
+          PREPARATION_DESCRIPTIONS[recipe.output.itemId]?.[language] ?? ""),
+        text(`${recipe.id}-use`, "preparationBody", column, 228,
+          getPreparationUse(recipe.output.itemId, language)),
+        text(`${recipe.id}-inputs`, "preparationNote", column, 266, ingredients),
+        text(`${recipe.id}-station`, "preparationNote", column, 316,
+          `${copy.station}: ${copy.stations[recipe.station]}`),
+        text(`${recipe.id}-availability`, "preparationNote", column, 334,
+          ingredientsReady
+            ? (language === "es" ? "Ingredientes disponibles en la bolsa." : "Ingredients available in your bag.")
+            : (language === "es" ? "Faltan ingredientes en la bolsa." : "Some ingredients are missing from your bag.")),
+      );
       if (intermediates.length) {
-        texts.push(text(`${recipe.id}-steps`, "body", column, 232,
+        texts.push(text(`${recipe.id}-steps`, "preparationNote", column, 298,
           `${language === "es" ? "Preparar antes" : "Prepare first"}: ${intermediates.map(input => getItemName(input.itemId, language)).join(", ")}.`));
       }
     });
-
-    spreads.push({
-      id: `preparations-${start / 2 + 1}`,
-      layers: [PLAIN_BASE_LAYER],
-      texts,
-    });
+    spreads.push({ id: `preparations-${start / 2 + 1}`, layers, texts });
   }
-
   return spreads;
 }

@@ -88,6 +88,10 @@ export const bookCopy: Record<Language, BookCopy> = {
 
 // Names of the ailments the PACIENTES pages mention.
 export const ailmentNames: Record<string, Record<Language, string>> = {
+  "stomach-ailment": { es: "Mal del estómago", en: "Stomach ailment" },
+  "chest-cough": { es: "Tos del pecho", en: "Chest cough" },
+  scurvy: { es: "Escorbuto", en: "Scurvy" },
+  poisoning: { es: "Envenenamiento", en: "Poisoning" },
   "exhaustion": { es: "Agotamiento", en: "Exhaustion" },
   "infected-wound": { es: "Herida infectada", en: "Infected wound" },
   "suspected-poisoning": { es: "Posible envenenamiento", en: "Suspected poisoning" },

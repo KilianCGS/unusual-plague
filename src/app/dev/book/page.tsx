@@ -3,6 +3,10 @@
 import { useState } from "react";
 
 import { BookOverlay } from "../../../game/book/BookOverlay";
+import type { BookSectionId } from "../../../game/book/bookPages";
+import { RECIPES } from "../../../game/crafting/recipes";
+import { createEmptyInventory } from "../../../game/inventory/inventory";
+import type { Language } from "../../../game/i18n/types";
 import { useBookHotkeys } from "../../../game/book/useBookHotkeys";
 import { useDirectionInput } from "../../../game/protagonist/useDirectionInput";
 import { useIsClient } from "../../../game/ui/useIsClient";
@@ -24,6 +28,8 @@ export default function BookPreviewPage() {
   const input = useDirectionInput();
   const isClient = useIsClient();
   const [open, setOpen] = useState(false);
+  const [previewSection, setPreviewSection] = useState<BookSectionId>();
+  const [language, setLanguage] = useState<Language>("es");
 
   useBookHotkeys({ open, setOpen });
 
@@ -39,9 +45,27 @@ export default function BookPreviewPage() {
           onInteract={() => undefined}
         />
       ) : null}
-      {open ? <BookOverlay /> : null}
+      {open ? <BookOverlay
+        key={language}
+        initialSectionId={previewSection}
+        context={{
+          language,
+          patients: {},
+          inventory: createEmptyInventory(),
+          knownRecipeIds: new Set(previewSection === "preparations" ? RECIPES.map(recipe => recipe.id) : []),
+        }}
+      /> : null}
       <aside className={styles.panel}>
         <strong>/dev/book</strong>
+        <button type="button" onClick={() => { setPreviewSection("preparations"); setOpen(true); }}>
+          Ver los 15 preparados (datos de prueba)
+        </button>
+        <button type="button" onClick={() => { setPreviewSection("ailments"); setOpen(true); }}>
+          Ver las 7 dolencias
+        </button>
+        <button type="button" onClick={() => setLanguage(value => value === "es" ? "en" : "es")}>
+          Idioma: {language.toUpperCase()}
+        </button>
         <span>
           WASD / flechas: mover al Doctor (bloqueado con el libro abierto)
         </span>

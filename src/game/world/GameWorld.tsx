@@ -1,6 +1,8 @@
 "use client";
 
-import { PATIENT_CASES } from "../patients/patientRegistry";
+import { getPatientDefinitions } from "../patients/patientRegistry";
+import { canAnalyzeFarmerSample, FARMER_ANALYSIS_ID, FARMER_RECIPE_IDS } from "../patients/farmerInvestigation";
+import { farmerAnalysisResult } from "../dialogue/chapter2AnalysisDialogues";
 
 import {
   useCallback,
@@ -13,6 +15,9 @@ import {
 
 import { ApothecaryScene } from "../apothecary/ApothecaryScene";
 import { BookOverlay } from "../book/BookOverlay";
+import { DiagnosisOverlay } from "../patients/DiagnosisOverlay";
+import { DIAGNOSIS_SYMPTOMS, checkDiagnosis, diagnosisConversation, type DiagnosisSession } from "../patients/diagnosis";
+import { CompendiumNotice } from "../book/CompendiumNotice";
 import {
   markCollected,
   NO_COLLECTED,
@@ -34,6 +39,8 @@ import {
   type StoryEffect,
 } from "../dialogue/storyInteractions";
 import { day1Closing } from "../dialogue/chapter1Day1Dialogues";
+import { day2Closing } from "../dialogue/chapter2ClosingDialogues";
+import { DAY2_COMPLETED_ID, shouldCloseDay2 } from "../patients/day2";
 import { messengerOpening } from "../dialogue/chapter2OpeningDialogues";
 import { day2OpeningCopy } from "../i18n/day2Opening";
 import { DOCTOR_SPEAKER } from "../dialogue/dialogueTypes";
@@ -179,11 +186,18 @@ export function GameWorld({
   // The closing of Day 1 (a narrative interlude, like the opening) blocks the
   // world exactly as the opening does.
   const [closingActive, setClosingActive] = useState(false);
+  const [closingChapter, setClosingChapter] = useState("chapter-1");
   const interludeActive = openingActive || closingActive;
 
   // Main interfaces. They never open on top of each other, of a conversation
   // or during a scene fade, and each one blocks the Doctor while it is up.
   const [bookOpen, setBookOpen] = useState(false);
+  const [diagnosis, setDiagnosis] = useState<DiagnosisSession | null>(null);
+  const diagnosisRef = useRef<DiagnosisSession | null>(null);
+  const updateDiagnosis = useCallback((next: DiagnosisSession | null) => {
+    diagnosisRef.current = next;
+    setDiagnosis(next);
+  }, []);
   // Whether the Doctor is running, as the scene reports it (for his remarks).
   const [doctorRunning, setDoctorRunning] = useState(false);
   // The Apothecary storage chest interface (another main interface).
@@ -236,6 +250,8 @@ export function GameWorld({
     | "examination-finished"
     | "leave-bedroom"
     | "leave-messenger"
+    | "diagnosis-retry"
+    | "diagnosis-confirmed"
     | null
   >(null);
   const examinationStartedRef = useRef(false);
@@ -281,6 +297,7 @@ export function GameWorld({
   // not walk while the story is there.
   const inNarrativeScene = world.sceneId === "bakers-bedroom";
   const canOpenInterface =
+    diagnosis === null &&
     phase === "playing" &&
     !interludeActive &&
     !dialogue.active &&
@@ -314,6 +331,7 @@ export function GameWorld({
   // while a conversation is open; control returns when its last line closes.
   const isPlaying =
     phase === "playing" &&
+    diagnosis === null &&
     !interludeActive &&
     !dialogue.active &&
     !bookOpen &&
@@ -344,6 +362,11 @@ export function GameWorld({
     setOpen: (open) => {
       if (!open) {
         setBookOpen(false);
+        const current = diagnosisRef.current;
+        if (current?.stage === "book") updateDiagnosis({ ...current, stage: "choose" });
+      } else if (diagnosisRef.current?.stage === "choose") {
+        updateDiagnosis({ ...diagnosisRef.current, stage: "book" });
+        setBookOpen(true);
       } else if (canOpenInterface && !mapVisible) {
         setBookOpen(true);
       }
@@ -359,7 +382,7 @@ export function GameWorld({
   // scene change is running nothing else can trigger.
   const startTransition = useCallback(
     (sceneId: SceneId, spawnName: string, caption?: string, captionDurationMs?: number) => {
-      if (phaseRef.current !== "playing") {
+      if (phaseRef.current !== "playing" || diagnosisRef.current !== null) {
         return;
       }
 
@@ -462,7 +485,7 @@ export function GameWorld({
             effect.to,
           );
         } else {
-          const definition = PATIENT_CASES[effect.patientId];
+          const definition = getPatientDefinitions(nextRewards)[effect.patientId];
           const treated = treatPatient(nextPatients, definition, nextInventory);
 
           if (!treated) {
@@ -545,7 +568,7 @@ export function GameWorld({
       interactionId: string,
       source: { instanceId?: string; itemId?: string; quantity?: number },
     ) => {
-      if (phaseRef.current !== "playing") {
+      if (phaseRef.current !== "playing" || diagnosisRef.current !== null) {
         return;
       }
 
@@ -713,12 +736,23 @@ export function GameWorld({
     [world.sceneId, chapterId, language, claimFlag, startTransition],
   );
 
-  // The closing is ONE sequence: the narrative interlude over the fireplace
+  // The closing is ONE sequence: the narrative interlude over the supper
   // picture (its first line is the caption about going home), and
   // while the picture covers the game the next chapter becomes the active one
   // and the Doctor wakes in the Doctor's Room. Nothing of Day 1 (inventory,
   // storage, recipes, cases, flags, collected things) is touched.
   const startNextChapter = useCallback(() => {
+    // Day 2 epilogue returns home for aftercare/free exploration. Day 3 has
+    // no approved population yet, so finishing this chapter does not enter it.
+    if (closingChapter === "chapter-2") {
+      if (chapterAdvancedRef.current) return;
+      chapterAdvancedRef.current = true;
+      const home = getChapterStart("chapter-2");
+      pendingRef.current = null;
+      arrivalRef.current = null;
+      setWorld(current => ({ sceneId: home.sceneId, spawnName: home.spawnName, arrival: current.arrival + 1 }));
+      return;
+    }
     const nextChapterId = getNextChapterId(chapterId);
 
     if (nextChapterId === null || chapterAdvancedRef.current) {
@@ -736,15 +770,15 @@ export function GameWorld({
       spawnName: start.spawnName,
       arrival: current.arrival + 1,
     }));
-  }, [chapterId]);
+  }, [chapterId, closingChapter]);
   const finishClosing = useCallback(() => {
     // Covered already when the interlude ended early (Esc); harmless otherwise.
     startNextChapter();
     setClosingActive(false);
   }, [startNextChapter]);
   const closingConversation = useMemo(
-    () => localizeConversation(day1Closing, language, DOCTOR_SPEAKER),
-    [language],
+    () => localizeConversation(closingChapter === "chapter-2" ? day2Closing : day1Closing, language, DOCTOR_SPEAKER),
+    [language, closingChapter],
   );
 
   // Real events for the tutorial: the Book was opened / closed, the Map was
@@ -816,7 +850,7 @@ export function GameWorld({
   // (Doctor's thoughts about what he still lacks) > fade back to the bakery.
   const finishExamination = useCallback(() => {
     const patientId = examiningPatientRef.current;
-    const definition = PATIENT_CASES[patientId];
+    const definition = getPatientDefinitions(claimedRewardsRef.current)[patientId];
     const inPlace = definition.examination === "in-place";
     // A case that was never announced is noticed by looking at him.
     const noticed = advancePatient(
@@ -849,6 +883,33 @@ export function GameWorld({
     }
   }, [language, startDialogue, startTransition]);
 
+  const beginDiagnosis = useCallback(() => {
+    const patientId = examiningPatientRef.current;
+    if (!DIAGNOSIS_SYMPTOMS[patientId]) { finishExamination(); return; }
+    const noticed = advancePatient(patientsRef.current, patientId, "discovered");
+    patientsRef.current = noticed;
+    setPatients(noticed);
+    updateDiagnosis({ patientId, stage: "choose" });
+  }, [finishExamination, updateDiagnosis]);
+
+  const chooseDiagnosis = useCallback((choice: string) => {
+    const current = diagnosisRef.current;
+    if (current?.stage !== "choose") return;
+    const result = checkDiagnosis(current.patientId, choice);
+    if (result === "invalid") return;
+    const correct = result === "correct";
+    updateDiagnosis({ ...current, stage: correct ? "confirm" : "review" });
+    afterDialogueRef.current = correct ? "diagnosis-confirmed" : "diagnosis-retry";
+    startDialogue(diagnosisConversation(current.patientId, language, correct));
+  }, [language, startDialogue, updateDiagnosis]);
+
+  const consultDiagnosis = useCallback(() => {
+    const current = diagnosisRef.current;
+    if (current?.stage !== "choose") return;
+    updateDiagnosis({ ...current, stage: "book" });
+    setBookOpen(true);
+  }, [updateDiagnosis]);
+
   useEffect(() => {
     if (dialogue.active) {
       return;
@@ -861,7 +922,15 @@ export function GameWorld({
     if (action === "go-to-examination") {
       startTransition("bakers-bedroom", "narrative");
     } else if (action === "examination-finished") {
-      finishExamination();
+      beginDiagnosis();
+    } else if (action === "diagnosis-retry") {
+      const current = diagnosisRef.current;
+      if (current?.stage === "review") updateDiagnosis({ ...current, stage: "choose" });
+    } else if (action === "diagnosis-confirmed") {
+      if (diagnosisRef.current?.stage === "confirm") {
+        updateDiagnosis(null);
+        finishExamination();
+      }
     } else if (action === "leave-bedroom") {
       startTransition("bakery-interior", "from-bakers-bedroom");
     } else if (action === "leave-messenger") {
@@ -873,6 +942,8 @@ export function GameWorld({
     dialogue.active,
     startTransition,
     finishExamination,
+    beginDiagnosis,
+    updateDiagnosis,
     startStayFade,
     claimFlag,
   ]);
@@ -882,7 +953,7 @@ export function GameWorld({
   // its goodbye and its effects) has closed, and never over a scripted step of
   // another flow or a fade. It is declared after the effect above so a flow
   // that just started a transition is seen here.
-  const closingChapterAvailable = getNextChapterId(chapterId) !== null;
+  const closingChapterAvailable = chapterId === "chapter-1" && getNextChapterId(chapterId) !== null;
 
   useEffect(() => {
     if (
@@ -893,9 +964,21 @@ export function GameWorld({
       shouldCloseDay1(patientsRef.current, claimedRewardsRef.current)
     ) {
       claimFlag(DAY1_COMPLETED_ID);
+      setClosingChapter("chapter-1");
+      chapterAdvancedRef.current = false;
       setClosingActive(true);
     }
   }, [isPlaying, patients, claimedRewards, closingChapterAvailable, claimFlag]);
+
+  useEffect(() => {
+    if (chapterId === "chapter-2" && isPlaying && phaseRef.current === "playing" &&
+      afterDialogueRef.current === null && shouldCloseDay2(patientsRef.current, claimedRewardsRef.current)) {
+      claimFlag(DAY2_COMPLETED_ID);
+      setClosingChapter("chapter-2");
+      chapterAdvancedRef.current = false;
+      setClosingActive(true);
+    }
+  }, [chapterId, isPlaying, patients, claimedRewards, claimFlag]);
 
   // THE OPENING ENCOUNTER OF DAY 2. It belongs to the arrival that follows the
   // Botica's street door: read once, when the transition is over and control is
@@ -1219,20 +1302,24 @@ export function GameWorld({
       )}
       {bookOpen ? (
         <BookOverlay
-          context={{ language, patients, inventory, knownRecipeIds }}
+          context={{ language, patients, inventory, knownRecipeIds, storyFlags: claimedRewards, diagnosisPatientId: diagnosis?.patientId }}
           // While the tutorial teaches page turning, the book opens on a section
           // with several pages made of things the Doctor already knows
           // (PACIENTES has a single page at the start). INGREDIENTES, not
           // DOLENCIAS: its pages are plain descriptions, whereas the ailment
           // pages already spell out future treatments. Only the tab changes.
           initialSectionId={
-            tutorialStep === "book" || tutorialStep === "book-page"
+            diagnosis !== null ? "ailments" : tutorialStep === "book" || tutorialStep === "book-page"
               ? "ingredients"
               : undefined
           }
           onPageChange={() => notifyTutorial("book-page-changed")}
           onSectionChange={() => notifyTutorial("book-tab-changed")}
         />
+      ) : null}
+      {diagnosis?.stage === "choose" && !dialogue.active && !bookOpen ? (
+        <DiagnosisOverlay patientId={diagnosis.patientId} language={language}
+          onChoose={chooseDiagnosis} onConsult={consultDiagnosis} />
       ) : null}
       {mapVisible ? (
         <MapOverlay currentLocationId={SCENE_TO_MAP_LOCATION[world.sceneId]} />
@@ -1248,6 +1335,15 @@ export function GameWorld({
             setInventory(next);
             if (rememberRecipes(next)) showNotice(recipeDiscoveryCopy[language]);
           }}
+          onAnalyzeSample={craftingStation === "manual" && canAnalyzeFarmerSample(patients, claimedRewards) ? () => {
+            if (!canAnalyzeFarmerSample(patientsRef.current, claimedRewardsRef.current)) return;
+            claimFlag(FARMER_ANALYSIS_ID);
+            const learned = new Set([...learnedRecipesRef.current, ...FARMER_RECIPE_IDS]);
+            learnedRecipesRef.current = learned;
+            setKnownRecipeIds(learned);
+            setCraftingStation(null);
+            startDialogue(localizeConversation(farmerAnalysisResult, language, "doctor"));
+          } : undefined}
           onClose={() => setCraftingStation(null)}
         />
       ) : null}
@@ -1267,6 +1363,7 @@ export function GameWorld({
         />
       ) : null}
       {notice ? <ItemFeedback text={notice.text} /> : null}
+      <CompendiumNotice context={{ language, patients, inventory, knownRecipeIds, storyFlags: claimedRewards, diagnosisPatientId: diagnosis?.patientId }} />
       {fastTravelAvailable ? (
         <FastTravelButton
           label={fastTravelCopy[language].label}
@@ -1289,7 +1386,7 @@ export function GameWorld({
       {closingActive ? (
         <div className={dayClosingStyles.fadeIn}>
           <NarrativeInterlude
-            illustration={NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]}
+            illustration={NARRATIVE_ILLUSTRATIONS["doctor-eating"]}
             conversation={closingConversation}
             language={language}
             onCovered={startNextChapter}

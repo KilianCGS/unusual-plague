@@ -5,6 +5,10 @@ import { getPatientStatus } from "../patients/patientCases";
 import { chapter2AmbientDialogues } from "./chapter2AmbientDialogues";
 import { localizeConversation, type LocalizedConversation } from "./localizedConversation";
 import type { StoryFacts, StoryOutcome } from "./storyInteractions";
+import { resolveChapter2Patient } from "./chapter2PatientDialogues";
+import { resolveChapter2Supplies } from "./chapter2Supplies";
+import { doctorThought } from "./doctorThought";
+import { FARMER_SAMPLE_ID } from "../patients/farmerInvestigation";
 
 export const DAY2_LEECH_REWARD_ID = "chapter2.witch.leech";
 const npc = (es: string, en: string) => ({ speaker: "subject", text: { es, en } });
@@ -20,6 +24,7 @@ const witchInvestigation = talk("chapter2.cave.witch.investigation", [
 
 const leechGift = [
   npc("He encontrado una sanguijuela junto al agua. La he guardado en un frasco; quizá te sirva más a ti.", "I found a leech by the water. I've kept it in a jar; perhaps it'll be more useful to you."),
+  npc("Estos bichejos se pirran por la sangre ajena.", "These little creatures have quite a taste for other people's blood."),
   doctor("¿La has recogido sin necesitarla?", "You picked it up without needing it?"),
   npc("Tú llevas un libro entero por si acaso. Yo, un frasco.", "You carry a whole book just in case. I carry a jar."),
   doctor("Me la llevaré. Gracias.", "I'll take it. Thank you."),
@@ -50,8 +55,32 @@ const farmAfterExam = talk("chapter2.farm.woman.afterExam", [
 export function resolveChapter2StoryInteraction(
   interactionId: string, facts: StoryFacts, language: Language, subjectId: string,
 ): StoryOutcome | null {
+  const patient = resolveChapter2Patient(interactionId, facts, language, subjectId);
+  if (patient) return patient;
+  const supplies = resolveChapter2Supplies(interactionId, facts, language, subjectId);
+  if (supplies) return supplies;
   const examined = getPatientStatus(facts.patients, FARMER_DAY2_ID) === "examined";
   const local = (conversation: LocalizedConversation) => localizeConversation(conversation, language, subjectId);
+  if (interactionId === "chapter2.mine.recoveringMiner" && examined &&
+    !facts.claimedRewards?.has(FARMER_SAMPLE_ID) && countItem(facts.inventory, "leech") === 0) {
+    const alreadyGiven = facts.claimedRewards?.has(DAY2_LEECH_REWARD_ID);
+    return { conversation: local(talk("chapter2.mine.farmerClue", [
+      ...chapter2AmbientDialogues[interactionId].lines,
+      ...(alreadyGiven ? [
+        doctorThought("Ya conseguí una sanguijuela. Debería revisar el cofre antes de seguir buscando.", "I've already obtained a leech. I should check the chest before looking any further."),
+      ] : [
+        npc("Si busca a su amiga del farol, está en la cueva del fondo. Dice que allí se oye pensar.", "If you're looking for your friend with the lantern, she's in the cave at the back. Says you can hear yourself think there."),
+        doctorThought("Agua tranquila y una visita de la bruja. Merece la pena preguntarle por las sanguijuelas.", "Still water and a visit from the witch. It's worth asking her about leeches."),
+      ]),
+    ])), effects: [] };
+  }
+  if (interactionId === "chapter2.farm.woman" && getPatientStatus(facts.patients, FARMER_DAY2_ID) === "treated") {
+    return { conversation: local(talk("chapter2.farm.woman.farmerTreated", [
+      npc("Me han dicho que ya lo ha atendido. Gracias por ir hasta allí.", "They told me you've attended to him. Thank you for going out there."),
+      doctor("Ahora necesita descansar y seguir acompañado.", "Now he needs rest and someone to keep him company."),
+      npc("De eso podemos encargarnos. Hasta las gallinas tendrán que esperar un poco.", "We can see to that. Even the hens will have to wait a little."),
+    ])), effects: [] };
+  }
   if (interactionId === "chapter2.farm.woman" && examined) {
     return { conversation: local(farmAfterExam), effects: [] };
   }
@@ -67,6 +96,10 @@ export function resolveChapter2StoryInteraction(
   return {
     conversation: local(talk(`${intro.id}.${room ? "leech" : "noRoom"}`, [
       ...intro.lines, ...(room ? leechGift : leechNoRoom),
+      ...(room ? [examined
+        ? doctorThought("Ya tengo cómo obtener la muestra. Debería volver al granero.", "Now I have a way to obtain the sample. I should return to the granary.")
+        : doctorThought("La guardaré. Puede resultar útil, aunque todavía no sepa para qué.", "I'll keep it. It may prove useful, even if I don't know what for yet.")
+      ] : []),
     ])),
     effects: room ? [
       { type: "give-item", itemId: "leech", quantity: 1 },

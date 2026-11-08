@@ -482,7 +482,8 @@ test("P3 1. the injured miner is there from the start: examined where he sits, w
   assert.deepEqual(first.effects, []);
   const es = lines(first);
   assert.equal(es[0], "Ah... despacio. La pierna.");
-  assert.ok(es.includes("La herida está infectada."));
+  assert.ok(es.includes("La zona está roja, hinchada y supura. El dolor no ha remitido."));
+  assert.ok(!es.includes("La herida está infectada."), "the examination leaves diagnosis to the player");
   assert.equal(es.at(-1), "Intentaré colaborar.");
   // the same with any state of the other cases, in any order
   for (const p1 of ["discovered", "examined", "treated"])

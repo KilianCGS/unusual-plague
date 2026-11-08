@@ -7,7 +7,7 @@ export const BLACKSMITH_DAY2_ID = "chapter2-blacksmith";
 export const CHAPTER2_PATIENTS: Record<string, PatientCaseDefinition> = {
   [WOODCUTTER_DAY2_ID]: {
     id: WOODCUTTER_DAY2_ID,
-    name: { es: "LEÑADOR AGOTADO", en: "THE EXHAUSTED WOODCUTTER" },
+    name: { es: "LEÑADOR DEL BOSQUE", en: "THE WOODCUTTER" },
     ailmentId: "exhaustion",
     discovered: { es: "El leñador descansa junto al hacha en el bosque.", en: "The woodcutter is resting beside his axe in the forest." },
     observation: { es: "Agotamiento tras trabajar sin pausas, sed y mareo. Necesita descansar y recuperar fuerzas.", en: "Exhaustion after working without breaks, thirst and dizziness. He needs rest and time to regain his strength." },

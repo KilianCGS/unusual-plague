@@ -216,13 +216,13 @@ test("the other tabs and the tutorial Book are untouched", () => {
     ["PATIENTS", "AILMENTS", "INGREDIENTS", "REMEDIES"],
   );
   // PACIENTES and PREPARADOS stay text pages built from the game state;
-  // DOLENCIAS keeps its two layers: the shared base (smooth) and its pixel-art
-  // illustration (not smoothed)
+  // DOLENCIAS keeps its two layers, with smooth ink illustrations on parchment.
   assert.ok(es[0].spreads[0].texts.length > 0);
   assert.ok(es[3].spreads[0].texts.length > 0);
   assert.ok(
     es[1].spreads.every(
-      (s) => s.layers.length === 2 && s.layers[0].smooth && !s.layers[1].smooth,
+      (s) => s.layers.length === 2 && s.layers[0].smooth && s.layers[1].smooth
+        && s.layers[1].fit === "contain" && s.layers[1].blend === "multiply",
     ),
   );
   // the tutorial still opens the Book on INGREDIENTES (several pages to turn)

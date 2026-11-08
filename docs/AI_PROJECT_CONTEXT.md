@@ -2,6 +2,192 @@
 
 ## Latest Day 2 placement update
 
+DAY 1 CLOSING ILLUSTRATION (Kilian, 2026-11-08): `doctor-eating.png` is the
+correct picture for the narrative bridge between the Day 1 closing and Day 2,
+with the Doctor's lines. The Day 1 closing therefore shows `doctor-eating` with
+the already approved `chapter1Day1Dialogues.ts` lines (unchanged, no new text);
+`doctor-fireplace.png` stays registered but unused. NOTE: the Day 2 epilogue
+(below, text NOT approved) currently reuses that same picture too; whether it
+should use another image or its own text is an open question for Kilian.
+Tests updated; browser review of the new closing image is pending.
+
+PLAYER DIAGNOSIS IMPLEMENTED: after a first patient examination, GameWorld opens
+a seven-option diagnosis dialog (six previous ailments plus poisoning). Wrong
+choices play three parenthesized Doctor thoughts reviewing the same symptoms,
+then return to the choice, with no item, reward, recipe or patient advancement.
+The Book button/Q opens Ailments; Q/Esc closes it and returns to the SAME pending
+case. Pending patient pages show observed symptoms without a diagnosis or cure.
+Only the correct-answer conversation finishing calls the existing examination
+completion, records the diagnosis and learns case recipes. All six implemented
+Day 1/2 cases participate; completed dev fixture cases do not repeat exams.
+Farmer poisoning is a hypothesis: the sample, analysis flag and treatment gating
+remain intact. No culprit or poison source is assigned. Dialogue examinations
+now describe signs rather than naming their conclusion in advance; the woodcutter
+case title no longer gives the answer away. Movement, interactions, travel and
+other interfaces are blocked during diagnosis; consulting the Book is allowed.
+Synchronous session refs reject double choices and stale interaction events.
+Poisoning has its own ink illustration and bilingual Book entry. All seven
+ailment reference pages are now available in English too. Old references to
+uncatalogued remedy names were aligned with existing preparations, without
+changing any recipe or patient treatment requirement. New tests exercise every
+choice for all cases, retry thoughts, pending Book entries, confirmation wiring
+and server-rendered dialog labels. Browser interaction/pacing review pending.
+This supersedes the earlier diagnosis-proposal-only notes below.
+
+PREPARATION PAGINATION CONFIRMED: Kilian answered the layout question: one
+recipe per physical leaf, TWO recipes per opening. This supersedes the earlier
+one-per-opening placeholder below. `buildPreparationSpreads` now pairs known
+recipes (including learned prerequisites) in catalog order; 15 entries make
+eight openings with an empty final right leaf. Each leaf stacks its approved
+image, name, description and use, followed by its own ingredients, prerequisite
+note when relevant, station and carried-stock availability. Preparation-only
+text roles keep the denser layout separate from other Book sections. No images,
+discovery rules, recipes or patient mechanics changed. The diagnosis-selection
+idea remains a proposal, not an implemented feature. Browser layout review pending.
+
+SHARED FIRE: Kilian supplied a new chapter-1 export and requested permanent
+campfires/flames just like vegetation. Only its 41 fire placements were added
+to `shared-environment.ts`: campfire 2, candle-flame 39. The existing 55 plants
+are preserved, for 96 shared instances. No NPC, resource or other export change
+was imported. All authored ids, positions, scales, flips and collision settings
+are preserved. Shared ids deduplicate chapter copies across all chapters.
+The botica authoring id `apothecary-main-zone` maps to `apothecary-interior` for
+shared decor only: both use the same background and 480x293 logical space.
+ApothecaryScene now renders those nine shared flames with DecorSprite; its
+manual colliders, interaction zones, spawns and transitions are unchanged.
+Other rooms already use the ordinary composition renderer. Decorator's shared
+backdrop now says "Ambiente compartido" to include vegetation and fire.
+Browser placement/animation review remains pending.
+
+AILMENT ART V2: Kilian requested improved ailment illustrations matching the
+approved ingredients/preparations engraving style. The six existing ailment
+drawings have new sibling `*-v2.png` assets under `public/game/ui/book/ailments/`;
+original PNGs are retained. Their existing subjects and 176x176 Book slots are
+preserved; the new high-resolution brown ink art is smoothed, contained and
+multiply-blended over the shared parchment. No symptom/treatment text, ailment
+list, patient rules or recipe data changed. `/dev/book` has "Ver las 6 dolencias"
+to enter that section directly. Source prompts are recorded under
+`art/medical-book/ailments-v2/`. These new illustrations await Kilian's visual
+review; browser rendering has not been manually validated.
+
+PREPARATION ENTRY UPDATE: Kilian approved all 15 final preparation images.
+Keep those assets unchanged. Known recipes (including prerequisite recipes)
+alone produce entries; obtaining/using inventory does not erase them.
+Each entry's left leaf now stacks illustration, name, bilingual description,
+and indication. The existing right leaf retains actual ingredients, station,
+prerequisite steps and carried-stock availability. Physical-leaf versus full-
+opening pagination clarification was asked; this preserves the existing one-
+preparation-per-opening layout meanwhile. `book/preparations.ts` describes all
+15 outputs and derives indications from registered game treatment requirements,
+using the completed farmer investigation definition for its medical indication
+only. This does not mutate player flags or reveal patient identities. Intermediates
+name their products instead of claiming a direct cure; balsamic syrup currently
+has no case indication and says so. No new cure, recipe or patient was added.
+
+COMPENDIUM NOTICE: GameWorld mounts CompendiumNotice, observing known recipe ids
+and visible patient records (including effective investigation definitions).
+Knowledge changes show a nonblocking ES/EN toast at top right for 4.5 seconds;
+simultaneous changes coalesce and subsequent changes refresh its duration.
+Initial/dev fixture knowledge, bag changes and opening the Book do not trigger
+it. Existing item feedback stays separate. Browser visual review pending.
+Kilian requests more natural dialogue with occasional humor, and soft contextual
+links between patients rather than mandatory order. Preparation illustrations
+should match the ingredients' brown ink engraving style, not inventory pixels.
+Preparation spreads now allocate one whole opening per known recipe: name and
+illustration on the left, live localized ingredients/station/prerequisites and
+bag availability on the right. Artwork uses contain scaling and multiply blending
+(opaque white source paper, preserving ink; the first transparent batch had
+destructive cutouts and was rejected). Ingredient pages
+and existing inventory icons are preserved. `/dev/book` offers an explicit
+all-15 preparation fixture and ES/EN selector, without teaching runtime recipes.
+
+DAY 2 EPILOGUE: `patients/day2.ts` derives completion from all three Day 2 cases,
+in any order, and its own `chapter2.day2.completed` flag. GameWorld waits for
+plain play after the last treatment conversation (no dialogue, overlay, fade or
+pending scripted step), claims the flag first and opens a single interlude using
+the existing doctor-eating illustration and bilingual `chapter2ClosingDialogues`.
+The caption is followed by parenthesized Doctor thoughts, with no artifacts or
+new narrative cause assigned to the poisoning. While the image covers the game,
+the Doctor returns to the existing Chapter 2 room/start spawn exactly once.
+Inventory, storage, cases, collected ids, recipes and flags are preserved.
+Chapter 2 remains active for aftercare/free exploration; this is an epilogue,
+NOT a transition into unfinished Chapter 3. `getNextChapterId("chapter-2")` remains
+null. Chapter 1 keeps its separate closing and chapter transition unchanged.
+The Day 2 dev page (both aliases) now has "Probar cierre": a disposable fixture
+with Day 2 cases treated and investigation/messenger flags set, but completion
+unclaimed. Restart restores the normal Day 2 test fixture. Nothing is saved.
+New epilogue is implemented for play review; browser pacing/visual review pending.
+
+SHARED ENVIRONMENT: Kilian supplied a chapter-1 export and explicitly requested
+its wind vegetation in EVERY chapter. Only its 55 bush-round/bush-tall/grass-tuft/
+fern-weed instances were extracted into `compositions/shared-environment.ts`:
+farm 16, forest 5, mill-farmland 14, mountain-path 12, outskirts 8. All authored
+instance values are preserved; all anchors are within their scene worlds.
+NPCs, collectible herbs/resin/etc and other export changes were NOT imported.
+`getComposition` layers these placements over any chapter (including future
+chapters without population), deduplicating by stable instanceId with shared
+placements authoritative. No legacy exterior population is reintroduced.
+Decorator previews shared vegetation as a read-only backdrop outside local
+drafts/exports; a matching local id suppresses that preview for editing. Updating
+the shared placements still requires integrating the approved vegetation export.
+These assets are animated, nonblocking and noncollectible. `DecorSprite` frame
+keys now include their sequence index, allowing intentionally repeated PNGs
+without duplicate React child keys. No character or manual geometry was changed.
+
+CONDITIONAL HINTS: new internal Doctor lines use `doctorThought` (ES/EN text
+wrapped in parentheses). Farmer examination ends with a sample hint that knows
+whether a leech is already carried. Witch's gift explicitly mentions leeches'
+taste for blood; the following thought mentions returning to the granary only
+if that case was examined. Before obtaining the sample, an examined case with
+no carried leech can prompt the recovering miner's cave clue. If the Witch gift
+was already received, the thought instead suggests checking storage. These
+clues never spawn the Witch or gate access; the miner hint disappears once the
+sample exists. The solo analysis result is internal speech as well.
+
+FARMER INVESTIGATION IMPLEMENTED: after examination, interacting with the farmer
+while carrying a leech consumes that existing item and claims
+`chapter2.farmer.sampleCollected` atomically. The used leech/sample are narrative
+state (no new inventory item). The Witch's existing gift flag prevents duplicates.
+The Book directs the player to the apothecary work table. Only the manual
+CraftingOverlay offers "Analyze the farmer's sample" while the examined case
+has a collected, unanalyzed sample. The guarded action claims
+`chapter2.farmer.sampleAnalyzed`, learns suspension/infusion recipes, closes
+crafting and plays the Doctor's bilingual result conversation. No new station,
+coordinates, reagent items, recipes, poison cause or culprit were introduced.
+
+`farmerInvestigation.ts` derives case definitions from flags. GameWorld treatment,
+Book, material suppliers and river all use those effective definitions; before
+analysis the case remains an unresolved investigation and cannot be treated.
+After analysis it requires charcoal suspension + medicinal infusion. Existing
+recovering miner supplies missing coal, farm woman missing herbs, and river
+water uses the existing flask. Delivery consumes both preparations exactly once;
+farmer/carer/farm woman have aftercare dialogue. The three Day 2 cases now have
+treatment paths, but Day 2 closing and Day 3 remain unimplemented.
+Tests exercise sample gating, one-shot collection/analysis, six-slot crafting,
+all Book stages and treatment with Day 1 rewards already claimed. Browser
+validation of the new button and full route remains pending.
+
+DAY 2 TWO COMPLETE CASES: the woodcutter (exhaustion) and blacksmith
+(inflamed hand wound, existing infected-wound ailment) now have hidden ->
+examined in-place -> treated flows, with bilingual examination, waiting,
+delivery and aftercare dialogue. Woodcutter takes citrus drink + mint infusion;
+blacksmith takes poultice + medicinal compress. Both can be completed independently
+with the existing six slots, empty flask and leech carried; tests exercise both
+orders with all Day 1 reward flags already claimed. Treatment consumes both
+preparations atomically, once. Neither case ends Day 2 or advances the farmer.
+
+MATERIAL SOURCES (existing Day 2 NPC interactions, no new placements): farm
+woman supplies orange/mint/herb/animal fat; baker flour/honey; mill neighbour
+resin/cloth. `chapter2Supplies.ts` derives quantities from examined untreated
+Day 2 cases, recursively accounting for carried intermediates and prepared cures.
+No known need means normal ambient dialogue. Full inventory gives nothing and
+allows retry. Supplies do not depend on Day 1's one-time reward flags and may be
+requested again only when a real shortage remains. Player still carries/transfers
+materials normally; chest contents are not used remotely. River water logic now
+reads the combined patient registry, so Day 2 water needs fill the existing flask.
+Blacksmith is no longer the blood-sample case; that investigation stays with the
+farmer and is still pending. Assets, placements and manual geometry are unchanged.
+
 RECIPE DISCOVERY ACTIVE: `crafting/recipeDiscovery.ts` maps existing recognizable
 ingredients to recipe ids (water, vessels and leech are excluded). Successful
 world pickups, story gifts/trades, chest withdrawals and crafting results call
@@ -313,7 +499,7 @@ and the conversation of the last treatment has fully closed (GameWorld only asks
 at a moment of plain play: no dialogue, interface or fade), the day closes by
 itself. The flag is claimed as the closing starts, so it cannot fire twice and is
 never reused for Day 2. The closing is ONE sequence: the existing narrative
-interlude over `doctor-fireplace`, whose first line is the caption ("Con los
+interlude over `doctor-eating` (formerly `doctor-fireplace`, changed 2026-11-08), whose first line is the caption ("Con los
 pacientes atendidos, regresas a casa para descansar." / "With your patients cared
 for, you return home to rest.") followed by the Doctor's three lines
 (`chapter1Day1Dialogues.ts`). While the picture covers the game, the active

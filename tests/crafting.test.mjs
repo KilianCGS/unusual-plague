@@ -844,8 +844,8 @@ test("knowing a chained recipe reveals intermediate preparation pages without re
   const {buildPreparationSpreads}=at("src/game/book/dynamicPages.ts");
   for(const language of ['es','en']){
     const spreads=buildPreparationSpreads({language,patients:{},inventory:stock([]),knownRecipeIds:known});
-    assert.equal(spreads.length,1);
-    assert.ok(spreads[0].texts.some(t=>t.id==='manual.medicinal-compress-steps'));
+    assert.equal(spreads.length,1, 'two known preparations share an opening, one per leaf');
+    assert.ok(spreads.some(s=>s.texts.some(t=>t.id==='manual.medicinal-compress-steps')));
   }
 });
 

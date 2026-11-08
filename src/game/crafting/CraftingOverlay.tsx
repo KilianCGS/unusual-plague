@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
 import { craftingCopy } from "../i18n/crafting";
+import { farmerAnalysisLabel } from "../dialogue/chapter2AnalysisDialogues";
 import type { Language } from "../i18n/types";
 import type { InventoryState } from "../inventory/inventory";
 import { getItemIcon, getItemName } from "../items/items";
@@ -45,12 +46,14 @@ export function CraftingOverlay({
   language,
   onInventoryChange,
   onClose,
+  onAnalyzeSample,
 }: {
   station: CraftStation;
   inventory: InventoryState;
   language: Language;
   onInventoryChange: (inventory: InventoryState) => void;
   onClose: () => void;
+  onAnalyzeSample?: () => void;
 }) {
   const copy = craftingCopy[language];
   const [selection, setSelection] = useState<CraftSelection>(() =>
@@ -146,6 +149,11 @@ export function CraftingOverlay({
             ×
           </button>
           <h2 className={styles.title}>{copy.title[station]}</h2>
+          {station === "manual" && onAnalyzeSample ? (
+            <button type="button" className={styles.action} onClick={onAnalyzeSample} disabled={modalOpen}>
+              {farmerAnalysisLabel[language]}
+            </button>
+          ) : null}
           <p className={styles.counter} data-crafting-counter>
             {copy.ingredients} {selectedCount}/{selection.length}
           </p>

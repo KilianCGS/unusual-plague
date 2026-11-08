@@ -52,14 +52,14 @@ export const injuredMinerExam = conversation("mine.injuredMiner.exam", [
     "Sí. Bueno. En retrospectiva todo parece más sencillo.",
     "Yes. Well. Everything looks simpler in hindsight.",
   ),
-  doctor("La herida está infectada.", "The wound is infected."),
+  doctor("La zona está roja, hinchada y supura. El dolor no ha remitido.", "The area is red, swollen and discharging. The pain has not eased."),
   subject(
     "Eso suena peor cuando lo dice alguien con máscara.",
     "That sounds worse coming from someone in a mask.",
   ),
   doctor(
-    "Necesito limpiarla y cubrirla correctamente. Y preparar algo para la infección.",
-    "I need to clean it and dress it properly. And prepare something for the infection.",
+    "Necesito valorar estos signos antes de elegir cómo tratarla. Mientras tanto, deja la pierna en reposo.",
+    "I need to assess these signs before choosing a treatment. Rest your leg in the meantime.",
   ),
   subject("¿Voy a perder la pierna?", "Am I going to lose the leg?"),
   doctor(

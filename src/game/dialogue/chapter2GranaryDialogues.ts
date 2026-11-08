@@ -2,8 +2,11 @@ import type { Language } from "../i18n/types";
 import { countItem } from "../inventory/inventory";
 import { FARMER_DAY2_ID } from "../patients/chapter2Patients";
 import { getPatientStatus } from "../patients/patientCases";
+import { isTreatable } from "../patients/patientCases";
+import { FARMER_SAMPLE_ID, FARMER_ANALYSIS_ID, getChapter2PatientDefinitions } from "../patients/farmerInvestigation";
 import { localizeConversation, type LocalizedConversation } from "./localizedConversation";
 import type { StoryFacts, StoryOutcome } from "./storyInteractions";
+import { doctorThought } from "./doctorThought";
 
 const woman = (es: string, en: string) => ({ speaker: "subject", text: { es, en } });
 const doctor = (es: string, en: string) => ({ speaker: "doctor", text: { es, en } });
@@ -57,9 +60,9 @@ const farmerExam: LocalizedConversation = {
     woman("Aquí uno come lo que hay. No llevo la cuenta de cada bocado.", "You eat what's there in this place. I don't keep a tally of every mouthful."),
     doctor("¿Y en el trabajo? ¿Algo distinto entre el grano o las herramientas?", "And at work? Anything unusual among the grain or the tools?"),
     woman("No me pida que se lo ordene ahora. Tengo la cabeza como el molino.", "Don't ask me to put it all in order now. My head's turning like the mill."),
-    doctor("No se fuerce. Con lo que veo, sospecho un envenenamiento. No sé todavía por qué sustancia.", "Don't strain yourself. From what I can see, I suspect poisoning. I don't yet know what substance is involved."),
-    woman("¿Veneno? ¿Aquí?", "Poison? Here?"),
-    doctor("Eso no significa que alguien lo haya hecho a propósito. Primero hay que averiguar qué ha pasado.", "That doesn't mean someone did it deliberately. First we need to find out what happened."),
+    doctor("No se fuerce. La debilidad ha aparecido deprisa y viene acompañada de sudor frío y náuseas.", "Don't strain yourself. The weakness came on quickly, together with cold sweats and nausea."),
+    woman("¿Y puede saber qué me pasa?", "Can you tell what is wrong with me?"),
+    doctor("Primero voy a contrastar estos signos. No quiero sacar conclusiones antes de tiempo.", "First I will compare these signs. I don't want to jump to conclusions."),
     woman("No quiero que empiecen a señalar a nadie por mi culpa.", "I don't want people pointing fingers on my account."),
     doctor("Ni yo. Necesito una muestra de sangre para continuar el análisis en la botica.", "Neither do I. I need a blood sample to continue the investigation at the apothecary."),
     woman("Haga lo que tenga que hacer. Pero no me deje a medias.", "Do what you need to do. Just see it through."),
@@ -86,6 +89,38 @@ const farmerWithLeech: LocalizedConversation = {
     woman("¿Eso también trabaja para usted?", "Does that work for you too?"),
     doctor("Por ahora, viaja conmigo.", "For now, it's travelling with me."),
     woman("Pues vigile que no se acostumbre a la buena vida.", "Then mind it doesn't get used to the easy life."),
+    doctor("Ya está. La guardaré con la muestra y continuaré el análisis en la mesa de la botica.", "There. I'll keep it with the sample and continue the analysis at the apothecary's work table."),
+  ],
+};
+
+const farmerSampleWaiting: LocalizedConversation = {
+  id: "chapter2.granary.farmer.sampleWaiting", lines: [
+    woman("¿Se ha llevado ya lo que necesitaba?", "Have you taken what you needed?"),
+    doctor("La muestra está recogida. Ahora necesito examinarla en la mesa de la botica.", "The sample is collected. Now I need to examine it at the apothecary's work table."),
+    woman("Vuelva cuando sepa algo. Aquí las horas se hacen largas.", "Come back when you know something. The hours feel long in here."),
+  ],
+};
+const farmerRemedyWaiting: LocalizedConversation = {
+  id: "chapter2.granary.farmer.remedyWaiting", lines: [
+    doctor("El análisis está hecho. Prepararé una suspensión de carbón y una infusión medicinal.", "The analysis is done. I'll prepare a charcoal suspension and a medicinal infusion."),
+    woman("Me basta con que ahora sepa por dónde seguir.", "It's enough to know you have a way forward now."),
+    doctor("El minero puede ayudarme con el carbón y la granjera con las hierbas. He anotado los pasos en el Compendio.", "The miner can help with charcoal and the farm woman with herbs. I've noted the steps in the Compendium."),
+  ],
+};
+const farmerCure: LocalizedConversation = {
+  id: "chapter2.granary.farmer.cure", lines: [
+    doctor("La suspensión y la infusión están listas. Vamos a atenderle.", "The suspension and infusion are ready. Let's attend to you."),
+    woman("¿Y después podré volver al molino?", "And then can I go back to the mill?"),
+    doctor("Después seguirá descansando. Que tengamos un tratamiento no significa que haya recuperado las fuerzas.", "Then you'll keep resting. Having a treatment doesn't mean you've regained your strength."),
+    woman("Ya me imaginaba que no iba a salir ganando esa discusión.", "I thought I wasn't going to win that argument."),
+    doctor("No tiene que ganar nada hoy. Deje que lo cuiden.", "You don't have to win anything today. Let people look after you."),
+  ],
+};
+const farmerAfter: LocalizedConversation = {
+  id: "chapter2.granary.farmer.after", lines: [
+    woman("Han recogido las herramientas. Me lo han dicho tres veces.", "They've put away the tools. They've told me three times."),
+    doctor("Entonces puede dejar de contarlas por hoy.", "Then you can stop counting them for today."),
+    woman("Voy a probar. Pero no prometo dormirme sin repasarlas una vez más.", "I'll try. But I can't promise to fall asleep without going over them once more."),
   ],
 };
 
@@ -93,11 +128,18 @@ export function resolveGranaryInteraction(
   interactionId: string, facts: StoryFacts, language: Language, subjectId: string,
 ): StoryOutcome | null {
   const status = getPatientStatus(facts.patients, FARMER_DAY2_ID);
+  const flags = facts.claimedRewards ?? new Set<string>();
   const conversation = (text: LocalizedConversation) => localizeConversation(text, language, subjectId);
   if (interactionId === "chapter2.granary.carer") {
     const first = !facts.claimedRewards?.has(heard);
     return {
-      conversation: conversation(first ? carerFirst : status === "examined" ? carerAfter : carerBefore),
+      conversation: conversation(status === "treated" ? {
+        id: "chapter2.granary.carer.treated", lines: [
+          woman("Se ha quedado más tranquilo. Todavía pregunta por el trabajo, pero ya no intenta levantarse.", "He's settled down. He still asks about work, but he isn't trying to get up anymore."),
+          doctor("Siga acompañándolo. Necesita tiempo para recuperarse.", "Keep him company. He needs time to recover."),
+          woman("Tiempo tengo. Y si hace falta le vuelvo a contar lo de las herramientas.", "I have time. And if I must, I'll tell him about the tools again."),
+        ],
+      } : first ? carerFirst : status === "examined" ? carerAfter : carerBefore),
       effects: [
         ...(first ? [{ type: "claim-reward" as const, rewardId: heard }] : []),
         ...(status === "hidden" ? [{ type: "advance-patient" as const, patientId: FARMER_DAY2_ID, to: "discovered" as const }] : []),
@@ -106,10 +148,25 @@ export function resolveGranaryInteraction(
   }
   if (interactionId !== "chapter2.granary.farmer") return null;
   if (status === "hidden" || status === "discovered") {
-    return { conversation: conversation(farmerExam), effects: [], after: "examine-in-place", patientId: FARMER_DAY2_ID };
+    const thought = countItem(facts.inventory, "leech") > 0
+      ? doctorThought("La sanguijuela que llevo puede servirme para obtener una muestra de sangre. Después podré analizarla en la botica.", "The leech I'm carrying could help me obtain a blood sample. Then I can analyze it at the apothecary.")
+      : doctorThought("Debería obtener una muestra de sangre antes de elegir un remedio. Una sanguijuela podría servirme.", "I should obtain a blood sample before choosing a remedy. A leech could help.");
+    return { conversation: conversation({ ...farmerExam, lines: [...farmerExam.lines, thought] }), effects: [], after: "examine-in-place", patientId: FARMER_DAY2_ID };
+  }
+  if (status === "treated") return { conversation: conversation(farmerAfter), effects: [] };
+  if (flags.has(FARMER_ANALYSIS_ID)) {
+    const ready = isTreatable(facts.patients, getChapter2PatientDefinitions(flags)[FARMER_DAY2_ID], facts.inventory);
+    return { conversation: conversation(ready ? farmerCure : farmerRemedyWaiting), effects: ready ? [{ type: "treat", patientId: FARMER_DAY2_ID }] : [] };
+  }
+  if (flags.has(FARMER_SAMPLE_ID)) return { conversation: conversation(farmerSampleWaiting), effects: [] };
+  if (countItem(facts.inventory, "leech") > 0) {
+    return { conversation: conversation(farmerWithLeech), effects: [
+      { type: "take-item", itemId: "leech", quantity: 1 },
+      { type: "claim-reward", rewardId: FARMER_SAMPLE_ID },
+    ] };
   }
   return {
-    conversation: conversation(countItem(facts.inventory, "leech") > 0 ? farmerWithLeech : farmerWaiting),
+    conversation: conversation(farmerWaiting),
     effects: [],
   };
 }

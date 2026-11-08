@@ -257,20 +257,21 @@ test("there is no 'go home' step any more: no work-done remark, no arrival condi
   assert.ok(!/day1|Day1|DAY1/.test(rule));
 });
 
-test("the closing is ONE sequence: the existing fireplace interlude whose first line is the caption", () => {
-  assert.ok(NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]);
+test("the closing is ONE sequence: the existing supper interlude whose first line is the caption", () => {
+  assert.ok(NARRATIVE_ILLUSTRATIONS["doctor-eating"]);
   assert.ok(
     fs.existsSync(
       path.join(
         root,
         "public",
-        NARRATIVE_ILLUSTRATIONS["doctor-fireplace"].src,
+        NARRATIVE_ILLUSTRATIONS["doctor-eating"].src,
       ),
     ),
   );
   const source = read("src/game/world/GameWorld.tsx");
   assert.equal((source.match(/<NarrativeInterlude/g) ?? []).length, 2); // opening + closing
-  assert.ok(source.includes('NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]'));
+  assert.ok(source.includes('NARRATIVE_ILLUSTRATIONS["doctor-eating"]'));
+  assert.ok(!source.includes('NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]'));
   assert.ok(source.includes("onCovered={startNextChapter}"));
   assert.ok(source.includes("onFinished={finishClosing}"));
   // blocks movement and every interface exactly as the opening does

@@ -20,6 +20,9 @@ import { DAY1_COMPLETED_ID } from "../patients/day1";
 import { createEmptyStorage } from "../storage/storage";
 import type { TutorialStep } from "../tutorial/tutorialFlow";
 import { WORLD_SCENES } from "./worldScenes";
+import { CHAPTER2_PATIENTS } from "../patients/chapter2Patients";
+import { FARMER_SAMPLE_ID, FARMER_ANALYSIS_ID, FARMER_RECIPE_IDS } from "../patients/farmerInvestigation";
+import { MESSENGER_MET_ID, MESSENGER_LEFT_ID } from "./day2Opening";
 
 // A DEVELOPMENT start: the state GameWorld begins with when it is handed one
 // (see /dev/day2). The real game never passes it, so a normal game starts as
@@ -94,5 +97,18 @@ export function createDay2DevStart(): GameDevStart {
     collected: getDay1CollectedInstanceIds(),
     // The tutorial of the first morning is over.
     tutorialStep: "done",
+  };
+}
+
+// TEST DATA: jump to the last conversation already closed, not a real save.
+export function createDay2ClosingDevStart(): GameDevStart {
+  const start = createDay2DevStart();
+  return {
+    ...start,
+    patients: { ...start.patients, ...Object.fromEntries(Object.keys(CHAPTER2_PATIENTS).map(id => [id, "treated" as const])) },
+    claimedRewards: new Set([...start.claimedRewards, FARMER_SAMPLE_ID, FARMER_ANALYSIS_ID,
+      MESSENGER_MET_ID, MESSENGER_LEFT_ID, "chapter2.witch.leech"]),
+    knownRecipeIds: new Set([...start.knownRecipeIds, ...FARMER_RECIPE_IDS,
+      ...Object.values(CHAPTER2_PATIENTS).flatMap(definition => definition.revealsRecipeIds)]),
   };
 }

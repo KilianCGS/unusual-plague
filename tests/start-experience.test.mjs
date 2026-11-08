@@ -171,7 +171,7 @@ test("leaving the Doctor's Room: the Doctor arrives in the Apothecary at the app
   );
 });
 
-test("the opening uses the writing illustration; the fireplace one closes Day 1; the eating one stays available, unused", () => {
+test("the opening uses writing, Day 1 closes at the fireplace and Day 2 closes over supper", () => {
   for (const [id, illustration] of Object.entries(NARRATIVE_ILLUSTRATIONS)) {
     const file = path.join(root, "public", illustration.src);
     assert.ok(fs.existsSync(file), id);
@@ -186,8 +186,10 @@ test("the opening uses the writing illustration; the fireplace one closes Day 1;
     "doctor-writing",
   ]);
   const gameWorld = read("src/game/world/GameWorld.tsx");
-  assert.ok(!/doctor-eating/.test(gameWorld));
-  assert.ok(gameWorld.includes('NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]'));
+  // Supper is the bridge from the Day 1 closing into Day 2 (every closing
+  // interlude uses it); Chapter 1 still starts with writing.
+  assert.ok(gameWorld.includes('NARRATIVE_ILLUSTRATIONS["doctor-eating"]'));
+  assert.ok(!gameWorld.includes('NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]'));
   assert.ok(
     !/doctor-eating|doctor-fireplace/.test(
       read("src/game/world/chapterStart.ts"),

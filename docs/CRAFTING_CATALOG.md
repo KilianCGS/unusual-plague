@@ -36,6 +36,12 @@ al consumir su última unidad, si hay espacio; si no lo hay, no se consume nada.
 
 ## Libro y materiales
 
+Los preparados conocidos se muestran de uno en uno por hoja: dos fichas por
+apertura. Cada ficha conserva imagen, nombre, descripción, uso, ingredientes,
+estación, pasos previos y disponibilidad en la bolsa. Las 15 recetas ocupan ocho
+aperturas; la última hoja derecha queda vacía. Las recetas desconocidas no se
+muestran.
+
 Conocer una receta final hace visibles también las recetas intermedias necesarias.
 Los preparados encadenados indican «Preparar antes» en ES/EN. El cálculo de
 materiales recorre la cadena, suma necesidades compartidas, descuenta preparados
@@ -50,12 +56,21 @@ intermedio. Se conserva el orden de las pistas del Día 1.
   recetas. Recibir/fabricar un preparado enseña también su receta.
 - El conocimiento se conserva durante la sesión aunque se gasten o guarden los
   objetos. Las operaciones fallidas no enseñan recetas. Examinar pacientes
-  sigue siendo otra vía de aprendizaje. Una notificación ES/EN indica cuándo
+  y acertar su diagnóstico sigue siendo otra vía de aprendizaje. Equivocarse no
+  consume materiales ni revela recetas del caso; permite repasar síntomas y
+  consultar el libro. Una notificación ES/EN indica cuándo
   consultar Preparados, y las páginas muestran disponibilidad en la bolsa.
-- Las nuevas fuentes de materiales en el Día 2 siguen pendientes; estar en el
-  catálogo no implica poder conseguir el ingrediente durante una partida.
-- No se han fijado nuevos tratamientos ni casos del Día 3 con esta entrega.
-- La extracción/análisis de sangre y el tratamiento del agricultor siguen pendientes.
+- Leñador: bebida cítrica + infusión de menta. Herrero: cataplasma + compresa
+  medicinal. Examen, entrega y conversación posterior ya están conectados.
+- Fuentes para estos dos casos: granjera (naranja, menta, hierba y grasa),
+  panadera (harina y miel), vecino del molino (resina y tela), río (agua con el
+  frasco). Dan lo que falta para pacientes examinados sin depender de regalos
+  del Día 1. Sin espacio, no se pierde material y se puede volver.
+- Otras fuentes del catálogo y los casos del Día 3 siguen pendientes.
+- Agricultor: examen → sanguijuela → muestra registrada en el libro → análisis
+  desde la mesa de la botica → suspensión de carbón + infusión medicinal.
+  Minero recuperado: carbón; granjera: hierbas; río: agua. El análisis y la
+  entrega tienen protección contra repeticiones; no se añade otro item al catálogo.
 - No se han añadido antídotos, tónicos ni papillas que no existieran en el catálogo.
 
 ## Prueba rápida

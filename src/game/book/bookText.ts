@@ -7,7 +7,8 @@ export type RichText = readonly RichTextFragment[];
 // Visual role of a block of page text; the stylesheet maps each to a size and
 // weight. "name" = the title under an illustration, "heading" = a section
 // title on a page, "body" = running text, "note" = small placeholder text.
-export type BookTextRole = "name" | "heading" | "body" | "note";
+export type BookTextRole = "name" | "heading" | "body" | "note"
+  | "preparationTitle" | "preparationBody" | "preparationNote";
 
 // A block of text placed on a spread, in BOOK pixels (688x384 art space).
 export type BookTextBlock = {

@@ -1,0 +1,38 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: #090806b8;
+}
+.panel {
+  width: min(640px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow: auto;
+  border: 2px solid #97794d;
+  padding: 24px;
+  color: #f2e7ce;
+  background: #211b14;
+  box-shadow: 0 12px 40px #0008;
+}
+.panel h2 { margin: 0 0 18px; font-size: 21px; }
+.thought { line-height: 1.6; color: #dccbab; }
+.options { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 22px 0 16px; }
+.panel button {
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: left;
+  padding: 11px 13px;
+  color: inherit;
+  border: 1px solid #756141;
+  background: #352b1e;
+  cursor: pointer;
+}
+.panel button:hover, .panel button:focus-visible { outline: 2px solid #d9b878; outline-offset: 2px; background: #493921; }
+.consult { width: 100%; }
+.hint { margin: 15px 0 0; font-size: 12px; line-height: 1.5; color: #c2b18f; }
+@media (max-width: 520px) { .options { grid-template-columns: 1fr; } .panel { padding: 18px; } }

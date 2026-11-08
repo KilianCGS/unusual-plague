@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import type { Language } from "../../../game/i18n/types";
 import { useIsClient } from "../../../game/ui/useIsClient";
-import { createDay2DevStart } from "../../../game/world/devStart";
+import { createDay2DevStart, createDay2ClosingDevStart } from "../../../game/world/devStart";
 import { GameWorld } from "../../../game/world/GameWorld";
 import styles from "./page.module.css";
 
@@ -17,10 +17,13 @@ export default function Day2DevPage() {
   const isClient = useIsClient();
   const [language, setLanguage] = useState<Language>("es");
   const [run, setRun] = useState(0);
+  const [closingPreview, setClosingPreview] = useState(false);
 
   return (
     <>
-      {isClient ? (
+      {isClient && closingPreview ? (
+        <GameWorld key={`closing-${run}-${language}`} language={language} devStart={createDay2ClosingDevStart()} />
+      ) : isClient ? (
         <GameWorld
           key={`${run}-${language}`}
           language={language}
@@ -46,9 +49,12 @@ export default function Day2DevPage() {
           ))}
           <button
             type="button"
-            onClick={() => setRun((current) => current + 1)}
+            onClick={() => { setClosingPreview(false); setRun((current) => current + 1); }}
           >
             Reiniciar
+          </button>
+          <button type="button" onClick={() => { setClosingPreview(true); setRun(current => current + 1); }}>
+            Probar cierre
           </button>
         </span>
       </aside>

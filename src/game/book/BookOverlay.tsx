@@ -234,6 +234,8 @@ function SpreadView({ spread }: { spread: BookSpread }) {
             top: BOOK_TOP + layer.y,
             width: layer.width,
             height: layer.height,
+            objectFit: layer.fit,
+            mixBlendMode: layer.blend,
           }}
         />
       ))}

@@ -639,7 +639,8 @@ test("water: the river fills the flask once (2 units, the flask is used up), onl
 
   // a future open case that needs more water re-enables the river by itself
   // (nothing was stored about the river)
-  ch1.CHAPTER1_PATIENTS["test.second"] = {
+  const registry = at("src/game/patients/patientRegistry.ts").PATIENT_CASES;
+  registry["test.second"] = {
     id: "test.second",
     requiredTreatments: [{ itemId: "medicinal-infusion", quantity: 1 }],
   };
@@ -660,7 +661,7 @@ test("water: the river fills the flask once (2 units, the flask is used up), onl
       "not-needed",
     );
   } finally {
-    delete ch1.CHAPTER1_PATIENTS["test.second"];
+    delete registry["test.second"];
   }
   // and spending the water elsewhere makes it useful again
   assert.equal(
@@ -1066,15 +1067,17 @@ test("the standing baker uses the hand-adjusted PNG exactly, and its size in the
   assert.ok(Math.abs(sprite.frameHeight / 257 - 0.3) < 0.001);
 });
 
-test("Bakers Bedroom: ONE source of truth, the composition exported from the Decorator, exactly", () => {
+test("Bakers Bedroom: exported narrative placements stay exact alongside two shared flames", () => {
   const { getComposition } = at("src/game/compositions/index.ts");
   const { chapter1Compositions } = at("src/game/compositions/chapter-1.ts");
-  const composition = getComposition("bakers-bedroom", "chapter-1");
+  const complete = getComposition("bakers-bedroom", "chapter-1");
+  assert.equal(complete.instances.filter(i=>i.assetId === "candle-flame").length, 2);
+  const composition = { ...complete, instances: complete.instances.filter(i=>i.assetId !== "candle-flame") };
   const exported = chapter1Compositions.filter(
     (c) => c.sceneId === "bakers-bedroom",
   );
 
-  // chapter-1.ts holds it once, and nothing else adds instances to that scene
+  // chapter-1.ts holds the narrative cast once; shared decor only adds flames.
   assert.equal(exported.length, 1);
   assert.equal(composition.instances.length, 3);
   assert.deepEqual(composition.instances, exported[0].instances);

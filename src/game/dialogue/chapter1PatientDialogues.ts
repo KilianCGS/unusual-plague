@@ -148,13 +148,13 @@ export const husbandExam: LocalizedConversation = {
       "Since the night before last. And my head is about to split.",
     ),
     doctor(
-      "Frente ardiendo, pulso rápido, sudor frío... Fiebre común.",
-      "Burning forehead, quick pulse, cold sweat... A common fever.",
+      "Tiene la frente muy caliente, el pulso rápido y sudor frío. Voy a contrastar los síntomas.",
+      "Your forehead is very hot, your pulse is quick and you are in a cold sweat. Let me compare the symptoms.",
     ),
     bedroomBaker("¿Es grave, Doctor?", "Is it serious, Doctor?"),
     doctor(
-      "Nada grave si se trata a tiempo. Necesita una infusión medicinal y un paño frío.",
-      "Nothing serious if it's treated in time. He needs a medicinal infusion and a cold compress.",
+      "Voy a ocuparme de él. Primero quiero estar seguro del diagnóstico.",
+      "I will look after him. First I want to be sure of the diagnosis.",
     ),
     subject("Lo que usted diga, Doctor.", "Whatever you say, Doctor."),
   ],

@@ -97,6 +97,25 @@
   line-height: 1.2;
 }
 
+/* Each preparation occupies one physical leaf; other sections keep their type. */
+.preparationTitle {
+  font-size: 18px;
+  line-height: 20px;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.preparationBody {
+  font-size: 14px;
+  line-height: 16px;
+}
+
+.preparationNote {
+  font-size: 12px;
+  line-height: 14px;
+}
+
 /* Preparations named inside a text. */
 .emphasis {
   font-style: italic;

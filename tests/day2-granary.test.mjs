@@ -83,13 +83,16 @@ test("the farmer can be examined first; knowledge advances only when dialogue cl
   }
 });
 
-test("an existing leech changes repeat conversation without consuming it or fabricating a sample", () => {
+test("an existing leech enables sample collection as an atomic story outcome", () => {
   const facts = fresh(); facts.patients = { [FARMER_DAY2_ID]: "examined" };
   facts.inventory = addItem(facts.inventory, "leech", 1);
   assert.ok(facts.inventory);
   const result = resolve("farmer", facts);
   assert.equal(result.conversation.id, "chapter2.granary.farmer.leechKnown");
-  assert.deepEqual(result.effects, []);
+  assert.deepEqual(result.effects, [
+    { type: "take-item", itemId: "leech", quantity: 1 },
+    { type: "claim-reward", rewardId: "chapter2.farmer.sampleCollected" },
+  ]);
 });
 
 test("an unresolved investigation cannot be treated for free; its Book page records the next step", () => {

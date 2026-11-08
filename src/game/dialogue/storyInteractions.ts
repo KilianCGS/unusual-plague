@@ -1,7 +1,7 @@
 import type { ItemNeed } from "../crafting/needs";
 import { resolveGranaryInteraction } from "./chapter2GranaryDialogues";
 import { resolveChapter2StoryInteraction } from "./chapter2StoryInteractions";
-import { PATIENT_CASES } from "../patients/patientRegistry";
+import { getPatientDefinitions } from "../patients/patientRegistry";
 import { gatherCopy, itemFeedbackCopy } from "../i18n/items";
 import type { Language } from "../i18n/types";
 import {
@@ -167,7 +167,7 @@ export function getGatherDecision(
 
   const missing = getActiveMissingIngredients(
     facts.patients,
-    PATIENT_CASES,
+    getPatientDefinitions(facts.claimedRewards),
     facts.inventory,
   );
 
@@ -701,7 +701,7 @@ export function resolveStoryInteraction(
 
   const missing = getActiveMissingIngredients(
     facts.patients,
-    CHAPTER1_PATIENTS,
+    getPatientDefinitions(facts.claimedRewards),
     facts.inventory,
   );
 

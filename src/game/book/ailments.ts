@@ -11,7 +11,7 @@ export type Ailment = {
   id: string;
   name: string;
   illustration: {
-    // File in public/game/ui/book/ailments (copy of the original drawing).
+    // Versioned engraving in public/game/ui/book/ailments; old drawings remain.
     file: string;
     // Where the 176x176 illustration canvas sits on the 688x384 book image.
     x: number;
@@ -23,9 +23,17 @@ export type Ailment = {
 
 export const AILMENTS: Ailment[] = [
   {
+    id: "poisoning",
+    name: "Envenenamiento",
+    illustration: { file: "poisoning-v2", x: 106, y: 28 },
+    symptoms: ["Debilidad repentina, sudor frío, náuseas y falta de apetito. Los síntomas pueden parecerse a otros cuadros; conviene reunir indicios antes de dar el diagnóstico por seguro."],
+    treatment: ["Obtener y analizar una muestra antes de elegir el remedio. El tratamiento registrado combina ",
+      { emphasis: "suspensión de carbón" }, " e ", { emphasis: "infusión medicinal" }, ". Su origen requiere una investigación aparte."],
+  },
+  {
     id: "common-fever",
     name: "Fiebre común",
-    illustration: { file: "fever", x: 102, y: 39 },
+    illustration: { file: "fever-v2", x: 102, y: 39 },
     symptoms: [
       "Calor corporal, escalofríos, dolor de cabeza y debilidad. El enfermo puede alternar entre sudor y sensación de frío.",
     ],
@@ -40,7 +48,7 @@ export const AILMENTS: Ailment[] = [
   {
     id: "stomach-ailment",
     name: "Mal del estómago",
-    illustration: { file: "stomach", x: 108, y: 30 },
+    illustration: { file: "stomach-v2", x: 108, y: 30 },
     symptoms: [
       "Dolor de vientre, náuseas, falta de apetito y pesadez. La causa puede variar según el enfermo.",
     ],
@@ -49,8 +57,6 @@ export const AILMENTS: Ailment[] = [
       { emphasis: "Sopa ligera" },
       ", ",
       { emphasis: "leche con miel" },
-      ", ",
-      { emphasis: "papilla nutritiva" },
       " o un ",
       { emphasis: "preparado de carbón" },
       " pueden ser útiles según el caso.",
@@ -59,7 +65,7 @@ export const AILMENTS: Ailment[] = [
   {
     id: "infected-wound",
     name: "Herida infectada",
-    illustration: { file: "infected-wound", x: 100, y: 24 },
+    illustration: { file: "infected-wound-v2", x: 100, y: 24 },
     symptoms: [
       "Dolor persistente alrededor de una herida, inflamación, enrojecimiento y posible supuración.",
     ],
@@ -67,50 +73,50 @@ export const AILMENTS: Ailment[] = [
       "Limpiar y proteger la zona con un ",
       { emphasis: "vendaje desinfectado" },
       ". Las infecciones más avanzadas pueden requerir ",
-      { emphasis: "ungüento antiséptico" },
+      { emphasis: "ungüento medicinal" },
       " antes de vendar.",
     ],
   },
   {
     id: "chest-cough",
     name: "Tos del pecho",
-    illustration: { file: "chest-cough", x: 112, y: 23 },
+    illustration: { file: "chest-cough-v2", x: 112, y: 23 },
     symptoms: [
       "Tos persistente, garganta irritada, respiración pesada y molestias en el pecho. Puede empeorar durante la noche.",
     ],
     treatment: [
       "Una ",
-      { emphasis: "infusión balsámica" },
+      { emphasis: "infusión de menta" },
       " ayuda a despejar la respiración. El ",
-      { emphasis: "jarabe de miel" },
+      { emphasis: "jarabe balsámico" },
       " puede aliviar la irritación y la tos.",
     ],
   },
   {
     id: "scurvy",
     name: "Escorbuto",
-    illustration: { file: "scurvy", x: 107, y: 20 },
+    illustration: { file: "scurvy-v2", x: 107, y: 20 },
     symptoms: [
       "Cansancio, debilidad, encías doloridas y heridas que tardan demasiado en sanar. Puede aparecer tras una alimentación pobre durante largo tiempo.",
     ],
     treatment: [
       "Reforzar la alimentación con fruta y alimentos nutritivos. Administrar ",
-      { emphasis: "tónico cítrico" },
+      { emphasis: "bebida cítrica" },
       " y acompañarlo con ",
-      { emphasis: "papilla nutritiva" },
+      "alimentos nutritivos",
       ".",
     ],
   },
   {
     id: "exhaustion",
     name: "Agotamiento",
-    illustration: { file: "exhaustion", x: 117, y: 15 },
+    illustration: { file: "exhaustion-v2", x: 117, y: 15 },
     symptoms: [
       "Debilidad profunda, somnolencia, mareos y dificultad para concentrarse. El enfermo puede carecer de fuerzas incluso después de descansar.",
     ],
     treatment: [
       "Reposo, alimento y observación. Un ",
-      { emphasis: "tónico reconstituyente" },
+      { emphasis: "bebida cítrica" },
       " puede devolver fuerzas, aunque conviene investigar la causa cuando el agotamiento persista.",
     ],
   },

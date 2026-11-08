@@ -3,8 +3,8 @@ import type {
   LocalizedLine,
 } from "./localizedConversation";
 
-// The end of Day 1: what the narrative interlude says over the fireplace
-// picture once the last case is done. The interlude shows no speaker, so the
+// The end of Day 1: what the narrative interlude says over the supper
+// (doctor-eating) picture once the last case is done. The interlude shows no speaker, so the
 // first line is the narrator's caption (second person) and the rest is the
 // Doctor thinking, in the first person. One sequence, one fade.
 const doctor = (es: string, en: string): LocalizedLine => ({
