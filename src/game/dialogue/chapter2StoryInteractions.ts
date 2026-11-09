@@ -28,6 +28,7 @@ const leechGift = [
   doctor("¿La has recogido sin necesitarla?", "You picked it up without needing it?"),
   npc("Tú llevas un libro entero por si acaso. Yo, un frasco.", "You carry a whole book just in case. I carry a jar."),
   doctor("Me la llevaré. Gracias.", "I'll take it. Thank you."),
+  npc("Por donde yo vivo no se dan las sanguijuelas, pero hay un arroyo con tanta menta alrededor que se huele desde el camino. Por si te hace falta.", "Leeches don't live where I do, but there's a stream with so much mint around it you can smell it from the path. In case you ever need some."),
 ];
 
 const leechNoRoom = [

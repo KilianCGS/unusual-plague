@@ -161,6 +161,76 @@ export const chapter2Compositions: DecorComposition[] = [
         "flipX": true,
         "colliderEnabled": false,
         "zOffset": 0
+      },
+      // Kilian's export used the Day 1 id "forest-medicinal-herb-dev-01". A
+      // collectible must not reuse a Day 1 pick-up id (the collected set lasts
+      // the whole game), so this Day 2 plant has its own id. Its asset is the
+      // pile of two herbs (Kilian: "2 herbs from the same heap").
+      {
+        "instanceId": "forest-medicinal-herb-dev-02",
+        "assetId": "medicinal-herb-pile",
+        "x": 544,
+        "y": 364,
+        "scale": 0.94,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      }
+    ]
+  },
+  {
+    "sceneId": "forest-cottage",
+    "chapterId": "chapter-2",
+    "instances": [
+      {
+        "instanceId": "forest-cottage-mint-world-01",
+        "assetId": "mint-world",
+        "x": 995,
+        "y": 644,
+        "scale": 0.75,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-cottage-fern-weed-01",
+        "assetId": "fern-weed",
+        "x": 320,
+        "y": 614,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-cottage-grass-tuft-01",
+        "assetId": "grass-tuft",
+        "x": 633,
+        "y": 562,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-cottage-fern-weed-02",
+        "assetId": "fern-weed",
+        "x": 750,
+        "y": 298,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-cottage-bush-tall-01",
+        "assetId": "bush-tall",
+        "x": 635,
+        "y": 425,
+        "scale": 0.75,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
       }
     ]
   },
@@ -199,6 +269,16 @@ export const chapter2Compositions: DecorComposition[] = [
         "assetId": "villager-man-02",
         "x": 1632,
         "y": 459,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "mill-farmland-beekeeper-01",
+        "assetId": "beekeeper",
+        "x": 2008,
+        "y": 876,
         "scale": 1,
         "flipX": false,
         "colliderEnabled": true,

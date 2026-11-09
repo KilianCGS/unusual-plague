@@ -100,7 +100,7 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.plaza.cat",
     zone: { offsetX: -33, offsetY: -64, width: 64, height: 80 },
   },
-  "plaza-merchant-01": {
+  "plaza-merchant-humble-01": {
     interactionId: "chapter1.plaza.merchant",
     zone: { offsetX: -46, offsetY: -99, width: 94, height: 115 },
   },

@@ -356,6 +356,17 @@ export function ExteriorScene({
               />
             ) : null,
           )}
+          {decor.sprites.map(({ asset, instance }) =>
+            asset.collectibleItemId ? (
+              <AttentionMark
+                key={`${instance.instanceId}-item`}
+                kind="item"
+                x={instance.x}
+                y={getInstanceHeadTop(asset, instance) - 4}
+                zIndex={Math.round(instance.y) + instance.zOffset + 1000}
+              />
+            ) : null,
+          )}
           {attentionPoints?.map((point) => (
             <AttentionMark key={point.id} x={point.x} y={point.y} zIndex={Math.round(point.y) + 1000} />
           ))}

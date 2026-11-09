@@ -2,6 +2,43 @@
 
 ## Latest Day 2 placement update
 
+PLACEMENTS, CRAFTING GUARD AND LOCKED HOUSE (Kilian, 2026-11-09): his exports
+are integrated verbatim. Chapter 2 `forest-cottage` (new scene entry): mint
+`forest-cottage-mint-world-01` (995,644,0.75) plus fern/grass/bush decor. Chapter
+2 `forest`: the medicinal herb at (544,364,0.94), kept under the NEW id
+`forest-medicinal-herb-dev-02` because his export reused the Day 1 id
+`...-01` and a collectible must not reuse a Day 1 pick-up id. Chapter 2
+`mill-farmland`: the beekeeper `mill-farmland-beekeeper-01` (2008,876). Chapter 1
+`plaza` (V2 export in `newWorldCompositions.ts`): cart, table (flipX true),
+woman and the new `plaza-merchant-humble-01` (no collider) replace the old
+layout; the merchant's conversation (`chapter1.plaza.merchant`) moved to that
+instance and `plaza-merchant-01` no longer exists. The plaza table is now
+`merchant-table-draper` in the same place (same collider). The Day 2 forest herb
+uses the new asset `medicinal-herb-pile` (same art, ONE pick-up gives TWO herbs:
+the blacksmith's paste and the farmer's infusion); the Day 1 herb still gives one.
+CRAFTING GUARD: the crafting interface refuses any recipe whose output no
+examined, untreated case needs (as cure or intermediate, counting what is
+carried): the Doctor thinks "(Eso no lo necesito ahora.)" and nothing is
+consumed (`getCraftingTargets` in `crafting/needs.ts`, `craftableOutputs` prop
+of CraftingOverlay; `/dev/crafting` stays free). It applies to Day 1 and Day 2.
+LOCKED HOUSE: touching the door of the Witch's house (`forest-cottage` ->
+`forest-cottage-interior`) shows "No debería colarme aquí sin permiso." in every
+chapter (`world/lockedDoors.ts`, `openInChapters` empty); Kilian plans to open
+it on the last day, when the Doctor visits her after seeing how strange the
+village has become. This is a plan, not implemented content.
+WORLD PICK-UPS: every uncollected collectible shows a light-blue "?" (AttentionMark
+kind "item"); characters with news keep the yellow "!".
+WITCH LINE: when she gives the leech she adds that where she lives there are no
+leeches but a stream surrounded by mint (a hint to explore the cottage area;
+wording awaits Kilian's review).
+
+KILIAN'S PLAN FOR LATER CHAPTERS (2026-11-09; a plan, NOT implemented and NOT
+canon until he approves it): Chapter 3 would have two or three patients so that
+every ailment appears at least once (chest cough and scurvy are the two not used
+yet in Days 1-2); Chapter 4 would be purely visual: every villager hooked on the
+artifact and the Doctor visiting the Witch without knowing what is happening.
+His partner will QA the whole game.
+
 DAY 2 MATERIAL FLOW REWORK (Kilian, 2026-11-09): the Doctor now carries FIVE
 item types (`INVENTORY_CAPACITY` 5) and the chest holds TEN (`STORAGE_CAPACITY`
 10); the Storage overlay draws both in five columns. Surplus is welcome: it

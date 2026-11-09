@@ -72,7 +72,13 @@ const hit = (a, b) =>
   a.y < b.y + b.height &&
   a.y + a.height > b.y;
 
-const instances = chapter1Compositions.flatMap((c) => c.instances);
+const { newWorldChapter1Compositions } = at("src/game/new-world-map/newWorldCompositions.ts");
+// Day 1 exterior placements are Kilian's hand-made world export; the humble
+// merchant lives only there (the legacy chapter-1.ts keeps the old merchant).
+const instances = [
+  ...chapter1Compositions,
+  ...newWorldChapter1Compositions,
+].flatMap((c) => c.instances);
 const byId = new Map(instances.map((i) => [i.instanceId, i]));
 
 let passed = 0;
@@ -153,12 +159,12 @@ test("language switches the text; 'subject' binds to the instance, not to a posi
   const es = resolveInteractionConversation(
     "chapter1.plaza.merchant",
     "es",
-    "plaza-merchant-01",
+    "plaza-merchant-humble-01",
   );
   const en = resolveInteractionConversation(
     "chapter1.plaza.merchant",
     "en",
-    "plaza-merchant-01",
+    "plaza-merchant-humble-01",
   );
   assert.equal(
     es.lines[0].text,
@@ -170,7 +176,7 @@ test("language switches the text; 'subject' binds to the instance, not to a posi
   );
   assert.deepEqual(
     es.lines.map((l) => l.speaker),
-    ["plaza-merchant-01", "doctor", "plaza-merchant-01"],
+    ["plaza-merchant-humble-01", "doctor", "plaza-merchant-humble-01"],
   );
   assert.equal(resolveInteractionConversation("nobody.home", "es", "x"), null);
 });

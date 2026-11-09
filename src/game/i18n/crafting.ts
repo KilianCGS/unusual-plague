@@ -13,6 +13,8 @@ type CraftingCopy = {
   noRecipe: string;
   // Feedback line: a valid recipe whose result does not fit in the inventory.
   noSpace: string;
+  // Feedback line: a valid recipe nobody needs right now (nothing is consumed).
+  notNeeded: string;
   // Feedback line: the station has no free ingredient slot left.
   limitReached: string;
   // Success modal: the heading, then the localized item name.
@@ -29,6 +31,7 @@ export const craftingCopy: Record<Language, CraftingCopy> = {
     close: "Cerrar",
     noRecipe: "Estos ingredientes no parecen combinar bien aquí.",
     noSpace: "No tengo sitio para llevar esto.",
+    notNeeded: "(Eso no lo necesito ahora.)",
     limitReached: "Ya no caben más ingredientes.",
     created: "Has preparado",
     closeModal: "Cerrar",
@@ -41,6 +44,7 @@ export const craftingCopy: Record<Language, CraftingCopy> = {
     close: "Close",
     noRecipe: "These ingredients don't seem to combine well here.",
     noSpace: "I don't have room to carry this.",
+    notNeeded: "(I don't need that right now.)",
     limitReached: "No more ingredients fit.",
     created: "Prepared",
     closeModal: "Close",

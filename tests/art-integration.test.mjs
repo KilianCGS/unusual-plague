@@ -442,6 +442,7 @@ test("world Mint, Mushroom, Resin and Orange: registered resources; only the Mus
   assert.deepEqual(resources, [
     "leech-world",
     "medicinal-herb-dev",
+    "medicinal-herb-pile",
     "mint-world",
     "mushroom-world",
     "orange-world",

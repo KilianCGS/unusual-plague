@@ -84,7 +84,15 @@ const EXPECTED_ADDED = [
   "tavern-street-villager-woman-01-01",
   "forest-resin-world-01",
   "mill-farmland-orange-world-02",
+  "plaza-merchant-humble-01",
 ];
+// Replaced (not dropped): Kilian swapped the luxurious merchant for the humble
+// one; the conversation moved to the new instance, so no old interaction stays.
+const EXPECTED_REPLACED = ["plaza-merchant-01"];
+// Flips Kilian authored by hand in the Decorator (everything else is unchanged).
+const AUTHORED_FLIPS = { "plaza-merchant-table-01": true };
+// Assets Kilian swapped in place (same instance, same position): the draper's table.
+const AUTHORED_ASSETS = { "plaza-merchant-table-01": "merchant-table-draper" };
 const EXPECTED_REMOVED = [
   "tavern-street-villager-woman-02-01",
   "mill-farmland-farmer-old-01",
@@ -341,7 +349,7 @@ test("the new world population keeps authored instances and shared ambient decor
       if (was) {
         assert.deepEqual(
           [i.assetId, i.flipX, i.colliderEnabled],
-          [was.assetId, was.flipX, was.colliderEnabled],
+          [AUTHORED_ASSETS[i.instanceId] ?? was.assetId, AUTHORED_FLIPS[i.instanceId] ?? was.flipX, was.colliderEnabled],
           i.instanceId,
         );
       } else {
@@ -361,7 +369,7 @@ test("the new world population keeps authored instances and shared ambient decor
         .map((i) => i.instanceId)
         .filter((x) => !fresh.instances.some((i) => i.instanceId === x))
         .sort(),
-      EXPECTED_REMOVED.filter((x) => x.startsWith(id)).sort(),
+      [...EXPECTED_REMOVED, ...EXPECTED_REPLACED].filter((x) => x.startsWith(id)).sort(),
       `${id}: instances not placed in the new world`,
     );
 
@@ -595,7 +603,7 @@ test("the Decorator export is applied literally (x, y, scale, flipX, colliderEna
   const pins = {
     plaza: {
       "plaza-cat-01": [1194, 782, 1, true],
-      "plaza-merchant-cart-01": [1141, 376, 1.28, true],
+      "plaza-merchant-cart-01": [1120, 371, 1.28, true],
     },
     farm: {
       "farm-cow-01": [908, 353, 2, true],

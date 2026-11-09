@@ -61,6 +61,48 @@ export function getRequiredIngredients(
   }));
 }
 
+// The prepared items (final cures and the intermediates they need) that still
+// have to be CRAFTED for these treatments, given what the Doctor carries. A
+// preparation he already carries enough of is not in the set. The crafting
+// interface uses it to refuse recipes nobody needs (Kilian, 2026-11-09), so no
+// ingredient is wasted on something the known cases do not call for.
+export function getCraftingTargets(
+  treatments: readonly ItemNeed[],
+  inventory: InventoryState,
+  recipes: readonly Recipe[] = RECIPES,
+): ReadonlySet<string> {
+  const byOutput = new Map(recipes.map(recipe => [recipe.output.itemId as string, recipe]));
+  const demands = new Map<string, number>();
+  const ordered: string[] = [];
+  const visited = new Set<string>();
+  const visiting = new Set<string>();
+
+  function visit(itemId: string) {
+    if (visiting.has(itemId)) throw new Error(`Cyclic crafting recipe: ${itemId}`);
+    if (visited.has(itemId)) return;
+    visiting.add(itemId);
+    for (const input of byOutput.get(itemId)?.inputs ?? []) visit(input.itemId);
+    visiting.delete(itemId);
+    visited.add(itemId);
+    ordered.push(itemId);
+  }
+  for (const treatment of treatments) {
+    addNeed(demands, treatment.itemId, treatment.quantity);
+    visit(treatment.itemId);
+  }
+  const targets = new Set<string>();
+  for (const itemId of [...ordered].reverse()) {
+    const recipe = byOutput.get(itemId);
+    if (!recipe) continue;
+    const shortfall = Math.max(0, (demands.get(itemId) ?? 0) - countItem(inventory, itemId));
+    const crafts = Math.ceil(shortfall / recipe.output.quantity);
+    if (crafts <= 0) continue;
+    targets.add(itemId);
+    for (const input of recipe.inputs) addNeed(demands, input.itemId, input.quantity * crafts);
+  }
+  return targets;
+}
+
 // The ingredients the Doctor still lacks, with the MISSING quantity: needed
 // minus carried. Water x2 needed with Water x1 carried is Water x1 missing.
 export function getMissingIngredients(

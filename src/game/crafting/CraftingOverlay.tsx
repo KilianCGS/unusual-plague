@@ -26,7 +26,7 @@ import styles from "./CraftingOverlay.module.css";
 
 // What the feedback line says (null = nothing). It clears as soon as the
 // selection changes, so it never needs a timer.
-type Message = "no-recipe" | "no-space" | "limit" | null;
+type Message = "no-recipe" | "no-space" | "limit" | "not-needed" | null;
 
 type Created = { itemId: string; quantity: number };
 
@@ -47,6 +47,7 @@ export function CraftingOverlay({
   onInventoryChange,
   onClose,
   onAnalyzeSample,
+  craftableOutputs,
 }: {
   station: CraftStation;
   inventory: InventoryState;
@@ -54,6 +55,10 @@ export function CraftingOverlay({
   onInventoryChange: (inventory: InventoryState) => void;
   onClose: () => void;
   onAnalyzeSample?: () => void;
+  // The prepared items the known cases still need (see getCraftingTargets).
+  // When given, any other recipe is refused and consumes nothing; left out
+  // (the /dev/crafting page), every valid recipe can be made.
+  craftableOutputs?: ReadonlySet<string>;
 }) {
   const copy = craftingCopy[language];
   const [selection, setSelection] = useState<CraftSelection>(() =>
@@ -115,7 +120,14 @@ export function CraftingOverlay({
   function handleCombine() {
     const result = combine(inventory, station, selection);
 
-    if (result.kind === "success") {
+    if (
+      result.kind === "success" &&
+      craftableOutputs &&
+      !craftableOutputs.has(result.recipe.output.itemId)
+    ) {
+      // Nothing is consumed: the selection stays so it can be corrected.
+      setMessage("not-needed");
+    } else if (result.kind === "success") {
       onInventoryChange(result.inventory);
       setSelection(createEmptySelection(station));
       setMessage(null);
@@ -207,7 +219,9 @@ export function CraftingOverlay({
                 ? copy.noSpace
                 : message === "limit"
                   ? copy.limitReached
-                  : " "}
+                  : message === "not-needed"
+                    ? copy.notNeeded
+                    : " "}
           </p>
 
           <hr className={styles.divider} />

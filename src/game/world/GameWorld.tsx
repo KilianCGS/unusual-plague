@@ -86,11 +86,13 @@ import {
   treatPatient,
   type PatientCasesState,
 } from "../patients/patientCases";
-import { getPatientMissingIngredients } from "../patients/patientNeeds";
+import { getActiveTreatments, getPatientMissingIngredients } from "../patients/patientNeeds";
+import { getCraftingTargets } from "../crafting/needs";
 import { SCENE_TO_MAP_LOCATION } from "../map/mapLocations";
 import { useMapHold } from "../map/useMapHold";
 import { useDirectionInput } from "../protagonist/useDirectionInput";
 import { NarrativeInterlude } from "../narrative/NarrativeInterlude";
+import { getLockedDoorNotice } from "./lockedDoors";
 import { FLOUR_SACK_MARK, shouldMarkFlourSack } from "../dialogue/chapter2Supplies";
 import { NARRATIVE_ILLUSTRATIONS } from "../narrative/illustrations";
 import { TutorialHint } from "../tutorial/TutorialHint";
@@ -716,6 +718,12 @@ export function GameWorld({
       );
 
       if (exit) {
+        // A shut door (the Witch's house): a short notice, no transition.
+        const locked = getLockedDoorNotice(world.sceneId, exit.targetScene, chapterId, language);
+        if (locked) {
+          showNotice(locked);
+          return;
+        }
         const showMessengerCaption =
           world.sceneId === "apothecary-interior" &&
           shouldShowMessengerCaption(
@@ -734,7 +742,7 @@ export function GameWorld({
         );
       }
     },
-    [world.sceneId, chapterId, language, claimFlag, startTransition],
+    [world.sceneId, chapterId, language, claimFlag, startTransition, showNotice],
   );
 
   // The closing is ONE sequence: the narrative interlude over the supper
@@ -1231,6 +1239,17 @@ export function GameWorld({
     [patients, claimedRewards, inventory],
   );
 
+  // What the known cases still need to be prepared; any other recipe is refused
+  // in the crafting interface ("I don't need that right now").
+  const craftableOutputs = useMemo(
+    () =>
+      getCraftingTargets(
+        getActiveTreatments(patients, getPatientDefinitions(claimedRewards)),
+        inventory,
+      ),
+    [patients, claimedRewards, inventory],
+  );
+
   // "!" over painted zones (not placed instances): today the baker's flour sack
   // in Day 2, once she has allowed it and flour is still missing.
   const attentionPoints = useMemo(
@@ -1344,6 +1363,7 @@ export function GameWorld({
           station={craftingStation}
           inventory={inventory}
           language={language}
+          craftableOutputs={craftableOutputs}
           onInventoryChange={(next) => {
             inventoryRef.current = next;
             setInventory(next);

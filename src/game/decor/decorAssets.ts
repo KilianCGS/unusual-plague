@@ -1409,6 +1409,27 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     },
     anchor: { x: 0.5, y: 1 },
     defaultScale: 1,
+    // Same silhouette (x19-71 y9-55) and collider as the table it replaces.
+    defaultCollider: { offsetX: -29, offsetY: -55, width: 53, height: 47 },
+  },
+  {
+    // Day 2: the forest herb is a small pile; one pick-up gives TWO herbs (the
+    // blacksmith's paste and the farmer's infusion). Same art and anchor as
+    // medicinal-herb-dev, whose Day 1 pick-up still gives one.
+    id: "medicinal-herb-pile",
+    label: "Medicinal herb (world, pile of 2)",
+    category: "resources",
+    sprite: {
+      frames: ["/game/resources/medicinal-herb/world.png"],
+      frameWidth: 48,
+      frameHeight: 48,
+      fps: 0,
+      loop: false,
+    },
+    anchor: { x: 0.48, y: 0.81 },
+    defaultScale: 0.75,
+    collectibleItemId: "medicinal-herb",
+    collectibleQuantity: 2,
   },
   {
     // Village girl flying a kite. ONE composite on purpose: the string, kite
