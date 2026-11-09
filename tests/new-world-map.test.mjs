@@ -85,10 +85,11 @@ const EXPECTED_ADDED = [
   "forest-resin-world-01",
   "mill-farmland-orange-world-02",
   "plaza-merchant-humble-01",
+  "mountain-path-miner-pick-swing-01",
 ];
 // Replaced (not dropped): Kilian swapped the luxurious merchant for the humble
 // one; the conversation moved to the new instance, so no old interaction stays.
-const EXPECTED_REPLACED = ["plaza-merchant-01"];
+const EXPECTED_REPLACED = ["plaza-merchant-01", "mountain-path-miner-01"];
 // Flips Kilian authored by hand in the Decorator (everything else is unchanged).
 const AUTHORED_FLIPS = { "plaza-merchant-table-01": true };
 // Assets Kilian swapped in place (same instance, same position): the draper's table.

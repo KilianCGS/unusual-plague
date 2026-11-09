@@ -221,11 +221,12 @@ test("COPY CHAPTER output cannot erase interactions: the table is a separate fil
   );
   assert.equal(getChapterInteractions("chapter-1"), chapter1Interactions);
   assert.ok(getComposition("plaza", "chapter-1"));
-  assert.equal(getComposition("plaza", "chapter-2"), undefined);
+  // Day 2 plaza: Kilian's kite girl and cat, no interactions yet.
+  assert.deepEqual(getComposition("plaza", "chapter-2").instances.map((i) => i.assetId), ["kite-girl", "cat"]);
 });
 
 test("blacksmith: the Doctor can interact from just in front of the anvil he works behind", () => {
-  const smith = byId.get("smithy-interior-blacksmith-01");
+  const smith = byId.get("smithy-interior-blacksmith-hammer-01");
   const { zone } = chapter1Interactions[smith.instanceId];
   const anvil = smithyInterior.smithyInteriorColliders
     .filter(

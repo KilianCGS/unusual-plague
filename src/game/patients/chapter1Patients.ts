@@ -132,7 +132,7 @@ export const BEEKEEPER_INSTANCE_ID = "mill-farmland-beekeeper-01";
 // The injured miner inside the mine, the miner on the Mountain Path who has
 // the coal, and Witch at the bar.
 export const INJURED_MINER_INSTANCE_ID = "mine-interior-injured-miner-01";
-export const MOUNTAIN_MINER_INSTANCE_ID = "mountain-path-miner-01";
+export const MOUNTAIN_MINER_INSTANCE_ID = "mountain-path-miner-pick-swing-01";
 export const WITCH_INSTANCE_ID = "tavern-interior-witch-tavern-sitting-01";
 
 // The placed characters that show the "!". Derived from the cases, the claimed

@@ -223,13 +223,13 @@ export const newWorldChapter1Compositions: DecorComposition[] = [
     chapterId: "chapter-1",
     instances: [
       {
-        instanceId: "mountain-path-miner-01",
-        assetId: "miner",
+        instanceId: "mountain-path-miner-pick-swing-01",
+        assetId: "miner-pick-swing",
         x: 753,
-        y: 412,
+        y: 378,
         scale: 1,
         flipX: false,
-        colliderEnabled: true,
+        colliderEnabled: false,
         zOffset: 0,
       },
     ],

@@ -80,7 +80,7 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.mine.injuredMiner",
     zone: { offsetX: -48, offsetY: -68, width: 95, height: 84 },
   },
-  "mountain-path-miner-01": {
+  "mountain-path-miner-pick-swing-01": {
     interactionId: "chapter1.mountainPath.miner",
     zone: { offsetX: -32, offsetY: -97, width: 57, height: 113 },
   },
@@ -108,7 +108,7 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.plaza.merchantCustomer",
     zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },
   },
-  "smithy-interior-blacksmith-01": {
+  "smithy-interior-blacksmith-hammer-01": {
     interactionId: "chapter1.smithy.blacksmith",
     zone: { offsetX: -36, offsetY: -60, width: 72, height: 140 },
   },

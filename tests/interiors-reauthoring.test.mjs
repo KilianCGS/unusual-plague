@@ -83,7 +83,7 @@ const ROOMS = {
     file: "smithy-interior/smithy-interior-background.png",
     street: "smithy-street",
     arrival: "from-smithy-street",
-    npcs: { "smithy-interior-blacksmith-01": "chapter1.smithy.blacksmith" },
+    npcs: { "smithy-interior-blacksmith-hammer-01": "chapter1.smithy.blacksmith" },
   },
   "bakery-interior": {
     file: "bakery-interior/bakery-interior-background.png",
@@ -274,7 +274,7 @@ test("NPCs keep instance ids, assets and interaction ids; none stands inside a w
   );
   assert.equal(
     composition("smithy-interior").instances[0].assetId,
-    "blacksmith",
+    "blacksmith-hammer",
   );
   assert.equal(composition("bakery-interior").instances[0].assetId, "baker");
 });
@@ -353,7 +353,7 @@ test("final authored Baker and Blacksmith placements (Decorator exports), reacha
   const smith = composition("smithy-interior").instances[0];
   assert.deepEqual(
     [smith.instanceId, smith.assetId, smith.x, smith.y, smith.scale],
-    ["smithy-interior-blacksmith-01", "blacksmith", 411, 164, 0.99],
+    ["smithy-interior-blacksmith-hammer-01", "blacksmith-hammer", 416, 163, 1],
   );
   // The Blacksmith works behind the anvil: the Doctor talks to him from just
   // in front of the anvil block, on free floor.

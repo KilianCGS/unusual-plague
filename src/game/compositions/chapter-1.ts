@@ -415,13 +415,13 @@ export const chapter1Compositions: DecorComposition[] = [
     "chapterId": "chapter-1",
     "instances": [
       {
-        "instanceId": "smithy-interior-blacksmith-01",
-        "assetId": "blacksmith",
-        "x": 411,
-        "y": 164,
-        "scale": 0.99,
+        "instanceId": "smithy-interior-blacksmith-hammer-01",
+        "assetId": "blacksmith-hammer",
+        "x": 416,
+        "y": 163,
+        "scale": 1,
         "flipX": false,
-        "colliderEnabled": true,
+        "colliderEnabled": false,
         "zOffset": 0
       }
     ]

@@ -381,6 +381,33 @@ export const chapter2Compositions: DecorComposition[] = [
     ]
   },
   {
+    // Kilian's export: the kite girl and the cat on the Day 2 plaza.
+    "sceneId": "plaza",
+    "chapterId": "chapter-2",
+    "instances": [
+      {
+        "instanceId": "plaza-kite-girl-01",
+        "assetId": "kite-girl",
+        "x": 458,
+        "y": 649,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "plaza-cat-01",
+        "assetId": "cat",
+        "x": 577,
+        "y": 661,
+        "scale": 0.84,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      }
+    ]
+  },
+  {
     "sceneId": "smithy-interior",
     "chapterId": "chapter-2",
     "instances": [
