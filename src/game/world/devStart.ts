@@ -61,6 +61,14 @@ function getDay1CollectedInstanceIds(): ReadonlySet<string> {
   return ids;
 }
 
+function day2StartInventory() {
+  let inventory = createChapter1Inventory();
+  for (const [itemId, quantity] of [["empty-flask", 1], ["orange", 2], ["cloth", 1], ["medicinal-herb", 2]] as const) {
+    inventory = addItem(inventory, itemId, quantity) ?? inventory;
+  }
+  return inventory;
+}
+
 // TEST DATA: Day 1 completed. All three cases treated, every one-time exchange
 // of Day 1 received, every recipe shown, the closing already played. The
 // Doctor carries his empty flask (TEST FIXTURE) and the chest is empty.
@@ -90,9 +98,10 @@ export function createDay2DevStart(): GameDevStart {
         (definition) => definition.revealsRecipeIds,
       ),
     ),
-    inventory:
-      addItem(createChapter1Inventory(), "empty-flask", 1) ??
-      createChapter1Inventory(),
+    // TEST FIXTURE: the empty flask plus what Day 1 leaves over by design
+    // (two oranges, one scrap of cloth) plus two medicinal herbs, standing in for
+    // the forest pickups until they are placed.
+    inventory: day2StartInventory(),
     storage: createEmptyStorage(),
     collected: getDay1CollectedInstanceIds(),
     // The tutorial of the first morning is over.

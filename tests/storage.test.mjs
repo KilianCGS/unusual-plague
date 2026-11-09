@@ -65,10 +65,10 @@ const stock = (pairs, base = inv.createEmptyInventory()) =>
 const storageOf = (pairs) => stock(pairs, st.createEmptyStorage());
 const snap = (x) => JSON.stringify(x);
 
-test("A. the Doctor's inventory holds 6 item types; the storage has its own generous capacity", () => {
-  assert.equal(inv.INVENTORY_CAPACITY, 6);
-  assert.equal(inv.createEmptyInventory().slots.length, 6);
-  assert.equal(createChapter1Inventory().capacity, 6);
+test("A. the Doctor's inventory holds 5 item types; the storage has its own generous capacity", () => {
+  assert.equal(inv.INVENTORY_CAPACITY, 5);
+  assert.equal(inv.createEmptyInventory().slots.length, 5);
+  assert.equal(createChapter1Inventory().capacity, 5);
   assert.equal(st.createEmptyStorage().capacity, st.STORAGE_CAPACITY);
   assert.ok(st.STORAGE_CAPACITY > inv.INVENTORY_CAPACITY);
   assert.ok(inv.isValidInventory(st.createEmptyStorage()));
@@ -111,10 +111,10 @@ test("D. a destination that already holds the item merges quantities without a s
 });
 
 test("E. a full Doctor inventory refuses a NEW type from storage, atomically", () => {
-  const doctor = stock(["a", "b", "c", "d", "e", "f"].map((id) => [id, 1]));
+  const doctor = stock(["a", "b", "c", "d", "e"].map((id) => [id, 1]));
   const storage = storageOf([["water", 2]]);
   const [d0, s0] = [snap(doctor), snap(storage)];
-  assert.equal(inv.countOccupiedSlots(doctor), 6);
+  assert.equal(inv.countOccupiedSlots(doctor), 5);
   assert.equal(st.transferStack(storage, doctor, "water"), null);
   assert.equal(snap(doctor), d0);
   assert.equal(snap(storage), s0);
@@ -123,12 +123,12 @@ test("E. a full Doctor inventory refuses a NEW type from storage, atomically", (
 });
 
 test("F. a full Doctor inventory still receives more of a type it already carries", () => {
-  const doctor = stock(["water", "b", "c", "d", "e", "f"].map((id) => [id, 1]));
+  const doctor = stock(["water", "b", "c", "d", "e"].map((id) => [id, 1]));
   const storage = storageOf([["water", 2]]);
   const out = st.transferStack(storage, doctor, "water");
   assert.ok(out);
   assert.equal(inv.countItem(out.destination, "water"), 3);
-  assert.equal(inv.countOccupiedSlots(out.destination), 6);
+  assert.equal(inv.countOccupiedSlots(out.destination), 5);
 });
 
 test("G/H. the Empty flask is an ordinary item: it can be retrieved from the chest and stored again", () => {
@@ -160,7 +160,7 @@ test("exactly ONE initial Empty flask exists across the carried inventory and th
   const taken = st.transferStack(chest, doctor, "empty-flask");
   assert.equal(total(taken.destination, taken.source), 1);
   assert.equal(chest.capacity, st.STORAGE_CAPACITY);
-  assert.equal(st.STORAGE_CAPACITY, 24);
+  assert.equal(st.STORAGE_CAPACITY, 10);
 });
 
 test("I/J. gather.water needs the flask CARRIED (not stored); filling it uses it up", () => {

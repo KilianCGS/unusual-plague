@@ -91,6 +91,7 @@ import { SCENE_TO_MAP_LOCATION } from "../map/mapLocations";
 import { useMapHold } from "../map/useMapHold";
 import { useDirectionInput } from "../protagonist/useDirectionInput";
 import { NarrativeInterlude } from "../narrative/NarrativeInterlude";
+import { FLOUR_SACK_MARK, shouldMarkFlourSack } from "../dialogue/chapter2Supplies";
 import { NARRATIVE_ILLUSTRATIONS } from "../narrative/illustrations";
 import { TutorialHint } from "../tutorial/TutorialHint";
 import { useTutorial } from "../tutorial/useTutorial";
@@ -737,7 +738,8 @@ export function GameWorld({
   );
 
   // The closing is ONE sequence: the narrative interlude over the supper
-  // picture (its first line is the caption about going home), and
+  // picture for Day 1 and the fireplace picture for Day 2 (its first line is
+  // the caption about going home), and
   // while the picture covers the game the next chapter becomes the active one
   // and the Doctor wakes in the Doctor's Room. Nothing of Day 1 (inventory,
   // storage, recipes, cases, flags, collected things) is touched.
@@ -1229,6 +1231,17 @@ export function GameWorld({
     [patients, claimedRewards, inventory],
   );
 
+  // "!" over painted zones (not placed instances): today the baker's flour sack
+  // in Day 2, once she has allowed it and flour is still missing.
+  const attentionPoints = useMemo(
+    () =>
+      world.sceneId === FLOUR_SACK_MARK.sceneId &&
+      shouldMarkFlourSack(patients, claimedRewards, inventory)
+        ? [{ id: "chapter2-flour-sack-attention", x: FLOUR_SACK_MARK.x, y: FLOUR_SACK_MARK.y }]
+        : [],
+    [world.sceneId, patients, claimedRewards, inventory],
+  );
+
   // The hint of the current step. The interaction hint only shows while the
   // [E] prompt does; none shows over an open interface or a conversation.
   const tutorialStep = tutorial.step;
@@ -1294,6 +1307,7 @@ export function GameWorld({
           collectedInstanceIds={collected}
           hiddenInstanceIds={narrativeHiddenInstanceIds}
           attentionInstanceIds={attentionInstanceIds}
+          attentionPoints={attentionPoints}
           renderOverlay={renderSceneOverlay}
           onPlayerMoved={handlePlayerMoved}
           onRunningChange={setDoctorRunning}
@@ -1386,7 +1400,9 @@ export function GameWorld({
       {closingActive ? (
         <div className={dayClosingStyles.fadeIn}>
           <NarrativeInterlude
-            illustration={NARRATIVE_ILLUSTRATIONS["doctor-eating"]}
+            illustration={closingChapter === "chapter-2"
+              ? NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]
+              : NARRATIVE_ILLUSTRATIONS["doctor-eating"]}
             conversation={closingConversation}
             language={language}
             onCovered={startNextChapter}

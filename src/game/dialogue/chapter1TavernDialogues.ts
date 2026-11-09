@@ -178,7 +178,7 @@ export const tavernPatientAfter: LocalizedConversation = {
   ],
 };
 
-// ---- the farm woman: milk for three oranges and a jar ----------------------
+// ---- the farm woman: milk for one orange and a jar ----------------------
 
 const farmMissing = (
   id: string,
@@ -196,8 +196,8 @@ const farmIntro = (withJar: boolean): LocalizedConversation => ({
       "I need some milk for a sick man.",
     ),
     subject(
-      "Puedo darle un poco. Si va hacia los frutales, tráigame tres naranjas.",
-      "I can spare a little. If you're heading to the orchards, bring me three oranges.",
+      "Puedo darle un poco. Si va hacia los frutales, tráigame una naranja.",
+      "I can spare a little. If you're heading to the orchards, bring me an orange.",
     ),
     withJar
       ? subject(
@@ -218,20 +218,20 @@ export const farmWomanMissing = {
   // After the introduction she does not explain it again, only reminds him.
   all: farmMissing("missing", [
     subject(
-      "Tres naranjas y una jarra vacía, Doctor. Con eso, la leche es suya.",
-      "Three oranges and an empty jar, Doctor. Bring those and the milk is yours.",
+      "Una naranja y una jarra vacía, Doctor. Con eso, la leche es suya.",
+      "An orange and an empty jar, Doctor. Bring those and the milk is yours.",
     ),
   ]),
   orange: farmMissing("missingOranges", [
     subject(
-      "La jarra ya la tiene. Ahora faltan las tres naranjas.",
-      "You have the jar. Now I need the three oranges.",
+      "La jarra ya la tiene. Ahora falta la naranja.",
+      "You have the jar. Now I need the orange.",
     ),
   ]),
   "empty-jar": farmMissing("missingJar", [
     subject(
-      "Las naranjas están bien, pero ¿dónde se la pongo? Tráigame una jarra vacía.",
-      "The oranges are fine, but where do I put it? Bring me an empty jar.",
+      "La naranja está bien, pero ¿dónde se la pongo? Tráigame una jarra vacía.",
+      "The orange is fine, but where do I put it? Bring me an empty jar.",
     ),
   ]),
 };
@@ -240,8 +240,8 @@ export const farmWomanReady: LocalizedConversation = {
   id: "chapter1.farm.woman.ready",
   lines: [
     subject(
-      "Tres naranjas y una jarra. Trato hecho.",
-      "Three oranges and a jar. Deal.",
+      "Una naranja y una jarra. Trato hecho.",
+      "An orange and a jar. Deal.",
     ),
     doctor("Se lo agradezco.", "I appreciate it."),
     subject("Tome. Recién ordeñada.", "Here. Fresh from the cow."),

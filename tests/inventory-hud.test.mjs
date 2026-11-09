@@ -87,12 +87,12 @@ function sampleInventory() {
   return state;
 }
 
-test("the HUD draws exactly the 6 slots of the carried inventory", () => {
+test("the HUD draws exactly the 5 slots of the carried inventory", () => {
   const markup = html(
     h(InventoryHud, { inventory: sampleInventory(), language: "es" }),
   );
-  assert.equal(count(markup, "data-inventory-slot"), 6);
-  assert.equal(inv.INVENTORY_CAPACITY, 6);
+  assert.equal(count(markup, "data-inventory-slot"), 5);
+  assert.equal(inv.INVENTORY_CAPACITY, 5);
   assert.ok(markup.includes("data-inventory-hud"));
 });
 
@@ -122,13 +122,13 @@ test("quantity is drawn only when there is more than one unit; empty slots are m
   ).replace(/<span[^>]*data-slot-tooltip[^>]*>.*?<\/span>/g, "");
   assert.equal(count(markup, "×3"), 1);
   assert.equal(count(markup, "×1"), 0, "a single unit shows no number");
-  assert.equal(count(markup, 'data-empty="true"'), 4);
+  assert.equal(count(markup, 'data-empty="true"'), 3);
   assert.equal(count(markup, 'data-empty="false"'), 2);
-  // an empty inventory: six empty slots, nothing else
+  // an empty inventory: five empty slots, nothing else
   const empty = html(
     h(InventoryHud, { inventory: inv.createEmptyInventory(), language: "es" }),
   );
-  assert.equal(count(empty, 'data-empty="true"'), 6);
+  assert.equal(count(empty, 'data-empty="true"'), 5);
   assert.equal(count(empty, "data-item-icon="), 0);
   assert.equal(count(empty, "×"), 0);
 });
@@ -142,7 +142,7 @@ test("same source of truth: the HUD follows the state and keeps holes where item
   state = inv.removeItem(state, WATER, 1);
   const after = html(h(InventoryHud, { inventory: state, language: "es" }));
   assert.equal(count(after, `data-item-id="${WATER}"`), 0);
-  assert.equal(count(after, 'data-empty="true"'), 5);
+  assert.equal(count(after, 'data-empty="true"'), 4);
 
   // the HUD is a pure function of the state: same state, same markup
   assert.equal(
@@ -150,9 +150,9 @@ test("same source of truth: the HUD follows the state and keeps holes where item
     after,
   );
 
-  // a full inventory still shows 6 occupied slots
+  // a full inventory still shows 5 occupied slots
   let full = inv.createEmptyInventory();
-  for (const id of ["water", "salt", "cloth", "alcohol", "coal", "honey"]) {
+  for (const id of ["water", "salt", "cloth", "alcohol", "coal"]) {
     full = inv.addItem(full, id);
   }
   assert.equal(
@@ -160,7 +160,7 @@ test("same source of truth: the HUD follows the state and keeps holes where item
       html(h(InventoryHud, { inventory: full, language: "es" })),
       'data-empty="false"',
     ),
-    6,
+    5,
   );
 });
 
@@ -175,7 +175,7 @@ test("Storage and Crafting draw their slots with the same shared contents, uncha
       onClose: () => {},
     }),
   );
-  assert.equal(count(storage, "data-storage-slot"), 12);
+  assert.equal(count(storage, "data-storage-slot"), 10);
   assert.equal(count(storage, "data-item-icon="), 4);
   assert.equal(count(storage, "×3"), 2);
   assert.equal(
@@ -193,7 +193,7 @@ test("Storage and Crafting draw their slots with the same shared contents, uncha
       onClose: () => {},
     }),
   );
-  assert.equal(count(crafting, "data-inventory-slot"), 6);
+  assert.equal(count(crafting, "data-inventory-slot"), 5);
   // (the hover labels repeat the numbers; this counts the slots themselves)
   const slotsOnly = crafting.replace(
     /<span[^>]*data-slot-tooltip[^>]*>.*?<\/span>/g,

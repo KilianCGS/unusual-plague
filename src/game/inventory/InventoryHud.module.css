@@ -1,4 +1,4 @@
-/* The carried-inventory bar: a strip of 6 slots at the bottom-centre of the
+/* The carried-inventory bar: a strip of 5 slots at the bottom-centre of the
    game frame. Parchment like the Inventory overlay (paper #e9dbb9, slot
    #c9b88f, dark brown #2b1a14); square, hard-edged, no blur or gradients. */
 .dock {

@@ -12,6 +12,8 @@ const ids: Record<string, string> = {
   "farm-villager-woman-01-01": "chapter2.farm.woman",
   "forest-woodcutter-day2-tired-01": "chapter2.forest.woodcutter",
   "mill-farmland-villager-man-02-01": "chapter2.mill.neighbour",
+  // Only takes effect if Kilian places the beekeeper in Chapter 2.
+  "mill-farmland-beekeeper-01": "chapter2.mill.beekeeper",
   "mine-interior-miner-recovering-working-01": "chapter2.mine.recoveringMiner",
   "mine-natural-cave-witch-cave-lantern-01": "chapter2.cave.witch",
   "outskirts-villager-young-01": "chapter2.outskirts.young",

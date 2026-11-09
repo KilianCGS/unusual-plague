@@ -160,7 +160,6 @@ const crowded = (extra = []) =>
     ["salt", 1],
     ["water", 1],
     ["orange", 1],
-    ["leech", 1],
     ...extra,
   ]);
 
@@ -273,10 +272,10 @@ test("Witch 4. the swap: exactly Mushroom x1 for Medicinal herb x1, once, never 
 });
 
 test("Witch 5. atomic: a swap that does not fit changes nothing and is retried later", () => {
-  // Mushroom x2 plus five other stacks: the herb has no slot and paying one
+  // Mushroom x2 plus four other stacks: the herb has no slot and paying one
   // mushroom frees none
   const full = crowded([["mushroom", 2]]);
-  assert.equal(inv.countOccupiedSlots(full), 6);
+  assert.equal(inv.countOccupiedSlots(full), 5);
   let f = { ...world(), inventory: full };
   const blocked = talk(WITCH, {
     ...f,
@@ -300,7 +299,7 @@ test("Witch 5. atomic: a swap that does not fit changes nothing and is retried l
     "not marked as done",
   );
   // with room, the retry is the plain trade
-  f = { ...f, inventory: inv.removeItem(f.inventory, "leech", 1) };
+  f = { ...f, inventory: inv.removeItem(f.inventory, "salt", 1) };
   const retry = talk(WITCH, f);
   assert.equal(retry.conversation.id, "chapter1.tavern.witch.trade");
   assert.equal(count(apply(f, retry), "medicinal-herb"), 1);
@@ -615,14 +614,14 @@ test("P3 4. Cloth: once the miner is examined the merchant's existing provider g
     const gives = talk(MERCHANT, f);
     assert.deepEqual(
       gives.effects,
-      [{ type: "give-item", itemId: "cloth", quantity: 1 }],
+      [{ type: "give-item", itemId: "cloth", quantity: 2 }],
       p1,
     );
   }
   // it stops by itself once he carries it: no endless cloth
   const f = world({ p3: "examined" });
   const { next } = go(MERCHANT, f);
-  assert.equal(count(next, "cloth"), 1);
+  assert.equal(count(next, "cloth"), 2, "two scraps: one is left over for Day 2");
   assert.equal(talk(MERCHANT, next), null);
 });
 
@@ -659,7 +658,7 @@ test("P3 5. Alcohol: the bartender gives it once the miner is examined, first of
   assert.deepEqual(blocked.effects, []);
   const roomy = {
     ...full,
-    inventory: inv.removeItem(full.inventory, "leech", 1),
+    inventory: inv.removeItem(full.inventory, "salt", 1),
   };
   assert.equal(
     talk(BARTENDER, roomy).conversation.id,
@@ -831,7 +830,7 @@ test("Route A (the suggested order): Witch asks > mine > Mushroom > Witch gives 
   ({ next: f } = go(BARTENDER, f)); // alcohol
   ({ next: f } = go(MOUNTAIN, f)); // coal
   for (const id of ["cloth", "alcohol", "medicinal-herb", "coal"])
-    assert.equal(count(f, id), 1, id);
+    assert.equal(count(f, id), id === "cloth" ? 2 : 1, id); // two scraps: one is Day 2's
   const bandage = cr.combine(f.inventory, "manual", ["cloth", "alcohol"]);
   const ointment = cr.combine(bandage.inventory, "manual", [
     "medicinal-herb",

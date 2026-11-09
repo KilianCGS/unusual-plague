@@ -712,7 +712,9 @@ export function resolveStoryInteraction(
   if (wanted) {
     return {
       conversation: localize(merchantCloth, language, subjectId),
-      effects: [{ type: "give-item", itemId: wanted, quantity: 1 }],
+      // Two scraps at once: the case uses one and one is left over for
+      // Day 2 (the compress needs cloth). It takes a single slot either way.
+      effects: [{ type: "give-item", itemId: wanted, quantity: 2 }],
     };
   }
 

@@ -31,6 +31,14 @@ const smithExam = talk("chapter2.blacksmith.exam", [
   npc("Toda esa gente va a saber que estoy sentado.", "All those people will know I'm sitting down."),
   doctor("Me conformo con que siga sentado cuando vuelva.", "I'll settle for you still being seated when I return."),
 ]);
+// The woodcutter's thank-you: animal fat, once. It is part of the treatment
+// conversation, so the slots freed by the two preparations make room for it.
+export const WOODCUTTER_FAT_REWARD_ID = "chapter2.woodcutter.fat";
+const woodThanks = [
+  npc("Tome esto, Doctor. Es grasa animal: me la doy en las manos después de la jornada, para que el hacha no me las agriete.", "Take this, Doctor. It's animal fat: I rub it into my hands after a day's work so the axe doesn't crack them."),
+  doctor("Se lo agradezco. Seguro que le encuentro un buen uso.", "Thank you. I'm sure I'll find a good use for it."),
+  npc("Mejor que mis manos no se lo van a encontrar.", "Better than my hands will, that's certain."),
+];
 const woodCure = talk("chapter2.woodcutter.cure", [
   doctor("La bebida cítrica y la infusión. Tómese su tiempo; no son una excusa para volver al hacha.", "Your citrus drink and infusion. Take your time; they aren't an excuse to pick up the axe again."),
   npc("Eso iba a preguntarle.", "I was about to ask."),
@@ -72,6 +80,16 @@ export function resolveChapter2Patient(
     return { conversation: local(wood ? woodExam : smithExam), effects: [], after: "examine-in-place", patientId: id };
   }
   if (status === "examined" && isTreatable(facts.patients, CHAPTER2_PATIENTS[id], facts.inventory)) {
+    if (wood && !facts.claimedRewards?.has(WOODCUTTER_FAT_REWARD_ID)) {
+      return {
+        conversation: local(talk("chapter2.woodcutter.cure.fat", [...woodCure.lines, ...woodThanks])),
+        effects: [
+          { type: "treat", patientId: id },
+          { type: "give-item", itemId: "animal-fat", quantity: 1 },
+          { type: "claim-reward", rewardId: WOODCUTTER_FAT_REWARD_ID },
+        ],
+      };
+    }
     return { conversation: local(wood ? woodCure : smithCure), effects: [{ type: "treat", patientId: id }] };
   }
   if (status === "treated") return { conversation: local(after[id]), effects: [] };

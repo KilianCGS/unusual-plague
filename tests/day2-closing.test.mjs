@@ -71,8 +71,8 @@ test('every treatment order triggers only after its last conversation, then neve
   assert.ok(trigger.includes('afterDialogueRef.current === null'));
   assert.ok(trigger.indexOf('claimFlag(DAY2_COMPLETED_ID)')<trigger.indexOf('setClosingActive(true)'));
 });
-test('epilogue reuses the dinner image, with ES/EN caption and parenthesized Doctor thoughts',()=>{
-  assert.ok(fs.existsSync(path.join(root,'public',NARRATIVE_ILLUSTRATIONS['doctor-eating'].src)));
+test('epilogue uses the fireplace image, with ES/EN caption and parenthesized Doctor thoughts',()=>{
+  assert.ok(fs.existsSync(path.join(root,'public',NARRATIVE_ILLUSTRATIONS['doctor-fireplace'].src)));
   for(const language of ['es','en']){
     const conversation=localizeConversation(day2Closing,language,'doctor');
     assert.equal(conversation.lines.length,4);

@@ -6,7 +6,7 @@ import { chapter2AmbientDialogues } from "./chapter2AmbientDialogues";
 import { localizeConversation, type LocalizedConversation } from "./localizedConversation";
 import type { StoryFacts, StoryOutcome } from "./storyInteractions";
 import { resolveChapter2Patient } from "./chapter2PatientDialogues";
-import { resolveChapter2Supplies } from "./chapter2Supplies";
+import { BEEKEEPER_INTERACTION_ID, FLOUR_OFFERED_ID, FLOUR_SACK_INTERACTION_ID, resolveBeekeeperHoney, resolveChapter2Supplies, resolveFlourSack } from "./chapter2Supplies";
 import { doctorThought } from "./doctorThought";
 import { FARMER_SAMPLE_ID } from "../patients/farmerInvestigation";
 
@@ -52,9 +52,27 @@ const farmAfterExam = talk("chapter2.farm.woman.afterExam", [
   doctor("Hoy puede decírselo a usted misma.", "You can say it to yourself today."),
 ]);
 
+// The baker tells the Doctor he may help himself to flour from her sack. It is
+// said on the first conversation of Day 2 and never again (a narrative flag).
+const flourOffer = [
+  doctor("¿Podría llevarme algo de harina si la necesito?", "Could I take some flour if I need it?"),
+  npc("Sírvase del saco del rincón, Doctor. Con la cantidad que pueda llevar bastará.", "Help yourself from the sack in the corner, Doctor. Whatever you can carry will do."),
+];
+
 export function resolveChapter2StoryInteraction(
   interactionId: string, facts: StoryFacts, language: Language, subjectId: string,
 ): StoryOutcome | null {
+  if (interactionId === FLOUR_SACK_INTERACTION_ID) return resolveFlourSack(facts, language, subjectId);
+  if (interactionId === BEEKEEPER_INTERACTION_ID) return resolveBeekeeperHoney(facts, language, subjectId);
+  if (interactionId === "chapter2.bakery.baker" && !facts.claimedRewards?.has(FLOUR_OFFERED_ID)) {
+    const honey = resolveChapter2Supplies(interactionId, facts, language, subjectId);
+    const offer = localizeConversation(talk("chapter2.bakery.baker.flour", flourOffer), language, subjectId).lines;
+    const base = honey?.conversation ?? localizeConversation(chapter2AmbientDialogues[interactionId], language, subjectId);
+    return {
+      conversation: { ...base, id: `${base.id}.flour`, lines: [...base.lines, ...offer] },
+      effects: [...(honey?.effects ?? []), { type: "claim-reward", rewardId: FLOUR_OFFERED_ID }],
+    };
+  }
   const patient = resolveChapter2Patient(interactionId, facts, language, subjectId);
   if (patient) return patient;
   const supplies = resolveChapter2Supplies(interactionId, facts, language, subjectId);

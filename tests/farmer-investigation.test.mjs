@@ -80,15 +80,17 @@ test('sample requires examination and leech, cannot be repeated, and analysis ca
   assert.deepEqual(interact('chapter2.cave.witch',f).effects,[],'Witch cannot duplicate the used leech');
   assert.equal(isTreatable(f.patients,getChapter2PatientDefinitions(f.claimedRewards)[ID],f.inventory),false);
 });
-test('the complete farmer path is playable with six slots and consumed Day 1 rewards',()=>{
+test('the complete farmer path is playable with five slots, Day 1 leftovers in the chest and consumed Day 1 rewards',()=>{
   const f=fresh();examine(f);
+  // five carried types: orange and cloth wait in the chest; the herb is a Day 1 leftover / forest pickup
+  for(const id of ['orange','cloth'])f.inventory=removeItem(f.inventory,id,countItem(f.inventory,id));
   assert.deepEqual(interact('chapter2.granary.farmer',f).effects,[],'without leech wait');
   apply(f,interact('chapter2.cave.witch',f));apply(f,interact('chapter2.granary.farmer',f));
   assert.ok(canAnalyzeFarmerSample(f.patients,f.claimedRewards));
   f.claimedRewards=new Set([...f.claimedRewards,ANALYSIS]);
   assert.equal(canAnalyzeFarmerSample(f.patients,f.claimedRewards),false);
   apply(f,interact('chapter2.mine.recoveringMiner',f));
-  apply(f,interact('chapter2.farm.woman',f));
+  assert.equal(interact('chapter2.farm.woman',f)?.effects?.length??0,0,'the farm woman no longer hands out herbs');
   apply(f,interact('gather.water',f));
   for(const id of ['manual.crushed-coal','manual.charcoal-suspension','fire.medicinal-infusion']){
     const next=craft(f.inventory,RECIPES.find(r=>r.id===id));assert.ok(next,id);f.inventory=next;

@@ -313,7 +313,6 @@ test("crafting Milk with honey: right station, consumes both, adds the result, n
     ["cloth", 1],
     ["salt", 1],
     ["coal", 1],
-    ["alcohol", 1],
   ]);
   assert.equal(
     cr.combine(full, "fire", ["milk", "honey", null]).kind,
@@ -365,7 +364,6 @@ test("11. the BARTENDER hands over the jar: not before the examination, once, no
   const crowded = facts("examined", [
     ["cloth", 1],
     ["salt", 1],
-    ["coal", 1],
     ["alcohol", 1],
     ["water", 1],
     ["mushroom", 1],
@@ -567,9 +565,9 @@ test("16a. the farm woman PRESENTS the deal first: ambient before the examinatio
   // first relevant conversation: the introduction, whatever he carries
   for (const pairs of [
     [],
-    [["orange", 3]],
+    [["orange", 1]],
     [
-      ["orange", 3],
+      ["orange", 1],
       ["empty-jar", 1],
     ],
   ]) {
@@ -586,7 +584,7 @@ test("16a. the farm woman PRESENTS the deal first: ambient before the examinatio
   assert.equal(empty.conversation.id, "chapter1.farm.woman.intro");
   assert.deepEqual(lines(empty), [
     "Necesito algo de leche para un enfermo.",
-    "Puedo darle un poco. Si va hacia los frutales, tráigame tres naranjas.",
+    "Puedo darle un poco. Si va hacia los frutales, tráigame una naranja.",
     "Y necesitará algo donde llevársela.",
   ]);
   const withJar = talk(FARM, facts("examined", [["empty-jar", 1]]));
@@ -617,11 +615,11 @@ test("16a. the farm woman PRESENTS the deal first: ambient before the examinatio
   // after the introduction: missing both / jar / oranges / ready
   const after = (pairs) => talk(FARM, farmFacts(pairs)).conversation.id;
   assert.equal(after([]), "chapter1.farm.woman.missing");
-  assert.equal(after([["orange", 3]]), "chapter1.farm.woman.missingJar");
+  assert.equal(after([["orange", 1]]), "chapter1.farm.woman.missingJar");
   assert.equal(after([["empty-jar", 1]]), "chapter1.farm.woman.missingOranges");
   assert.equal(
     after([
-      ["orange", 3],
+      ["orange", 1],
       ["empty-jar", 1],
     ]),
     "chapter1.farm.woman.ready",
@@ -641,7 +639,7 @@ test("16a. the farm woman PRESENTS the deal first: ambient before the examinatio
 });
 
 // ------------------------------------------------------------ THE FARM WOMAN
-test("16-18. the farm woman trades Orange x3 + Empty jar for Milk x1: exact, atomic, once", () => {
+test("16-18. the farm woman trades Orange x1 + Empty jar for Milk x1: exact, atomic, once", () => {
   // before the case is examined she is only the ambient farm woman
   assert.equal(talk(FARM, facts("hidden")), null);
   assert.equal(talk(FARM, facts("discovered")), null);
@@ -649,29 +647,21 @@ test("16-18. the farm woman trades Orange x3 + Empty jar for Milk x1: exact, ato
 
   const ids = (pairs) => talk(FARM, farmFacts(pairs)).conversation.id;
   assert.equal(ids([]), "chapter1.farm.woman.missing");
-  assert.equal(ids([["orange", 3]]), "chapter1.farm.woman.missingJar");
+  assert.equal(ids([["orange", 1]]), "chapter1.farm.woman.missingJar");
   assert.equal(ids([["empty-jar", 1]]), "chapter1.farm.woman.missingOranges");
-  assert.equal(
-    ids([
-      ["orange", 2],
-      ["empty-jar", 1],
-    ]),
-    "chapter1.farm.woman.missingOranges",
-    "two oranges are not enough",
-  );
-  for (const pairs of [[], [["orange", 3]], [["empty-jar", 1]]]) {
+  for (const pairs of [[], [["orange", 1]], [["empty-jar", 1]]]) {
     assert.deepEqual(talk(FARM, farmFacts(pairs)).effects, []);
   }
 
   const have = farmFacts([
-    ["orange", 3],
+    ["orange", 1],
     ["empty-jar", 1],
     ["water", 1],
   ]);
   const ready = talk(FARM, have);
   assert.equal(ready.conversation.id, "chapter1.farm.woman.ready");
   assert.deepEqual(ready.effects, [
-    { type: "take-item", itemId: "orange", quantity: 3 },
+    { type: "take-item", itemId: "orange", quantity: 1 },
     { type: "take-item", itemId: "empty-jar", quantity: 1 },
     { type: "give-item", itemId: "milk", quantity: 1 },
     { type: "claim-reward", rewardId: ch1.FARM_MILK_REWARD_ID },
@@ -685,14 +675,14 @@ test("16-18. the farm woman trades Orange x3 + Empty jar for Milk x1: exact, ato
   const richer = {
     ...traded,
     inventory: stock([
-      ["orange", 3],
+      ["orange", 1],
       ["empty-jar", 1],
     ]),
   };
   const second = talk(FARM, richer);
   assert.equal(second.conversation.id, "chapter1.farm.woman.done");
   assert.deepEqual(second.effects, []);
-  // extra oranges are not taken: only exactly three
+  // extra oranges are not taken: only exactly one
   const spare = talk(
     FARM,
     farmFacts([
@@ -708,7 +698,7 @@ test("16-18. the farm woman trades Orange x3 + Empty jar for Milk x1: exact, ato
       ]),
       spare.effects,
     ).inventory.slots.find((s) => s?.itemId === "orange").quantity,
-    1,
+    3,
   );
 });
 
@@ -730,7 +720,6 @@ test("the generic trade is ATOMIC: no room means no payment taken and nothing ma
       ["salt", 1],
       ["coal", 1],
       ["alcohol", 1],
-      ["water", 1],
     ]),
     claimedRewards: new Set(),
   };
@@ -751,12 +740,11 @@ test("the generic trade is ATOMIC: no room means no payment taken and nothing ma
   const pocket = {
     patients: state("examined"),
     inventory: stock([
-      ["orange", 3],
+      ["orange", 1],
       ["empty-jar", 1],
       ["cloth", 1],
       ["salt", 1],
       ["coal", 1],
-      ["alcohol", 1],
     ]),
     claimedRewards: new Set([ch1.FARM_WOMAN_INTRO_ID]),
   };
@@ -792,7 +780,6 @@ test("19-20. the beekeeper gives Honey x1 once, only while the case is examined;
     ["salt", 1],
     ["coal", 1],
     ["alcohol", 1],
-    ["water", 1],
     ["mushroom", 1],
   ]);
   const blocked = talk(BEE, crowded);
@@ -814,7 +801,7 @@ test("19-20. the beekeeper gives Honey x1 once, only while the case is examined;
 test("the trades are independent: any order works after the examination", () => {
   let f = facts("examined", [
     ["empty-jar", 1],
-    ["orange", 3],
+    ["orange", 1],
   ]);
   f = apply(f, talk(BEE, f).effects);
   f = apply(f, talk(FARM, f).effects); // she introduces the deal first
@@ -824,7 +811,7 @@ test("the trades are independent: any order works after the examination", () => 
   // honey first and milk first give the same result
   let g = facts("examined", [
     ["empty-jar", 1],
-    ["orange", 3],
+    ["orange", 1],
   ]);
   g = apply(g, talk(FARM, g).effects); // the introduction
   g = apply(g, talk(FARM, g).effects);
@@ -920,17 +907,15 @@ test('25. the "!" follows what can progress and then goes away', () => {
   assert.deepEqual(ids("examined"), [BART, BEEK].sort());
   assert.deepEqual(
     ids("examined", [
-      ["orange", 3],
+      ["orange", 1],
       ["empty-jar", 1],
     ]),
     [WOMAN, BEEK].sort(),
   );
   assert.deepEqual(
-    ids("examined", [
-      ["orange", 2],
-      ["empty-jar", 1],
-    ]),
+    ids("examined", [["empty-jar", 1]]),
     [BEEK],
+    "the jar alone is not enough: she also wants the orange",
   );
   assert.deepEqual(
     ids("examined", [
@@ -950,7 +935,7 @@ test('25. the "!" follows what can progress and then goes away', () => {
     ids(
       "examined",
       [
-        ["orange", 3],
+        ["orange", 1],
         ["empty-jar", 1],
       ],
       [ch1.BEEKEEPER_HONEY_REWARD_ID],
@@ -961,7 +946,7 @@ test('25. the "!" follows what can progress and then goes away', () => {
     ids(
       "examined",
       [
-        ["orange", 3],
+        ["orange", 1],
         ["empty-jar", 1],
       ],
       [ch1.BEEKEEPER_HONEY_REWARD_ID, ch1.FARM_MILK_REWARD_ID],

@@ -183,7 +183,7 @@ export function getAttentionInstanceIds(
     if (
       inventory &&
       !claimedRewards.has(FARM_MILK_REWARD_ID) &&
-      countItem(inventory, "orange") >= 3 &&
+      countItem(inventory, "orange") >= 1 &&
       countItem(inventory, "empty-jar") >= 1
     ) {
       instances.add(FARM_WOMAN_INSTANCE_ID);

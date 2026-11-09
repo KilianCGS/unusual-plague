@@ -10,7 +10,7 @@ import {
 } from "../../../game/apothecary/apothecaryMainZoneGeometry";
 import type { LogicalRect, SceneCollider } from "../../../game/collision";
 import { getSceneInteractionZones } from "../../../game/interactions/sceneInteractions";
-import { ENVIRONMENT_INTERACTIONS } from "../../../game/interactions/environmentCatalog";
+import { ENVIRONMENT_INTERACTIONS, STORY_ZONE_INTERACTIONS } from "../../../game/interactions/environmentCatalog";
 import {
   doctorRoomNewColliders,
   doctorRoomNewSpawns,
@@ -1119,7 +1119,7 @@ function SceneGeometryEditor({
               />
             </label>
             <datalist id="environment-interaction-ids">
-              {ENVIRONMENT_INTERACTIONS.filter((entry) => entry.sceneId === scene.id).map((entry) => (
+              {[...ENVIRONMENT_INTERACTIONS, ...STORY_ZONE_INTERACTIONS].filter((entry) => entry.sceneId === scene.id).map((entry) => (
                 <option key={entry.interactionId} value={entry.interactionId}>{entry.label}</option>
               ))}
             </datalist>

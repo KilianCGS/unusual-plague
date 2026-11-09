@@ -9,3 +9,9 @@ export const ENVIRONMENT_INTERACTIONS = [
   { interactionId: "world.tavern.hearth", sceneId: "tavern-interior", label: "Hogar de la taberna" },
   { interactionId: "world.smithy.anvil", sceneId: "smithy-interior", label: "Yunque" },
 ] as const;
+
+// Painted zones that DO something (story outcomes), unlike the Doctor-only
+// observations above. Offered in /dev/collisions the same way.
+export const STORY_ZONE_INTERACTIONS = [
+  { interactionId: "chapter2.bakery.flourSack", sceneId: "bakery-interior", label: "Saco de harina de la panadera (da harina)" },
+] as const;

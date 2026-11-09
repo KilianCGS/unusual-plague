@@ -203,13 +203,13 @@ test("prepared catalog now has recipes, without changing Chapter 1 needs or addi
 });
 
 test("inventory presentation: capacity untouched; storage and crafting draw every carried slot", () => {
-  assert.equal(INVENTORY_CAPACITY, 6);
+  assert.equal(INVENTORY_CAPACITY, 5);
   const storage = fs.readFileSync(
     path.join(root, "src/game/storage/StorageOverlay.tsx"),
     "utf8",
   );
   assert.ok(
-    /\b6\b/.test(storage),
+    /\b5\b/.test(storage),
     "storage lays the carried inventory out in 6",
   );
   // crafting draws `inventory.slots` as they are (6, in order), no table of its own

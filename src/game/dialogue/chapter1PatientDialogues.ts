@@ -168,8 +168,8 @@ export const merchantCloth: LocalizedConversation = {
       "Would you have a bit of clean cloth?",
     ),
     subject(
-      "Justo me queda un retal decente. Tómelo.",
-      "I happen to have a decent scrap left. Take it.",
+      "Justo me quedan un par de retales decentes. Tómelos.",
+      "I happen to have a couple of decent scraps left. Take them.",
     ),
     doctor("Se lo agradezco.", "I appreciate it."),
   ],

@@ -13,7 +13,7 @@ import {
 // InventoryState (same stack model, same operations), so it can be serialized
 // next to the carried inventory later. Crafting never reads it: the Doctor has
 // to take things out first.
-export const STORAGE_CAPACITY = 24;
+export const STORAGE_CAPACITY = 10;
 
 // What the chest's interaction zone reports to the owner of the game state.
 export const STORAGE_INTERACTION_ID = "storage.doctor-room";

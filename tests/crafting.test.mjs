@@ -262,9 +262,9 @@ test("13. a failed craft leaves the inventory untouched (all or nothing)", () =>
   const snapshot = JSON.stringify(partial);
   assert.equal(cr.craft(partial, bandage), null);
   assert.equal(JSON.stringify(partial), snapshot);
-  // output cannot fit: 6 slots full of other types, inputs are 1 slot each...
-  const filler = Array.from({ length: 4 }, (_, i) => [`filler-${i}`, 1]);
-  const full = stock([["cloth", 1], ["alcohol", 1], ...filler]); // 6 slots
+  // output cannot fit: 5 slots full of other types, inputs are 1 slot each...
+  const filler = Array.from({ length: 3 }, (_, i) => [`filler-${i}`, 1]);
+  const full = stock([["cloth", 1], ["alcohol", 1], ...filler]); // 5 slots
   // ...consuming both inputs frees two slots, so the output DOES fit
   assert.ok(cr.craft(full, bandage));
   // a recipe whose inputs stay in their slots and whose output is a new type cannot fit
@@ -276,7 +276,7 @@ test("13. a failed craft leaves the inventory untouched (all or nothing)", () =>
   };
   const fullStays = stock([
     ["cloth", 2],
-    ...Array.from({ length: 5 }, (_, i) => [`filler-${i}`, 1]),
+    ...Array.from({ length: 4 }, (_, i) => [`filler-${i}`, 1]),
   ]);
   const fullSnapshot = JSON.stringify(fullStays);
   assert.equal(cr.craft(fullStays, stays), null);
@@ -331,7 +331,6 @@ test("combine: fire recipe, wrong station and unknown mix never change the inven
     ["mushroom", 1],
     ["cloth", 1],
     ["alcohol", 1],
-    ["honey", 1],
   ]);
   const snapshot = JSON.stringify(state);
   const soup = cr.combine(state, "fire", ["mushroom", "water", "salt"]);
@@ -342,20 +341,19 @@ test("combine: fire recipe, wrong station and unknown mix never change the inven
     "no-recipe",
   );
   assert.equal(
-    cr.combine(state, "manual", ["cloth", "honey"]).kind,
+    cr.combine(state, "manual", ["cloth", "salt"]).kind,
     "no-recipe",
   );
   assert.equal(JSON.stringify(state), snapshot);
 });
 
 test("combine: a valid recipe with no room for the result is no-space, and consumes nothing", () => {
-  // six types, every input stack larger than 1: nothing is freed for the output
+  // five types, every input stack larger than 1: nothing is freed for the output
   const full = stock([
     ["cloth", 2],
     ["alcohol", 2],
     ["water", 3],
     ["salt", 1],
-    ["honey", 1],
     ["coal", 1],
   ]);
   const snapshot = JSON.stringify(full);
@@ -376,7 +374,6 @@ test("combine: a valid recipe with no room for the result is no-space, and consu
     ["alcohol", 2],
     ["water", 3],
     ["salt", 1],
-    ["honey", 1],
     ["coal", 1],
   ]);
   const made = cr.combine(frees, "manual", ["alcohol", "cloth"]);
@@ -727,10 +724,9 @@ test("only a successful craft uses the water: an invalid recipe, the wrong stati
     ["cloth", 2],
     ["alcohol", 1],
     ["coal", 1],
-    ["honey", 1],
     ["salt", 1],
   ]);
-  assert.equal(inv.countOccupiedSlots(crowded), 6);
+  assert.equal(inv.countOccupiedSlots(crowded), 5);
   const crowdedSnapshot = JSON.stringify(crowded);
   assert.equal(make(crowded, COLD_CLOTH).kind, "no-space");
   assert.equal(JSON.stringify(crowded), crowdedSnapshot);
@@ -741,8 +737,6 @@ test("only a successful craft uses the water: an invalid recipe, the wrong stati
     ["water", 1],
     ["cloth", 2],
     ["alcohol", 1],
-    ["coal", 1],
-    ["honey", 1],
   ]);
   const done = make(roomy, COLD_CLOTH);
   assert.equal(done.kind, "success");

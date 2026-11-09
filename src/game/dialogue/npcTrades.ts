@@ -68,13 +68,14 @@ export const BARTENDER_ALCOHOL_TRADE_ID = "chapter1.tavern.bartender.alcohol";
 export const WITCH_HERB_TRADE_ID = "chapter1.witch.herb";
 
 export const NPC_TRADES: Record<string, NpcTrade> = {
-  // The farm woman gives milk for three oranges and a jar to put it in.
+  // The farm woman gives milk for ONE orange and a jar to put it in (a branch
+  // gives three at once, so two oranges are left over for Day 2).
   "chapter1.farm.woman": {
     interactionId: "chapter1.farm.woman",
     rewardId: FARM_MILK_REWARD_ID,
     requiresPatient: { patientId: TAVERN_PATIENT_ID, status: "examined" },
     consumes: [
-      { itemId: "orange", quantity: 3 },
+      { itemId: "orange", quantity: 1 },
       { itemId: "empty-jar", quantity: 1 },
     ],
     grants: [{ itemId: "milk", quantity: 1 }],

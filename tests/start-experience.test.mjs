@@ -186,10 +186,9 @@ test("the opening uses writing, Day 1 closes at the fireplace and Day 2 closes o
     "doctor-writing",
   ]);
   const gameWorld = read("src/game/world/GameWorld.tsx");
-  // Supper is the bridge from the Day 1 closing into Day 2 (every closing
-  // interlude uses it); Chapter 1 still starts with writing.
-  assert.ok(gameWorld.includes('NARRATIVE_ILLUSTRATIONS["doctor-eating"]'));
-  assert.ok(!gameWorld.includes('NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]'));
+  // Supper closes Day 1 (the bridge into Day 2); the fireplace closes Day 2.
+  // Chapter 1 still starts with writing.
+  assert.match(gameWorld, /closingChapter === "chapter-2"\s*\? NARRATIVE_ILLUSTRATIONS\["doctor-fireplace"\]\s*: NARRATIVE_ILLUSTRATIONS\["doctor-eating"\]/);
   assert.ok(
     !/doctor-eating|doctor-fireplace/.test(
       read("src/game/world/chapterStart.ts"),
@@ -274,8 +273,8 @@ test("gameplay is blocked while the opening runs, and its end starts the tutoria
 test("a new game: no Empty flask in the pocket, ONE in the Storage chest", () => {
   const pocket = createChapter1Inventory();
   const chest = createChapter1Storage();
-  assert.equal(pocket.capacity, 6);
-  assert.equal(chest.capacity, 24);
+  assert.equal(pocket.capacity, 5);
+  assert.equal(chest.capacity, 10);
   assert.equal(inv.countItem(pocket, "empty-flask"), 0);
   assert.equal(inv.countOccupiedSlots(pocket), 0);
   assert.equal(inv.countItem(chest, "empty-flask"), 1);
@@ -443,7 +442,7 @@ test("the flask is what counts: another item, a failed transfer or no change nev
   assert.equal(carries(other.destination), false);
 
   // a failed transfer (pocket full of OTHER things) leaves the pocket untouched
-  const full = ["a", "b", "c", "d", "e", "f"].reduce(
+  const full = ["a", "b", "c", "d", "e"].reduce(
     (state, id) => inv.addItem(state, id, 1),
     pocket,
   );

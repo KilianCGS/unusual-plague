@@ -2,14 +2,42 @@
 
 ## Latest Day 2 placement update
 
-DAY 1 CLOSING ILLUSTRATION (Kilian, 2026-11-08): `doctor-eating.png` is the
-correct picture for the narrative bridge between the Day 1 closing and Day 2,
-with the Doctor's lines. The Day 1 closing therefore shows `doctor-eating` with
-the already approved `chapter1Day1Dialogues.ts` lines (unchanged, no new text);
-`doctor-fireplace.png` stays registered but unused. NOTE: the Day 2 epilogue
-(below, text NOT approved) currently reuses that same picture too; whether it
-should use another image or its own text is an open question for Kilian.
-Tests updated; browser review of the new closing image is pending.
+DAY 2 MATERIAL FLOW REWORK (Kilian, 2026-11-09): the Doctor now carries FIVE
+item types (`INVENTORY_CAPACITY` 5) and the chest holds TEN (`STORAGE_CAPACITY`
+10); the Storage overlay draws both in five columns. Surplus is welcome: it
+gives the chest a use. Day 1: the farm woman asks for ONE orange (a branch still
+gives three, so two are left over) and the merchant hands over TWO scraps of
+cloth (one is left over); the `/dev/day2` fixture starts with 2 oranges, 1 cloth
+and 2 medicinal herbs (the herbs stand in for forest pickups / Day 1 surplus).
+Day 2 sources (`chapter2Supplies.ts`): mill neighbour = resin; recovering miner =
+coal; medicinal herb = forest and/or Day 1 leftovers (no NPC gives it); MINT =
+picked in the forest cottage (a `mint-world` instance Kilian will place, none
+exists yet); HONEY = the beekeeper again (`chapter2.mill.beekeeper`, ironic
+"you're a sweet tooth" dialogue; it only works if Kilian places the beekeeper in
+Chapter 2 with the id `mill-farmland-beekeeper-01`); FLOUR = the baker's sack,
+after she says so on her first Day 2 conversation (`chapter2.bakery.flourOffered`);
+ANIMAL FAT = the woodcutter's thank-you, once, with his treatment
+(`chapter2.woodcutter.fat`). The baker no longer gives honey and the farm woman
+no longer gives anything. So the intended order is woodcutter first, then
+blacksmith (his ointment base needs that fat); the farmer is diagnosed first but
+treated later. The sack: Kilian's painted export is integrated in
+`environmentZones.ts` (bakery-interior): the two lower rectangles interact
+(`chapter2.bakery.flourSack`); the third (x227 y84 12x10) only marks where the
+"!" goes (`FLOUR_SACK_MARK`, drawn through the new `attentionPoints` prop of
+ExteriorScene while the baker allowed it and flour is missing). Items cannot be
+dropped or discarded; they are only consumed by crafting, trades and treatments
+(so the Day 1 surplus can still be wasted by crafting extras). New ES/EN lines
+(baker's offer, sack thoughts, woodcutter's gift, beekeeper, merchant/farm-woman
+wording for the new quantities) await Kilian's review. Browser review pending.
+
+DAY 1 / DAY 2 CLOSING ILLUSTRATIONS (Kilian, 2026-11-09): `doctor-eating.png`
+closes ONLY Day 1 (the bridge into Day 2), with the approved
+`chapter1Day1Dialogues.ts` lines unchanged. The Day 2 epilogue uses
+`doctor-fireplace.png` (Doctor looking at the fireplace). Kilian also supplied a
+mirrored fireplace variant (fire on the left); the existing file is the same
+scene with the fire on the right and is the one wired. The Day 2 epilogue text
+is still NOT approved: only its caption was adapted to "te quedas un momento
+frente al fuego" so it matches the picture. Browser review of both closings is pending.
 
 PLAYER DIAGNOSIS IMPLEMENTED: after a first patient examination, GameWorld opens
 a seven-option diagnosis dialog (six previous ailments plus poisoning). Wrong
@@ -105,7 +133,7 @@ DAY 2 EPILOGUE: `patients/day2.ts` derives completion from all three Day 2 cases
 in any order, and its own `chapter2.day2.completed` flag. GameWorld waits for
 plain play after the last treatment conversation (no dialogue, overlay, fade or
 pending scripted step), claims the flag first and opens a single interlude using
-the existing doctor-eating illustration and bilingual `chapter2ClosingDialogues`.
+the existing doctor-fireplace illustration and bilingual `chapter2ClosingDialogues`.
 The caption is followed by parenthesized Doctor thoughts, with no artifacts or
 new narrative cause assigned to the poisoning. While the image covers the game,
 the Doctor returns to the existing Chapter 2 room/start spawn exactly once.
@@ -393,12 +421,12 @@ Narrative order alone must not become mandatory quest gating (see `AGENTS.md`).
 
 ## Inventory/storage
 
-`src/game/inventory/inventory.ts` implements a six-slot carried inventory, one
+`src/game/inventory/inventory.ts` implements a five-slot carried inventory (was six until 2026-11-09), one
 item type per occupied slot, quantities without a stack limit, and pure operations.
 `src/game/items/items.ts` is the item catalog; `inventory/initialInventory.ts`
 provides starting inventory/storage data.
 
-`src/game/storage/storage.ts` uses the same model with 24 slots and atomic
+`src/game/storage/storage.ts` uses the same model with 10 slots (was 24 until 2026-11-09) and atomic
 whole-stack transfers. The storage access interaction is the chest in the
 Doctor's Room. Crafting uses carried items, not chest contents; items must first
 be transferred. These are current implementation facts, not immutable design canon.
@@ -499,7 +527,7 @@ and the conversation of the last treatment has fully closed (GameWorld only asks
 at a moment of plain play: no dialogue, interface or fade), the day closes by
 itself. The flag is claimed as the closing starts, so it cannot fire twice and is
 never reused for Day 2. The closing is ONE sequence: the existing narrative
-interlude over `doctor-eating` (formerly `doctor-fireplace`, changed 2026-11-08), whose first line is the caption ("Con los
+interlude over `doctor-eating` (formerly `doctor-fireplace`, changed 2026-11-08; the fireplace now closes Day 2), whose first line is the caption ("Con los
 pacientes atendidos, regresas a casa para descansar." / "With your patients cared
 for, you return home to rest.") followed by the Doctor's three lines
 (`chapter1Day1Dialogues.ts`). While the picture covers the game, the active

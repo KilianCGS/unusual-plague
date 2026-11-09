@@ -466,7 +466,7 @@ test("collecting respects the inventory: with room it adds the item; when full t
   const empty = inv.createEmptyInventory();
   const added = inv.addItem(empty, "mushroom", 1);
   assert.equal(inv.countItem(added, "mushroom"), 1);
-  const full = ["a", "b", "c", "d", "e", "f"].reduce(
+  const full = ["a", "b", "c", "d", "e"].reduce(
     (state, id) => inv.addItem(state, id, 1),
     empty,
   );
@@ -482,7 +482,7 @@ test("collecting respects the inventory: with room it adds the item; when full t
   assert.ok(pickup.indexOf("markCollected") > pickup.indexOf("canAddItem"));
   assert.ok(pickup.includes("copy.inventoryFull"));
   // a stack already carried still takes more even when the pocket is full
-  const fullWithMushroom = ["mushroom", "b", "c", "d", "e", "f"].reduce(
+  const fullWithMushroom = ["mushroom", "b", "c", "d", "e"].reduce(
     (state, id) => inv.addItem(state, id, 1),
     empty,
   );

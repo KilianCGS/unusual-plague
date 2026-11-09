@@ -105,6 +105,7 @@ export function ExteriorScene({
   collectedInstanceIds,
   hiddenInstanceIds,
   attentionInstanceIds,
+  attentionPoints,
 }: {
   scene: ExteriorWorldScene;
   // Selects which versioned composition (src/game/compositions) populates the
@@ -138,6 +139,8 @@ export function ExteriorScene({
   hiddenInstanceIds?: ReadonlySet<string>;
   // Placed characters that show the "!" (they have news for the Doctor).
   attentionInstanceIds?: ReadonlySet<string>;
+  // "!" marks drawn at fixed scene points (bottom-centre), for painted zones.
+  attentionPoints?: readonly { id: string; x: number; y: number }[];
 }) {
   const zoomMultiplier = scene.visual.zoomMultiplier ?? 1;
   const world = getSceneWorld(scene.visual);
@@ -353,6 +356,9 @@ export function ExteriorScene({
               />
             ) : null,
           )}
+          {attentionPoints?.map((point) => (
+            <AttentionMark key={point.id} x={point.x} y={point.y} zIndex={Math.round(point.y) + 1000} />
+          ))}
           {npcs.map((npc) => (
             <SceneNpcSprite key={npc.id} npc={npc} />
           ))}

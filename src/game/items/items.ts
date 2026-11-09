@@ -150,7 +150,7 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     icon: `${RESOURCE_ICONS}/empty-flask.png`,
   },
   // The jar of the tavern: a normal physical item (no container logic). Patient
-  // 2 trades it, with three oranges, for milk (see npcTrades.ts).
+  // 2 trades it, with one orange, for milk (see npcTrades.ts).
   "empty-jar": {
     id: "empty-jar",
     name: { es: "Jarra vacía", en: "Empty jar" },
