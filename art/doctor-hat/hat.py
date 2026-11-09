@@ -1,9 +1,9 @@
 import os, glob, sys
 from PIL import Image, ImageDraw
-R='../../public/game/characters/protagonist/'
+R='previous-frames/'
 OUT='frames/'
 OL=(16,12,13,255); CROWN=(40,33,32,255); BRIM=(31,26,26,255); HI=(70,58,52,255); BAND=(86,62,44,255)
-HAIR=(96,68,50,255); HAIRD=(66,46,36,255); TIE=(120,40,52,255)
+HAIR=(81,54,43,255); HAIRD=(58,38,31,255); TIE=(120,40,52,255)
 
 def head_info(im, facing):
     px=im.load(); W,H=im.size
@@ -18,7 +18,7 @@ def head_info(im, facing):
 def pix_ellipse(d,box,fill):
     d.ellipse(box,fill=fill)
 
-HAIRL=(128,92,66,255)
+HAIRL=(99,68,54,255)
 
 def add_hat(im, facing, bob=0):
     y0,cx,xl,xr=head_info(im,facing)
@@ -27,20 +27,20 @@ def add_hat(im, facing, bob=0):
     lay=Image.new('RGBA',im.size,(0,0,0,0)); d=ImageDraw.Draw(lay)
     bx=cx+sh*1
     # brim: ellipse whose ends curl slightly up
-    d.ellipse((bx-16,y0-1,bx+16,y0+8),fill=OL)
-    d.ellipse((bx-15,y0,bx+15,y0+7),fill=BRIM)
+    d.ellipse((bx-16,y0+1,bx+16,y0+7),fill=OL)
+    d.ellipse((bx-15,y0+2,bx+15,y0+6),fill=BRIM)
     # crown: tapered dome (wider at the base, rounded top, soft pinch)
     def crown(fill,grow):
         g=grow
-        d.polygon([(cx-7-g,y0+3+g),(cx-6-g,y0-1),(cx-5-g,y0-4),(cx-3-g,y0-6-g),
-                   (cx+3+g,y0-6-g),(cx+5+g,y0-4),(cx+6+g,y0-1),(cx+7+g,y0+3+g)],fill=fill)
+        d.polygon([(cx-7-g,y0+4+g),(cx-6-g,y0-1),(cx-5-g,y0-4),(cx-3-g,y0-6-g),
+                   (cx+3+g,y0-6-g),(cx+5+g,y0-4),(cx+6+g,y0-1),(cx+7+g,y0+4+g)],fill=fill)
     crown(OL,1); crown(CROWN,0)
     # highlight on the dome and the soft pinch down the middle
     d.line((cx-3,y0-5,cx+3,y0-5),fill=HI)
     d.point((cx-4,y0-4),fill=HI)
     d.line((cx,y0-5,cx,y0-4),fill=OL)
-    d.rectangle((cx-6,y0+1,cx+6,y0+2),fill=BAND)
-    d.point((cx+3,y0+1),fill=HI)  # buckle glint
+    d.rectangle((cx-6,y0+2,cx+6,y0+3),fill=BAND)
+    d.point((cx+3,y0+2),fill=HI)  # buckle glint
     out=im.copy(); out.alpha_composite(lay); return out,(y0,cx,xl,xr)
 
 def add_tail(im, facing, info, phase=0):
