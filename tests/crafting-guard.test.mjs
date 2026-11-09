@@ -99,11 +99,15 @@ test("the Witch's house is shut in every chapter, with an ES/EN notice, and only
   assert.ok(game.indexOf("getLockedDoorNotice(") < game.indexOf("startTransition(\n          exit.targetScene"));
 });
 
-test("every world pick-up shows a \"?\" and news characters keep the \"!\"", () => {
+test("every world pick-up has a soft aura (no \"?\") and news characters keep the \"!\"", () => {
   const scene = read("src/game/world/ExteriorScene.tsx");
   assert.ok(scene.includes("asset.collectibleItemId"));
-  assert.ok(scene.includes('kind="item"'));
-  assert.ok(read("src/game/ui/AttentionMark.tsx").includes('kind === "item" ? "?" : "!"'));
+  assert.ok(scene.includes("<PickupAura"));
+  assert.ok(!scene.includes('kind="item"'));
+  const mark = read("src/game/ui/AttentionMark.tsx");
+  assert.ok(!mark.includes('"?"'));
+  assert.ok(mark.includes("!"));
+  assert.ok(/animation:\s*pickup-aura-breathe/.test(read("src/game/ui/PickupAura.module.css")));
 });
 
 test("Kilian's Day 2 placements: mint at the cottage, herb in the forest (own id), beekeeper at the mill", () => {

@@ -21,8 +21,9 @@ export type MapLocationId =
 
 export type MapLocation = {
   id: MapLocationId;
-  // Short name written on the map.
+  // Short name written on the map (Spanish; labelEn for the English game).
   label: string;
+  labelEn: string;
   // Position on the schematic, in map units (see MAP_SIZE). Layout only: the
   // sketch Kilian drew is the reference (plaza in the middle, the river path
   // to the east, the smithy / mountain / mine chain to the west...).
@@ -36,19 +37,19 @@ const COLUMN = (index: number) => 44 + 94 * index;
 const ROW = (index: number) => [52, 135, 218][index];
 
 export const MAP_LOCATIONS: MapLocation[] = [
-  { id: "pharmacy", label: "BOTICA", x: COLUMN(2), y: ROW(0) },
-  { id: "plaza", label: "PLAZA", x: COLUMN(2), y: ROW(1) },
-  { id: "bakery", label: "PANADERÍA", x: COLUMN(2), y: ROW(2) },
-  { id: "smithy", label: "HERRERÍA", x: COLUMN(1), y: ROW(1) },
-  { id: "mountain", label: "MONTAÑA", x: COLUMN(0), y: ROW(1) },
-  { id: "mine", label: "MINA", x: COLUMN(0), y: ROW(0) },
-  { id: "tavern", label: "TABERNA", x: COLUMN(3), y: ROW(1) },
-  { id: "river", label: "RÍO", x: COLUMN(4), y: ROW(1) },
-  { id: "forest", label: "BOSQUE", x: COLUMN(5), y: ROW(1) },
-  { id: "farm", label: "GRANJA", x: COLUMN(4), y: ROW(0) },
-  { id: "mill", label: "MOLINO", x: COLUMN(5), y: ROW(0) },
+  { id: "pharmacy", label: "BOTICA", labelEn: "APOTHECARY", x: COLUMN(2), y: ROW(0) },
+  { id: "plaza", label: "PLAZA", labelEn: "SQUARE", x: COLUMN(2), y: ROW(1) },
+  { id: "bakery", label: "PANADERÍA", labelEn: "BAKERY", x: COLUMN(2), y: ROW(2) },
+  { id: "smithy", label: "HERRERÍA", labelEn: "SMITHY", x: COLUMN(1), y: ROW(1) },
+  { id: "mountain", label: "MONTAÑA", labelEn: "MOUNTAIN", x: COLUMN(0), y: ROW(1) },
+  { id: "mine", label: "MINA", labelEn: "MINE", x: COLUMN(0), y: ROW(0) },
+  { id: "tavern", label: "TABERNA", labelEn: "TAVERN", x: COLUMN(3), y: ROW(1) },
+  { id: "river", label: "RÍO", labelEn: "RIVER", x: COLUMN(4), y: ROW(1) },
+  { id: "forest", label: "BOSQUE", labelEn: "FOREST", x: COLUMN(5), y: ROW(1) },
+  { id: "farm", label: "GRANJA", labelEn: "FARM", x: COLUMN(4), y: ROW(0) },
+  { id: "mill", label: "MOLINO", labelEn: "MILL", x: COLUMN(5), y: ROW(0) },
   // The Casita del bosque: south of the Forest.
-  { id: "cottage", label: "CASITA", x: COLUMN(5), y: ROW(2) },
+  { id: "cottage", label: "CASITA", labelEn: "COTTAGE", x: COLUMN(5), y: ROW(2) },
 ];
 
 // Paths between places (undirected), following the real connections.

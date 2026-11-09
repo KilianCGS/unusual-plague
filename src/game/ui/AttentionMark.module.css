@@ -16,9 +16,3 @@
   pointer-events: none;
   user-select: none;
 }
-
-/* The "?" over a pick-up: same tag, a light blue glyph so it reads differently
-   from the yellow "!" of a character with news. */
-.item {
-  color: #9fd8ff;
-}

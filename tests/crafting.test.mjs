@@ -75,8 +75,8 @@ const permutations = (list) =>
       );
 
 test("the V1 recipes, the two patient recipes and Milk with honey exist with the right stations and sizes", () => {
-  assert.equal(RECIPES.length, 15);
-  assert.deepEqual(STATION_MAX_INPUTS, { manual: 2, fire: 3 });
+  assert.equal(RECIPES.length, 16);
+  assert.deepEqual(STATION_MAX_INPUTS, { manual: 2, fire: 3, mortar: 1 });
   assert.equal(recipeById("manual.disinfected-bandage").inputs.length, 2);
   assert.equal(recipeById("fire.mushroom-soup").inputs.length, 3);
   for (const recipe of RECIPES) {
@@ -92,7 +92,7 @@ test("1. manual matching", () => {
     "manual.disinfected-bandage",
   );
   assert.equal(
-    cr.findMatchingRecipe("manual", ing("medicinal-herb", "honey")).id,
+    cr.findMatchingRecipe("manual", ing("crushed-herb", "honey")).id,
     "manual.medicinal-paste",
   );
 });
@@ -289,13 +289,18 @@ test("13. a failed craft leaves the inventory untouched (all or nothing)", () =>
   assert.equal(JSON.stringify(fullStays), fullSnapshot);
 });
 
-test("14. the chained recipe works with no special logic", () => {
+test("14. the chained recipes work with no special logic (mortar, then table)", () => {
   let state = stock([
     ["medicinal-herb", 1],
     ["honey", 1],
     ["coal", 1],
   ]);
-  let result = cr.combine(state, "manual", ["medicinal-herb", "honey"]);
+  // grind the herb in the mortar, then bind it with honey on the table
+  let result = cr.combine(state, "mortar", ["medicinal-herb"]);
+  assert.equal(result.kind, "success");
+  assert.equal(result.recipe.output.itemId, "crushed-herb");
+  state = result.inventory;
+  result = cr.combine(state, "manual", ["crushed-herb", "honey"]);
   assert.equal(result.kind, "success");
   assert.equal(result.recipe.output.itemId, "medicinal-paste");
   state = result.inventory;
@@ -306,16 +311,15 @@ test("14. the chained recipe works with no special logic", () => {
       .sort(),
     ["coal", "medicinal-paste"],
   );
-  // the paste is no longer a step of the ointment: herb + coal make it
-  result = cr.combine(state, "manual", ["coal", "medicinal-paste"]);
-  assert.equal(result.kind, "no-recipe");
+  // the whole herb is no longer a step of the paste, and the paste is no step of the ointment
+  assert.equal(cr.combine(stock([["medicinal-herb", 1], ["honey", 1]]), "manual", ["medicinal-herb", "honey"]).kind, "no-recipe");
+  assert.equal(cr.combine(state, "manual", ["coal", "medicinal-paste"]).kind, "no-recipe");
+  // the ointment is made of the whole herb and GROUND coal
+  const ground = cr.combine(stock([["coal", 1]]), "mortar", ["coal"]);
   const direct = cr.combine(
-    stock([
-      ["medicinal-herb", 1],
-      ["coal", 1],
-    ]),
+    inv.addItem(ground.inventory, "medicinal-herb", 1),
     "manual",
-    ["coal", "medicinal-herb"], // any order
+    ["crushed-coal", "medicinal-herb"], // any order
   );
   assert.equal(direct.kind, "success");
   assert.equal(direct.recipe.output.itemId, "medicinal-ointment");
@@ -410,7 +414,7 @@ test("availableUnits: the stock minus the selection, derived (the inventory is n
 
 test("crafting keeps its current rule: a valid recipe can be made whether or not it is known (knownRecipeIds is only for the Book)", () => {
   const state = stock([
-    ["medicinal-herb", 1],
+    ["crushed-herb", 1],
     ["honey", 1],
   ]);
   // crafting.ts neither receives nor reads the known recipes
@@ -423,7 +427,7 @@ test("crafting keeps its current rule: a valid recipe can be made whether or not
   );
   // manual.medicinal-paste is not revealed by any patient, yet it can be made
   assert.equal(
-    cr.combine(state, "manual", ["honey", "medicinal-herb"]).kind,
+    cr.combine(state, "manual", ["honey", "crushed-herb"]).kind,
     "success",
   );
 });
@@ -776,22 +780,24 @@ test("the flask only comes back with the LAST water; nothing else has a vessel",
   );
 });
 
-test("all 15 catalog preparations have unique recipes; every recipe fits its actual station", () => {
-  assert.equal(new Set(RECIPES.map(r => r.output.itemId)).size, 15);
-  assert.equal(new Set(RECIPES.map(r => r.id)).size, 15);
+test("all 16 catalog preparations have unique recipes; every recipe fits its actual station", () => {
+  assert.equal(new Set(RECIPES.map(r => r.output.itemId)).size, 16);
+  assert.equal(new Set(RECIPES.map(r => r.id)).size, 16);
   for (const recipe of RECIPES) {
     assert.ok(recipe.inputs.reduce((sum,input)=>sum+input.quantity,0)<=STATION_MAX_INPUTS[recipe.station]);
     assert.ok(ITEMS[recipe.output.itemId]);
   }
 });
 
-test("single coal processing is enabled only at the manual table and crafts atomically", () => {
-  assert.equal(cr.canAttemptCombine(["coal",null],"manual"),true);
+test("grinding is a single-ingredient processing at the MORTAR only and crafts atomically", () => {
+  assert.equal(cr.canAttemptCombine(["coal"],"mortar"),true);
+  assert.equal(cr.canAttemptCombine(["medicinal-herb"],"mortar"),true);
+  assert.equal(cr.canAttemptCombine(["coal",null],"manual"),false);
   assert.equal(cr.canAttemptCombine(["coal",null,null],"fire"),false);
-  assert.equal(cr.canAttemptCombine(["cloth",null],"manual"),false);
-  assert.equal(cr.canAttemptCombine([null,null],"manual"),false);
+  assert.equal(cr.canAttemptCombine(["cloth"],"mortar"),false);
+  assert.equal(cr.canAttemptCombine([null],"mortar"),false);
   const before=stock([["coal",1]]);
-  const after=cr.combine(before,"manual",["coal",null]);
+  const after=cr.combine(before,"mortar",["coal"]);
   assert.equal(after.kind,"success");
   assert.equal(inv.countItem(before,"coal"),1);
   assert.equal(inv.countItem(after.inventory,"crushed-coal"),1);
@@ -800,9 +806,9 @@ test("single coal processing is enabled only at the manual table and crafts atom
 test("four real two-step chains consume their intermediates and produce the catalog result", () => {
   const chains=[
     [[['water',1],['mint',1],['honey',1],['garlic',1]],'fire.mint-infusion','fire.balsamic-syrup'],
-    [[['medicinal-herb',1],['honey',1],['flour',1]],'manual.medicinal-paste','manual.poultice'],
+    [[['crushed-herb',1],['honey',1],['flour',1]],'manual.medicinal-paste','manual.poultice'],
     [[['animal-fat',1],['resin',1],['cloth',1]],'fire.ointment-base','manual.medicinal-compress'],
-    [[['coal',1],['water',1]],'manual.crushed-coal','manual.charcoal-suspension'],
+    [[['coal',1],['water',1]],'mortar.crushed-coal','manual.charcoal-suspension'],
   ];
   for(const [inputs,firstId,lastId] of chains){
     const first=recipeById(firstId),last=recipeById(lastId);
@@ -857,13 +863,13 @@ test("ingredient discovery teaches specific recipes permanently, including their
   assert.ok(!flour.has('fire.balsamic-syrup'));
   for(const ids of Object.values(RECIPE_DISCOVERY_ITEMS)) for(const id of ids)assert.ok(recipeById(id));
   const all=learnRecipesFromItems(empty,Object.keys(RECIPE_DISCOVERY_ITEMS));
-  assert.equal(all.size,15,'existing ingredients can eventually reveal the whole catalog');
+  assert.equal(all.size,16,'existing ingredients can eventually reveal the whole catalog');
 });
 
 test("receiving or crafting a preparation teaches its recipe and prerequisite without a patient gate", () => {
   const {learnRecipesFromItems}=at("src/game/crafting/recipeDiscovery.ts");
   const learned=learnRecipesFromItems(new Set(),['charcoal-suspension']);
-  assert.deepEqual([...learned].sort(),['manual.charcoal-suspension','manual.crushed-coal']);
+  assert.deepEqual([...learned].sort(),['manual.charcoal-suspension','mortar.crushed-coal']);
   const game=fs.readFileSync(path.join(root,'src/game/world/GameWorld.tsx'),'utf8');
   assert.ok(game.includes('nextInventory !== inventoryRef.current && rememberRecipes(nextInventory)'), 'atomic story acquisition learns only after validation');
   assert.ok(game.includes('!toStorage && rememberRecipes(nextInventory)'), 'taking from the chest learns without treating chest contents as carried');

@@ -97,7 +97,11 @@ export type StoryEffect =
   | { type: "claim-reward"; rewardId: string }
   | { type: "give-item"; itemId: string; quantity: number }
   // Takes items out of the carried inventory (all or nothing, with the rest).
-  | { type: "take-item"; itemId: string; quantity: number };
+  | { type: "take-item"; itemId: string; quantity: number }
+  // The Doctor's copper coins (see src/game/money): earning never fails, paying
+  // fails (and so does the whole effect list) when the purse is too light.
+  | { type: "give-coins"; amount: number }
+  | { type: "take-coins"; amount: number };
 
 export type StoryOutcome = {
   // Null for light interactions (the river): only effects and a short notice.
@@ -129,9 +133,8 @@ export const PATIENT_INTERACTION_IDS: Record<string, string> = {
 // The merchant is not a shop: when the Doctor KNOWS he needs something this
 // character can give and does not carry enough of it, the conversation gives
 // it. Which items each character can give.
-export const NPC_PROVIDES: Record<string, string[]> = {
-  "chapter1.plaza.merchant": ["cloth"],
-};
+// The merchant no longer gives cloth: he SELLS it (src/game/shop/shops.ts).
+export const NPC_PROVIDES: Record<string, string[]> = {};
 
 // A source the Doctor can take from while he needs it (not a tap that never
 // runs dry). `requires` is the empty vessel he must carry: filling it USES UP

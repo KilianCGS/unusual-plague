@@ -35,6 +35,7 @@ export type ItemId =
   | "poultice"
   | "medicinal-compress"
   | "crushed-coal"
+  | "crushed-herb"
   | "charcoal-suspension"
   | "citrus-drink"
   | "empty-flask"
@@ -232,6 +233,11 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     id: "crushed-coal",
     name: { es: "Carbón triturado", en: "Crushed coal" },
     icon: `${PREPARED_ICONS}/crushed-coal.png`,
+  },
+  "crushed-herb": {
+    id: "crushed-herb",
+    name: { es: "Hierba machacada", en: "Crushed herb" },
+    icon: `${PREPARED_ICONS}/crushed-herb.png`,
   },
   "charcoal-suspension": {
     id: "charcoal-suspension",

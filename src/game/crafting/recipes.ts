@@ -6,13 +6,16 @@ import type { ItemId } from "../items/items";
 //
 // Two stations share this one model. The station only decides which recipes
 // are valid there and how many ingredients can be placed:
-//   manual  the work table: mixing, grinding, soaking, wrapping...  (2 inputs)
+//   manual  the work table: mixing, soaking, wrapping...            (2 inputs)
 //   fire    the hearth: boiling, cooking, infusing, reducing...     (3 inputs)
-export type CraftStation = "manual" | "fire";
+//   mortar  the mortar on the work table: GRINDING one ingredient   (1 input)
+//           (the mortar is never consumed: it is a fixture of the table)
+export type CraftStation = "manual" | "fire" | "mortar";
 
 export const STATION_MAX_INPUTS: Record<CraftStation, number> = {
   manual: 2,
   fire: 3,
+  mortar: 1,
 };
 
 // Inputs carry a quantity (a future recipe may need "herb x2"), so they are a
@@ -40,22 +43,23 @@ export const RECIPES: Recipe[] = [
     output: { itemId: "disinfected-bandage", quantity: 1 },
   },
   {
+    // The herb is ground in the mortar first, then bound with honey.
     id: "manual.medicinal-paste",
     station: "manual",
     inputs: [
-      { itemId: "medicinal-herb", quantity: 1 },
+      { itemId: "crushed-herb", quantity: 1 },
       { itemId: "honey", quantity: 1 },
     ],
     output: { itemId: "medicinal-paste", quantity: 1 },
   },
   {
-    // Herb + coal. (Medicinal paste above is no longer a step of this one: it
-    // stays as a recipe of its own, unused by any case.)
+    // Herb + ground coal, mixed by hand. (Medicinal paste above is not a step
+    // of this one.)
     id: "manual.medicinal-ointment",
     station: "manual",
     inputs: [
       { itemId: "medicinal-herb", quantity: 1 },
-      { itemId: "coal", quantity: 1 },
+      { itemId: "crushed-coal", quantity: 1 },
     ],
     output: { itemId: "medicinal-ointment", quantity: 1 },
   },
@@ -127,10 +131,16 @@ export const RECIPES: Recipe[] = [
     output: { itemId: "medicinal-compress", quantity: 1 },
   },
   {
-    id: "manual.crushed-coal",
-    station: "manual",
+    id: "mortar.crushed-coal",
+    station: "mortar",
     inputs: [{ itemId: "coal", quantity: 1 }],
     output: { itemId: "crushed-coal", quantity: 1 },
+  },
+  {
+    id: "mortar.crushed-herb",
+    station: "mortar",
+    inputs: [{ itemId: "medicinal-herb", quantity: 1 }],
+    output: { itemId: "crushed-herb", quantity: 1 },
   },
   {
     id: "manual.charcoal-suspension",

@@ -1,0 +1,84 @@
+/* Same parchment family as the inventory bar and the Book: paper #e9dbb9, dark
+   brown ink #2b1a14, hard edges, no blur. Top left of the game frame; it never
+   takes the pointer except its own title. */
+.panel {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 15;
+  max-width: 300px;
+  font-family: var(--ui-font);
+  color: #2b1a14;
+  background: #e9dbb9;
+  border: 3px solid #1c110c;
+  box-shadow: inset 0 0 0 1px #8a6a4a;
+  pointer-events: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 5px 8px;
+  font: 700 12px/1 var(--ui-font);
+  color: #2b1a14;
+  text-align: left;
+  background: #d9c9a3;
+  border: 0;
+  border-bottom: 2px solid #8a6a4a;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.title {
+  flex: 1;
+  letter-spacing: 0.14em;
+}
+
+.hint {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.box {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  background: #f4ead5;
+  border: 2px solid #2b1a14;
+}
+
+.done .box {
+  color: #2f6b34;
+}
+
+.done .text {
+  text-decoration: line-through;
+  opacity: 0.65;
+}

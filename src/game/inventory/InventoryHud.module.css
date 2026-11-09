@@ -2,6 +2,11 @@
    game frame. Parchment like the Inventory overlay (paper #e9dbb9, slot
    #c9b88f, dark brown #2b1a14); square, hard-edged, no blur or gradients. */
 .dock {
+  /* The icons are 48 px pixel art: they are shown at an EXACT multiple (2x on
+     normal windows, 1x on short ones) so the pixels stay even. The slot is the
+     icon plus its 2 px border on each side. */
+  --icon-size: 96px;
+  --slot-size: 100px;
   position: absolute;
   left: 0;
   right: 0;
@@ -27,8 +32,8 @@
 .slot {
   position: relative;
   box-sizing: border-box;
-  width: 60px;
-  height: 60px;
+  width: var(--slot-size);
+  height: var(--slot-size);
   background: #c9b88f;
   border: 2px solid #2b1a14;
 }
@@ -47,8 +52,8 @@
 .itemIcon {
   position: absolute;
   inset: 0;
-  width: 56px;
-  height: 56px;
+  width: var(--icon-size);
+  height: var(--icon-size);
 }
 
 .name {
@@ -68,7 +73,7 @@
   right: 2px;
   bottom: 0;
   color: #2b1a14;
-  font-size: 13px;
+  font-size: 22px;
   line-height: 1;
   font-weight: 700;
 }
@@ -86,4 +91,15 @@
 .slot:focus-visible {
   outline: 2px solid #1c110c;
   outline-offset: 1px;
+}
+
+@media (max-height: 760px) {
+  .dock {
+    --icon-size: 48px;
+    --slot-size: 52px;
+  }
+
+  .quantity {
+    font-size: 13px;
+  }
 }

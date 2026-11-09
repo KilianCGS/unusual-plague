@@ -56,7 +56,7 @@ export const bookCopy: Record<Language, BookCopy> = {
       "Ingredientes: grasa animal, ajo, sal y sanguijuela",
     ],
     station: "Estación",
-    stations: { manual: "Mesa", fire: "Cocina" },
+    stations: { manual: "Mesa", fire: "Cocina", mortar: "Mortero" },
   },
   en: {
     tabs: {
@@ -82,7 +82,7 @@ export const bookCopy: Record<Language, BookCopy> = {
       "Ingredients: animal fat, garlic, salt and leech",
     ],
     station: "Station",
-    stations: { manual: "Work table", fire: "Stove" },
+    stations: { manual: "Work table", fire: "Stove", mortar: "Mortar" },
   },
 };
 

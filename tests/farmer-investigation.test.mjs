@@ -92,7 +92,7 @@ test('the complete farmer path is playable with five slots, Day 1 leftovers in t
   apply(f,interact('chapter2.mine.recoveringMiner',f));
   assert.equal(interact('chapter2.farm.woman',f)?.effects?.length??0,0,'the farm woman no longer hands out herbs');
   apply(f,interact('gather.water',f));
-  for(const id of ['manual.crushed-coal','manual.charcoal-suspension','fire.medicinal-infusion']){
+  for(const id of ['mortar.crushed-coal','manual.charcoal-suspension','fire.medicinal-infusion']){
     const next=craft(f.inventory,RECIPES.find(r=>r.id===id));assert.ok(next,id);f.inventory=next;
   }
   const treatment=interact('chapter2.granary.farmer',f);

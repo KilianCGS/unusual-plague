@@ -15,6 +15,7 @@ import type { CollectedInstanceIds } from "../collectibles/collectibles";
 import { getChapterInteractions, getComposition } from "../compositions";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { AttentionMark } from "../ui/AttentionMark";
+import { PickupAura } from "../ui/PickupAura";
 import { DecorSprite } from "../decor/DecorSprite";
 import { DOCTOR_NARRATIVE_ASSET_ID } from "../decor/decorAssets";
 import { resolveDecorInstances } from "../decor/decorRuntime";
@@ -356,17 +357,25 @@ export function ExteriorScene({
               />
             ) : null,
           )}
-          {decor.sprites.map(({ asset, instance }) =>
-            asset.collectibleItemId ? (
-              <AttentionMark
-                key={`${instance.instanceId}-item`}
-                kind="item"
+          {decor.sprites.map(({ asset, instance }) => {
+            if (!asset.collectibleItemId) {
+              return null;
+            }
+
+            // A soft glow centred on the object's body, just behind its sprite.
+            const body = Math.max(instance.y - getInstanceHeadTop(asset, instance), 12);
+
+            return (
+              <PickupAura
+                key={`${instance.instanceId}-aura`}
                 x={instance.x}
-                y={getInstanceHeadTop(asset, instance) - 4}
-                zIndex={Math.round(instance.y) + instance.zOffset + 1000}
+                y={instance.y - body / 2}
+                width={Math.max(body * 1.9, 40)}
+                height={Math.max(body * 1.5, 34)}
+                zIndex={Math.round(instance.y) + instance.zOffset - 1}
               />
-            ) : null,
-          )}
+            );
+          })}
           {attentionPoints?.map((point) => (
             <AttentionMark key={point.id} x={point.x} y={point.y} zIndex={Math.round(point.y) + 1000} />
           ))}

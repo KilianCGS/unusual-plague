@@ -7,6 +7,7 @@ import { craftingCopy } from "../i18n/crafting";
 import { farmerAnalysisLabel } from "../dialogue/chapter2AnalysisDialogues";
 import type { Language } from "../i18n/types";
 import type { InventoryState } from "../inventory/inventory";
+import { getMissingIngredients, type ItemNeed } from "./needs";
 import { getItemIcon, getItemName } from "../items/items";
 import { ItemIcon } from "../items/ItemIcon";
 import { InventorySlotContents } from "../inventory/InventorySlotView";
@@ -26,7 +27,24 @@ import styles from "./CraftingOverlay.module.css";
 
 // What the feedback line says (null = nothing). It clears as soon as the
 // selection changes, so it never needs a timer.
-type Message = "no-recipe" | "no-space" | "limit" | "not-needed" | null;
+type Message =
+  | "no-recipe"
+  | "no-space"
+  | "limit"
+  | "not-needed"
+  | "needed-elsewhere"
+  | null;
+
+// The mortar's picture (a fixture of the work table, not an item).
+const MORTAR_ICON = "/game/ui/mortar.png";
+
+// How many raw ingredients the known cases still lack in total.
+function totalMissing(treatments: readonly ItemNeed[], inventory: InventoryState) {
+  return getMissingIngredients(treatments, inventory).reduce(
+    (sum, need) => sum + need.quantity,
+    0,
+  );
+}
 
 type Created = { itemId: string; quantity: number };
 
@@ -48,6 +66,9 @@ export function CraftingOverlay({
   onClose,
   onAnalyzeSample,
   craftableOutputs,
+  activeTreatments,
+  onOpenMortar,
+  onBackToTable,
 }: {
   station: CraftStation;
   inventory: InventoryState;
@@ -59,6 +80,13 @@ export function CraftingOverlay({
   // When given, any other recipe is refused and consumes nothing; left out
   // (the /dev/crafting page), every valid recipe can be made.
   craftableOutputs?: ReadonlySet<string>;
+  // The treatments the known cases still need. When given, a craft that would
+  // leave them MORE short than before is refused too (grinding the herb that
+  // another cure needs whole), and nothing is consumed.
+  activeTreatments?: readonly ItemNeed[];
+  // The mortar button of the work table, and the way back from the mortar.
+  onOpenMortar?: () => void;
+  onBackToTable?: () => void;
 }) {
   const copy = craftingCopy[language];
   const [selection, setSelection] = useState<CraftSelection>(() =>
@@ -127,6 +155,13 @@ export function CraftingOverlay({
     ) {
       // Nothing is consumed: the selection stays so it can be corrected.
       setMessage("not-needed");
+    } else if (
+      result.kind === "success" &&
+      activeTreatments &&
+      totalMissing(activeTreatments, result.inventory) >
+        totalMissing(activeTreatments, inventory)
+    ) {
+      setMessage("needed-elsewhere");
     } else if (result.kind === "success") {
       onInventoryChange(result.inventory);
       setSelection(createEmptySelection(station));
@@ -161,13 +196,38 @@ export function CraftingOverlay({
             ×
           </button>
           <h2 className={styles.title}>{copy.title[station]}</h2>
+          {station === "manual" && onOpenMortar ? (
+            <button
+              type="button"
+              className={styles.mortar}
+              data-crafting-mortar
+              aria-label={copy.mortar.label}
+              disabled={modalOpen}
+              onClick={onOpenMortar}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={MORTAR_ICON} alt="" width={48} height={48} draggable={false} />
+              <span className={styles.mortarLabel}>{copy.mortar.label}</span>
+            </button>
+          ) : null}
+          {station === "mortar" && onBackToTable ? (
+            <button
+              type="button"
+              className={styles.back}
+              data-crafting-back
+              disabled={modalOpen}
+              onClick={onBackToTable}
+            >
+              {copy.mortar.back}
+            </button>
+          ) : null}
           {station === "manual" && onAnalyzeSample ? (
             <button type="button" className={styles.action} onClick={onAnalyzeSample} disabled={modalOpen}>
               {farmerAnalysisLabel[language]}
             </button>
           ) : null}
           <p className={styles.counter} data-crafting-counter>
-            {copy.ingredients} {selectedCount}/{selection.length}
+            {station === "mortar" ? copy.mortar.ingredient : copy.ingredients} {selectedCount}/{selection.length}
           </p>
 
           <div className={styles.selection} data-crafting-selection>
@@ -221,7 +281,9 @@ export function CraftingOverlay({
                   ? copy.limitReached
                   : message === "not-needed"
                     ? copy.notNeeded
-                    : " "}
+                    : message === "needed-elsewhere"
+                      ? copy.neededElsewhere
+                      : " "}
           </p>
 
           <hr className={styles.divider} />

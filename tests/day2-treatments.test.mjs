@@ -95,7 +95,7 @@ function complete(facts,id){
     apply(facts,interact('chapter2.bakery.baker',facts));    // permission for the sack
     assert.ok(facts.claimedRewards.has(FLOUR));
     apply(facts,interact(SACK,facts));                       // flour from the sack
-    make(facts,'manual.medicinal-paste');make(facts,'manual.poultice');
+    make(facts,'mortar.crushed-herb');make(facts,'manual.medicinal-paste');make(facts,'manual.poultice');
     apply(facts,interact('chapter2.mill.neighbour',facts));  // resin
     make(facts,'fire.ointment-base');make(facts,'manual.medicinal-compress');
   }

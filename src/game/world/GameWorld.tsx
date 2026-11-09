@@ -27,6 +27,14 @@ import { useBookHotkeys } from "../book/useBookHotkeys";
 import { PlayerBark } from "../bark/PlayerBark";
 import { useRunBark } from "../bark/useRunBark";
 import { CraftingOverlay } from "../crafting/CraftingOverlay";
+import { moneyCopy } from "../i18n/money";
+import { CoinHud } from "../money/CoinHud";
+import { getObjectives } from "../objectives/objectives";
+import { ObjectivesPanel } from "../objectives/ObjectivesPanel";
+import { addCoins, canAfford, spendCoins, STARTING_COINS } from "../money/money";
+import { getPatientPayment } from "../money/payments";
+import { ShopOverlay } from "../shop/ShopOverlay";
+import { buyEffects, getShop, type ShopDefinition, type ShopEntry } from "../shop/shops";
 import { CRAFT_STATION_BY_INTERACTION_ID } from "../crafting/crafting";
 import type { CraftStation } from "../crafting/recipes";
 import { learnRecipesFromItems } from "../crafting/recipeDiscovery";
@@ -282,6 +290,13 @@ export function GameWorld({
     () => devStart?.storage ?? createChapter1Storage(),
   );
   const storageRef = useRef(storage);
+  // The copper coins in the Doctor's purse (a counter, not items). The ref
+  // mirrors it for the same reason as the inventory's.
+  const [coins, setCoins] = useState<number>(() => devStart?.coins ?? STARTING_COINS);
+  const coinsRef = useRef(coins);
+  // The shop interface that is open (the merchant's counter) and its last line.
+  const [openShop, setOpenShop] = useState<ShopDefinition | null>(null);
+  const [shopMessage, setShopMessage] = useState<string | null>(null);
   const [collected, setCollected] = useState<CollectedInstanceIds>(() =>
     devStart ? new Set(devStart.collected) : NO_COLLECTED,
   );
@@ -306,6 +321,7 @@ export function GameWorld({
     !dialogue.active &&
     craftingStation === null &&
     !storageOpen &&
+    openShop === null &&
     !inNarrativeScene;
   const mapVisible = mapHeld && canOpenInterface && !bookOpen;
   const pendingRef = useRef<{
@@ -341,6 +357,7 @@ export function GameWorld({
     !mapVisible &&
     craftingStation === null &&
     !storageOpen &&
+    openShop === null &&
     !inNarrativeScene;
 
   // A scene change takes the input away for a moment. Tell the run key that
@@ -425,7 +442,7 @@ export function GameWorld({
     dialogueActive: dialogue.active,
     bookOpen,
     mapVisible,
-    storageOpen,
+    storageOpen: storageOpen || openShop !== null,
     craftingOpen: craftingStation !== null,
     inNarrativeScene,
   });
@@ -455,6 +472,8 @@ export function GameWorld({
       let nextInventory = inventoryRef.current;
       let nextPatients = patientsRef.current;
       let nextRewards = claimedRewardsRef.current;
+      let nextCoins = coinsRef.current;
+      let earned = 0;
       const obtained: { itemId: string; quantity: number }[] = [];
 
       for (const effect of effects) {
@@ -479,6 +498,17 @@ export function GameWorld({
           }
 
           nextInventory = removed;
+        } else if (effect.type === "give-coins") {
+          nextCoins = addCoins(nextCoins, effect.amount);
+          earned += effect.amount;
+        } else if (effect.type === "take-coins") {
+          const paid = spendCoins(nextCoins, effect.amount);
+
+          if (paid === null) {
+            return false;
+          }
+
+          nextCoins = paid;
         } else if (effect.type === "claim-reward") {
           nextRewards = new Set([...nextRewards, effect.rewardId]);
         } else if (effect.type === "advance-patient") {
@@ -497,6 +527,13 @@ export function GameWorld({
 
           nextPatients = treated.state;
           nextInventory = treated.inventory;
+
+          // Patients pay once treated (Kilian's economy): a rule keyed by the
+          // patient, so every conversation that treats one pays the same.
+          const payment = getPatientPayment(effect.patientId);
+
+          nextCoins = addCoins(nextCoins, payment);
+          earned += payment;
         }
       }
 
@@ -516,6 +553,15 @@ export function GameWorld({
         setClaimedRewards(nextRewards);
       }
 
+      if (nextCoins !== coinsRef.current) {
+        coinsRef.current = nextCoins;
+        setCoins(nextCoins);
+      }
+
+      if (earned > 0) {
+        showNotice(moneyCopy[language].received(earned));
+      }
+
       for (const { itemId, quantity } of obtained) {
         showNotice(
           formatObtainedNotice(
@@ -529,6 +575,25 @@ export function GameWorld({
       return true;
     },
     [language, showNotice, rememberRecipes],
+  );
+
+  // The Buy button of a shop: pay, receive and remember, all or nothing.
+  const handleBuy = useCallback(
+    (shop: ShopDefinition, entry: ShopEntry) => {
+      const copy = moneyCopy[language];
+
+      if (!canAfford(coinsRef.current, entry.price)) {
+        setShopMessage(copy.notEnough);
+        return;
+      }
+
+      const applied = applyStoryEffects(
+        buyEffects(claimedRewardsRef.current, shop, entry),
+      );
+
+      setShopMessage(applied ? copy.spent(entry.price) : copy.noRoom);
+    },
+    [language, applyStoryEffects],
   );
 
   // Click on a stack in the storage interface: the whole stack goes to the
@@ -586,6 +651,15 @@ export function GameWorld({
 
       if (station) {
         setCraftingStation(station);
+        return;
+      }
+
+      // A seller: open the buying interface.
+      const shop = getShop(interactionId);
+
+      if (shop) {
+        setShopMessage(null);
+        setOpenShop(shop);
         return;
       }
 
@@ -1183,7 +1257,7 @@ export function GameWorld({
     inNarrativeScene,
     tutorialDone: tutorial.step === "done",
     bookOpen,
-    storageOpen,
+    storageOpen: storageOpen || openShop !== null,
     craftingOpen: craftingStation !== null,
     mapVisible,
   });
@@ -1221,12 +1295,25 @@ export function GameWorld({
       />
     ) : null;
   };
+  // The errands panel's list: derived from the cases, never stored.
+  const objectives = useMemo(
+    () => getObjectives(patients, language),
+    [patients, language],
+  );
   const renderSceneOverlay = (context: SceneOverlayContext) => (
     <>
       {renderDialogue(context)}
       {renderRunBark(context)}
       {inventoryHudVisible ? (
         <InventoryHud inventory={inventory} language={language} />
+      ) : null}
+      {inventoryHudVisible ? <CoinHud coins={coins} language={language} /> : null}
+      {inventoryHudVisible ? (
+        <ObjectivesPanel
+          objectives={objectives}
+          language={language}
+          keyboardActive={isPlaying && !dialogue.active}
+        />
       ) : null}
     </>
   );
@@ -1241,13 +1328,13 @@ export function GameWorld({
 
   // What the known cases still need to be prepared; any other recipe is refused
   // in the crafting interface ("I don't need that right now").
+  const activeTreatments = useMemo(
+    () => getActiveTreatments(patients, getPatientDefinitions(claimedRewards)),
+    [patients, claimedRewards],
+  );
   const craftableOutputs = useMemo(
-    () =>
-      getCraftingTargets(
-        getActiveTreatments(patients, getPatientDefinitions(claimedRewards)),
-        inventory,
-      ),
-    [patients, claimedRewards, inventory],
+    () => getCraftingTargets(activeTreatments, inventory),
+    [activeTreatments, inventory],
   );
 
   // "!" over painted zones (not placed instances): today the baker's flour sack
@@ -1295,6 +1382,7 @@ export function GameWorld({
     !mapVisible &&
     craftingStation === null &&
     (!storageOpen || hintOverStorage) &&
+    openShop === null &&
     !inNarrativeScene;
 
   return (
@@ -1355,7 +1443,7 @@ export function GameWorld({
           onChoose={chooseDiagnosis} onConsult={consultDiagnosis} />
       ) : null}
       {mapVisible ? (
-        <MapOverlay currentLocationId={SCENE_TO_MAP_LOCATION[world.sceneId]} />
+        <MapOverlay currentLocationId={SCENE_TO_MAP_LOCATION[world.sceneId]} language={language} />
       ) : null}
       {craftingStation ? (
         <CraftingOverlay
@@ -1364,6 +1452,9 @@ export function GameWorld({
           inventory={inventory}
           language={language}
           craftableOutputs={craftableOutputs}
+          activeTreatments={activeTreatments}
+          onOpenMortar={() => setCraftingStation("mortar")}
+          onBackToTable={() => setCraftingStation("manual")}
           onInventoryChange={(next) => {
             inventoryRef.current = next;
             setInventory(next);
@@ -1379,6 +1470,17 @@ export function GameWorld({
             startDialogue(localizeConversation(farmerAnalysisResult, language, "doctor"));
           } : undefined}
           onClose={() => setCraftingStation(null)}
+        />
+      ) : null}
+      {openShop ? (
+        <ShopOverlay
+          shop={openShop}
+          coins={coins}
+          claimedRewards={claimedRewards}
+          language={language}
+          message={shopMessage}
+          onBuy={(entry) => handleBuy(openShop, entry)}
+          onClose={() => setOpenShop(null)}
         />
       ) : null}
       {storageOpen ? (

@@ -32,6 +32,66 @@ WITCH LINE: when she gives the leech she adds that where she lives there are no
 leeches but a stream surrounded by mint (a hint to explore the cottage area;
 wording awaits Kilian's review).
 
+MORTAR (implemented 2026-11-09; assumes option A for the paste, awaiting Kilian's
+confirmation): a third crafting station "mortar" (1 input, `crafting/recipes.ts`).
+On the work table a mortar button (top right, hover label "Triturar") opens the
+grinding view with one slot and a back button; the mortar is a fixture of the
+table, never an item. Recipes: `mortar.crushed-coal` (coal), `mortar.crushed-herb`
+(herb -> new item "Hierba machacada"); the paste is now crushed herb + honey and
+the ointment is herb + crushed coal (both on the table); recipes are 16.
+GUARD: besides refusing preparations nobody needs, a craft is refused (nothing
+consumed, "(Eso me hace falta para otra cosa.)") when it would leave the known
+cases MORE short of raw ingredients than before (e.g. grinding the herb another
+cure needs whole). Icons are scripted pixel art (`ui/mortar.png`,
+`prepared-icons/crushed-herb.png`); the Book illustration
+`book/preparations/crushed-herb.png` is a TEMPORARY copy of medicinal-paste.png
+(see docs/CODEX_MAP_ICONS_PROMPT.md, deliverable B).
+Day 1 impact: the ointment needs the coal crushed first; Day 2: the paste needs
+the herb crushed first; no material counts changed.
+
+QA FEEDBACK ROUND (2026-11-09, from Kilian's partner): (1) world pick-ups no longer
+show a "?" but a soft breathing glow (`ui/PickupAura`, drawn behind the sprite);
+the yellow "!" stays for characters with news. (2) ERRANDS PANEL (`objectives/`):
+top left, derived from the cases (a discovered case = an open errand "Tratar al
+marido de la panadera"; treated = ticked, then it leaves after 6 s); R or a click
+on the title folds it; the texts are NEW and await review. (3) Inventory icons
+are shown at 2x (96 px icon, 100 px slot) on normal windows and 1x on short ones
+(max-height 760 px) so the 48 px pixel art stays even. (4) The MAP is now drawn
+as a page of the Compendium (same open book image, sepia ink, Patrick Hand
+names, one painted engraving per place (`public/game/ui/map/<id>.png`, 512 px,
+transparent, made by Codex from docs/CODEX_MAP_ICONS_PROMPT.md; the contact
+sheet is `art/map-icons/contact-sheet.png`), dotted trails, the
+river, a compass, a red pin and ring for the current place); geography data is
+unchanged (`mapLocations.ts`, now with `labelEn`). A new place = one entry in
+mapLocations.ts + one PNG (the quarry and forest-deep PNGs already exist, not
+placed on the map yet; add them to MapLocationId, SCENE_TO_MAP_LOCATION and the
+ICON_TOP table in MapOverlay.tsx when their scenes exist).
+PLANNED WORLD CHANGES (Kilian paints the art himself, NOT implemented): a NEW
+quarry camp scene (NPCs at work) and a NEW second forest scene, plus a NEW exit
+in the current forest and a NEW exit on the mine path to reach them. Also two
+river-side paths between the river and the farm. Materials for these zones are
+still to be decided.
+
+COPPER COINS (implemented 2026-11-09, first slice; Kilian approved the design):
+one counter 0-99 (`money/money.ts`), 3 at the start of the game, carried between
+days, not items (no slot). HUD `money/CoinHud` (bottom right, icon
+`public/game/ui/coin.png`, drawn by script, awaiting Kilian's review). Patients
+PAY when treated, by rule (`money/payments.ts`, applied in `applyStoryEffects`
+on the `treat` effect: baker husband 6, tavern patient 8, injured miner 11,
+woodcutter 7, blacksmith 9, farmer 13; invented amounts, to balance). New story
+effects `give-coins` / `take-coins` (a failed payment cancels the whole list).
+SHOPS (`shop/shops.ts`, `shop/ShopOverlay.tsx`): a seller opens a buying
+interface; each entry has price and stock, purchases are claimed-reward flags
+`shop.<id>.<item>.<n>`; sold-out items are dimmed. The Day 1 merchant now SELLS
+cloth (1 coin, stock 3: two for Day 1, one for Day 2) instead of giving it;
+`NPC_PROVIDES` is empty. His old ambient conversation is not shown any more
+(the counter opens directly with a NEW greeting line awaiting review).
+NOT YET: garlic (2 coins), the vegetable mix and the new soup, the antigripal
+drink, the mortar (waiting for Kilian's A or B on the paste), the other sellers
+(beekeeper, baker, tavern keeper, blacksmith), errands, chest starting stock.
+Verified in a headless browser on /dev/day2 (HUD, buying, sold out); the real
+Day 1 route to the plaza was not walked.
+
 KILIAN'S PLAN FOR LATER CHAPTERS (2026-11-09; a plan, NOT implemented and NOT
 canon until he approves it): Chapter 3 would have two or three patients so that
 every ailment appears at least once (chest cough and scurvy are the two not used

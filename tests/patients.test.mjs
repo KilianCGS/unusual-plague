@@ -474,57 +474,20 @@ test("the Doctor's hints: one natural line per missing ingredient, in ES and EN"
 });
 
 // ---------------------------------------------------------------------- MERCHANT
-test("the merchant offers Cloth only for a KNOWN need he can cover", () => {
-  // before the Doctor knows the need: the narrative dialogue (no story outcome)
-  assert.equal(
-    story.resolveStoryInteraction(MERCHANT, facts("discovered"), "es", "m"),
-    null,
-  );
-  assert.equal(
-    story.resolveStoryInteraction(MERCHANT, facts("hidden"), "es", "m"),
-    null,
-  );
-  // known need and the Doctor lacks cloth: he gives one
-  const offer = story.resolveStoryInteraction(
-    MERCHANT,
-    facts("examined"),
-    "es",
-    "m",
-  );
-  assert.deepEqual(offer.effects, [
-    { type: "give-item", itemId: "cloth", quantity: 2 },
-  ]);
-  assert.equal(offer.conversation.lines[0].speaker, "doctor");
-  // with enough cloth he does not hand out more
-  assert.equal(
-    story.resolveStoryInteraction(
-      MERCHANT,
-      facts("examined", [["cloth", 1]]),
-      "es",
-      "m",
-    ),
-    null,
-  );
-  // the need is covered by a finished compress too
-  assert.equal(
-    story.resolveStoryInteraction(
-      MERCHANT,
-      facts("examined", [["cold-cloth", 1]]),
-      "es",
-      "m",
-    ),
-    null,
-  );
-  // after the treatment there is no need left
-  assert.equal(
-    story.resolveStoryInteraction(MERCHANT, facts("treated"), "es", "m"),
-    null,
-  );
-});
-
-test("the merchant's pickup is generic (cloth is just what he provides)", () => {
-  assert.deepEqual(story.NPC_PROVIDES[MERCHANT], ["cloth"]);
+test("the merchant SELLS cloth: he never gives it through the story any more", () => {
+  for (const status of ["hidden", "discovered", "examined", "treated"]) {
+    assert.equal(
+      story.resolveStoryInteraction(MERCHANT, facts(status), "es", "m"),
+      null,
+      status,
+    );
+  }
+  assert.deepEqual(story.NPC_PROVIDES, {});
   assert.ok(!(MERCHANT in story.PATIENT_INTERACTION_IDS));
+  const shops = at("src/game/shop/shops.ts");
+  assert.deepEqual(shops.getShop(MERCHANT).entries, [
+    { itemId: "cloth", price: 1, stock: 3 },
+  ]);
 });
 
 // ------------------------------------------------------------------------ WATER
@@ -1391,7 +1354,7 @@ test("baker's Salt: Patient 1's treatment is unchanged and no other patient or r
     ch1.INJURED_MINER_ID,
   ]);
   assert.deepEqual(Object.keys(ch1.CHAPTER1_INITIAL_PATIENTS), [HUSBAND]);
-  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 15);
+  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 16);
   // the reward conversations say nothing about patients, soup or recipes
   for (const lang of ["es", "en"]) {
     for (const key of ["bakerReward", "bakerRewardNoRoom"]) {

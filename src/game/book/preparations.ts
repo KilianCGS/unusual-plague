@@ -56,8 +56,12 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
     en: "Cloth coated with ointment base to cover the painful area.",
   },
   "crushed-coal": {
-    es: "Carbón reducido a polvo en la mesa de trabajo. Requiere otra preparación.",
-    en: "Charcoal ground to powder at the work table. Requires further preparation.",
+    es: "Carbón reducido a polvo en el mortero. Requiere otra preparación.",
+    en: "Charcoal ground to powder in the mortar. Requires further preparation.",
+  },
+  "crushed-herb": {
+    es: "Hierba medicinal machacada en el mortero. Base para la pasta.",
+    en: "Medicinal herb ground in the mortar. The base for the paste.",
   },
   "charcoal-suspension": {
     es: "Carbón triturado mezclado con agua. Preparado de administración oral.",

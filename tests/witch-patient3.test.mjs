@@ -548,13 +548,13 @@ test("P3 2. infected-wound, both treatments and their recipes are revealed", () 
   assert.ok(!text("en").includes("MEDICINAL PASTE"));
 });
 
-test("P3 3. recipes: ointment = Medicinal herb + Coal (manual); bandage = Cloth + Alcohol; the paste stays but no case needs it", () => {
+test("P3 3. recipes: ointment = Medicinal herb + Crushed coal (manual); bandage = Cloth + Alcohol; the paste stays but no case needs it", () => {
   const recipe = (id) => RECIPES.find((r) => r.id === id);
   const ointment = recipe("manual.medicinal-ointment");
   assert.equal(ointment.station, "manual");
   assert.deepEqual(ointment.inputs, [
     { itemId: "medicinal-herb", quantity: 1 },
-    { itemId: "coal", quantity: 1 },
+    { itemId: "crushed-coal", quantity: 1 },
   ]);
   assert.deepEqual(ointment.output, {
     itemId: "medicinal-ointment",
@@ -574,13 +574,12 @@ test("P3 3. recipes: ointment = Medicinal herb + Coal (manual); bandage = Cloth 
     assert.ok(!def.revealsRecipeIds.includes("manual.medicinal-paste"));
   }
   // really craftable
+  const ground = cr.combine(stock([["coal", 1]]), "mortar", ["coal"]);
+  assert.equal(ground.kind, "success");
   const made = cr.combine(
-    stock([
-      ["medicinal-herb", 1],
-      ["coal", 1],
-    ]),
+    inv.addItem(ground.inventory, "medicinal-herb", 1),
     "manual",
-    ["coal", "medicinal-herb"],
+    ["crushed-coal", "medicinal-herb"],
   );
   assert.equal(made.kind, "success");
   assert.equal(made.recipe.output.itemId, "medicinal-ointment");
@@ -596,7 +595,7 @@ test("P3 3. recipes: ointment = Medicinal herb + Coal (manual); bandage = Cloth 
   assert.equal(wrapped.recipe.output.itemId, "disinfected-bandage");
 });
 
-test("P3 4. Cloth: once the miner is examined the merchant's existing provider gives it again, whatever Patient 1 did", () => {
+test("P3 4. Cloth: the merchant sells it (one coin each, three in stock), whatever Patient 1 did", () => {
   const needs = (f) =>
     getActiveMissingIngredients(f.patients, ch1.CHAPTER1_PATIENTS, f.inventory)
       .map((n) => `${n.itemId}x${n.quantity}`)
@@ -607,22 +606,30 @@ test("P3 4. Cloth: once the miner is examined the merchant's existing provider g
     "coalx1",
     "medicinal-herbx1",
   ]);
-  // not before he is examined
-  assert.equal(talk(MERCHANT, world()), null);
-  for (const p1 of ["discovered", "examined", "treated"]) {
-    const f = world({ p1, p3: "examined" });
-    const gives = talk(MERCHANT, f);
-    assert.deepEqual(
-      gives.effects,
-      [{ type: "give-item", itemId: "cloth", quantity: 2 }],
-      p1,
-    );
+  // he no longer gives it through the story: the counter is a shop
+  for (const p1 of [undefined, "discovered", "examined", "treated"]) {
+    assert.equal(talk(MERCHANT, world({ p1, p3: "examined" })), null, String(p1));
   }
-  // it stops by itself once he carries it: no endless cloth
-  const f = world({ p3: "examined" });
-  const { next } = go(MERCHANT, f);
-  assert.equal(count(next, "cloth"), 2, "two scraps: one is left over for Day 2");
-  assert.equal(talk(MERCHANT, next), null);
+  const shops = at("src/game/shop/shops.ts");
+  const money = at("src/game/money/money.ts");
+  const shop = shops.getShop(MERCHANT);
+  const cloth = shop.entries[0];
+  // buying is all or nothing: the coin goes only with the cloth
+  let claimed = new Set();
+  let coins = money.STARTING_COINS;
+  let inventory = world({ p3: "examined" }).inventory;
+  for (let i = 1; i <= 3; i++) {
+    assert.equal(shops.unitsLeft(claimed, shop, cloth), 4 - i);
+    const effects = shops.buyEffects(claimed, shop, cloth);
+    assert.deepEqual(effects.map((e) => e.type), ["take-coins", "give-item", "claim-reward"]);
+    coins = money.spendCoins(coins, cloth.price);
+    inventory = inv.addItem(inventory, "cloth", 1);
+    claimed = new Set([...claimed, effects[2].rewardId]);
+  }
+  assert.equal(shops.unitsLeft(claimed, shop, cloth), 0, "sold out after three");
+  assert.equal(coins, 0);
+  assert.equal(inv.countItem(inventory, "cloth"), 3, "two now, one left over for Day 2");
+  assert.equal(money.spendCoins(coins, cloth.price), null, "no coins, nothing is spent");
 });
 
 test("P3 5. Alcohol: the bartender gives it once the miner is examined, first of all, once, atomically", () => {
@@ -826,15 +833,16 @@ test("Route A (the suggested order): Witch asks > mine > Mushroom > Witch gives 
   ({ next: f } = go(WITCH, f)); // the swap
   assert.equal(count(f, "medicinal-herb"), 1);
   ({ next: f } = go(MINER, f)); // examined
-  ({ next: f } = go(MERCHANT, f)); // cloth
+  f = { ...f, inventory: inv.addItem(f.inventory, "cloth", 2) }; // bought at the merchant (one coin each)
   ({ next: f } = go(BARTENDER, f)); // alcohol
   ({ next: f } = go(MOUNTAIN, f)); // coal
   for (const id of ["cloth", "alcohol", "medicinal-herb", "coal"])
     assert.equal(count(f, id), id === "cloth" ? 2 : 1, id); // two scraps: one is Day 2's
   const bandage = cr.combine(f.inventory, "manual", ["cloth", "alcohol"]);
-  const ointment = cr.combine(bandage.inventory, "manual", [
+  const ground = cr.combine(bandage.inventory, "mortar", ["coal"]);
+  const ointment = cr.combine(ground.inventory, "manual", [
     "medicinal-herb",
-    "coal",
+    "crushed-coal",
   ]);
   f = { ...f, inventory: ointment.inventory };
   const { outcome, next } = go(MINER, f);

@@ -1,0 +1,197 @@
+/* Same family as the Map/Book overlays: dimmed world, dark stepped border,
+   parchment panel. Not interactive. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  font-family: var(--ui-font);
+}
+
+.border {
+  padding: 4px;
+  background: #2b1a14;
+  clip-path: polygon(
+    0 8px,
+    4px 8px,
+    4px 4px,
+    8px 4px,
+    8px 0,
+    calc(100% - 8px) 0,
+    calc(100% - 8px) 4px,
+    calc(100% - 4px) 4px,
+    calc(100% - 4px) 8px,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 8px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 8px) calc(100% - 4px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    8px calc(100% - 4px),
+    4px calc(100% - 4px),
+    4px calc(100% - 8px),
+    0 calc(100% - 8px)
+  );
+}
+
+.paper {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 34px 26px 22px;
+  background: #e9dbb9;
+  color: #2b1a14;
+  clip-path: polygon(
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+}
+
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+
+.greeting {
+  max-width: 420px;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(460px, 80vw);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 56px 1fr auto auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  background: #c9b88f;
+  border: 3px solid #2b1a14;
+  border-right-color: #8a6a4a;
+  border-bottom-color: #8a6a4a;
+}
+
+/* Sold out: dark and flat. Too dear for now: only a little dimmed. */
+.soldOut {
+  opacity: 0.45;
+  filter: grayscale(0.8) brightness(0.8);
+}
+
+.tooDear .price {
+  color: #8c2a1f;
+}
+
+.icon {
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+
+.itemIcon {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.left {
+  font-size: 12px;
+}
+
+.price {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.coin {
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+}
+
+.buy {
+  padding: 6px 12px;
+  font: 700 13px/1 var(--ui-font);
+  color: #2b1a14;
+  background: #d9c9a3;
+  border: 2px solid #2b1a14;
+  cursor: pointer;
+}
+
+.buy:not(:disabled):hover {
+  background: #f1e6c8;
+}
+
+.buy:disabled {
+  cursor: default;
+}
+
+.message {
+  min-height: 1.3em;
+  margin: 0;
+  font-size: 13px;
+  text-align: center;
+}
+
+.purse {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  font: 700 18px/1 var(--ui-font);
+  color: #2b1a14;
+  background: #d9c9a3;
+  border: 2px solid #2b1a14;
+  cursor: pointer;
+}
+
+.close:hover {
+  background: #f1e6c8;
+}

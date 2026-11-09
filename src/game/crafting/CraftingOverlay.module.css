@@ -107,6 +107,69 @@
   cursor: pointer;
 }
 
+/* The mortar fixed to the work table, at the right of the title: its label
+   shows on hover; a click opens the grinding view. */
+.mortar {
+  position: absolute;
+  top: 6px;
+  right: 40px;
+  z-index: 2;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  background: #d9c9a3;
+  border: 3px solid #2b1a14;
+  border-right-color: #8a6a4a;
+  border-bottom-color: #8a6a4a;
+  cursor: pointer;
+}
+
+.mortar img {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+.mortar:hover:not(:disabled) {
+  background: #f1e6c8;
+}
+
+.mortarLabel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 3;
+  display: none;
+  padding: 3px 8px 4px;
+  font: 700 12px/1.2 var(--ui-font);
+  color: #2b1a14;
+  white-space: nowrap;
+  background: #e9dbb9;
+  border: 2px solid #1c110c;
+  pointer-events: none;
+}
+
+.mortar:hover .mortarLabel,
+.mortar:focus-visible .mortarLabel {
+  display: block;
+}
+
+.back {
+  position: absolute;
+  top: 8px;
+  left: 10px;
+  padding: 4px 8px;
+  font: 700 12px/1 var(--ui-font);
+  color: #2b1a14;
+  background: #d9c9a3;
+  border: 2px solid #2b1a14;
+  cursor: pointer;
+}
+
+.back:hover:not(:disabled) {
+  background: #f1e6c8;
+}
+
 .close:hover {
   background: #f1e6c8;
 }

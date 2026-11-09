@@ -37,6 +37,8 @@ export type GameDevStart = {
   storage: InventoryState;
   collected: ReadonlySet<string>;
   tutorialStep: TutorialStep;
+  // TEST DATA: the copper coins the Doctor carries (a real game starts with 3).
+  coins?: number;
 };
 
 // The resources Day 1's treatments consume: taken, so their instances are in
@@ -106,6 +108,8 @@ export function createDay2DevStart(): GameDevStart {
     collected: getDay1CollectedInstanceIds(),
     // The tutorial of the first morning is over.
     tutorialStep: "done",
+    // TEST FIXTURE: what the three Day 1 payments leave after the purchases.
+    coins: 12,
   };
 }
 

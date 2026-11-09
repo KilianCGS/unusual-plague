@@ -162,8 +162,8 @@ test("one single base for every language and every section: the React text is wh
       .join(" | ");
   assert.ok(text("es", "patients").includes("MINERO HERIDO"));
   assert.ok(text("en", "patients").includes("INJURED MINER"));
-  assert.ok(text("es", "preparations").includes("Hierba medicinal + Carbón"));
-  assert.ok(text("en", "preparations").includes("Medicinal herb + Coal"));
+  assert.ok(text("es", "preparations").includes("Hierba medicinal + Carbón triturado"));
+  assert.ok(text("en", "preparations").includes("Medicinal herb + Crushed coal"));
 });
 
 test("the content stays dynamic and grows by itself: pages follow the patients, ailments and recipes", () => {
@@ -243,7 +243,7 @@ test("the tutorial Book is untouched: it still opens on INGREDIENTES, which keep
   assert.equal(sections("en").ingredients.spreads.length, 4);
 });
 
-test("all fifteen preparations occupy one localized leaf each, two per opening", () => {
+test("all sixteen preparations occupy one localized leaf each, two per opening", () => {
   const { RECIPES } = at("src/game/crafting/recipes.ts");
   const known = RECIPES.map(recipe => recipe.id);
   for (const language of ["es", "en"]) {
@@ -275,8 +275,8 @@ test("all fifteen preparations occupy one localized leaf each, two per opening",
         assert.ok(blocks.some(block => block.id.endsWith("-availability")));
       });
     });
-    assert.ok(preparations.spreads.at(-1).texts.every(block => block.x < 344),
-      "the final unoccupied leaf has no copied recipe text");
+    assert.ok(preparations.spreads.at(-1).texts.some(block => block.x > 344),
+      "the sixteenth recipe fills the final leaf");
   }
 });
 

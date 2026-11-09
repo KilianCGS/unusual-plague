@@ -373,7 +373,7 @@ test("the Botica in play is the new one: its background, its 480x293 world, and 
 });
 
 test("18. the original four recipes are untouched (two patient recipes and Milk with honey were added after them)", () => {
-  assert.equal(RECIPES.length, 15);
+  assert.equal(RECIPES.length, 16); // + crushed herb (mortar)
   assert.deepEqual(
     RECIPES.slice(0, 4).map((r) => [
       r.id,
@@ -391,13 +391,13 @@ test("18. the original four recipes are untouched (two patient recipes and Milk 
       [
         "manual.medicinal-paste",
         "manual",
-        "medicinal-herbx1+honeyx1",
+        "crushed-herbx1+honeyx1",
         "medicinal-paste",
       ],
       [
         "manual.medicinal-ointment",
         "manual",
-        "medicinal-herbx1+coalx1",
+        "medicinal-herbx1+crushed-coalx1",
         "medicinal-ointment",
       ],
       [

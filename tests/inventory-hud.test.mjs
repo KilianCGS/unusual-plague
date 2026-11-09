@@ -220,9 +220,11 @@ test("the HUD is presentational: no state, no input, no inventory of its own", (
     "anchored to the frame, not the window",
   );
   assert.ok(!/position:\s*fixed/.test(css));
-  // icons are drawn at a fixed size (56px), slots at 60px
-  assert.ok(/width:\s*56px/.test(css) && /height:\s*56px/.test(css));
-  assert.ok(/width:\s*60px/.test(css) && /height:\s*60px/.test(css));
+  // the 48 px icons are shown at an EXACT multiple (2x = 96 px on normal
+  // windows, 1x = 48 px on short ones); the slot is the icon plus its border
+  assert.ok(/--icon-size:\s*96px/.test(css) && /--slot-size:\s*100px/.test(css));
+  assert.ok(/--icon-size:\s*48px/.test(css) && /--slot-size:\s*52px/.test(css));
+  assert.ok(/width:\s*var\(--icon-size\)/.test(css) && /width:\s*var\(--slot-size\)/.test(css));
 });
 
 test("HUD: an occupied slot carries its own label 'Name ×quantity'; empty slots have none", () => {

@@ -1,0 +1,35 @@
+/* A pale warm halo that breathes slowly. Soft edges (a gradient, not a pixel
+   shape) on purpose: it is light, not an object. Subtle on every background. */
+.aura {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 238, 178, 0.62) 0%,
+    rgba(255, 226, 150, 0.3) 42%,
+    rgba(255, 220, 140, 0) 72%
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: pickup-aura-breathe 2.6s ease-in-out infinite;
+}
+
+@keyframes pickup-aura-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aura {
+    animation: none;
+    opacity: 0.8;
+  }
+}
