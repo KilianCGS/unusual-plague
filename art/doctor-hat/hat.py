@@ -18,54 +18,65 @@ def head_info(im, facing):
 def pix_ellipse(d,box,fill):
     d.ellipse(box,fill=fill)
 
+HAIRL=(128,92,66,255)
+
 def add_hat(im, facing, bob=0):
     y0,cx,xl,xr=head_info(im,facing)
     cx=round(cx)
     sh={'east':1,'west':-1}.get(facing,0)
     lay=Image.new('RGBA',im.size,(0,0,0,0)); d=ImageDraw.Draw(lay)
-    # brim (outline then fill)
     bx=cx+sh*1
+    # brim: ellipse whose ends curl slightly up
     d.ellipse((bx-16,y0-1,bx+16,y0+8),fill=OL)
     d.ellipse((bx-15,y0,bx+15,y0+7),fill=BRIM)
-    # crown
-    d.rectangle((cx-7,y0-5,cx+7,y0+3),fill=OL)
-    d.rectangle((cx-6,y0-4,cx+6,y0+3),fill=CROWN)
-    d.line((cx-6,y0-4,cx+6,y0-4),fill=HI)
+    # crown: tapered dome (wider at the base, rounded top, soft pinch)
+    def crown(fill,grow):
+        g=grow
+        d.polygon([(cx-7-g,y0+3+g),(cx-6-g,y0-1),(cx-5-g,y0-4),(cx-3-g,y0-6-g),
+                   (cx+3+g,y0-6-g),(cx+5+g,y0-4),(cx+6+g,y0-1),(cx+7+g,y0+3+g)],fill=fill)
+    crown(OL,1); crown(CROWN,0)
+    # highlight on the dome and the soft pinch down the middle
+    d.line((cx-3,y0-5,cx+3,y0-5),fill=HI)
+    d.point((cx-4,y0-4),fill=HI)
+    d.line((cx,y0-5,cx,y0-4),fill=OL)
     d.rectangle((cx-6,y0+1,cx+6,y0+2),fill=BAND)
-    # front brim edge highlight
-    d.arc((bx-15,y0,bx+15,y0+7),20,160,fill=HI)
-    # redraw crown over brim's back half so crown sits on top of the brim
-    d.rectangle((cx-6,y0-4,cx+6,y0+2),fill=CROWN)
-    d.line((cx-6,y0-4,cx+6,y0-4),fill=HI)
-    d.rectangle((cx-6,y0+1,cx+6,y0+2),fill=BAND)
+    d.point((cx+3,y0+1),fill=HI)  # buckle glint
     out=im.copy(); out.alpha_composite(lay); return out,(y0,cx,xl,xr)
 
 def add_tail(im, facing, info, phase=0):
     y0,cx,xl,xr=info
-    lay=Image.new('RGBA',im.size,(0,0,0,0)); d=ImageDraw.Draw(lay); px=im.load()
+    lay=Image.new('RGBA',im.size,(0,0,0,0)); d=ImageDraw.Draw(lay)
+    sway=[0,1,0,-1][phase%4]
     if facing=='north':
-        # hangs from the nape down over the back
-        top=y0+13
-        sway=[0,1,0,-1][phase%4]
-        pts=[(cx+(0 if i<4 else sway*(i-3)//3),top+i) for i in range(11)]
-        for i,(x,y) in enumerate(pts):
-            w=2 if i<8 else (1 if i<10 else 0)
+        top=y0+15
+        widths=[3,4,4,4,4,4,4,3,3,3,2,2,1]
+        for i,w in enumerate(widths):
+            x=cx+(sway*(i-4)//4 if i>4 else 0)
+            y=top+i
+            d.rectangle((x-w-1,y,x+w+1,y),fill=OL)
             d.rectangle((x-w,y,x+w,y),fill=HAIR)
-            d.point((x-w,y),fill=HAIRD); d.point((x+w,y),fill=HAIRD)
-        d.rectangle((cx-1,top,cx+1,top+1),fill=TIE)
-        for (x,y) in pts[-1:]: d.point((x,y+1),fill=HAIRD)
+            for k in range(-w+1,w+1):
+                if k%2==0 and abs(k)<w: d.point((x+k,y),fill=HAIRD)
+            if i>1 and w>1: d.point((x-1,y),fill=HAIRL)
+        d.rectangle((cx-4,top-1,cx+4,top),fill=TIE)
+        d.point((cx+sway,top+len(widths)),fill=OL)
     elif facing in('east','west'):
-        s=-1 if facing=='east' else 1   # tail goes opposite the beak
+        s=-1 if facing=='east' else 1
         bx=(xl if facing=='east' else xr)
         top=y0+9
-        sway=[0,1,0,-1][phase%4]
-        for i in range(11):
-            x=bx+s*(2+ (1 if i>3 else 0))+s*(sway if i>4 else 0)
+        widths=[3,4,4,5,5,5,4,4,3,3,2,1]
+        for i,w in enumerate(widths):
             y=top+i
-            w=2 if i<8 else 1
-            if s<0: d.rectangle((x-w,y,x,y),fill=HAIR); d.point((x-w,y),fill=HAIRD)
-            else: d.rectangle((x,y,x+w,y),fill=HAIR); d.point((x+w,y),fill=HAIRD)
-        d.rectangle((bx+s*1-(1 if s<0 else 0),top,bx+s*1+(0 if s<0 else 1),top+1),fill=TIE)
+            off=1+(i//4)+(sway if i>5 else 0)
+            x0=bx+s*off
+            xa,xb=(x0-w+1,x0) if s<0 else (x0,x0+w-1)
+            d.rectangle((xa-1,y,xb+1,y),fill=OL)
+            d.rectangle((xa,y,xb,y),fill=HAIR)
+            for k in range(xa,xb+1):
+                if (k-xa)%2==1: d.point((k,y),fill=HAIRD)
+            if w>2: d.point((xa+(1 if s>0 else w-2),y),fill=HAIRL)
+        tx=bx+s*1
+        d.rectangle((min(tx,tx+s*3),top-1,max(tx,tx+s*3),top),fill=TIE)
     out=im.copy(); out.alpha_composite(lay); return out
 
 def process(path, facing, k):
