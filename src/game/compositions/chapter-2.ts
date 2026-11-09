@@ -17,6 +17,16 @@ export const chapter2Compositions: DecorComposition[] = [
         "flipX": false,
         "colliderEnabled": true,
         "zOffset": 0
+      },
+      {
+        "instanceId": "apothecary-street-seamstress-sitting-01",
+        "assetId": "seamstress-sitting",
+        "x": 519,
+        "y": 671,
+        "scale": 0.94,
+        "flipX": true,
+        "colliderEnabled": false,
+        "zOffset": 0
       }
     ]
   },
