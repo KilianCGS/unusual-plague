@@ -31,8 +31,13 @@ export const MERCHANT_SHOP: ShopDefinition = {
     en: "Not much stock, but honest. If you don't see it here, I don't have it.",
   },
   // Day 1 needs two scraps for the cold cloth and the bandage and Day 2 needs
-  // a third for the compress, so three are on sale, one coin each.
-  entries: [{ itemId: "cloth", price: 1, stock: 3 }],
+  // a third for the compress, so three are on sale, one coin each. Salt (the
+  // tavern man's soup) is sold too, so that case never waits for the baker's
+  // thank-you: Day 1 spends 2 + 1 of the 4 starting coins.
+  entries: [
+    { itemId: "cloth", price: 1, stock: 3 },
+    { itemId: "salt", price: 1, stock: 1 },
+  ],
 };
 
 export const SHOPS: Readonly<Record<string, ShopDefinition>> = {

@@ -487,6 +487,7 @@ test("the merchant SELLS cloth: he never gives it through the story any more", (
   const shops = at("src/game/shop/shops.ts");
   assert.deepEqual(shops.getShop(MERCHANT).entries, [
     { itemId: "cloth", price: 1, stock: 3 },
+    { itemId: "salt", price: 1, stock: 1 },
   ]);
 });
 

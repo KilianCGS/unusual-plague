@@ -53,7 +53,7 @@ const test = (name, fn) => {
 };
 
 test("the purse: starts at 3, caps at 99, never goes negative, a failed payment spends nothing", () => {
-  assert.equal(STARTING_COINS, 3);
+  assert.equal(STARTING_COINS, 4);
   assert.equal(MAX_COINS, 99);
   assert.equal(addCoins(90, 20), 99);
   assert.equal(addCoins(5, -3), 5, "earning cannot subtract");
@@ -92,10 +92,13 @@ test("the merchant's shop: cloth at one coin, three in stock, sold out after thr
   assert.equal(shops.getShop("chapter1.farm.woman"), undefined);
 });
 
-test("Day 1 can never block on money: the three coins buy the cloth for the first patient and every payment covers the rest", () => {
+test("Day 1 can never block on money: the four coins buy the cloth and the salt before the first payment and every payment covers the rest", () => {
   const shop = shops.getShop("chapter1.plaza.merchant");
   const spendAll = shop.entries.reduce((n, e) => n + e.price * e.stock, 0);
-  assert.equal(spendAll, 3, "all the cloth costs exactly the starting purse");
+  assert.equal(spendAll, 4, "everything on sale costs exactly the starting purse");
+  // the mandatory purchases of Day 1: two cloths and one salt
+  const price = (id) => shop.entries.find((e) => e.itemId === id).price;
+  assert.ok(STARTING_COINS >= 2 * price("cloth") + price("salt"), "cloth x2 + salt fit in the starting purse");
   const day1Income = Object.keys(CHAPTER1_PATIENTS).reduce((n, id) => n + getPatientPayment(id), 0);
   assert.ok(STARTING_COINS + day1Income >= spendAll);
   // even the worst order: only the cloth is mandatory before the first payment

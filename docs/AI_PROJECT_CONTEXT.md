@@ -83,7 +83,9 @@ effects `give-coins` / `take-coins` (a failed payment cancels the whole list).
 SHOPS (`shop/shops.ts`, `shop/ShopOverlay.tsx`): a seller opens a buying
 interface; each entry has price and stock, purchases are claimed-reward flags
 `shop.<id>.<item>.<n>`; sold-out items are dimmed. The Day 1 merchant now SELLS
-cloth (1 coin, stock 3: two for Day 1, one for Day 2) instead of giving it;
+cloth (1 coin, stock 3: two for Day 1, one for Day 2) and salt (1 coin, stock 1;
+the tavern man's soup no longer waits for the baker's thank-you) instead of giving
+them; the Doctor starts with 4 coins (Kilian, 2026-11-10);
 `NPC_PROVIDES` is empty. His old ambient conversation is not shown any more
 (the counter opens directly with a NEW greeting line awaiting review).
 NOT YET: garlic (2 coins), the vegetable mix and the new soup, the antigripal

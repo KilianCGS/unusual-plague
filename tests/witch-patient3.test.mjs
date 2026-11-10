@@ -627,9 +627,10 @@ test("P3 4. Cloth: the merchant sells it (one coin each, three in stock), whatev
     claimed = new Set([...claimed, effects[2].rewardId]);
   }
   assert.equal(shops.unitsLeft(claimed, shop, cloth), 0, "sold out after three");
-  assert.equal(coins, 0);
+  assert.equal(coins, money.STARTING_COINS - 3, "three cloths cost three of the starting coins");
   assert.equal(inv.countItem(inventory, "cloth"), 3, "two now, one left over for Day 2");
-  assert.equal(money.spendCoins(coins, cloth.price), null, "no coins, nothing is spent");
+  // with nothing left, a purchase that cannot be paid takes nothing
+  assert.equal(money.spendCoins(0, cloth.price), null, "no coins, nothing is spent");
 });
 
 test("P3 5. Alcohol: the bartender gives it once the miner is examined, first of all, once, atomically", () => {

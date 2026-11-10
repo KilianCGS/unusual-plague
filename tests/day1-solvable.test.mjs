@@ -72,11 +72,13 @@ for (const trade of Object.values(NPC_TRADES)) {
   for (const g of trade.grants) add(balance, g.itemId, g.quantity);
   for (const c of trade.consumes) add(balance, c.itemId, -c.quantity);
 }
-// the baker's thank-you
+// the baker's thank-you (an extra now: the merchant sells the salt too)
 add(balance, BAKER_SALT_REWARD.itemId, BAKER_SALT_REWARD.quantity);
-// the merchant sells cloth (stock) for coins
+// the merchant sells cloth and salt (stock) for coins
 const cloth = MERCHANT_SHOP.entries.find((e) => e.itemId === "cloth");
+const salt = MERCHANT_SHOP.entries.find((e) => e.itemId === "salt");
 add(balance, "cloth", cloth.stock);
+add(balance, "salt", salt.stock);
 // sources that refill while a need is open (the river)
 const unlimited = new Set(Object.values(GATHER_SOURCES).map((s) => s.itemId));
 
@@ -94,22 +96,20 @@ assert.deepEqual(deficits, [], `Day 1 cannot be completed:\n- ${deficits.join("\
 
 // ---- money: the purchases of the day fit in the starting coins
 const clothNeeded = demand.get("cloth") ?? 0;
+const saltNeeded = demand.get("salt") ?? 0;
 assert.ok(clothNeeded <= cloth.stock, "the merchant has enough cloth for Day 1");
-assert.ok(clothNeeded * cloth.price <= STARTING_COINS, `Day 1 cloth costs ${clothNeeded * cloth.price}, the Doctor starts with ${STARTING_COINS}`);
+assert.ok(saltNeeded <= salt.stock, "the merchant has enough salt for Day 1");
+const spend = clothNeeded * cloth.price + saltNeeded * salt.price;
+assert.ok(spend <= STARTING_COINS, `Day 1 purchases cost ${spend}, the Doctor starts with ${STARTING_COINS}`);
 // and the three treatments pay more than they cost
 const income = Object.keys(CHAPTER1_PATIENTS).reduce((sum, id) => sum + (PATIENT_PAYMENTS[id] ?? 0), 0);
-assert.ok(income > clothNeeded * cloth.price, "Day 1 earns more than it spends");
+assert.ok(income > spend, "Day 1 earns more than it spends");
 
-// ---- the ONE soft dependency in the day, written down so it is a decision and not an accident:
-// salt (the tavern man's soup) only comes from the baker's thank-you, so the tavern case
-// cannot be finished before the baker's husband is treated.
-const saltSources = [
-  ...[...Object.values(NPC_TRADES)].filter((t) => t.grants.some((g) => g.itemId === "salt")).map((t) => t.rewardId),
-];
-assert.deepEqual(saltSources, [], "salt is not given by any trade");
-assert.equal(BAKER_SALT_REWARD.itemId, "salt");
+// ---- no order is imposed any more: the salt of the tavern man's soup can be BOUGHT, so the
+// tavern case never waits for the baker's thank-you
+assert.ok(salt.stock >= saltNeeded, "salt is on sale in the plaza");
 assert.ok(CHAPTER1_PATIENTS[BAKER_HUSBAND_ID], "the baker's husband case exists");
 
 console.log("day1-solvable: ok");
 console.log(`  demand: ${[...demand].map(([k, v]) => `${k} x${v}`).join(", ")}`);
-console.log(`  coins: start ${STARTING_COINS}, cloth costs ${clothNeeded * cloth.price}, patients pay ${income}`);
+console.log(`  coins: start ${STARTING_COINS}, purchases cost ${spend}, patients pay ${income}`);

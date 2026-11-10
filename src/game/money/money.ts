@@ -1,8 +1,9 @@
 // The Doctor's purse: ONE counter of copper coins, not items (they take no
 // inventory slot). Pure helpers, nothing is mutated. Kilian's rules: 0 to 99,
-// the Doctor starts with 3, and the coins carry over from one day to the next.
+// the Doctor starts with 4 (cloth x2 + salt for Day 1, with one coin to spare),
+// and the coins carry over from one day to the next.
 export const MAX_COINS = 99;
-export const STARTING_COINS = 3;
+export const STARTING_COINS = 4;
 
 function clamp(coins: number): number {
   return Math.min(MAX_COINS, Math.max(0, Math.floor(coins)));
