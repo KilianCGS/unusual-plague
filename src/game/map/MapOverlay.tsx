@@ -105,10 +105,10 @@ function Trail({ from, to, bend }: { from: MapLocation; to: MapLocation; bend: n
       d={`M${a.x} ${a.y - 6} Q${mx + nx} ${my + ny - 6} ${b.x} ${b.y - 6}`}
       fill="none"
       stroke={MAP_INK}
-      strokeWidth={3.2}
+      strokeWidth={5.5}
       strokeLinecap="round"
-      strokeDasharray="0.1 9"
-      opacity={0.7}
+      strokeDasharray="13 10"
+      opacity={0.9}
     />
   );
 }

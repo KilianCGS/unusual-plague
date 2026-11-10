@@ -24,13 +24,13 @@
   pointer-events: none;
 }
 
-/* The parchment spans the screen from side to side; the window's height only
-   limits it on very wide screens. */
+/* The parchment takes a good part of the screen but leaves the world visible
+   around it; the window's height limits it on short screens. */
 .stage {
   display: block;
-  width: 100vw;
+  width: 80vw;
   height: auto;
-  max-height: 96vh;
+  max-height: 80vh;
 }
 
 /* the dashed red ring around the place the Doctor is in */
