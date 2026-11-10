@@ -18,6 +18,7 @@ import {
 } from "./geometry/apothecaryStreetGeometry";
 import {
   bakeryStreetColliders,
+  bakeryStreetOccluders,
   bakeryStreetSpawns,
   bakeryStreetTransitions,
 } from "./geometry/bakeryStreetGeometry";
@@ -38,6 +39,7 @@ import {
 } from "./geometry/forestCottageGeometry";
 import {
   millFarmlandColliders,
+  millFarmlandOccluders,
   millFarmlandSpawns,
   millFarmlandTransitions,
 } from "./geometry/millFarmlandGeometry";
@@ -237,6 +239,7 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("bakery-street"),
     colliders: bakeryStreetColliders,
+    occluders: bakeryStreetOccluders,
     exits: [
       exit(
         "to-plaza",
@@ -484,6 +487,7 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("mill-farmland"),
     colliders: millFarmlandColliders,
+    occluders: millFarmlandOccluders,
     exits: [
       exit("to-granary-interior", millFarmlandTransitions,
         "mill-farmland-transition-2", "granary-interior", "from-mill-farmland"),

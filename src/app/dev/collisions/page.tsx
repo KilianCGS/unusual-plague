@@ -67,6 +67,12 @@ import {
   type Direction,
 } from "../../../game/protagonist/useProtagonistController";
 import {
+  tavernInteriorColliders,
+  tavernInteriorOccluders,
+  tavernInteriorSpawns,
+  tavernInteriorTransitions,
+} from "../../../game/tavern-interior/tavernInteriorGeometry";
+import {
   smithyInteriorColliders,
   smithyInteriorSpawns,
   smithyInteriorTransitions,
@@ -84,6 +90,7 @@ import {
 } from "../../../game/new-world-map/geometry/apothecaryStreetGeometry";
 import {
   bakeryStreetColliders as nwBakeryStreetColliders,
+  bakeryStreetOccluders as nwBakeryStreetOccluders,
   bakeryStreetSpawns as nwBakeryStreetSpawns,
   bakeryStreetTransitions as nwBakeryStreetTransitions,
 } from "../../../game/new-world-map/geometry/bakeryStreetGeometry";
@@ -104,6 +111,7 @@ import {
 } from "../../../game/new-world-map/geometry/forestCottageGeometry";
 import {
   millFarmlandColliders as nwMillFarmlandColliders,
+  millFarmlandOccluders as nwMillFarmlandOccluders,
   millFarmlandSpawns as nwMillFarmlandSpawns,
   millFarmlandTransitions as nwMillFarmlandTransitions,
 } from "../../../game/new-world-map/geometry/millFarmlandGeometry";
@@ -362,6 +370,12 @@ const PERSISTED_GEOMETRY: Record<
     transitions: doctorRoomNewTransitions,
     spawns: doctorRoomNewSpawns,
   },
+  "tavern-interior": {
+    colliders: tavernInteriorColliders,
+    occluders: tavernInteriorOccluders,
+    transitions: tavernInteriorTransitions,
+    spawns: tavernInteriorSpawns,
+  },
   "smithy-street": {
     colliders: smithyStreetColliders,
     transitions: smithyStreetTransitions,
@@ -423,6 +437,7 @@ const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
   },
   "bakery-street": {
     colliders: nwBakeryStreetColliders,
+    occluders: nwBakeryStreetOccluders,
     transitions: nwBakeryStreetTransitions,
     spawns: nwBakeryStreetSpawns,
   },
@@ -459,6 +474,7 @@ const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
   },
   "mill-farmland": {
     colliders: nwMillFarmlandColliders,
+    occluders: nwMillFarmlandOccluders,
     transitions: nwMillFarmlandTransitions,
     spawns: nwMillFarmlandSpawns,
   },

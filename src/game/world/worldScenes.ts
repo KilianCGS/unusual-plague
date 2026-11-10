@@ -83,6 +83,7 @@ import {
 } from "../smithy-street/smithyStreetGeometry";
 import {
   tavernInteriorColliders,
+  tavernInteriorOccluders,
   tavernInteriorSpawns,
   tavernInteriorTransitions,
 } from "../tavern-interior/tavernInteriorGeometry";
@@ -389,6 +390,7 @@ export const OLD_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visualOf("tavern-interior"),
     colliders: tavernInteriorColliders,
+    occluders: tavernInteriorOccluders,
     exits: [
       {
         // The south doorway: back to Calle Taberna.
