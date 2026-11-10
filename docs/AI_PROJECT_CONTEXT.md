@@ -804,3 +804,30 @@ recipes, item requirements, NPC relationships, coordinates, quest conditions, or
 rewards are unapproved, inspect existing implementation and ask/report rather
 than inventing them. Shared collaboration and implementation rules remain in
 `AGENTS.md`.
+
+### Free-hand colliders and depth shapes (/dev/collisions)
+
+`/dev/collisions` keeps its colour code: red = colliders, yellow = transitions,
+blue = spawns, green = interactions; violet = depth shapes. Transitions, spawns
+and interactions stay rectangles/points exactly as before.
+
+- **Red colliders** can be rectangles or free-hand shapes ("Free shape": click
+  points, close on the first point or Enter). Free shapes export as
+  `xxxPolygonColliders: PolygonCollider[]` and are read by the Doctor's
+  controller through `collidesWithScene(rect, colliders, polygons)` (area
+  overlap; touching an edge does not collide; concave shapes work).
+- **Violet depth shapes** (`OcclusionShape` in `src/game/occlusion.ts`, export
+  `xxxOccluders`): a part of the painted background that covers the Doctor
+  while his feet are above `depthY`. The scene paints a copy of the background
+  clipped to the shape, sorted like a sprite (`occlusionZIndex`). The depth line
+  is read against the soles of the feet hitbox (the edge the colliders stop),
+  with a 2-unit tolerance for hand-drawn lines. Only `ExteriorScene` paints
+  them.
+- Tool extras: Undo (Ctrl+Z; takes back a point, else the last created item),
+  zoom x1/x2/x4, and SELECT (picks any kind, cycles through stacked items,
+  Delete removes).
+- Scene wiring: a scene may carry `polygonColliders` and `occluders`
+  (`WorldSceneBase`). Wired so far with the user's hand-drawn geometry: plaza,
+  apothecary-street, outskirts (new world). Manual geometry stays authoritative.
+- Botica (`ApothecaryScene`) now sorts the Doctor by his feet like the other
+  scenes (candle flames no longer cover him).

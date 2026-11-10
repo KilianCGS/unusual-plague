@@ -30,10 +30,14 @@ import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
 import { useReportRunning } from "../protagonist/useReportRunning";
 import type { DirectionInputHandle } from "../protagonist/useDirectionInput";
 import { usePlayerMoved } from "../protagonist/usePlayerMoved";
-import { useProtagonistController } from "../protagonist/useProtagonistController";
+import {
+  PROTAGONIST_FEET_HITBOX,
+  useProtagonistController,
+} from "../protagonist/useProtagonistController";
 import styles from "./ExteriorScene.module.css";
 import { useTransitionTrigger } from "./useTransitionTrigger";
 import type { ExteriorWorldScene, SpawnPoint } from "./worldScenes";
+import { occlusionClipPath, occlusionZIndex } from "../occlusion";
 
 const SPRITE_SIZE = 96;
 const SCENE_PADDING = 48;
@@ -193,6 +197,7 @@ export function ExteriorScene({
     initialDirection: start.direction,
     spriteSize: SPRITE_SIZE,
     sceneColliders: blockingColliders,
+    polygonColliders: scene.polygonColliders,
     input,
     inputEnabled: isPlaying,
   });
@@ -395,6 +400,27 @@ export function ExteriorScene({
               zIndex={Math.round(player.y)}
             />
           )}
+          {/* Depth shapes: the background again, clipped to the shape, sorted
+              like a sprite anchored at its depth line (after the Doctor in the
+              DOM so an exact tie covers him). */}
+          {scene.occluders?.map((shape) => (
+            <div
+              key={shape.id}
+              aria-hidden
+              style={{
+                position: "absolute",
+                inset: 0,
+                zIndex: occlusionZIndex(shape.depthY, PROTAGONIST_FEET_HITBOX),
+                backgroundImage: `url("${scene.visual.backgroundSrc}")`,
+                backgroundSize: "100% 100%",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                imageRendering: "pixelated",
+                clipPath: occlusionClipPath(shape.points),
+                pointerEvents: "none",
+              }}
+            />
+          ))}
           {SHOW_COLLISION_DEBUG ? (
             <div
               style={{
@@ -420,6 +446,54 @@ export function ExteriorScene({
                   }}
                 />
               ))}
+              {scene.polygonColliders?.length ? (
+                <svg
+                  width={world.width}
+                  height={world.height}
+                  style={{ position: "absolute", left: 0, top: 0 }}
+                >
+                  {scene.polygonColliders.map((polygon) => (
+                    <polygon
+                      key={polygon.id}
+                      points={polygon.points.map((p) => `${p.x},${p.y}`).join(" ")}
+                      fill="rgba(255, 92, 92, 0.28)"
+                      stroke="#ff5c5c"
+                      strokeWidth={1}
+                    />
+                  ))}
+                </svg>
+              ) : null}
+              {scene.occluders?.length ? (
+                <svg
+                  width={world.width}
+                  height={world.height}
+                  style={{ position: "absolute", left: 0, top: 0 }}
+                >
+                  {scene.occluders.map((shape) => {
+                    const xs = shape.points.map((p) => p.x);
+
+                    return (
+                      <g key={shape.id}>
+                        <polygon
+                          points={shape.points.map((p) => `${p.x},${p.y}`).join(" ")}
+                          fill="rgba(168, 85, 247, 0.22)"
+                          stroke="#a855f7"
+                          strokeWidth={1}
+                          strokeDasharray="4 3"
+                        />
+                        <line
+                          x1={Math.min(...xs)}
+                          x2={Math.max(...xs)}
+                          y1={shape.depthY}
+                          y2={shape.depthY}
+                          stroke="#a855f7"
+                          strokeWidth={1.5}
+                        />
+                      </g>
+                    );
+                  })}
+                </svg>
+              ) : null}
               {npcColliders.map((collider) => (
                 <div
                   key={collider.id}

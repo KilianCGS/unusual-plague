@@ -18,7 +18,12 @@ import {
   bakeryStreetSpawns,
   bakeryStreetTransitions,
 } from "../bakery-street/bakeryStreetGeometry";
-import type { LogicalRect, SceneCollider } from "../collision";
+import type {
+  LogicalRect,
+  PolygonCollider,
+  SceneCollider,
+} from "../collision";
+import type { OcclusionShape } from "../occlusion";
 import {
   doctorRoomNewColliders,
   doctorRoomNewSpawns,
@@ -146,6 +151,11 @@ export type SceneExit = {
 type WorldSceneBase = {
   id: SceneId;
   colliders: SceneCollider[];
+  // Free-hand red shapes drawn in /dev/collisions (optional).
+  polygonColliders?: PolygonCollider[];
+  // Violet depth shapes drawn in /dev/collisions (optional): parts of the
+  // background that cover the Doctor when he is north of their depth line.
+  occluders?: OcclusionShape[];
   exits: SceneExit[];
   arrivals: Record<string, SpawnPoint>;
 };

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 
 import {
   collidesWithScene,
+  type PolygonCollider,
   getHitboxRect,
   isRectWithinWorld,
   type AnchorHitbox,
@@ -49,6 +50,8 @@ type ProtagonistControllerOptions = {
   playerSpeed?: number;
   walkFrameDuration?: number;
   sceneColliders?: SceneCollider[];
+  // Free-hand red shapes from /dev/collisions; same effect as a collider.
+  polygonColliders?: PolygonCollider[];
   feetHitbox?: AnchorHitbox;
   // Keyboard state owned by a parent that outlives this controller (so held
   // keys survive a scene change). When omitted the controller listens to the
@@ -63,6 +66,7 @@ const DEFAULT_SPRITE_SIZE = 96;
 const DEFAULT_PLAYER_SPEED = PROTAGONIST_WALK_SPEED;
 const DEFAULT_WALK_FRAME_DURATION = PROTAGONIST_WALK_FRAME_DURATION;
 const EMPTY_COLLIDERS: SceneCollider[] = [];
+const EMPTY_POLYGONS: PolygonCollider[] = [];
 
 export const PROTAGONIST_FEET_HITBOX: AnchorHitbox = {
   offsetX: -6,
@@ -115,6 +119,7 @@ export function useProtagonistController({
   playerSpeed = DEFAULT_PLAYER_SPEED,
   walkFrameDuration = DEFAULT_WALK_FRAME_DURATION,
   sceneColliders = EMPTY_COLLIDERS,
+  polygonColliders = EMPTY_POLYGONS,
   feetHitbox = PROTAGONIST_FEET_HITBOX,
   input,
   inputEnabled = true,
@@ -200,7 +205,11 @@ export function useProtagonistController({
           );
           const isBlocked =
             !isRectWithinWorld(proposedFeetHitbox, sceneWidth, sceneHeight) ||
-            collidesWithScene(proposedFeetHitbox, sceneColliders);
+            collidesWithScene(
+              proposedFeetHitbox,
+              sceneColliders,
+              polygonColliders,
+            );
           const didMove =
             !isBlocked &&
             (proposedX !== currentPlayer.x || proposedY !== currentPlayer.y);
@@ -292,6 +301,7 @@ export function useProtagonistController({
     directionInput,
     feetHitbox,
     playerSpeed,
+    polygonColliders,
     sceneColliders,
     sceneHeight,
     sceneWidth,

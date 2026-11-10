@@ -186,6 +186,9 @@ export function ApothecaryScene({
               direction={player.direction}
               isWalking={player.isWalking}
               mirrored={spriteMirrored}
+              // sorted by his feet like every other scene: decor with a smaller
+              // Y (candle flames on shelves) is drawn behind him
+              zIndex={Math.round(player.y)}
             />
             {SHOW_COLLISION_DEBUG ? (
               <>

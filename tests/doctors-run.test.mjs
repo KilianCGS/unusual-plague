@@ -380,7 +380,9 @@ test("Space alone does not move the Doctor; running changes only speed and anima
       ),
   );
   assert.ok(
-    moveBlock.includes("collidesWithScene(proposedFeetHitbox, sceneColliders)"),
+    /collidesWithScene\(\s*proposedFeetHitbox,\s*sceneColliders,\s*polygonColliders,?\s*\)/.test(
+      moveBlock,
+    ),
   );
   assert.ok(
     !/isRunning|running/.test(

@@ -8,11 +8,13 @@
   font: 12px/1.45 var(--font-geist-mono, monospace);
 }
 
+/* Scrolls when the zoomed world is bigger than the window; `margin: auto`
+   on the viewport centres it otherwise without cutting the top-left. */
 .canvasArea {
   flex: 1 1 auto;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 100vh;
+  overflow: auto;
   padding: 24px;
   min-width: 0;
 }
@@ -21,6 +23,7 @@
 .viewport {
   position: relative;
   flex: 0 0 auto;
+  margin: auto;
   width: calc(var(--world-width) * var(--scale));
   height: calc(var(--world-height) * var(--scale));
   outline: 2px solid #3f3427;
@@ -58,30 +61,30 @@
 
 /* COLLIDER: red */
 .collider {
-  border: 1px solid #ff5c5c;
+  border: calc(1px / var(--scale)) solid #ff5c5c;
   background: rgba(255, 92, 92, 0.28);
 }
 
 /* TRANSITION: yellow */
 .transition {
-  border: 1px solid #ffd60a;
+  border: calc(1px / var(--scale)) solid #ffd60a;
   background: rgba(255, 214, 10, 0.26);
 }
 
 /* INTERACTION: green */
 .interaction {
-  border: 1px solid #3ddc84;
+  border: calc(1px / var(--scale)) solid #3ddc84;
   background: rgba(61, 220, 132, 0.26);
 }
 
 /* Any selected rectangle: thick white border, stronger fill. */
 .itemSelected {
-  border: 2px solid #ffffff;
+  border: calc(2px / var(--scale)) solid #ffffff;
   background-color: rgba(255, 255, 255, 0.22);
 }
 
 .preview {
-  border: 1px dashed #ffffff;
+  border: calc(1px / var(--scale)) dashed #ffffff;
   background: rgba(255, 255, 255, 0.16);
 }
 
@@ -96,7 +99,7 @@
 .spawnFeet {
   position: absolute;
   box-sizing: border-box;
-  border: 1px solid #4da3ff;
+  border: calc(1px / var(--scale)) solid #4da3ff;
   background: rgba(77, 163, 255, 0.22);
 }
 
@@ -107,7 +110,7 @@
   width: 10px;
   height: 10px;
   box-sizing: border-box;
-  border: 2px solid #4da3ff;
+  border: calc(2px / var(--scale)) solid #4da3ff;
   border-radius: 50%;
   background: rgba(9, 9, 9, 0.6);
 }
@@ -128,7 +131,7 @@
 }
 
 .spawnSelected .spawnFeet {
-  border: 2px solid #ffffff;
+  border: calc(2px / var(--scale)) solid #ffffff;
 }
 
 .spawnSelected .spawnDirection {
@@ -180,11 +183,12 @@
 
 .modes {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
 .modeButton {
-  flex: 1 1 0;
+  flex: 1 1 auto;
   padding: 6px 4px;
   font: inherit;
   font-size: 11px;
@@ -350,4 +354,26 @@
   border-radius: 4px;
   padding: 6px 10px;
   cursor: pointer;
+}
+
+/* Free-hand red shapes: an SVG over the whole world, never catching the mouse. */
+.polygonLayer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Draggable vertex of the selected free-hand shape. */
+.vertexHandle {
+  position: absolute;
+  width: var(--handle, 8px);
+  height: var(--handle, 8px);
+  margin: calc(var(--handle, 8px) / -2) 0 0 calc(var(--handle, 8px) / -2);
+  border-radius: 50%;
+  border: calc(1px / var(--scale)) solid #ff5c5c;
+  background: #ffffff;
+  cursor: move;
+  z-index: 5;
 }

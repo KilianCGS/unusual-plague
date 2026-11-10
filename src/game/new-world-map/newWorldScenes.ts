@@ -12,6 +12,7 @@ import type {
 } from "../world/worldScenes";
 import {
   apothecaryStreetColliders,
+  apothecaryStreetOccluders,
   apothecaryStreetSpawns,
   apothecaryStreetTransitions,
 } from "./geometry/apothecaryStreetGeometry";
@@ -47,11 +48,14 @@ import {
 } from "./geometry/mountainPathGeometry";
 import {
   outskirtsColliders,
+  outskirtsOccluders,
   outskirtsSpawns,
   outskirtsTransitions,
 } from "./geometry/outskirtsGeometry";
 import {
   plazaColliders,
+  plazaOccluders,
+  plazaPolygonColliders,
   plazaSpawns,
   plazaTransitions,
 } from "./geometry/plazaGeometry";
@@ -156,6 +160,8 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("plaza"),
     colliders: plazaColliders,
+    polygonColliders: plazaPolygonColliders,
+    occluders: plazaOccluders,
     exits: [
       exit(
         "to-apothecary-street",
@@ -198,6 +204,7 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("apothecary-street"),
     colliders: apothecaryStreetColliders,
+    occluders: apothecaryStreetOccluders,
     exits: [
       exit(
         "to-plaza",
@@ -336,6 +343,7 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("outskirts-brook-provisional"),
     colliders: outskirtsColliders,
+    occluders: outskirtsOccluders,
     exits: [
       exit(
         "to-forest",

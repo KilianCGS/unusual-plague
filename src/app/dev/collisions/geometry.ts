@@ -53,6 +53,42 @@ export function clientToWorld(
   };
 }
 
+// A free-hand shape smaller than this (world units squared) is an accident.
+export const MIN_POLYGON_AREA = 16;
+// Clicking this close to the first point of a shape being drawn closes it.
+export const POLYGON_CLOSE_RADIUS = 8;
+
+export function polygonArea(points: Point[]) {
+  let sum = 0;
+
+  for (let i = 0; i < points.length; i += 1) {
+    const a = points[i];
+    const b = points[(i + 1) % points.length];
+    sum += a.x * b.y - b.x * a.y;
+  }
+
+  return Math.abs(sum) / 2;
+}
+
+// Even-odd rule, valid for concave shapes.
+export function pointInPolygon(point: Point, points: Point[]) {
+  let inside = false;
+
+  for (let i = 0, j = points.length - 1; i < points.length; j = i, i += 1) {
+    const a = points[i];
+    const b = points[j];
+
+    if (
+      a.y > point.y !== b.y > point.y &&
+      point.x < ((b.x - a.x) * (point.y - a.y)) / (b.y - a.y) + a.x
+    ) {
+      inside = !inside;
+    }
+  }
+
+  return inside;
+}
+
 export type SpawnPoint = Point & { direction: string };
 
 function formatBlock(declaration: string, rows: string[]) {
@@ -79,6 +115,10 @@ export function formatSceneExport(
     transitions: Rect[];
     spawns: SpawnPoint[];
     interactions?: InteractionExport[];
+    // Free-hand red shapes. Only exported when there are some.
+    polygons?: { points: Point[] }[];
+    // Violet depth shapes. Only exported when there are some.
+    occluders?: { points: Point[]; depthY: number }[];
   },
   prefix: string,
   names: {
@@ -86,11 +126,20 @@ export function formatSceneExport(
     transitions: string;
     spawns: string;
     interactions?: string;
+    polygons?: string;
+    occluders?: string;
   },
 ) {
   const interactionRows = data.interactions ?? [];
+  const polygonRows = data.polygons ?? [];
+  const occluderRows = data.occluders ?? [];
   const imports =
-    'import type { LogicalRect, SceneCollider } from "../collision";\n' +
+    (polygonRows.length > 0
+      ? 'import type { LogicalRect, PolygonCollider, SceneCollider } from "../collision";\n'
+      : 'import type { LogicalRect, SceneCollider } from "../collision";\n') +
+    (occluderRows.length > 0
+      ? 'import type { OcclusionShape } from "../occlusion";\n'
+      : "") +
     'import type { Direction } from "../protagonist/useProtagonistController";\n' +
     (interactionRows.length > 0
       ? 'import type { InteractionZone } from "../interactions/interactionZone";\n'
@@ -138,5 +187,35 @@ export function formatSceneExport(
           ),
         );
 
-  return `${imports}${colliders}\n${transitions}\n${spawns}${interactions}`;
+  const polygons =
+    polygonRows.length === 0
+      ? ""
+      : "\n// FREE-HAND COLLIDERS (red shapes): same job as the colliders above,\n" +
+        "// drawn point by point. The shape closes itself; it may be concave.\n" +
+        formatBlock(
+          `export const ${names.polygons ?? "polygonColliders"}: PolygonCollider[]`,
+          polygonRows.map(
+            (p, i) =>
+              `  { id: "${prefix}-poly-${i + 1}", points: [${p.points
+                .map((pt) => `{ x: ${pt.x}, y: ${pt.y} }`)
+                .join(", ")}] },`,
+          ),
+        );
+
+  const occluders =
+    occluderRows.length === 0
+      ? ""
+      : "\n// DEPTH SHAPES (violet): part of the background that covers the Doctor\n" +
+        "// while his feet are above depthY (a treetop, a roof).\n" +
+        formatBlock(
+          `export const ${names.occluders ?? "occluders"}: OcclusionShape[]`,
+          occluderRows.map(
+            (o, i) =>
+              `  { id: "${prefix}-depth-${i + 1}", depthY: ${o.depthY}, points: [${o.points
+                .map((pt) => `{ x: ${pt.x}, y: ${pt.y} }`)
+                .join(", ")}] },`,
+          ),
+        );
+
+  return `${imports}${colliders}${polygons}${occluders}\n${transitions}\n${spawns}${interactions}`;
 }

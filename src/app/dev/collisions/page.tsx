@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 
 import {
@@ -8,7 +14,12 @@ import {
   apothecaryMainZoneSpawns,
   apothecaryMainZoneTransitions,
 } from "../../../game/apothecary/apothecaryMainZoneGeometry";
-import type { LogicalRect, SceneCollider } from "../../../game/collision";
+import type {
+  LogicalRect,
+  PolygonCollider,
+  SceneCollider,
+} from "../../../game/collision";
+import type { OcclusionShape } from "../../../game/occlusion";
 import { getSceneInteractionZones } from "../../../game/interactions/sceneInteractions";
 import { ENVIRONMENT_INTERACTIONS, STORY_ZONE_INTERACTIONS } from "../../../game/interactions/environmentCatalog";
 import {
@@ -67,6 +78,7 @@ import {
 } from "../../../game/smithy-street/smithyStreetGeometry";
 import {
   apothecaryStreetColliders as nwApothecaryStreetColliders,
+  apothecaryStreetOccluders as nwApothecaryStreetOccluders,
   apothecaryStreetSpawns as nwApothecaryStreetSpawns,
   apothecaryStreetTransitions as nwApothecaryStreetTransitions,
 } from "../../../game/new-world-map/geometry/apothecaryStreetGeometry";
@@ -102,11 +114,14 @@ import {
 } from "../../../game/new-world-map/geometry/mountainPathGeometry";
 import {
   outskirtsColliders as nwOutskirtsColliders,
+  outskirtsOccluders as nwOutskirtsOccluders,
   outskirtsSpawns as nwOutskirtsSpawns,
   outskirtsTransitions as nwOutskirtsTransitions,
 } from "../../../game/new-world-map/geometry/outskirtsGeometry";
 import {
   plazaColliders as nwPlazaColliders,
+  plazaOccluders as nwPlazaOccluders,
+  plazaPolygonColliders as nwPlazaPolygonColliders,
   plazaSpawns as nwPlazaSpawns,
   plazaTransitions as nwPlazaTransitions,
 } from "../../../game/new-world-map/geometry/plazaGeometry";
@@ -131,7 +146,11 @@ import {
   clientToWorld,
   formatSceneExport,
   MIN_COLLIDER_SIZE,
+  MIN_POLYGON_AREA,
   normalizeRect,
+  pointInPolygon,
+  polygonArea,
+  POLYGON_CLOSE_RADIUS,
   type Point,
   type Rect,
 } from "./geometry";
@@ -254,13 +273,28 @@ const DIRECTION_ANGLE: Record<Direction, number> = {
   north: 270,
 };
 
-type Kind = "collider" | "transition" | "spawn" | "interaction";
+// "polygon" is a free-hand RED collider: it has no button of its own (it is
+// drawn in the collider mode with the free-hand shape), only a list and a
+// selection.
+type Kind =
+  | "collider"
+  | "transition"
+  | "spawn"
+  | "interaction"
+  | "polygon"
+  | "occluder";
+type Shape = "rect" | "free";
+// SELECT draws nothing: it only picks existing items (to delete them).
+type Mode = Kind | "select";
+const ZOOM_LEVELS = [1, 2, 4];
 
-const KINDS: { kind: Kind; label: string; color: string }[] = [
+const KINDS: { kind: Mode; label: string; color: string }[] = [
+  { kind: "select", label: "⌖ SELECT", color: "#d8cdb8" },
   { kind: "collider", label: "🔴 COLLIDER", color: "#ff5c5c" },
   { kind: "transition", label: "🟡 TRANSITION", color: "#ffd60a" },
   { kind: "spawn", label: "🔵 SPAWN", color: "#4da3ff" },
   { kind: "interaction", label: "🟢 INTERACTION", color: "#3ddc84" },
+  { kind: "occluder", label: "🟣 DEPTH", color: "#a855f7" },
 ];
 
 // `editorId` is stable while editing and never reused (one counter for all
@@ -272,7 +306,13 @@ type EditorInteraction = EditorRect & {
   interactionId: string;
   requiredDirection: Direction | null;
 };
+type EditorPolygon = { editorId: string; points: Point[] };
+// A violet depth shape: the Doctor is drawn behind it while his feet are
+// above depthY.
+type EditorOccluder = EditorPolygon & { depthY: number };
 type SceneData = {
+  occluders: EditorOccluder[];
+  polygons: EditorPolygon[];
   colliders: EditorRect[];
   transitions: EditorRect[];
   spawns: EditorSpawn[];
@@ -298,6 +338,8 @@ const PERSISTED_GEOMETRY: Record<
     colliders: SceneCollider[];
     transitions: (LogicalRect & { id: string })[];
     spawns: { id: string; x: number; y: number; direction: Direction }[];
+    polygons?: PolygonCollider[];
+    occluders?: OcclusionShape[];
   }
 > = {
   "granary-interior": {
@@ -368,11 +410,14 @@ const PERSISTED_GEOMETRY: Record<
 const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
   plaza: {
     colliders: nwPlazaColliders,
+    polygons: nwPlazaPolygonColliders,
+    occluders: nwPlazaOccluders,
     transitions: nwPlazaTransitions,
     spawns: nwPlazaSpawns,
   },
   "apothecary-street": {
     colliders: nwApothecaryStreetColliders,
+    occluders: nwApothecaryStreetOccluders,
     transitions: nwApothecaryStreetTransitions,
     spawns: nwApothecaryStreetSpawns,
   },
@@ -393,6 +438,7 @@ const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
   },
   "outskirts-brook-provisional": {
     colliders: nwOutskirtsColliders,
+    occluders: nwOutskirtsOccluders,
     transitions: nwOutskirtsTransitions,
     spawns: nwOutskirtsSpawns,
   },
@@ -440,6 +486,15 @@ function createInitialData(sceneId: string): SceneData {
 
   if (persisted) {
     return {
+      occluders: (persisted.occluders ?? []).map((item) => ({
+        editorId: newEditorId("occluder"),
+        depthY: item.depthY,
+        points: item.points.map((p) => ({ x: p.x, y: p.y })),
+      })),
+      polygons: (persisted.polygons ?? []).map((item) => ({
+        editorId: newEditorId("polygon"),
+        points: item.points.map((p) => ({ x: p.x, y: p.y })),
+      })),
       colliders: persisted.colliders.map((item) => ({
         editorId: newEditorId("collider"),
         x: item.x,
@@ -464,7 +519,14 @@ function createInitialData(sceneId: string): SceneData {
     };
   }
 
-  return { colliders: [], transitions: [], spawns: [], interactions };
+  return {
+    occluders: [],
+    polygons: [],
+    colliders: [],
+    transitions: [],
+    spawns: [],
+    interactions,
+  };
 }
 
 function isTypingTarget(target: EventTarget | null) {
@@ -553,13 +615,31 @@ function SceneGeometryEditor({
   const world = getSceneWorld(scene);
   const layerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
-  const [mode, setMode] = useState<Kind>("collider");
+  const [mode, setMode] = useState<Mode>("collider");
+  // Zoom of the canvas on top of the fit-to-window scale; the canvas area
+  // scrolls when it is bigger than the window.
+  const [zoom, setZoom] = useState(1);
+  const areaRef = useRef<HTMLDivElement>(null);
+  const zoomCenter = useRef<Point | null>(null);
   const [spawnDirection, setSpawnDirection] = useState<Direction>("south");
   const [selection, setSelection] = useState<Selection | null>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
+  // Free-hand shape: the points placed so far (not yet a collider), and the
+  // vertex of the selected shape being dragged.
+  const [shape, setShape] = useState<Shape>("rect");
+  const [draftPoints, setDraftPoints] = useState<Point[]>([]);
+  // index -1 on a depth shape is its depth line.
+  const [vertexDrag, setVertexDrag] = useState<{
+    kind: "polygon" | "occluder";
+    editorId: string;
+    index: number;
+  } | null>(null);
+  // Everything created in this session, oldest first, for Undo.
+  const [history, setHistory] = useState<Selection[]>([]);
   const [cursor, setCursor] = useState<Point | null>(null);
   const [copyStatus, setCopyStatus] = useState("");
-  const { colliders, transitions, spawns, interactions } = data;
+  const { colliders, transitions, spawns, interactions, polygons, occluders } =
+    data;
 
   // Functional updaters over this scene's data (immutable: spread / filter).
   const setColliders = (update: (previous: EditorRect[]) => EditorRect[]) =>
@@ -640,6 +720,12 @@ function SceneGeometryEditor({
           kind === "interaction"
             ? previous.interactions.filter(keep)
             : previous.interactions,
+        polygons:
+          kind === "polygon" ? previous.polygons.filter(keep) : previous.polygons,
+        occluders:
+          kind === "occluder"
+            ? previous.occluders.filter(keep)
+            : previous.occluders,
       }));
       setSelection((current) =>
         current?.kind === kind && current.editorId === editorId
@@ -650,11 +736,118 @@ function SceneGeometryEditor({
     [onDataChange],
   );
 
+  // Closes the free-hand shape being drawn: a red collider, or in the depth
+  // mode a violet shape whose depth line starts at its lowest point.
+  const closeDraft = useCallback(() => {
+    if (draftPoints.length < 3 || polygonArea(draftPoints) < MIN_POLYGON_AREA) {
+      return;
+    }
+
+    if (mode === "occluder") {
+      const created: EditorOccluder = {
+        editorId: newEditorId("occluder"),
+        points: draftPoints,
+        depthY: Math.max(...draftPoints.map((p) => p.y)),
+      };
+
+      onDataChange((previous) => ({
+        ...previous,
+        occluders: [...previous.occluders, created],
+      }));
+      setHistory((current) => [
+        ...current,
+        { kind: "occluder", editorId: created.editorId },
+      ]);
+      setDraftPoints([]);
+      setSelection({ kind: "occluder", editorId: created.editorId });
+      return;
+    }
+
+    const created: EditorPolygon = {
+      editorId: newEditorId("polygon"),
+      points: draftPoints,
+    };
+
+    onDataChange((previous) => ({
+      ...previous,
+      polygons: [...previous.polygons, created],
+    }));
+    setHistory((current) => [
+      ...current,
+      { kind: "polygon", editorId: created.editorId },
+    ]);
+    setDraftPoints([]);
+    setSelection({ kind: "polygon", editorId: created.editorId });
+  }, [draftPoints, mode, onDataChange]);
+
+  // Undo: while drawing it takes back the last point; otherwise it deletes
+  // the most recent shape created in this session (of any kind).
+  const undo = useCallback(() => {
+    if (draftPoints.length > 0) {
+      setDraftPoints((current) => current.slice(0, -1));
+      return;
+    }
+
+    const lists: Record<Kind, { editorId: string }[]> = {
+      collider: colliders,
+      transition: transitions,
+      spawn: spawns,
+      interaction: interactions,
+      polygon: polygons,
+      occluder: occluders,
+    };
+    const live = history.filter((entry) =>
+      lists[entry.kind].some((item) => item.editorId === entry.editorId),
+    );
+    const last = live[live.length - 1];
+
+    setHistory(live.slice(0, -1));
+
+    if (last) {
+      removeItem(last.kind, last.editorId);
+    }
+  }, [
+    draftPoints.length,
+    colliders,
+    transitions,
+    spawns,
+    interactions,
+    polygons,
+    occluders,
+    history,
+    removeItem,
+  ]);
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setDrag(null);
+        setDraftPoints([]);
         return;
+      }
+
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key.toLowerCase() === "z" &&
+        !isTypingTarget(event.target)
+      ) {
+        event.preventDefault();
+        undo();
+        return;
+      }
+
+      if (draftPoints.length > 0 && !isTypingTarget(event.target)) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          closeDraft();
+          return;
+        }
+
+        if (event.key === "Backspace" || event.key === "Delete") {
+          event.preventDefault();
+          setDraftPoints((current) => current.slice(0, -1));
+          return;
+        }
       }
 
       if (
@@ -672,7 +865,7 @@ function SceneGeometryEditor({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selection, removeItem]);
+  }, [selection, removeItem, draftPoints.length, closeDraft, undo]);
 
   // Pointer position in world units, from the real rendered box of the layer.
   function toWorld(event: ReactPointerEvent<HTMLDivElement>): Point {
@@ -689,6 +882,102 @@ function SceneGeometryEditor({
     );
   }
 
+  // Every item under a point, smallest first (any kind).
+  function pickAll(point: Point): Selection[] {
+    const found: { entry: Selection; area: number }[] = [];
+    const inRect = (r: Rect) =>
+      point.x >= r.x &&
+      point.x <= r.x + r.width &&
+      point.y >= r.y &&
+      point.y <= r.y + r.height;
+
+    colliders.forEach((item) => {
+      if (inRect(item)) {
+        found.push({
+          entry: { kind: "collider", editorId: item.editorId },
+          area: item.width * item.height,
+        });
+      }
+    });
+    transitions.forEach((item) => {
+      if (inRect(item)) {
+        found.push({
+          entry: { kind: "transition", editorId: item.editorId },
+          area: item.width * item.height,
+        });
+      }
+    });
+    interactions.forEach((item) => {
+      if (inRect(item)) {
+        found.push({
+          entry: { kind: "interaction", editorId: item.editorId },
+          area: item.width * item.height,
+        });
+      }
+    });
+    spawns.forEach((item) => {
+      if (Math.hypot(point.x - item.x, point.y - item.y) <= 8) {
+        found.push({
+          entry: { kind: "spawn", editorId: item.editorId },
+          area: 0,
+        });
+      }
+    });
+    polygons.forEach((item) => {
+      if (pointInPolygon(point, item.points)) {
+        found.push({
+          entry: { kind: "polygon", editorId: item.editorId },
+          area: polygonArea(item.points),
+        });
+      }
+    });
+    occluders.forEach((item) => {
+      if (pointInPolygon(point, item.points)) {
+        found.push({
+          entry: { kind: "occluder", editorId: item.editorId },
+          area: polygonArea(item.points),
+        });
+      }
+    });
+
+    return found.sort((a, b) => a.area - b.area).map((hit) => hit.entry);
+  }
+
+  // Zoom keeps the point at the centre of the visible area where it was.
+  function changeZoom(next: number) {
+    const area = areaRef.current;
+    const layer = layerRef.current;
+
+    if (area && layer) {
+      const a = area.getBoundingClientRect();
+      const l = layer.getBoundingClientRect();
+
+      zoomCenter.current = {
+        x: (a.left + area.clientWidth / 2 - l.left) / l.width,
+        y: (a.top + area.clientHeight / 2 - l.top) / l.height,
+      };
+    }
+
+    setZoom(next);
+  }
+
+  useLayoutEffect(() => {
+    const center = zoomCenter.current;
+    const area = areaRef.current;
+    const layer = layerRef.current;
+
+    if (!center || !area || !layer) {
+      return;
+    }
+
+    zoomCenter.current = null;
+    const a = area.getBoundingClientRect();
+    const l = layer.getBoundingClientRect();
+
+    area.scrollLeft += l.left + l.width * center.x - (a.left + area.clientWidth / 2);
+    area.scrollTop += l.top + l.height * center.y - (a.top + area.clientHeight / 2);
+  }, [zoom]);
+
   function handlePointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (event.button !== 0) {
       return;
@@ -703,12 +992,39 @@ function SceneGeometryEditor({
     const point = toWorld(event);
 
     setCursor(point);
+
+    if (vertexDrag) {
+      const moveVertex = <T extends EditorPolygon>(item: T): T =>
+        item.editorId !== vertexDrag.editorId
+          ? item
+          : "depthY" in item && vertexDrag.index === -1
+            ? { ...item, depthY: point.y }
+            : {
+                ...item,
+                points: item.points.map((p, i) =>
+                  i === vertexDrag.index ? point : p,
+                ),
+              };
+
+      onDataChange((previous) =>
+        vertexDrag.kind === "occluder"
+          ? { ...previous, occluders: previous.occluders.map(moveVertex) }
+          : { ...previous, polygons: previous.polygons.map(moveVertex) },
+      );
+      return;
+    }
+
     setDrag((current) => (current ? { ...current, current: point } : current));
   }
 
   function handlePointerUp(event: ReactPointerEvent<HTMLDivElement>) {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    if (vertexDrag) {
+      setVertexDrag(null);
+      return;
     }
 
     if (!drag) {
@@ -718,6 +1034,46 @@ function SceneGeometryEditor({
     const end = toWorld(event);
 
     setDrag(null);
+
+    if (mode === "select") {
+      if (Math.hypot(end.x - drag.start.x, end.y - drag.start.y) > SPAWN_CLICK_TOLERANCE) {
+        return;
+      }
+
+      // Smallest items first; clicking the same spot again moves on to the
+      // next stacked item, and empty floor deselects.
+      const hits = pickAll(end);
+      const current = hits.findIndex(
+        (hit) =>
+          selection?.kind === hit.kind && selection.editorId === hit.editorId,
+      );
+
+      setSelection(hits.length === 0 ? null : hits[(current + 1) % hits.length]);
+      return;
+    }
+
+    if ((mode === "collider" && shape === "free") || mode === "occluder") {
+      // Free-hand: every click adds a point; a click on the first point (or
+      // Enter) closes the shape.
+      if (Math.hypot(end.x - drag.start.x, end.y - drag.start.y) > SPAWN_CLICK_TOLERANCE) {
+        return;
+      }
+
+      const first = draftPoints[0];
+
+      if (
+        first &&
+        draftPoints.length >= 3 &&
+        Math.hypot(drag.start.x - first.x, drag.start.y - first.y) <=
+          POLYGON_CLOSE_RADIUS
+      ) {
+        closeDraft();
+      } else {
+        setDraftPoints((current) => [...current, drag.start]);
+      }
+
+      return;
+    }
 
     if (mode === "collider") {
       // A click (no drag) on the map SELECTS instead of drawing: the topmost
@@ -736,7 +1092,19 @@ function SceneGeometryEditor({
               end.y <= item.y + item.height,
           );
 
-        setSelection(hit ? { kind: "collider", editorId: hit.editorId } : null);
+        const polygonHit = hit
+          ? undefined
+          : [...polygons]
+              .reverse()
+              .find((item) => pointInPolygon(end, item.points));
+
+        setSelection(
+          hit
+            ? { kind: "collider", editorId: hit.editorId }
+            : polygonHit
+              ? { kind: "polygon", editorId: polygonHit.editorId }
+              : null,
+        );
         return;
       }
     }
@@ -758,6 +1126,10 @@ function SceneGeometryEditor({
       };
 
       setSpawns((previous) => [...previous, newSpawn]);
+      setHistory((current) => [
+        ...current,
+        { kind: "spawn", editorId: newSpawn.editorId },
+      ]);
       setSelection({ kind: "spawn", editorId: newSpawn.editorId });
       return;
     }
@@ -777,6 +1149,10 @@ function SceneGeometryEditor({
       };
 
       setInteractions((previous) => [...previous, newInteraction]);
+      setHistory((current) => [
+        ...current,
+        { kind: "interaction", editorId: newInteraction.editorId },
+      ]);
       setSelection({ kind: "interaction", editorId: newInteraction.editorId });
       return;
     }
@@ -789,25 +1165,45 @@ function SceneGeometryEditor({
       setTransitions((previous) => [...previous, newRect]);
     }
 
+    setHistory((current) => [
+      ...current,
+      { kind: mode, editorId: newRect.editorId },
+    ]);
     setSelection({ kind: mode, editorId: newRect.editorId });
   }
 
-  function selectMode(nextMode: Kind) {
+  function selectMode(nextMode: Mode) {
     setDrag(null);
+    setDraftPoints([]);
     setMode(nextMode);
   }
 
+  const freeHand = (mode === "collider" && shape === "free") || mode === "occluder";
+  const draftColor = mode === "occluder" ? "#a855f7" : "#ff5c5c";
   const previewRect =
-    drag && mode !== "spawn" ? normalizeRect(drag.start, drag.current) : null;
+    drag && mode !== "spawn" && mode !== "select" && !freeHand
+      ? normalizeRect(drag.start, drag.current)
+      : null;
+  const selectedOccluder =
+    selection?.kind === "occluder"
+      ? occluders.find((item) => item.editorId === selection.editorId)
+      : undefined;
+  const selectedPolygon =
+    selection?.kind === "polygon"
+      ? polygons.find((item) => item.editorId === selection.editorId)
+      : undefined;
   const modeColor = KINDS.find((entry) => entry.kind === mode)?.color;
+  const effScale = scale * zoom;
   const exportText = formatSceneExport(
-    { colliders, transitions, spawns, interactions },
+    { colliders, transitions, spawns, interactions, polygons, occluders },
     config.idPrefix,
     {
       colliders: `${config.exportPrefix}Colliders`,
       transitions: `${config.exportPrefix}Transitions`,
       spawns: `${config.exportPrefix}Spawns`,
       interactions: `${config.exportPrefix}Interactions`,
+      polygons: `${config.exportPrefix}PolygonColliders`,
+      occluders: `${config.exportPrefix}Occluders`,
     },
   );
 
@@ -833,13 +1229,15 @@ function SceneGeometryEditor({
 
   return (
     <>
-      <div className={styles.canvasArea}>
+      <div ref={areaRef} className={styles.canvasArea}>
         <div
           className={styles.viewport}
           style={{
             ["--world-width" as string]: `${world.width}px`,
             ["--world-height" as string]: `${world.height}px`,
-            ["--scale" as string]: scale,
+            ["--scale" as string]: effScale,
+            // vertex handles keep a constant size on screen at any zoom
+            ["--handle" as string]: `${10 / effScale}px`,
           }}
         >
           <div
@@ -864,6 +1262,130 @@ function SceneGeometryEditor({
                   top: item.y,
                   width: item.width,
                   height: item.height,
+                }}
+              />
+            ))}
+            <svg
+              className={styles.polygonLayer}
+              width={world.width}
+              height={world.height}
+            >
+              {polygons.map((item) => (
+                <polygon
+                  key={item.editorId}
+                  points={item.points.map((p) => `${p.x},${p.y}`).join(" ")}
+                  fill="rgba(255, 92, 92, 0.28)"
+                  vectorEffect="non-scaling-stroke"
+                  stroke={isSelected("polygon", item.editorId) ? "#ffffff" : "#ff5c5c"}
+                  strokeWidth={isSelected("polygon", item.editorId) ? 2 : 1}
+                />
+              ))}
+              {occluders.map((item) => {
+                const xs = item.points.map((p) => p.x);
+                const selected = isSelected("occluder", item.editorId);
+
+                return (
+                  <g key={item.editorId}>
+                    <polygon
+                      points={item.points.map((p) => `${p.x},${p.y}`).join(" ")}
+                      fill="rgba(168, 85, 247, 0.28)"
+                      vectorEffect="non-scaling-stroke"
+                      stroke={selected ? "#ffffff" : "#a855f7"}
+                      strokeWidth={selected ? 2 : 1}
+                    />
+                    <line
+                      x1={Math.min(...xs)}
+                      x2={Math.max(...xs)}
+                      y1={item.depthY}
+                      y2={item.depthY}
+                      vectorEffect="non-scaling-stroke"
+                      stroke="#a855f7"
+                      strokeWidth={1.5}
+                      strokeDasharray="5 3"
+                    />
+                  </g>
+                );
+              })}
+              {draftPoints.length > 0 ? (
+                <>
+                  <polyline
+                    points={[...draftPoints, ...(cursor ? [cursor] : [])]
+                      .map((p) => `${p.x},${p.y}`)
+                      .join(" ")}
+                    fill="none"
+                    vectorEffect="non-scaling-stroke"
+                    stroke={draftColor}
+                    strokeWidth={1.5}
+                    strokeDasharray="4 3"
+                  />
+                  {draftPoints.map((p, i) => (
+                    <circle
+                      key={`${p.x}-${p.y}-${i}`}
+                      cx={p.x}
+                      cy={p.y}
+                      r={(i === 0 && draftPoints.length >= 3 ? 8 : 5) / effScale}
+                      fill={i === 0 ? "#ffffff" : draftColor}
+                      stroke={draftColor}
+                    />
+                  ))}
+                </>
+              ) : null}
+            </svg>
+            {selectedOccluder?.points.map((p, index) => (
+              <div
+                key={index}
+                className={styles.vertexHandle}
+                style={{ left: p.x, top: p.y, borderColor: "#a855f7" }}
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                  event.preventDefault();
+                  layerRef.current?.setPointerCapture(event.pointerId);
+                  setVertexDrag({
+                    kind: "occluder",
+                    editorId: selectedOccluder.editorId,
+                    index,
+                  });
+                }}
+              />
+            ))}
+            {selectedOccluder ? (
+              <div
+                className={styles.vertexHandle}
+                title="Depth line: drag up or down"
+                style={{
+                  left: Math.max(...selectedOccluder.points.map((p) => p.x)),
+                  top: selectedOccluder.depthY,
+                  borderColor: "#a855f7",
+                  background: "#a855f7",
+                  borderRadius: 2,
+                  cursor: "ns-resize",
+                }}
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                  event.preventDefault();
+                  layerRef.current?.setPointerCapture(event.pointerId);
+                  setVertexDrag({
+                    kind: "occluder",
+                    editorId: selectedOccluder.editorId,
+                    index: -1,
+                  });
+                }}
+              />
+            ) : null}
+            {selectedPolygon?.points.map((p, index) => (
+              <div
+                key={index}
+                className={styles.vertexHandle}
+                style={{ left: p.x, top: p.y }}
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                  event.preventDefault();
+                  layerRef.current?.setPointerCapture(event.pointerId);
+                  setVertexDrag({
+                    kind: "polygon",
+                    editorId: selectedPolygon.editorId,
+                    index,
+                  });
                 }}
               />
             ))}
@@ -965,6 +1487,26 @@ function SceneGeometryEditor({
             </button>
           ))}
         </div>
+        <div className={styles.modes} role="group" aria-label="Zoom">
+          {ZOOM_LEVELS.map((level) => (
+            <button
+              key={level}
+              type="button"
+              className={
+                level === zoom
+                  ? `${styles.modeButton} ${styles.modeButtonActive}`
+                  : styles.modeButton
+              }
+              aria-pressed={level === zoom}
+              onClick={(event) => {
+                event.currentTarget.blur();
+                changeZoom(level);
+              }}
+            >
+              🔍 ×{level}
+            </button>
+          ))}
+        </div>
         <div className={styles.modes} role="group" aria-label="Drawing mode">
           {KINDS.map((entry) => (
             <button
@@ -983,6 +1525,71 @@ function SceneGeometryEditor({
             </button>
           ))}
         </div>
+        <button
+          type="button"
+          className={styles.modeButton}
+          onClick={(event) => {
+            event.currentTarget.blur();
+            undo();
+          }}
+          title="Takes back the last point while drawing; otherwise deletes the last shape created (Ctrl+Z)"
+        >
+          ↶ Undo (Ctrl+Z)
+        </button>
+        {mode === "collider" ? (
+          <div className={styles.modes} role="group" aria-label="Collider shape">
+            <button
+              type="button"
+              className={
+                shape === "rect"
+                  ? `${styles.modeButton} ${styles.modeButtonActive}`
+                  : styles.modeButton
+              }
+              style={{ borderColor: "#ff5c5c" }}
+              aria-pressed={shape === "rect"}
+              onClick={() => {
+                setDraftPoints([]);
+                setShape("rect");
+              }}
+            >
+              ▭ Rectangle
+            </button>
+            <button
+              type="button"
+              className={
+                shape === "free"
+                  ? `${styles.modeButton} ${styles.modeButtonActive}`
+                  : styles.modeButton
+              }
+              style={{ borderColor: "#ff5c5c" }}
+              aria-pressed={shape === "free"}
+              onClick={() => {
+                setDrag(null);
+                setShape("free");
+              }}
+            >
+              ✎ Free shape
+            </button>
+          </div>
+        ) : null}
+        {freeHand ? (
+          <p className={styles.hint}>
+            Click to place points. Click the first point (white) or press Enter
+            to close the shape (3 points minimum). Backspace removes the last
+            point, Esc cancels. Select a finished shape (row or click in
+            rectangle mode) to drag its vertices.{" "}
+            {draftPoints.length > 0 ? `${draftPoints.length} points placed.` : ""}
+            {draftPoints.length >= 3 ? (
+              <button
+                type="button"
+                className={styles.copyButton}
+                onClick={closeDraft}
+              >
+                Close shape
+              </button>
+            ) : null}
+          </p>
+        ) : null}
         {mode === "spawn" ? (
           <label className={styles.directionPicker}>
             Facing of new spawns
@@ -1003,23 +1610,27 @@ function SceneGeometryEditor({
         <p className={styles.hint}>
           {mode === "spawn"
             ? "Click once to place the exact point where the feet will appear. The facing is the initial idle direction: arriving from the left → east, right → west, top → south, bottom → north."
-            : `Drag on the map to draw a ${mode}.`}{" "}
+            : mode === "select"
+              ? "Nothing is drawn in this mode: click an item on the map to select it (click the same spot again to cycle through stacked items, click empty floor to deselect), then press Delete or use the delete button. Colliders, free shapes, depth shapes, transitions, interactions and spawns can all be picked."
+              : mode === "occluder"
+              ? "Click points to outline the part of the picture that must cover the Doctor (a treetop, a roof). The dashed line is the depth line: the Doctor is behind the shape while the soles of his feet (the bottom edge of his collision box, where the red colliders stop him) are above it. It starts at the lowest point; drag its square handle or type depthY."
+              : `Drag on the map to draw a ${mode}.`}{" "}
           Esc cancels a drawing. Click a row to select it; Delete / Backspace or
           × removes it. In collider mode, click a collider on the map to select
           it (click empty floor to deselect).
         </p>
-        {selection?.kind === "collider" ? (
+        {selection ? (
           <button
             type="button"
             className={styles.deleteSelected}
-            onClick={() => removeItem("collider", selection.editorId)}
+            onClick={() => removeItem(selection.kind, selection.editorId)}
           >
             Delete collision / Eliminar colisión
           </button>
         ) : null}
         <div className={styles.hud}>
           <div>
-            world {world.width}×{world.height} units · scale {scale.toFixed(2)}×
+            world {world.width}×{world.height} units · scale {effScale.toFixed(2)}×
           </div>
           <div>
             cursor {cursor ? `(${cursor.x}, ${cursor.y})` : "—"} · mode {mode}
@@ -1031,7 +1642,9 @@ function SceneGeometryEditor({
               : "—"}
           </div>
           <div>
-            colliders {colliders.length} · transitions {transitions.length} ·
+            colliders {colliders.length} · free shapes {polygons.length} · depth{" "}
+            {occluders.length} ·
+            transitions {transitions.length} ·
             spawns {spawns.length} · interactions {interactions.length}
           </div>
         </div>
@@ -1047,6 +1660,56 @@ function SceneGeometryEditor({
           onSelect={(kind, editorId) => setSelection({ kind, editorId })}
           onDelete={removeItem}
         />
+        <ListSection
+          title="Free shapes"
+          kind="polygon"
+          color="#ff5c5c"
+          rows={polygons.map((item, index) => ({
+            editorId: item.editorId,
+            label: `${config.idPrefix}-poly-${index + 1} · ${item.points.length} points`,
+          }))}
+          selection={selection}
+          onSelect={(kind, editorId) => setSelection({ kind, editorId })}
+          onDelete={removeItem}
+        />
+        <ListSection
+          title="Depth shapes"
+          kind="occluder"
+          color="#a855f7"
+          rows={occluders.map((item, index) => ({
+            editorId: item.editorId,
+            label: `${config.idPrefix}-depth-${index + 1} · ${item.points.length} points · depth y ${item.depthY}`,
+          }))}
+          selection={selection}
+          onSelect={(kind, editorId) => setSelection({ kind, editorId })}
+          onDelete={removeItem}
+        />
+        {selectedOccluder ? (
+          <div className={styles.form}>
+            <div className={styles.formTitle}>Selected depth shape</div>
+            <label className={styles.formRow}>
+              depthY
+              <input
+                type="number"
+                value={selectedOccluder.depthY}
+                onChange={(event) => {
+                  const value = Math.round(Number(event.target.value));
+
+                  if (Number.isFinite(value)) {
+                    onDataChange((previous) => ({
+                      ...previous,
+                      occluders: previous.occluders.map((item) =>
+                        item.editorId === selectedOccluder.editorId
+                          ? { ...item, depthY: value }
+                          : item,
+                      ),
+                    }));
+                  }
+                }}
+              />
+            </label>
+          </div>
+        ) : null}
         <ListSection
           title="Transitions"
           kind="transition"
