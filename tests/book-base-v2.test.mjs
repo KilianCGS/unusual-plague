@@ -243,12 +243,12 @@ test("the tutorial Book is untouched: it still opens on INGREDIENTES, which keep
   assert.equal(sections("en").ingredients.spreads.length, 4);
 });
 
-test("all sixteen preparations occupy one localized leaf each, two per opening", () => {
+test("all twenty-two preparations occupy one localized leaf each, two per opening", () => {
   const { RECIPES } = at("src/game/crafting/recipes.ts");
   const known = RECIPES.map(recipe => recipe.id);
   for (const language of ["es", "en"]) {
     const preparations = buildBookSections(context(language, {}, known))[3];
-    assert.equal(preparations.spreads.length, 8);
+    assert.equal(preparations.spreads.length, 11);
     preparations.spreads.forEach((spread, index) => {
       const recipes = RECIPES.slice(index * 2, index * 2 + 2);
       assert.equal(spread.layers.length, 1 + recipes.length);

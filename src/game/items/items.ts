@@ -39,7 +39,20 @@ export type ItemId =
   | "charcoal-suspension"
   | "citrus-drink"
   | "empty-flask"
-  | "empty-jar";
+  | "empty-jar"
+  // 2026-11-11: the cooking-medicinal family (4 raw items, 6 fire recipes).
+  | "bone"
+  | "pine-mushroom"
+  | "sugar"
+  | "onion"
+  | "bone-broth"
+  | "mushroom-cream"
+  | "onion-syrup"
+  | "rehydration-drink"
+  | "citrus-syrup"
+  | "strong-broth"
+  // The black feather the Witch gives (Day 1): it is for no recipe; it matters on Day 4.
+  | "black-feather";
 
 export type ItemDefinition = {
   id: ItemId;
@@ -102,7 +115,8 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
   },
   mushroom: {
     id: "mushroom",
-    name: { es: "Hongo", en: "Mushroom" },
+    // Renamed 2026-11-11: the one from the mine; the forest one is the pine mushroom.
+    name: { es: "Hongo de cueva", en: "Cave mushroom" },
     icon: `${RESOURCE_ICONS}/mushroom.png`,
   },
   honey: {
@@ -248,6 +262,66 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     id: "citrus-drink",
     name: { es: "Bebida cítrica", en: "Citrus drink" },
     icon: `${PREPARED_ICONS}/citrus-drink.png`,
+  },
+  // The names below are NEW text, awaiting Kilian's review.
+  bone: {
+    id: "bone",
+    name: { es: "Hueso", en: "Bone" },
+    icon: `${RESOURCE_ICONS}/bone.png`,
+  },
+  "pine-mushroom": {
+    id: "pine-mushroom",
+    name: { es: "Seta de pino", en: "Pine mushroom" },
+    icon: `${RESOURCE_ICONS}/pine-mushroom.png`,
+    sourceHint: {
+      es: "Las setas de pino crecen en algún claro del bosque.",
+      en: "Pine mushrooms grow in a clearing somewhere in the forest.",
+    },
+  },
+  sugar: {
+    id: "sugar",
+    name: { es: "Azúcar", en: "Sugar" },
+    icon: `${RESOURCE_ICONS}/sugar.png`,
+  },
+  onion: {
+    id: "onion",
+    name: { es: "Cebolla", en: "Onion" },
+    icon: `${RESOURCE_ICONS}/onion.png`,
+  },
+  "bone-broth": {
+    id: "bone-broth",
+    name: { es: "Caldo de huesos", en: "Bone broth" },
+    icon: `${PREPARED_ICONS}/bone-broth.png`,
+  },
+  "mushroom-cream": {
+    id: "mushroom-cream",
+    name: { es: "Crema de setas", en: "Mushroom cream" },
+    icon: `${PREPARED_ICONS}/mushroom-cream.png`,
+  },
+  "onion-syrup": {
+    id: "onion-syrup",
+    name: { es: "Jarabe de cebolla", en: "Onion syrup" },
+    icon: `${PREPARED_ICONS}/onion-syrup.png`,
+  },
+  "rehydration-drink": {
+    id: "rehydration-drink",
+    name: { es: "Bebida reconstituyente", en: "Rehydration drink" },
+    icon: `${PREPARED_ICONS}/rehydration-drink.png`,
+  },
+  "citrus-syrup": {
+    id: "citrus-syrup",
+    name: { es: "Jarabe cítrico", en: "Citrus syrup" },
+    icon: `${PREPARED_ICONS}/citrus-syrup.png`,
+  },
+  "strong-broth": {
+    id: "strong-broth",
+    name: { es: "Caldo fuerte", en: "Strong broth" },
+    icon: `${PREPARED_ICONS}/strong-broth.png`,
+  },
+  "black-feather": {
+    id: "black-feather",
+    name: { es: "Pluma negra", en: "Black feather" },
+    icon: `${RESOURCE_ICONS}/black-feather.png`,
   },
 };
 

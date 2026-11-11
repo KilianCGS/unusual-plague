@@ -498,7 +498,7 @@ test("Patient 2 adds no gather source, no provider and no collectible Honey or M
     ch1.TAVERN_PATIENT_ID,
     ch1.INJURED_MINER_ID,
   ]);
-  assert.equal(RECIPES.length, 16); // + crushed herb (mortar)
+  assert.equal(RECIPES.length, 22); // + crushed herb (mortar) + the cooking family
   assert.deepEqual(Object.keys(GATHER_SOURCES), ["gather.water"]);
   assert.deepEqual(NPC_PROVIDES, {}); // the merchant sells cloth now
   for (const asset of DECOR_ASSETS) {

@@ -10,7 +10,23 @@ export type ShopEntry = {
   itemId: ItemId;
   price: number;
   stock: number;
+  // The first chapter (day) this item is on sale; left out = from the start.
+  fromChapter?: string;
 };
+
+// The order of the days, to compare `fromChapter` with the current chapter.
+const CHAPTER_ORDER = ["chapter-1", "chapter-2", "chapter-3", "chapter-4"];
+
+export function entryOnSale(entry: ShopEntry, chapterId: string): boolean {
+  if (!entry.fromChapter) return true;
+
+  return CHAPTER_ORDER.indexOf(chapterId) >= CHAPTER_ORDER.indexOf(entry.fromChapter);
+}
+
+// The shop as it looks on a given day: only what is on sale that day.
+export function shopForChapter(shop: ShopDefinition, chapterId: string): ShopDefinition {
+  return { ...shop, entries: shop.entries.filter((entry) => entryOnSale(entry, chapterId)) };
+}
 
 export type ShopDefinition = {
   id: string;
@@ -37,6 +53,12 @@ export const MERCHANT_SHOP: ShopDefinition = {
   entries: [
     { itemId: "cloth", price: 1, stock: 3 },
     { itemId: "salt", price: 1, stock: 1 },
+    // From Day 2 (prices decided by Kilian, 2026-11-11: sugar 3, bone 1, onion 1).
+    // None of these is needed to cure a patient: they feed the cooking recipes and
+    // the errands. The stock (3 each) is a proposal, to be balanced.
+    { itemId: "sugar", price: 3, stock: 3, fromChapter: "chapter-2" },
+    { itemId: "onion", price: 1, stock: 3, fromChapter: "chapter-2" },
+    { itemId: "bone", price: 1, stock: 3, fromChapter: "chapter-2" },
   ],
 };
 

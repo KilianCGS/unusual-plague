@@ -75,7 +75,7 @@ const permutations = (list) =>
       );
 
 test("the V1 recipes, the two patient recipes and Milk with honey exist with the right stations and sizes", () => {
-  assert.equal(RECIPES.length, 16);
+  assert.equal(RECIPES.length, 22);
   assert.deepEqual(STATION_MAX_INPUTS, { manual: 2, fire: 3, mortar: 1 });
   assert.equal(recipeById("manual.disinfected-bandage").inputs.length, 2);
   assert.equal(recipeById("fire.mushroom-soup").inputs.length, 3);
@@ -782,9 +782,9 @@ test("the flask only comes back with the LAST water; nothing else has a vessel",
   );
 });
 
-test("all 16 catalog preparations have unique recipes; every recipe fits its actual station", () => {
-  assert.equal(new Set(RECIPES.map(r => r.output.itemId)).size, 16);
-  assert.equal(new Set(RECIPES.map(r => r.id)).size, 16);
+test("all 22 catalog preparations have unique recipes; every recipe fits its actual station", () => {
+  assert.equal(new Set(RECIPES.map(r => r.output.itemId)).size, 22);
+  assert.equal(new Set(RECIPES.map(r => r.id)).size, 22);
   for (const recipe of RECIPES) {
     assert.ok(recipe.inputs.reduce((sum,input)=>sum+input.quantity,0)<=STATION_MAX_INPUTS[recipe.station]);
     assert.ok(ITEMS[recipe.output.itemId]);
@@ -865,7 +865,7 @@ test("ingredient discovery teaches specific recipes permanently, including their
   assert.ok(!flour.has('fire.balsamic-syrup'));
   for(const ids of Object.values(RECIPE_DISCOVERY_ITEMS)) for(const id of ids)assert.ok(recipeById(id));
   const all=learnRecipesFromItems(empty,Object.keys(RECIPE_DISCOVERY_ITEMS));
-  assert.equal(all.size,16,'existing ingredients can eventually reveal the whole catalog');
+  assert.equal(all.size,22,'existing ingredients can eventually reveal the whole catalog');
 });
 
 test("receiving or crafting a preparation teaches its recipe and prerequisite without a patient gate", () => {

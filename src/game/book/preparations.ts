@@ -71,6 +71,31 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
     es: "Bebida de naranja y agua preparada al fuego.",
     en: "A drink made from orange and water over the stove.",
   },
+  // The six below are NEW text (2026-11-11), awaiting Kilian's review.
+  "bone-broth": {
+    es: "Hueso hervido despacio con agua y sal. Un caldo que repone.",
+    en: "Bone simmered slowly with water and salt. A restoring broth.",
+  },
+  "mushroom-cream": {
+    es: "Seta de pino y leche con una pizca de sal, cocidas hasta quedar cremosas.",
+    en: "Pine mushroom and milk with a pinch of salt, cooked until creamy.",
+  },
+  "onion-syrup": {
+    es: "Cebolla y azúcar cocidas hasta formar un jarabe espeso para la tos.",
+    en: "Onion and sugar cooked into a thick syrup for a cough.",
+  },
+  "rehydration-drink": {
+    es: "Agua con azúcar y sal. Devuelve las fuerzas a quien está agotado.",
+    en: "Water with sugar and salt. Restores the strength of the exhausted.",
+  },
+  "citrus-syrup": {
+    es: "Naranja y azúcar cocidas hasta obtener un jarabe dulce y ácido.",
+    en: "Orange and sugar cooked into a sweet, tangy syrup.",
+  },
+  "strong-broth": {
+    es: "Cebolla, hueso y agua cocidos largo rato. Un caldo oscuro y fuerte.",
+    en: "Onion, bone and water cooked for a long time. A dark, strong broth.",
+  },
 };
 
 // Read the completed investigation definition for the medical indication only.

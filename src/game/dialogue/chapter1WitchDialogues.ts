@@ -108,6 +108,22 @@ const TRADE_LINES: LocalizedLine[] = [
     "I'm starting to regret the mushroom.",
   ),
   witch("Demasiado tarde.", "Too late."),
+  // NEW (2026-11-11), awaiting Kilian's review: the black feather.
+  witch("Y esto.", "And this."),
+  doctor("Una pluma.", "A feather."),
+  witch("Negra.", "Black."),
+  doctor(
+    "¿Qué se supone que hago con una pluma negra?",
+    "What am I supposed to do with a black feather?",
+  ),
+  witch("Guardarla.", "Keep it."),
+  doctor("¿Para qué?", "What for?"),
+  witch(
+    "Te lo diré cuando importe.",
+    "I'll tell you when it matters.",
+  ),
+  doctor("Cuando te convenga.", "When it suits you."),
+  witch("Es lo mismo.", "It's the same thing."),
 ];
 
 const NO_ROOM_LINES: LocalizedLine[] = [

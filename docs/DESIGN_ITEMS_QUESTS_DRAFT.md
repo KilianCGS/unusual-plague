@@ -96,3 +96,26 @@ ChatGPT pinta una versión nocturna de cada escena. Lo que hay que cuidar:
 - ¿Quién es el personaje del banco de la cantera y qué da?
 - El agradecimiento de la panadera ahora da una sal sobrante (el mercader ya la vende): ¿lo cambiamos por otra cosa?
 - Detalle de interfaz que he visto: con la pantalla de diagnóstico abierta, pulsar Espacio activa la primera opción (Envenenamiento) sin querer. ¿Lo dejamos o lo evitamos?
+
+## 8. Decisiones del 2026-11-11 (tarde) y lo que ya está en el código
+
+Decidido por Kilian:
+- **Los pacientes mantienen sus recetas.** Las recetas nuevas se usan en **encargos de PNJ en la cantera y el claro** ("craftear para conseguir oro"): cada PNJ pide una receta y paga monedas.
+- **Precios del mercader (suyos):** azúcar 3, hueso 1, cebolla 1; el mercader los vende **desde el día 2**.
+- **El hueso lo da la bruja en el día 3, en el claro.** Las setas de pino se **recogen en el claro en cualquier momento** (cuántas, ya se verá).
+- **La bruja:** capítulo 1, a cambio del hongo, nos da "algo" (por decidir); capítulo 2, nos da la sanguijuela sin más; capítulo 3, está en el claro y puede pedir algo a cambio de **un mal presagio** que da una pista del día 4.
+- **Capítulo 4:** de noche; la gente está con los artefactos; se bloquean zonas (bosque, granja y paso de la mina); el jugador se reúne con la bruja.
+
+Ya implementado (sin commit hasta que lo apruebe):
+- 4 objetos nuevos con iconos (hueso, seta de pino, azúcar, cebolla) y el hongo de la mina renombrado "Hongo de cueva".
+- 6 recetas al fuego (caldo de huesos, crema de setas, jarabe de cebolla, bebida reconstituyente, jarabe cítrico, caldo fuerte), con iconos, descubrimiento por ingredientes y entrada en el libro.
+- El mercader vende azúcar, cebolla y hueso desde el día 2 (existencias 3 de cada una: propuesta).
+- Asset de decorador `pine-mushroom-world` para colocar las setas en el claro.
+- Las 6 ilustraciones del libro son **provisionales** (el icono ampliado en tinta sepia). Pendiente: pintarlas como las demás (grabado a tinta sepia, 1678x937, fondo blanco). Prompt sugerido para ChatGPT: "grabado a tinta sepia de [objeto], estilo de libro de botánica medieval, tramado fino, fondo blanco, formato 16:9".
+
+Todos los textos nuevos (nombres de objetos y descripciones de las recetas) están en ES/EN y esperan tu revisión.
+
+Decidido después (2026-11-11, noche) e implementado:
+- **El claro se abre desde el día 1.** Los encargos de recetas los da el **minero de la cantera** (reutilizado, sentado en el banco); la bruja del claro **no** tiene encargos de recetas, solo el mal presagio del día 3.
+- **Encargo 1 (cantera):** caldo de huesos por 5 monedas, una vez. Se activa cuando Kilian coloca al minero en el Decorator con el `interactionId` `chapter2.quarry.miner`. Los pagos "a veces con un objeto" quedan para los siguientes encargos.
+- **Capítulo 1, la bruja:** además de la hierba, entrega una **pluma negra de cuervo** sin explicar nada ("te lo diré cuando importe"). La pluma no sirve para recetas y cuenta en el día 4. Ocupa una casilla de la bolsa hasta que se guarde en el cofre, así que el trueque ahora necesita dos huecos libres.

@@ -30,6 +30,11 @@ import {
   mountainMinerCoalReady,
 } from "./chapter1Patient3Dialogues";
 import { witchTrade, witchTradeNoRoom } from "./chapter1WitchDialogues";
+import {
+  quarryMinerAsk,
+  quarryMinerDone,
+  quarryMinerReady,
+} from "./chapter2QuarryDialogues";
 import type { LocalizedConversation } from "./localizedConversation";
 
 // NPC TRADES: "consume X, receive Y", once. One small data shape for what a
@@ -49,6 +54,8 @@ export type NpcTrade = {
   // What the Doctor hands over (may be nothing) and what he receives.
   consumes: ItemNeed[];
   grants: ItemNeed[];
+  // Copper coins paid on top of (or instead of) the items: an errand.
+  payCoins?: number;
   // Conversations; a trade without them (a shelf) answers with a notice.
   ready?: LocalizedConversation;
   noRoom?: LocalizedConversation;
@@ -66,6 +73,8 @@ export type NpcTrade = {
 export const BARTENDER_JAR_TRADE_ID = "chapter1.tavern.bartender.jar";
 export const BARTENDER_ALCOHOL_TRADE_ID = "chapter1.tavern.bartender.alcohol";
 export const WITCH_HERB_TRADE_ID = "chapter1.witch.herb";
+// The quarry miner's errand (a bone broth for five coins), done once.
+export const QUARRY_BROTH_REWARD_ID = "chapter2.quarry.miner.broth";
 
 export const NPC_TRADES: Record<string, NpcTrade> = {
   // The farm woman gives milk for ONE orange and a jar to put it in (a branch
@@ -138,8 +147,25 @@ export const NPC_TRADES: Record<string, NpcTrade> = {
     interactionId: "chapter1.tavern.witch",
     rewardId: WITCH_HERB_REWARD_ID,
     consumes: [{ itemId: "mushroom", quantity: 1 }],
-    grants: [{ itemId: "medicinal-herb", quantity: 1 }],
+    // The herb, and (2026-11-11) a black feather she gives without explaining: it
+    // is for no recipe and matters on Day 4.
+    grants: [
+      { itemId: "medicinal-herb", quantity: 1 },
+      { itemId: "black-feather", quantity: 1 },
+    ],
     ready: witchTrade,
     noRoom: witchTradeNoRoom,
+  },
+  // QUARRY ERRAND: the miner on the bench wants a bone broth and pays five
+  // coins. The first of the crafted-for-gold errands.
+  "chapter2.quarry.miner": {
+    interactionId: "chapter2.quarry.miner",
+    rewardId: QUARRY_BROTH_REWARD_ID,
+    consumes: [{ itemId: "bone-broth", quantity: 1 }],
+    grants: [],
+    payCoins: 5,
+    ready: quarryMinerReady,
+    done: quarryMinerDone,
+    missing: { all: quarryMinerAsk },
   },
 };

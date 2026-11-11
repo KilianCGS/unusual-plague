@@ -4,7 +4,7 @@
 //  1b. the mask hangs from a thin golden cord (the brown strap and its ring are removed);
 //  2. the beak of the mask is drawn longer, sweeping over the branch and curving down.
 // Everything that is not branch (the mask, the eye, the outline) is kept as it is.
-//   node art/title-p-finish.cjs <source png> <output png>
+//   node art/title-p-finish.cjs public/game/ui/title/p-loop-beak.png public/game/ui/title/p-post.png
 const sharp = require("sharp");
 
 const [src, out] = process.argv.slice(2);

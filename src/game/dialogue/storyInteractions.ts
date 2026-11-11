@@ -533,6 +533,9 @@ export function resolveTrade(
         itemId,
         quantity,
       })),
+      ...(trade.payCoins
+        ? [{ type: "give-coins" as const, amount: trade.payCoins }]
+        : []),
       { type: "claim-reward" as const, rewardId: trade.rewardId },
     ],
   };

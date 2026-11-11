@@ -35,7 +35,7 @@ import { ObjectivesPanel } from "../objectives/ObjectivesPanel";
 import { addCoins, canAfford, spendCoins, STARTING_COINS } from "../money/money";
 import { getPatientPayment } from "../money/payments";
 import { ShopOverlay } from "../shop/ShopOverlay";
-import { buyEffects, getShop, type ShopDefinition, type ShopEntry } from "../shop/shops";
+import { buyEffects, getShop, shopForChapter, type ShopDefinition, type ShopEntry } from "../shop/shops";
 import { CRAFT_STATION_BY_INTERACTION_ID } from "../crafting/crafting";
 import type { CraftStation } from "../crafting/recipes";
 import { learnRecipesFromItems } from "../crafting/recipeDiscovery";
@@ -1493,7 +1493,7 @@ export function GameWorld({
       ) : null}
       {openShop ? (
         <ShopOverlay
-          shop={openShop}
+          shop={shopForChapter(openShop, chapterId)}
           coins={coins}
           claimedRewards={claimedRewards}
           language={language}

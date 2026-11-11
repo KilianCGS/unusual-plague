@@ -201,6 +201,7 @@ test("Witch 2. first talk already carrying a Mushroom: she is annoyed and the sw
     { type: "claim-reward", rewardId: ch1.WITCH_MET_ID },
     { type: "take-item", itemId: "mushroom", quantity: 1 },
     { type: "give-item", itemId: "medicinal-herb", quantity: 1 },
+    { type: "give-item", itemId: "black-feather", quantity: 1 },
     { type: "claim-reward", rewardId: ch1.WITCH_HERB_REWARD_ID },
   ]);
   const es = lines(first);
@@ -256,11 +257,15 @@ test("Witch 4. the swap: exactly Mushroom x1 for Medicinal herb x1, once, never 
   assert.deepEqual(trade.effects, [
     { type: "take-item", itemId: "mushroom", quantity: 1 },
     { type: "give-item", itemId: "medicinal-herb", quantity: 1 },
+    { type: "give-item", itemId: "black-feather", quantity: 1 },
     { type: "claim-reward", rewardId: ch1.WITCH_HERB_REWARD_ID },
   ]);
   const es = lines(trade);
   assert.equal(es[0], "Tu hongo.");
-  assert.equal(es.at(-1), "Demasiado tarde.");
+  // the herb scene ends with "Demasiado tarde." and the feather lines follow
+  const late = es.indexOf("Demasiado tarde.");
+  assert.equal(es[late + 1], "Y esto.");
+  assert.equal(es.at(-1), "Es lo mismo.");
   const done = apply(f, trade);
   assert.equal(count(done, "mushroom"), 1, "only one mushroom is taken");
   assert.equal(count(done, "medicinal-herb"), 1, "exactly one herb");
@@ -298,15 +303,24 @@ test("Witch 5. atomic: a swap that does not fit changes nothing and is retried l
     !f.claimedRewards.has(ch1.WITCH_HERB_REWARD_ID),
     "not marked as done",
   );
-  // with room, the retry is the plain trade
-  f = { ...f, inventory: inv.removeItem(f.inventory, "salt", 1) };
+  // with room (two free slots: the herb and the black feather), the retry is the plain trade
+  f = { ...f, inventory: inv.removeItem(inv.removeItem(f.inventory, "salt", 1), "water", 1) };
   const retry = talk(WITCH, f);
   assert.equal(retry.conversation.id, "chapter1.tavern.witch.trade");
   assert.equal(count(apply(f, retry), "medicinal-herb"), 1);
-  // a single mushroom in a full bag: paying frees its own slot, so it fits
-  const single = {
+  // a single mushroom in a full bag: paying frees its own slot, but she now gives TWO
+  // things (the herb and the black feather), so one more free slot is needed
+  const singleFull = {
     ...world({ claimed: [ch1.WITCH_MET_ID] }),
-    inventory: crowded([["mushroom", 1]]),
+    inventory: crowded([["mushroom", 1], ["coal", 1]]),
+  };
+  assert.equal(
+    talk(WITCH, singleFull).conversation.id,
+    "chapter1.tavern.witch.tradeNoRoom",
+  );
+  const single = {
+    ...singleFull,
+    inventory: inv.removeItem(singleFull.inventory, "salt", 1),
   };
   const ok = talk(WITCH, single);
   assert.equal(ok.conversation.id, "chapter1.tavern.witch.trade");

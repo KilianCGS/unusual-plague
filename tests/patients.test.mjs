@@ -488,7 +488,20 @@ test("the merchant SELLS cloth: he never gives it through the story any more", (
   assert.deepEqual(shops.getShop(MERCHANT).entries, [
     { itemId: "cloth", price: 1, stock: 3 },
     { itemId: "salt", price: 1, stock: 1 },
+    // Day 2 onwards (sugar 3, bone 1, onion 1: Kilian's prices)
+    { itemId: "sugar", price: 3, stock: 3, fromChapter: "chapter-2" },
+    { itemId: "onion", price: 1, stock: 3, fromChapter: "chapter-2" },
+    { itemId: "bone", price: 1, stock: 3, fromChapter: "chapter-2" },
   ]);
+  // on Day 1 only the cloth and the salt are on sale
+  assert.deepEqual(
+    shops.shopForChapter(shops.getShop(MERCHANT), "chapter-1").entries.map((e) => e.itemId),
+    ["cloth", "salt"],
+  );
+  assert.deepEqual(
+    shops.shopForChapter(shops.getShop(MERCHANT), "chapter-2").entries.map((e) => e.itemId),
+    ["cloth", "salt", "sugar", "onion", "bone"],
+  );
 });
 
 // ------------------------------------------------------------------------ WATER
@@ -1356,7 +1369,7 @@ test("baker's Salt: Patient 1's treatment is unchanged and no other patient or r
     ch1.INJURED_MINER_ID,
   ]);
   assert.deepEqual(Object.keys(ch1.CHAPTER1_INITIAL_PATIENTS), [HUSBAND]);
-  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 16);
+  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 22);
   // the reward conversations say nothing about patients, soup or recipes
   for (const lang of ["es", "en"]) {
     for (const key of ["bakerReward", "bakerRewardNoRoom"]) {

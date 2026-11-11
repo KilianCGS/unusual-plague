@@ -752,6 +752,23 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     collectibleItemId: "mushroom",
   },
   {
+    // 2026-11-11: gathered in the mushroom glade (any time). Placed by Kilian in the Decorator.
+    id: "pine-mushroom-world",
+    label: "Pine mushroom (world)",
+    category: "resources",
+    sprite: {
+      frames: ["/game/resources/pine-mushroom/world.png"],
+      frameWidth: 48,
+      frameHeight: 48,
+      fps: 0,
+      loop: false,
+    },
+    // Soil patch ends at y39 of the 48 px frame; two caps centred on x23.
+    anchor: { x: 0.48, y: 0.81 },
+    defaultScale: 0.75,
+    collectibleItemId: "pine-mushroom",
+  },
+  {
     id: "resin-world",
     label: "Resin (world, on bark)",
     category: "resources",
