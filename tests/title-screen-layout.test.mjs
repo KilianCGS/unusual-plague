@@ -68,7 +68,7 @@ test("the background is the untouched picture: nothing over it, not darkened, no
 
 test("title and subtitle are ONE block in the upper centre of the sky, with no panel behind", () => {
   assert.ok(
-    /<div className="title-block">[\s\S]*?<h1 className="title"[^>]*>[\s\S]*?<p className="subtitle">[\s\S]*?<\/p>\s*<\/div>/.test(
+    /<div className="title-block">[\s\S]*?<h1 className="title"[^>]*>[\s\S]*?<p className="subtitle">[\s\S]*?<\/p>[\s\S]*?<div className="title-start">[\s\S]*?<\/div>\s*<\/div>/.test(
       page,
     ),
   );
@@ -91,10 +91,11 @@ test("title and subtitle are ONE block in the upper centre of the sky, with no p
   assert.ok(page.includes("/game/ui/title/ivy.png"));
 });
 
-test("start sits below the title block over the hills; about is secondary in the lower-left; languages in the upper-right", () => {
+test("start sits right under the subtitle; about is secondary in the lower-left; languages in the upper-right", () => {
   const start = rule(".title-start");
-  assert.ok(/top:\s*50%/.test(start));
-  assert.ok(/left:\s*50%/.test(start), "same axis as the title");
+  // the button is INSIDE the title block, under the subtitle (it cannot overlap it)
+  assert.ok(/margin-top:\s*clamp\(/.test(start));
+  assert.ok(!/position:\s*absolute/.test(start), "it follows the subtitle in the flow");
   assert.ok(
     /repeating-linear-gradient/.test(rule(".begin-button")),
     "a wooden plank in a darker wooden frame",

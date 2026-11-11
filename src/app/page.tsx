@@ -196,16 +196,18 @@ export default function Home() {
           <p className="subtitle">
             <GothicText text={copy.subtitle} />
           </p>
-        </div>
-        <div className="title-start">
-          <button
-            className="begin-button"
-            type="button"
-            disabled={isInteractionLocked}
-            onClick={handleBegin}
-          >
-            {copy.beginButton}
-          </button>
+          {/* The start button lives INSIDE the title block, under the subtitle, so
+              it can never overlap it whatever the size of the window. */}
+          <div className="title-start">
+            <button
+              className="begin-button"
+              type="button"
+              disabled={isInteractionLocked}
+              onClick={handleBegin}
+            >
+              {copy.beginButton}
+            </button>
+          </div>
         </div>
         <button
           className="begin-button secondary-title-button"

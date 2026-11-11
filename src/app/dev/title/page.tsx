@@ -12,6 +12,7 @@ type ButtonStyle = "wood" | "iron" | "wax" | "plank";
 
 // The P pictures to compare (E only): all in /game/ui/title/
 const PS = [
+  { file: "p-loop-2.png", name: "P cerrada (actual)" },
   { file: "p-crook-wood-rc.png", name: "gancho madera (color letras)" },
   { file: "p-crook-wood.png", name: "gancho madera (original)" },
   { file: "p-crook-gold.png", name: "gancho dorado" },

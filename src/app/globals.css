@@ -107,12 +107,9 @@ main.title-screen {
   transform: translateX(-50%);
 }
 
-/* The main action, over the hills of the horizon. */
+/* The main action: right under the subtitle, in the same block. */
 .title-start {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%);
+  margin-top: clamp(1rem, 2.6vh, 2rem);
 }
 
 .title-screen-fade {
@@ -228,9 +225,9 @@ main.title-screen.is-black .title-screen-fade {
 /* The P: a post with the mask hanging from it. It is taller than the letters
    and its foot goes below the baseline, like the stem of a P. */
 .title-p {
-  height: 1.3em;
+  height: 0.7em;
   width: auto;
-  margin: 0 0.02em -0.1em 0.02em;
+  margin: 0 0.01em 0.23em 0.02em;
   image-rendering: pixelated;
   /* -webkit-text-fill is transparent in the title; the image is drawn as is, and
      the title's own drop-shadow gives it the same outline as the letters */
@@ -326,17 +323,12 @@ main.title-screen.is-black .title-screen-fade {
 }
 
 /* Narrower windows: the title block takes the width (clear of the languages
-   in the corner), the start button stays right under it. */
+   in the corner); the start button follows the subtitle inside it. */
 @media (max-width: 900px), (max-aspect-ratio: 1/1) {
   .title-block {
     top: max(5%, 64px);
     left: 50%;
     width: 92vw;
-  }
-
-  .title-start {
-    top: max(30%, 168px);
-    left: 50%;
   }
 }
 
