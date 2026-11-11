@@ -2,23 +2,36 @@
 
 import { useState } from "react";
 
+import { GothicText } from "../../../game/ui/GothicText";
 import styles from "./page.module.css";
 
 // IDEAS for the title screen, over the real cover. Pick a lettering (A-D) and a
 // button style (1-3); nothing here is used by the game yet.
-type Lettering = "A" | "B" | "C" | "D";
-type ButtonStyle = "wood" | "iron" | "wax";
+type Lettering = "A" | "B" | "C" | "D" | "E";
+type ButtonStyle = "wood" | "iron" | "wax" | "plank";
+
+// The P pictures to compare (E only): all in /game/ui/title/
+const PS = [
+  { file: "p-crook-wood-rc.png", name: "gancho madera (color letras)" },
+  { file: "p-crook-wood.png", name: "gancho madera (original)" },
+  { file: "p-crook-gold.png", name: "gancho dorado" },
+  { file: "p-side-straps.png", name: "correas laterales" },
+  { file: "p-rope-2.png", name: "cuerda" },
+  { file: "p-chibi-1.png", name: "chibi" },
+];
 
 const LETTERINGS: { id: Lettering; name: string }[] = [
   { id: "A", name: "A · Manuscrito + P máscara" },
   { id: "B", name: "B · Uncial con hiedra" },
   { id: "C", name: "C · Gótica con setas" },
   { id: "D", name: "D · Máscara + hiedra" },
+  { id: "E", name: "E · Madera (prueba)" },
 ];
 const BUTTONS: { id: ButtonStyle; name: string }[] = [
   { id: "wood", name: "1 · Madera y pergamino" },
   { id: "iron", name: "2 · Hierro y oro" },
   { id: "wax", name: "3 · Lacre rojo" },
+  { id: "plank", name: "4 · Tablón madera" },
 ];
 
 export default function TitleIdeas() {
@@ -26,10 +39,12 @@ export default function TitleIdeas() {
   const [button, setButton] = useState<ButtonStyle>("wood");
   const [lang, setLang] = useState<"es" | "en">("es");
   const [shield, setShield] = useState(false);
+  const [pIndex, setPIndex] = useState(0);
 
-  const font = lettering === "B" ? styles.uncial : styles.gothic;
-  const withMask = lettering === "A" || lettering === "D";
-  const withIvy = lettering === "B" || lettering === "D";
+  const wood = lettering === "E";
+  const font = wood ? styles.woodLetters : lettering === "B" ? styles.uncial : styles.gothic;
+  const withMask = lettering === "A" || lettering === "D" || wood;
+  const withIvy = lettering === "B" || lettering === "D" || wood;
   const withMushrooms = lettering === "C";
 
   return (
@@ -44,7 +59,11 @@ export default function TitleIdeas() {
           {withMask ? (
             <span style={{ display: "inline-flex", alignItems: "flex-end" }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img className={styles.pmask} src="/game/ui/title/p-mask.png" alt="P" />
+              <img
+                className={wood ? styles.pcustom : styles.pmask}
+                src={wood ? `/game/ui/title/${PS[pIndex].file}` : "/game/ui/title/p-mask.png"}
+                alt="P"
+              />
               <span>lague</span>
             </span>
           ) : (
@@ -64,7 +83,9 @@ export default function TitleIdeas() {
           </>
         ) : null}
         <p className={styles.subtitle}>
-          {lang === "es" ? "Algo extraño se acerca" : "Something strange is coming"}
+          <GothicText
+            text={lang === "es" ? "Algo extraño se acerca." : "Something strange is coming."}
+          />
         </p>
       </div>
 
@@ -122,6 +143,20 @@ export default function TitleIdeas() {
             Banderas en escudo
           </button>
         </div>
+        {wood ? (
+          <div>
+            {PS.map((item, index) => (
+              <button
+                key={item.file}
+                type="button"
+                aria-pressed={pIndex === index}
+                onClick={() => setPIndex(index)}
+              >
+                P: {item.name}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
     </main>
   );

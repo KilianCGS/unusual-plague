@@ -107,6 +107,29 @@
   margin-top: 2px;
 }
 
+/* E: the wood test (same as the real title screen) */
+.woodLetters {
+  font-family: "UP Gothic", serif;
+  font-size: clamp(56px, 6.2vw, 102px);
+  color: transparent;
+  background:
+    linear-gradient(180deg, rgba(255, 224, 170, 0.38), transparent 38%, rgba(30, 14, 4, 0.4)),
+    repeating-linear-gradient(96deg, #b8793a 0 7px, #d89c55 7px 10px, #a26b34 10px 17px, #c08444 17px 20px);
+  -webkit-background-clip: text;
+  background-clip: text;
+  letter-spacing: 0.03em;
+  text-shadow: none;
+  filter: drop-shadow(3px 0 0 #1c110c) drop-shadow(-3px 0 0 #1c110c)
+    drop-shadow(0 3px 0 #1c110c) drop-shadow(0 -3px 0 #1c110c)
+    drop-shadow(0 8px 0 rgba(0, 0, 0, 0.55));
+}
+.pcustom {
+  height: 1.3em;
+  width: auto;
+  margin: 0 0.02em -0.1em 0.02em;
+  image-rendering: pixelated;
+}
+
 .mushroomL,
 .mushroomR {
   position: absolute;
@@ -125,10 +148,11 @@
 
 .subtitle {
   margin: 10px 0 0;
-  font: italic 600 clamp(15px, 1.6vw, 24px) Georgia, serif;
-  color: #e6d8b0;
+  font-family: "UP Gothic", Georgia, serif;
+  font-size: clamp(20px, 2.2vw, 34px);
+  color: #ffffff;
   letter-spacing: 0.06em;
-  text-shadow: 0 2px 0 #1c110c, 0 0 10px #000;
+  text-shadow: -2px 0 0 #1c110c, 2px 0 0 #1c110c, 0 -2px 0 #1c110c, 0 2px 0 #1c110c, 0 5px 0 rgba(0, 0, 0, 0.55);
 }
 
 /* ---------------------------------------------------------------- buttons */
@@ -207,6 +231,22 @@
 }
 .iron::after {
   right: 10px;
+}
+
+/* 4: wooden plank, like the wood title test */
+.plank {
+  color: #ffffff;
+  text-shadow: 0 2px 0 #1c110c, 2px 0 0 #1c110c, -2px 0 0 #1c110c, 0 -2px 0 #1c110c;
+  background:
+    linear-gradient(180deg, rgba(255, 224, 170, 0.3), transparent 40%, rgba(30, 14, 4, 0.35)),
+    repeating-linear-gradient(96deg, #b8793a 0 7px, #d89c55 7px 10px, #a26b34 10px 17px, #c08444 17px 20px);
+  border: 4px solid #1c110c;
+  box-shadow:
+    0 0 0 4px #5c3a1e,
+    0 0 0 7px #1c110c,
+    inset 0 -5px 0 rgba(30, 14, 4, 0.35),
+    inset 0 0 0 2px rgba(255, 224, 170, 0.35),
+    0 9px 0 7px rgba(10, 5, 2, 0.55);
 }
 
 /* 3: red wax seal look, hover brightens it */

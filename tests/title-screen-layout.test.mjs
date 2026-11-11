@@ -68,45 +68,47 @@ test("the background is the untouched picture: nothing over it, not darkened, no
 
 test("title and subtitle are ONE block in the upper centre of the sky, with no panel behind", () => {
   assert.ok(
-    /<div className="title-block">\s*<h1 className="title">[\s\S]*?<p className="subtitle">[\s\S]*?<\/p>\s*<\/div>/.test(
+    /<div className="title-block">[\s\S]*?<h1 className="title"[^>]*>[\s\S]*?<p className="subtitle">[\s\S]*?<\/p>\s*<\/div>/.test(
       page,
     ),
   );
   const block = rule(".title-block");
   assert.ok(/position:\s*absolute/.test(block));
-  assert.ok(/top:\s*5%/.test(block));
+  assert.ok(/top:\s*3%/.test(block));
   assert.ok(/left:\s*50%/.test(block), "centred on the viewport");
   assert.ok(!/background/.test(block), "no panel");
   // the title is the main type, the subtitle clearly smaller; contrast comes
   // from shadows only
   const title = rule(".title");
   const subtitle = rule(".subtitle");
-  assert.ok(/clamp\(1\.9rem, 4\.6vw, 5\.2rem\)/.test(title));
-  assert.ok(/clamp\(0\.95rem, 1\.6vw, 1\.7rem\)/.test(subtitle));
-  assert.ok(/text-shadow/.test(title) && /text-shadow/.test(subtitle));
-  assert.ok(!/background/.test(title) && !/background/.test(subtitle));
+  assert.ok(/clamp\(2\.6rem, 6\.2vw, 6\.4rem\)/.test(title));
+  assert.ok(/clamp\(1\.3rem, 2\.2vw, 2\.2rem\)/.test(subtitle));
+  assert.ok(/drop-shadow/.test(title) && /text-shadow/.test(subtitle));
+  // the title has no panel: its "background" is only the wood grain clipped to the letters
+  assert.ok(/background-clip:\s*text/.test(title) && !/background/.test(subtitle));
+  // the P is a post with the plague mask, and the title sits between two vines of ivy
+  assert.ok(page.includes("/game/ui/title/p-post.png"));
+  assert.ok(page.includes("/game/ui/title/ivy.png"));
 });
 
 test("start sits below the title block over the hills; about is secondary in the lower-left; languages in the upper-right", () => {
   const start = rule(".title-start");
-  assert.ok(/top:\s*33%/.test(start));
+  assert.ok(/top:\s*50%/.test(start));
   assert.ok(/left:\s*50%/.test(start), "same axis as the title");
   assert.ok(
-    /background-color:\s*rgba\(12, 10, 18, 0\.82\)/.test(rule(".begin-button")),
-    "visible dark button background",
+    /repeating-linear-gradient/.test(rule(".begin-button")),
+    "a wooden plank in a darker wooden frame",
   );
   assert.ok(
-    /background-color:\s*rgba\(12, 10, 18, 0\.82\)/.test(
-      rule(".secondary-title-button"),
-    ),
-    "about shares the same language",
+    page.includes("begin-button secondary-title-button"),
+    "about shares the same button",
   );
   const about = rule(".secondary-title-button");
   assert.ok(/position:\s*absolute/.test(about));
   assert.ok(/left:\s*clamp\(/.test(about));
   assert.ok(/bottom:\s*clamp\(/.test(about));
   assert.ok(
-    /font-size:\s*clamp\(0\.7rem/.test(about),
+    /font-size:\s*clamp\(0\.95rem/.test(about),
     "smaller than the start button",
   );
   const languages = rule(".language-selector");
@@ -149,7 +151,10 @@ test("the behaviour and the texts are the existing ones: same buttons, handlers 
   assert.ok(
     page.includes('setLanguage("es")') && page.includes('setLanguage("en")'),
   );
-  assert.ok(page.includes("{copy.title}") && page.includes("{copy.subtitle}"));
+  assert.ok(
+    page.includes("aria-label={copy.title}") &&
+      page.includes("<GothicText text={copy.subtitle} />"),
+  );
   assert.ok(
     page.includes("{copy.beginButton}") && page.includes("{copy.aboutButton}"),
   );

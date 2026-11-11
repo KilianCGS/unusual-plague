@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { GameWorld } from "../game/world/GameWorld";
 import { IntroScreen } from "../game/intro/IntroScreen";
 import { introScreenCopy } from "../game/i18n/introScreen";
+import { GothicText } from "../game/ui/GothicText";
 import { titleScreenCopy } from "../game/i18n/titleScreen";
 import type { Language } from "../game/i18n/types";
 
@@ -19,6 +20,10 @@ export default function Home() {
   const [fadePhase, setFadePhase] = useState<FadePhase>("idle");
   const [queuedPhase, setQueuedPhase] = useState<GamePhase | null>(null);
   const copy = titleScreenCopy[language];
+  // "UNUSUAL PLAGUE" -> ["Unusual", "Plague"] as letters, in title case
+  const titleWords = copy.title
+    .split(" ")
+    .map((word) => [...(word.charAt(0) + word.slice(1).toLowerCase())]);
   const introCopy = introScreenCopy[language];
   const isInteractionLocked = fadePhase !== "idle";
 
@@ -170,8 +175,27 @@ export default function Home() {
           </button>
         </div>
         <div className="title-block">
-          <h1 className="title">{copy.title}</h1>
-          <p className="subtitle">{copy.subtitle}</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="title-ivy" src="/game/ui/title/ivy.png" alt="" />
+          <h1 className="title" aria-label={copy.title}>
+            {titleWords.map(([first, ...rest], index) => (
+              <span className="title-word" key={index} aria-hidden="true">
+                {first === "P" ? (
+                  // The P of PLAGUE is a post with the plague mask hanging from it.
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img className="title-p" src="/game/ui/title/p-post.png" alt="" />
+                ) : (
+                  first
+                )}
+                {rest.join("")}
+              </span>
+            ))}
+          </h1>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img className="title-ivy is-below" src="/game/ui/title/ivy.png" alt="" />
+          <p className="subtitle">
+            <GothicText text={copy.subtitle} />
+          </p>
         </div>
         <div className="title-start">
           <button
