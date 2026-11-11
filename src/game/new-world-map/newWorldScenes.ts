@@ -47,9 +47,24 @@ import {
 } from "./geometry/millFarmlandGeometry";
 import {
   mountainPathColliders,
+  mountainPathOccluders,
+  mountainPathPolygonColliders,
   mountainPathSpawns,
   mountainPathTransitions,
 } from "./geometry/mountainPathGeometry";
+import {
+  quarryColliders,
+  quarryOccluders,
+  quarrySpawns,
+  quarryTransitions,
+} from "./geometry/quarryGeometry";
+import {
+  forestGladeColliders,
+  forestGladeOccluders,
+  forestGladePolygonColliders,
+  forestGladeSpawns,
+  forestGladeTransitions,
+} from "./geometry/forestGladeGeometry";
 import {
   outskirtsColliders,
   outskirtsOccluders,
@@ -153,13 +168,25 @@ export const NEW_WORLD_SCENES: Record<
 > = {
   // New zones: background only. Their colliders, exits and arrivals come from
   // Kilian's exports; until then they cannot be entered (no scene leads here).
+  // The quarry camp, south of the mountain path (Kilian's geometry, 2026-11-11).
   quarry: {
     id: "quarry",
     kind: "exterior",
     visual: visual("quarry"),
-    colliders: [],
-    exits: [],
-    arrivals: {},
+    colliders: quarryColliders,
+    occluders: quarryOccluders,
+    exits: [
+      exit(
+        "to-mountain-path",
+        quarryTransitions,
+        "quarry-transition-1",
+        "mountain-path",
+        "from-quarry",
+      ),
+    ],
+    arrivals: {
+      "from-mountain-path": spawnAt(quarrySpawns, "quarry-spawn-1"),
+    },
   },
   "forest-deep": {
     id: "forest-deep",
@@ -174,9 +201,26 @@ export const NEW_WORLD_SCENES: Record<
     id: "forest-glade",
     kind: "exterior",
     visual: visual("forest-glade"),
-    colliders: [],
-    exits: [],
-    arrivals: {},
+    colliders: forestGladeColliders,
+    polygonColliders: forestGladePolygonColliders,
+    occluders: forestGladeOccluders,
+    exits: [
+      // West edge: back to the forest, to the right of the cabin.
+      exit(
+        "to-forest",
+        forestGladeTransitions,
+        "forest-glade-transition-1",
+        "forest",
+        "from-forest-glade",
+      ),
+    ],
+    arrivals: {
+      // Arrives walking east, into the glade (the spawn was exported facing south).
+      "from-forest": {
+        ...spawnAt(forestGladeSpawns, "forest-glade-spawn-1"),
+        direction: "east",
+      },
+    },
   },
   "granary-interior": {
     id: "granary-interior",
@@ -432,8 +476,14 @@ export const NEW_WORLD_SCENES: Record<
         "forest-cottage",
         "from-forest",
       ),
-      // forest-transition-1 (east, to the right of the cabin) leads to the
-      // mushroom glade; it gets its exit when the glade has its arrival spawn.
+      // East edge, to the right of the cabin: the mushroom glade.
+      exit(
+        "to-forest-glade",
+        forestTransitions,
+        "forest-transition-1",
+        "forest-glade",
+        "from-forest",
+      ),
     ],
     arrivals: {
       // The spawns keep Kilian's exact positions; the arrival faces INTO the
@@ -550,6 +600,8 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("mountain-path"),
     colliders: mountainPathColliders,
+    polygonColliders: mountainPathPolygonColliders,
+    occluders: mountainPathOccluders,
     exits: [
       exit(
         "to-smithy-street",
@@ -565,6 +617,14 @@ export const NEW_WORLD_SCENES: Record<
         "mine-interior",
         "from-mountain-path",
       ),
+      // South edge: the quarry.
+      exit(
+        "to-quarry",
+        mountainPathTransitions,
+        "mountain-path-transition-3",
+        "quarry",
+        "from-mountain-path",
+      ),
     ],
     arrivals: {
       "from-smithy-street": spawnAt(
@@ -575,6 +635,12 @@ export const NEW_WORLD_SCENES: Record<
         mountainPathSpawns,
         "mountain-path-spawn-2",
       ),
+      // Coming back from the quarry the Doctor walks north (the spawn was
+      // exported facing south; the position is exactly Kilian's).
+      "from-quarry": {
+        ...spawnAt(mountainPathSpawns, "mountain-path-spawn-3"),
+        direction: "north",
+      },
     },
   },
 };

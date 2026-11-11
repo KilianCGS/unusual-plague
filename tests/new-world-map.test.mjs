@@ -150,7 +150,8 @@ test("the topology of the old world is kept, plus Forest <-> Casita del bosque",
   for (const id of NEW_IDS.filter((x) => x !== "forest-cottage")) {
     const expected = targets(OLD, id);
 
-    if (id === "forest") expected.push("forest-cottage");
+    if (id === "forest") expected.push("forest-cottage", "forest-glade");
+    if (id === "mountain-path") expected.push("quarry");
     if (id === "mill-farmland") expected.push("granary-interior");
 
     assert.deepEqual(targets(WORLD_SCENES, id), expected.sort(), id);
@@ -502,6 +503,7 @@ test("the new world is the only world: nothing selects a world through an enviro
   );
   assert.deepEqual(WORLD_SCENES.forest.exits.map((e) => e.targetScene).sort(), [
     "forest-cottage",
+    "forest-glade",
     "outskirts",
   ]);
   assert.ok(WORLD_SCENES["forest-cottage-interior"]);

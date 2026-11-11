@@ -8,6 +8,8 @@ import { millFarmlandColliders } from "./geometry/millFarmlandGeometry";
 import { mountainPathColliders } from "./geometry/mountainPathGeometry";
 import { outskirtsColliders } from "./geometry/outskirtsGeometry";
 import { plazaColliders } from "./geometry/plazaGeometry";
+import { quarryColliders } from "./geometry/quarryGeometry";
+import { forestGladeColliders } from "./geometry/forestGladeGeometry";
 import { smithyStreetColliders } from "./geometry/smithyStreetGeometry";
 import { tavernStreetColliders } from "./geometry/tavernStreetGeometry";
 
@@ -145,7 +147,7 @@ export const NEW_WORLD_VISUALS: DevScene[] = [
     initialAssetX: 860,
     initialAssetY: 140,
     logicalUnitsPerAssetPixel: 0.8,
-    colliders: [],
+    colliders: quarryColliders,
   },
   {
     id: "forest-deep",
@@ -172,7 +174,7 @@ export const NEW_WORLD_VISUALS: DevScene[] = [
     initialAssetX: 110,
     initialAssetY: 590,
     logicalUnitsPerAssetPixel: 1,
-    colliders: [],
+    colliders: forestGladeColliders,
   },
 ];
 

@@ -119,6 +119,8 @@ import {
 } from "../../../game/new-world-map/geometry/millFarmlandGeometry";
 import {
   mountainPathColliders as nwMountainPathColliders,
+  mountainPathOccluders as nwMountainPathOccluders,
+  mountainPathPolygonColliders as nwMountainPathPolygonColliders,
   mountainPathSpawns as nwMountainPathSpawns,
   mountainPathTransitions as nwMountainPathTransitions,
 } from "../../../game/new-world-map/geometry/mountainPathGeometry";
@@ -164,6 +166,19 @@ import {
   type Point,
   type Rect,
 } from "./geometry";
+import {
+  quarryColliders as nwQuarryColliders,
+  quarryOccluders as nwQuarryOccluders,
+  quarrySpawns as nwQuarrySpawns,
+  quarryTransitions as nwQuarryTransitions,
+} from "../../../game/new-world-map/geometry/quarryGeometry";
+import {
+  forestGladeColliders as nwForestGladeColliders,
+  forestGladeOccluders as nwForestGladeOccluders,
+  forestGladePolygonColliders as nwForestGladePolygonColliders,
+  forestGladeSpawns as nwForestGladeSpawns,
+  forestGladeTransitions as nwForestGladeTransitions,
+} from "../../../game/new-world-map/geometry/forestGladeGeometry";
 import {
   NIGHT_DAY_IDS,
   nightIdOf,
@@ -518,8 +533,23 @@ const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
   },
   "mountain-path": {
     colliders: nwMountainPathColliders,
+    polygons: nwMountainPathPolygonColliders,
+    occluders: nwMountainPathOccluders,
     transitions: nwMountainPathTransitions,
     spawns: nwMountainPathSpawns,
+  },
+  quarry: {
+    colliders: nwQuarryColliders,
+    occluders: nwQuarryOccluders,
+    transitions: nwQuarryTransitions,
+    spawns: nwQuarrySpawns,
+  },
+  "forest-glade": {
+    colliders: nwForestGladeColliders,
+    polygons: nwForestGladePolygonColliders,
+    occluders: nwForestGladeOccluders,
+    transitions: nwForestGladeTransitions,
+    spawns: nwForestGladeSpawns,
   },
 };
 
