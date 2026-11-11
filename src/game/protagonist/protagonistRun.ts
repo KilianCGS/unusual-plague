@@ -11,6 +11,49 @@ export const PROTAGONIST_WALK_FRAME_DURATION = 120;
 // per leg): 8 x 60 ms = 480 ms, the same cadence as the 4 x 120 ms walk.
 export const PROTAGONIST_RUN_FRAME_DURATION = 60;
 export const PROTAGONIST_RUN_FRAME_COUNT = 8;
+
+// Not every direction has the same number of frames: the sideways steps and the
+// run to the east and north got more frames so they read smoother. West walks
+// with its own frames and runs with the east ones, mirrored.
+export const PROTAGONIST_WALK_FRAME_COUNTS = {
+  north: 4,
+  south: 4,
+  east: 8,
+  west: 8,
+} as const satisfies Record<Direction, number>;
+
+export const PROTAGONIST_RUN_FRAME_COUNTS = {
+  south: 8,
+  north: 12,
+  east: 12,
+} as const;
+
+export function getWalkFrameCount(direction: Direction): number {
+  return PROTAGONIST_WALK_FRAME_COUNTS[direction];
+}
+
+export function getRunFrameCount(direction: Direction): number {
+  return PROTAGONIST_RUN_FRAME_COUNTS[direction === "west" ? "east" : direction];
+}
+
+// Time per frame. A longer cycle keeps a little more time (walk 8 frames: 70 ms
+// = 560 ms a step; run 12 frames: 45 ms = 540 ms) so more frames do not mean a
+// faster-looking gait.
+export function getFrameDuration(
+  running: boolean,
+  frameCount: number,
+  walkFrameDuration: number = PROTAGONIST_WALK_FRAME_DURATION,
+): number {
+  if (running) {
+    return frameCount > PROTAGONIST_RUN_FRAME_COUNT
+      ? Math.round((PROTAGONIST_RUN_FRAME_DURATION * 3) / 4)
+      : PROTAGONIST_RUN_FRAME_DURATION;
+  }
+
+  return frameCount > 4
+    ? Math.round((walkFrameDuration * 7) / 12)
+    : walkFrameDuration;
+}
 // A slow frame must not move the Doctor further than his 12px feet hitbox
 // (run: 240 / 30 = 8px).
 export const MAX_FRAME_DELTA_SECONDS = 1 / 30;
@@ -28,7 +71,7 @@ type RunSpriteDirection = Exclude<Direction, "west">;
 
 function runFrames(direction: RunSpriteDirection): string[] {
   return Array.from(
-    { length: PROTAGONIST_RUN_FRAME_COUNT },
+    { length: PROTAGONIST_RUN_FRAME_COUNTS[direction] },
     (_, frame) => `/game/characters/protagonist/run/${direction}/${frame}.png`,
   );
 }
@@ -54,7 +97,7 @@ export function getRunSprite(
 
 let runSpritesPreloaded = false;
 
-// Loads the 24 real run frames (3 directions x 8) once, so the first run does not flash an empty
+// Loads the real run frames (south 8, north 12, east 12) once, so the first run does not flash an empty
 // image (west needs none of its own).
 export function preloadRunSprites() {
   if (runSpritesPreloaded || typeof window === "undefined") {

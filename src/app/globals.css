@@ -57,12 +57,23 @@ main.title-screen {
   justify-content: center;
   background-color: #0a0a0a;
   /* The cover art, "cover" and centred, with nothing over it: the picture is
-     the protagonist (the text gets its contrast from its own shadow). */
-  background-image: url("/game/narrative/title-background.png");
+     the protagonist (the text gets its contrast from its own shadow). On top
+     goes the animated version of the same picture (the windows flicker and the
+     fountain runs; 48 frames, lossless WebP); the still PNG stays under it
+     while it loads and is all that shows with reduced motion. */
+  background-image:
+    url("/game/narrative/title-animated.webp"),
+    url("/game/narrative/title-background.png");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
   overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main.title-screen {
+    background-image: url("/game/narrative/title-background.png");
+  }
 }
 
 /* The composition of the title screen is laid out over the whole picture, in

@@ -48,7 +48,13 @@ export function InventorySlotContents({
   return (
     <>
       {hasIcon ? (
-        <ItemIcon itemId={slot.itemId} className={classes.itemIcon} />
+        // keyed by item and quantity: a new item or a changed number re-creates the
+        // icon, which restarts its small "pop" (the HUD's CSS; the others ignore it)
+        <ItemIcon
+          key={`${slot.itemId}-${slot.quantity}`}
+          itemId={slot.itemId}
+          className={classes.itemIcon}
+        />
       ) : (
         <span className={classes.name}>
           {getItemName(slot.itemId, language)}

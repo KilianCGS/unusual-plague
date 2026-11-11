@@ -1,5 +1,8 @@
 import type { CSSProperties } from "react";
 
+import { DOCTOR_SCALE } from "../protagonist/doctorScale";
+import styles from "./InteractionPrompt.module.css";
+
 // Transparent rows above the head in the protagonist's 96 px frames (the
 // highest visible row of any facing is 14). Sprite-art dependent.
 const SPRITE_TOP_PADDING = 14;
@@ -22,6 +25,7 @@ export function InteractionPrompt({
   zoom,
   cameraOffsetX,
   cameraOffsetY,
+  label,
 }: {
   feetX: number;
   feetY: number;
@@ -31,28 +35,25 @@ export function InteractionPrompt({
   // Camera offset in whole screen pixels (CameraView.offsetX / offsetY).
   cameraOffsetX: number;
   cameraOffsetY: number;
+  // What pressing E does, when the owner knows it ("Preparar", "Cocinar"); the
+  // key alone otherwise. The prompt itself still knows nothing about interactions.
+  label?: string;
 }) {
-  const headTopY = feetY - (spriteSize - SPRITE_TOP_PADDING) * spriteScale;
+  const headTopY =
+    feetY - (spriteSize - SPRITE_TOP_PADDING) * spriteScale * DOCTOR_SCALE;
 
+  // Only the position is computed here; the look (a keycap that is pressed) is
+  // in InteractionPrompt.module.css.
   const style: CSSProperties = {
-    position: "absolute",
     left: Math.round(feetX * zoom - cameraOffsetX),
     top: Math.round(headTopY * zoom - cameraOffsetY),
     transform: `translate(-50%, calc(-100% - ${GAP_PX}px))`,
-    zIndex: 10,
-    padding: "2px 8px",
-    font: "700 16px/1 monospace",
-    letterSpacing: "0.08em",
-    color: "#f4ead5",
-    background: "rgba(9, 9, 9, 0.82)",
-    border: "1px solid #3ddc84",
-    pointerEvents: "none",
-    whiteSpace: "nowrap",
   };
 
   return (
-    <div style={style} data-interaction-prompt="true">
-      [E]
+    <div className={styles.prompt} style={style} data-interaction-prompt="true">
+      <span>E</span>
+      {label ? <span className={styles.label}>{label}</span> : null}
     </div>
   );
 }

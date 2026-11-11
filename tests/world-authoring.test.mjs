@@ -466,7 +466,7 @@ test("collecting respects the inventory: with room it adds the item; when full t
   const empty = inv.createEmptyInventory();
   const added = inv.addItem(empty, "mushroom", 1);
   assert.equal(inv.countItem(added, "mushroom"), 1);
-  const full = ["a", "b", "c", "d", "e"].reduce(
+  const full = ["a", "b", "c", "d", "e", "f"].reduce(
     (state, id) => inv.addItem(state, id, 1),
     empty,
   );

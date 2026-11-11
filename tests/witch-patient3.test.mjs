@@ -272,10 +272,10 @@ test("Witch 4. the swap: exactly Mushroom x1 for Medicinal herb x1, once, never 
 });
 
 test("Witch 5. atomic: a swap that does not fit changes nothing and is retried later", () => {
-  // Mushroom x2 plus four other stacks: the herb has no slot and paying one
+  // Mushroom x2 plus five other stacks: the herb has no slot and paying one
   // mushroom frees none
-  const full = crowded([["mushroom", 2]]);
-  assert.equal(inv.countOccupiedSlots(full), 5);
+  const full = crowded([["mushroom", 2], ["coal", 1]]);
+  assert.equal(inv.countOccupiedSlots(full), 6);
   let f = { ...world(), inventory: full };
   const blocked = talk(WITCH, {
     ...f,
@@ -657,7 +657,7 @@ test("P3 5. Alcohol: the bartender gives it once the miner is examined, first of
   assert.equal(next.conversation.id, "chapter1.tavern.bartender.intro");
   assert.ok(!next.effects.some((e) => e.itemId === "alcohol"), "never twice");
   // a full bag: nothing is given, nothing is claimed, and it is retried
-  const full = { ...f, inventory: crowded([["mushroom", 1]]) };
+  const full = { ...f, inventory: crowded([["mushroom", 1], ["coal", 1]]) };
   const blocked = talk(BARTENDER, full);
   assert.equal(
     blocked.conversation.id,
@@ -705,7 +705,7 @@ test("P3 6. Coal: the Mountain Path miner is only ambient until the case is exam
   const again = talk(MOUNTAIN, done);
   assert.equal(again.conversation.id, "chapter1.mountainPath.miner.coalDone");
   assert.deepEqual(again.effects, []);
-  const full = { ...f, inventory: crowded([["mushroom", 1]]) };
+  const full = { ...f, inventory: crowded([["mushroom", 1], ["alcohol", 1]]) };
   const blocked = talk(MOUNTAIN, full);
   assert.equal(
     blocked.conversation.id,

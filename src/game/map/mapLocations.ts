@@ -102,6 +102,8 @@ export const SCENE_TO_MAP_LOCATION: Record<SceneId, MapLocationId> = {
   "mountain-path": "mountain",
   quarry: "quarry",
   "forest-deep": "forest-deep",
+  // Part of the forest, with no place of its own on the map.
+  "forest-glade": "forest",
   "mine-interior": "mine",
   "mine-natural-cave": "mine",
 };

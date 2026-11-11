@@ -128,7 +128,7 @@ test("the header and the button name the action of the station, and the button s
 test("the Doctor's inventory: the 6 carried slots in order, with quantities and hover labels", () => {
   const markup = render("manual", SAMPLE);
   assert.ok(markup.includes(">INVENTARIO DEL DOCTOR</h3>"));
-  assert.equal(count(markup, "data-inventory-slot"), 5);
+  assert.equal(count(markup, "data-inventory-slot"), 6);
   assert.deepEqual(
     [...markup.matchAll(/data-inventory-slot[^>]*data-item-id="([^"]*)"/g)].map(
       (x) => x[1],
@@ -139,9 +139,9 @@ test("the Doctor's inventory: the 6 carried slots in order, with quantities and 
   assert.equal(count(markup, "data-slot-tooltip"), 3);
   assert.ok(markup.includes(`>${getItemName("water", "es")} ×3</span>`));
   assert.equal(count(markup, "title="), 0);
-  // empty inventory slots cannot be clicked: 2 empty + 2 empty ingredient
-  // slots + the action button (nothing selected yet) = 5 disabled buttons
-  assert.equal(count(markup, 'disabled=""'), 5);
+  // empty inventory slots cannot be clicked: 3 empty + 2 empty ingredient
+  // slots + the action button (nothing selected yet) = 6 disabled buttons
+  assert.equal(count(markup, 'disabled=""'), 6);
 });
 
 test("an item without an icon (Medicinal paste) falls back to its readable name", () => {

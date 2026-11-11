@@ -710,7 +710,7 @@ test("Forest <-> Forest Cottage <-> Forest Cottage Interior: wired both ways to 
   const exitTo = (scene, name) => scene.exits.find((e) => e.name === name);
 
   // the exact zones and spawns used by each hop
-  assert.equal(exitTo(forest, "to-forest-cottage").zone.x, 696); // forest-transition-2
+  assert.equal(exitTo(forest, "to-forest-cottage").zone.x, 583); // forest-transition-2 (redrawn 2026-11-11)
   assert.equal(exitTo(forest, "to-forest-cottage").targetSpawn, "from-forest");
   assert.deepEqual(cottage.arrivals["from-forest"], {
     x: 690,

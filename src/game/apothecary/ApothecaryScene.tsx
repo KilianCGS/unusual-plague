@@ -11,6 +11,7 @@ import { getSceneInteractionZones } from "../interactions/sceneInteractions";
 import { useInteraction } from "../interactions/useInteraction";
 import { apothecaryMainZoneColliders } from "./apothecaryMainZoneGeometry";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
+import { DOCTOR_SCALE } from "../protagonist/doctorScale";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
 import { useReportRunning } from "../protagonist/useReportRunning";
 import { usePlayerMoved } from "../protagonist/usePlayerMoved";
@@ -73,6 +74,7 @@ export function ApothecaryScene({
   onRunningChange,
   onInteract,
   onInteractionAvailable,
+  promptLabelFor,
 }: {
   spawn?: { x: number; y: number; direction: Direction };
   input?: DirectionInputHandle;
@@ -90,6 +92,8 @@ export function ApothecaryScene({
   onInteract?: (interactionId: string, source: { instanceId?: string }) => void;
   // The interactionId available right now (null = none).
   onInteractionAvailable?: (interactionId: string | null) => void;
+  // Optional word shown after the E ("Preparar", "Cocinar") for an interaction.
+  promptLabelFor?: (interactionId: string) => string | undefined;
 }) {
   const [sceneScale, setSceneScale] = useState(1);
   const {
@@ -160,7 +164,8 @@ export function ApothecaryScene({
       ? {
           x: Math.round(player.x * sceneScale),
           y: Math.round(
-            (player.y - (spriteSize - SPEAKER_TOP_PADDING)) * sceneScale,
+            (player.y - (spriteSize - SPEAKER_TOP_PADDING) * DOCTOR_SCALE) *
+              sceneScale,
           ),
         }
       : null;
@@ -246,6 +251,7 @@ export function ApothecaryScene({
               feetY={player.y}
               spriteSize={spriteSize}
               spriteScale={1}
+              label={promptLabelFor?.(availableInteraction.interactionId)}
               zoom={sceneScale}
               cameraOffsetX={0}
               cameraOffsetY={0}

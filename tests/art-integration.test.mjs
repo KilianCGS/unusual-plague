@@ -204,7 +204,7 @@ test("prepared catalog now has recipes, without changing Chapter 1 needs or addi
 });
 
 test("inventory presentation: capacity untouched; storage and crafting draw every carried slot", () => {
-  assert.equal(INVENTORY_CAPACITY, 5);
+  assert.equal(INVENTORY_CAPACITY, 6);
   const storage = fs.readFileSync(
     path.join(root, "src/game/storage/StorageOverlay.tsx"),
     "utf8",

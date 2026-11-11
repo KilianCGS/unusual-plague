@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 
+import { DOCTOR_SCALE } from "./doctorScale";
 import type { Direction } from "./useProtagonistController";
 
 type ProtagonistSpriteProps = {
@@ -47,13 +48,9 @@ export function ProtagonistSprite({
     width: spriteSize,
     height: spriteSize,
     imageRendering: "pixelated",
-    ...(scale === 1 && !mirrored
-      ? null
-      : {
-          transform:
-            `${scale === 1 ? "" : `scale(${scale}) `}${mirrored ? "scaleX(-1)" : ""}`.trim(),
-          transformOrigin: "50% 100%",
-        }),
+    transform:
+      `scale(${scale * DOCTOR_SCALE}) ${mirrored ? "scaleX(-1)" : ""}`.trim(),
+    transformOrigin: "50% 100%",
   };
 
   return (

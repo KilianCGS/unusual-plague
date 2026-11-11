@@ -1,6 +1,6 @@
-/* Same parchment family as the inventory bar and the Book: paper #e9dbb9, dark
-   brown ink #2b1a14, hard edges, no blur. Top left of the game frame; it never
-   takes the pointer except its own title. */
+/* Same family as the inventory bar and the Book: a wooden title strip over
+   parchment (paper #e9dbb9, dark brown ink #2b1a14), hard edges, no blur. Top
+   left of the game frame; it never takes the pointer except its own title. */
 .panel {
   position: absolute;
   top: 12px;
@@ -22,11 +22,16 @@
   width: 100%;
   padding: 5px 8px;
   font: 700 12px/1 var(--ui-font);
-  color: #2b1a14;
+  color: #f4ead5;
   text-align: left;
-  background: #d9c9a3;
+  background-color: #4a3524;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(20, 10, 4, 0.2) 0 2px,
+    transparent 2px 9px
+  );
   border: 0;
-  border-bottom: 2px solid #8a6a4a;
+  border-bottom: 3px solid #1c110c;
   cursor: pointer;
   pointer-events: auto;
 }
@@ -74,8 +79,31 @@
   border: 2px solid #2b1a14;
 }
 
+/* The tick is stamped in ink when the errand is done. */
 .done .box {
   color: #2f6b34;
+  border-color: #2f6b34;
+  animation: stamp 0.4s steps(5) both;
+}
+
+@keyframes stamp {
+  0% {
+    transform: scale(2.2) rotate(-14deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(0.9) rotate(4deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .done .box {
+    animation: none;
+  }
 }
 
 .done .text {

@@ -66,9 +66,9 @@ const storageOf = (pairs) => stock(pairs, st.createEmptyStorage());
 const snap = (x) => JSON.stringify(x);
 
 test("A. the Doctor's inventory holds 5 item types; the storage has its own generous capacity", () => {
-  assert.equal(inv.INVENTORY_CAPACITY, 5);
-  assert.equal(inv.createEmptyInventory().slots.length, 5);
-  assert.equal(createChapter1Inventory().capacity, 5);
+  assert.equal(inv.INVENTORY_CAPACITY, 6);
+  assert.equal(inv.createEmptyInventory().slots.length, 6);
+  assert.equal(createChapter1Inventory().capacity, 6);
   assert.equal(st.createEmptyStorage().capacity, st.STORAGE_CAPACITY);
   assert.ok(st.STORAGE_CAPACITY > inv.INVENTORY_CAPACITY);
   assert.ok(inv.isValidInventory(st.createEmptyStorage()));
@@ -111,10 +111,10 @@ test("D. a destination that already holds the item merges quantities without a s
 });
 
 test("E. a full Doctor inventory refuses a NEW type from storage, atomically", () => {
-  const doctor = stock(["a", "b", "c", "d", "e"].map((id) => [id, 1]));
+  const doctor = stock(["a", "b", "c", "d", "e", "f"].map((id) => [id, 1]));
   const storage = storageOf([["water", 2]]);
   const [d0, s0] = [snap(doctor), snap(storage)];
-  assert.equal(inv.countOccupiedSlots(doctor), 5);
+  assert.equal(inv.countOccupiedSlots(doctor), 6);
   assert.equal(st.transferStack(storage, doctor, "water"), null);
   assert.equal(snap(doctor), d0);
   assert.equal(snap(storage), s0);

@@ -136,9 +136,11 @@ test("south, north and east run with their own frames; west runs with the east o
   assert.equal(Object.keys(run.PROTAGONIST_RUN_SPRITES).length, 3);
 });
 
-test("the 24 run frames are 96x96 RGBA PNGs, and the old 4-frame set is gone (no 8.png)", () => {
+test("the run frames (south 8, north 12, east 12) are 96x96 RGBA PNGs, with none past the end", () => {
   for (const direction of ["south", "north", "east"]) {
-    for (let frame = 0; frame < 8; frame++) {
+    const count = run.PROTAGONIST_RUN_FRAME_COUNTS[direction];
+    assert.equal(run.PROTAGONIST_RUN_SPRITES[direction].length, count);
+    for (let frame = 0; frame < count; frame++) {
       const png = fs.readFileSync(
         path.join(
           root,
@@ -157,17 +159,23 @@ test("the 24 run frames are 96x96 RGBA PNGs, and the old 4-frame set is gone (no
           root,
           "public/game/characters/protagonist/run",
           direction,
-          "8.png",
+          `${count}.png`,
         ),
       ),
     );
   }
 });
 
-test("walking is untouched: 4 frames per direction at 120 ms", () => {
+test("walking: 4 frames north/south at 120 ms, 8 frames east/west at 70 ms", () => {
   const controller = read("src/game/protagonist/useProtagonistController.ts");
+  assert.equal(run.getFrameDuration(false, 4), 120);
+  assert.equal(run.getFrameDuration(false, 8), 70);
+  assert.equal(run.getFrameDuration(true, 8), 60);
+  assert.equal(run.getFrameDuration(true, 12), 45);
   for (const direction of ["south", "north", "east", "west"]) {
-    for (let frame = 0; frame < 4; frame++) {
+    const count = run.PROTAGONIST_WALK_FRAME_COUNTS[direction];
+    assert.equal(count, direction === "south" || direction === "north" ? 4 : 8);
+    for (let frame = 0; frame < count; frame++) {
       assert.ok(
         fs.existsSync(
           path.join(
@@ -176,15 +184,17 @@ test("walking is untouched: 4 frames per direction at 120 ms", () => {
           ),
         ),
       );
-      assert.ok(
-        controller.includes(`/walk/${direction}/${frame}.png`),
-        `${direction} ${frame}`,
-      );
     }
     assert.ok(
-      !controller.includes(`/walk/${direction}/4.png`),
-      "walk has no 5th frame",
+      !fs.existsSync(
+        path.join(
+          root,
+          `public/game/characters/protagonist/walk/${direction}/${count}.png`,
+        ),
+      ),
+      "no frame past the end",
     );
+    assert.ok(controller.includes(`walkFrames("${direction}")`));
   }
   assert.ok(
     controller.includes(
@@ -193,22 +203,23 @@ test("walking is untouched: 4 frames per direction at 120 ms", () => {
   );
 });
 
-test("switching between walking (4 frames) and running (8) keeps the phase and never reads a missing frame", () => {
+test("switching between walking and running (and between directions) keeps the phase and never reads a missing frame", () => {
   const controller = read("src/game/protagonist/useProtagonistController.ts");
-  // the run frame count is the run constant, never a hard-coded 4
-  assert.ok(controller.includes("PROTAGONIST_RUN_FRAME_COUNT"));
-  assert.ok(controller.includes("currentPlayer.frame * 2"));
-  assert.ok(controller.includes("Math.floor(currentPlayer.frame / 2)"));
+  // the frame counts come from the data, never a hard-coded 4 or 8
+  assert.ok(controller.includes("getRunFrameCount"));
+  assert.ok(controller.includes("getWalkFrameCount"));
+  assert.ok(controller.includes("previousFrameCount"));
   assert.ok(controller.includes("% frameCount"));
-  assert.ok(!/% 4/.test(controller));
-  // the same mapping as a pure check: every walk frame maps inside the run cycle and back
-  for (let walkFrame = 0; walkFrame < 4; walkFrame++) {
-    const asRun = walkFrame * 2;
-    assert.ok(asRun < run.PROTAGONIST_RUN_FRAME_COUNT);
-    assert.equal(Math.floor(asRun / 2), walkFrame);
-  }
-  for (let runFrame = 0; runFrame < 8; runFrame++) {
-    assert.ok(Math.floor(runFrame / 2) < 4);
+  assert.ok(!/% 4/.test(controller));
+  // the same mapping as a pure check, for every pair of cycles
+  const counts = [4, 8, 12];
+  for (const from of counts) {
+    for (const to of counts) {
+      for (let frame = 0; frame < from; frame++) {
+        const mapped = Math.min(to - 1, Math.floor((frame * to) / from));
+        assert.ok(mapped >= 0 && mapped < to);
+      }
+    }
   }
 });
 
@@ -421,7 +432,7 @@ test("the west mirror is visual only: it flips the image around its centre and m
   }
 });
 
-test("the 24 run frames are preloaded (3 x 8), and nothing is preloaded for west", () => {
+test("the 32 run frames are preloaded (8 + 12 + 12), and nothing is preloaded for west", () => {
   const source = read("src/game/protagonist/protagonistRun.ts");
   assert.ok(source.includes("export function preloadRunSprites"));
   assert.ok(
@@ -434,10 +445,10 @@ test("the 24 run frames are preloaded (3 x 8), and nothing is preloaded for west
       (n, list) => n + list.length,
       0,
     ),
-    24,
+    32,
   );
-  for (const list of Object.values(run.PROTAGONIST_RUN_SPRITES)) {
-    assert.equal(list.length, 8);
+  for (const [direction, list] of Object.entries(run.PROTAGONIST_RUN_SPRITES)) {
+    assert.equal(list.length, run.PROTAGONIST_RUN_FRAME_COUNTS[direction]);
   }
 });
 

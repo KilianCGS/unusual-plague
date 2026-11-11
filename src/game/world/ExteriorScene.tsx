@@ -26,6 +26,7 @@ import { useInteraction } from "../interactions/useInteraction";
 import { getNpcColliders } from "../npcs/sceneNpc";
 import { getSceneNpcs } from "../npcs/sceneNpcs";
 import { SceneNpcSprite } from "../npcs/SceneNpcSprite";
+import { DOCTOR_SCALE } from "../protagonist/doctorScale";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
 import { useReportRunning } from "../protagonist/useReportRunning";
 import type { DirectionInputHandle } from "../protagonist/useDirectionInput";
@@ -107,6 +108,7 @@ export function ExteriorScene({
   onPlayerMoved,
   onRunningChange,
   onInteractionAvailable,
+  promptLabelFor,
   collectedInstanceIds,
   hiddenInstanceIds,
   attentionInstanceIds,
@@ -136,6 +138,8 @@ export function ExteriorScene({
   onRunningChange?: (running: boolean) => void;
   // The interactionId available right now (null = none).
   onInteractionAvailable?: (interactionId: string | null) => void;
+  // Optional word shown after the E ("Preparar") for an interaction.
+  promptLabelFor?: (interactionId: string) => string | undefined;
   // Collectibles already picked up this session; they are not drawn, do not
   // block and give no prompt.
   collectedInstanceIds?: CollectedInstanceIds;
@@ -290,7 +294,8 @@ export function ExteriorScene({
       headTopY =
         player.y -
         (spriteSize - SPEAKER_TOP_PADDING) *
-          (scene.visual.protagonistScale ?? 1);
+          (scene.visual.protagonistScale ?? 1) *
+          DOCTOR_SCALE;
     } else if (decorSpeaker) {
       // A decor instance: its anchor is where it stands, so a moved or
       // rescaled instance carries its bubble with it. The head is the top of
@@ -580,6 +585,7 @@ export function ExteriorScene({
             feetY={player.y}
             spriteSize={spriteSize}
             spriteScale={scene.visual.protagonistScale ?? 1}
+            label={promptLabelFor?.(availableInteraction.interactionId)}
             zoom={zoom}
             cameraOffsetX={camera.offsetX}
             cameraOffsetY={camera.offsetY}

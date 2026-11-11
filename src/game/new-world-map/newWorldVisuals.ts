@@ -158,6 +158,22 @@ export const NEW_WORLD_VISUALS: DevScene[] = [
     logicalUnitsPerAssetPixel: 1,
     colliders: [],
   },
+  // The mushroom glade (2026-11-11): a second place to find the Witch, picking
+  // mushrooms, and to gather them. Same size as the deep forest and the same
+  // units per pixel. Background only until Kilian paints its colliders, exits
+  // and spawns; initialAsset* is the preview start of the dev tools only (the
+  // west end of the path).
+  {
+    id: "forest-glade",
+    label: "Claro de las setas (nuevo mundo)",
+    backgroundSrc: `${DIR}/forest-glade-background.png`,
+    assetWidth: 1427,
+    assetHeight: 1102,
+    initialAssetX: 110,
+    initialAssetY: 590,
+    logicalUnitsPerAssetPixel: 1,
+    colliders: [],
+  },
 ];
 
 // The inside of the cottage: unmodified copy of the approved 1426x1103 image.

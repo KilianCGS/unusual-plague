@@ -1,0 +1,52 @@
+/* The "E" over the Doctor's head, drawn as a keycap that is pressed now and
+   then (it asks to be pushed). Parchment key, ink outline, thick lower edge. */
+.prompt {
+  position: absolute;
+  z-index: 10;
+  padding: 1px 9px 3px;
+  font: 700 17px/1 monospace;
+  letter-spacing: 0.04em;
+  color: #2b1a14;
+  background: #ecdfbe;
+  border: 2px solid #1c110c;
+  border-bottom-width: 5px;
+  box-shadow: inset 0 0 0 1px #fff6de;
+  pointer-events: none;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: baseline;
+  animation: key-press 1.3s steps(1) infinite;
+}
+
+/* What the key does, written after it ("E  Preparar"), separated by a thin ink rule. */
+.label {
+  margin-left: 9px;
+  padding-left: 9px;
+  border-left: 2px solid rgba(43, 26, 20, 0.45);
+  font: 700 13px/1 monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@keyframes key-press {
+  0%,
+  70% {
+    margin-top: 0;
+    border-bottom-width: 5px;
+  }
+  78%,
+  90% {
+    margin-top: 3px;
+    border-bottom-width: 2px;
+  }
+  100% {
+    margin-top: 0;
+    border-bottom-width: 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prompt {
+    animation: none;
+  }
+}

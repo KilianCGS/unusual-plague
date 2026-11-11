@@ -47,6 +47,11 @@ test("the background is the untouched picture: nothing over it, not darkened, no
     !/linear-gradient|rgba\(0, 0, 0/.test(main),
     "no veil over the art",
   );
+  // the animated version of the same picture sits on top of the still one
+  assert.ok(main.includes('url("/game/narrative/title-animated.webp")'));
+  assert.ok(
+    fs.existsSync(path.join(root, "public/game/narrative/title-animated.webp")),
+  );
   assert.ok(main.includes("background-size: cover"));
   assert.ok(!/filter|backdrop-filter/.test(main));
   assert.ok(

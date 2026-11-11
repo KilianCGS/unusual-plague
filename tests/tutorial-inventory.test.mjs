@@ -206,11 +206,11 @@ test("every hint step has ES and EN copy with its key", () => {
   assert.ok(inventoryCopy.es.title && inventoryCopy.en.title);
 });
 
-test("inventory: capacity is 5 and the initial state is empty", () => {
-  assert.equal(inv.INVENTORY_CAPACITY, 5);
+test("inventory: capacity is 6 and the initial state is empty", () => {
+  assert.equal(inv.INVENTORY_CAPACITY, 6);
   const state = inv.createEmptyInventory();
-  assert.equal(state.capacity, 5);
-  assert.equal(state.slots.length, 5);
+  assert.equal(state.capacity, 6);
+  assert.equal(state.slots.length, 6);
   assert.ok(state.slots.every((slot) => slot === null));
   assert.equal(inv.countOccupiedSlots(state), 0);
   assert.ok(inv.isValidInventory(state));

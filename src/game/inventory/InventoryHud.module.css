@@ -1,6 +1,7 @@
-/* The carried-inventory bar: a strip of 5 slots at the bottom-centre of the
-   game frame. Parchment like the Inventory overlay (paper #e9dbb9, slot
-   #c9b88f, dark brown #2b1a14); square, hard-edged, no blur or gradients. */
+/* The carried-inventory bar: a strip of slots at the bottom-centre of the game
+   frame. Parchment slots set in a dark wooden frame with iron rivets, the same
+   family as the Compendium and the map: hard-edged, no blur (the wood grain and
+   the bevels are solid stripes and solid shadows). */
 .dock {
   /* The icons are 48 px pixel art: they are shown at an EXACT multiple (2x on
      normal windows, 1x on short ones) so the pixels stay even. The slot is the
@@ -18,24 +19,67 @@
   pointer-events: none;
 }
 
+/* The wooden frame: dark planks with grain lines, a lit top edge, a heavy
+   drop edge below and two iron rivets on the top corners. */
 .bar {
+  position: relative;
   display: flex;
   gap: 4px;
   margin: 0;
-  padding: 4px;
+  padding: 9px 11px 11px;
   list-style: none;
-  background: #e9dbb9;
+  background-color: #4a3524;
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(20, 10, 4, 0.2) 0 2px,
+      transparent 2px 9px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 228, 180, 0.07) 0 1px,
+      transparent 1px 6px
+    );
   border: 3px solid #1c110c;
-  box-shadow: inset 0 0 0 1px #8a6a4a;
+  box-shadow:
+    inset 0 0 0 2px #6a4e35,
+    inset 0 4px 0 #8a6a47,
+    0 4px 0 rgba(10, 5, 2, 0.55);
 }
 
+.bar::before,
+.bar::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  width: 6px;
+  height: 6px;
+  background: #a7adb3;
+  border: 1px solid #1c110c;
+  box-shadow: inset 1px 1px 0 #e3e6e9;
+}
+
+.bar::before {
+  left: 3px;
+}
+
+.bar::after {
+  right: 3px;
+}
+
+/* A parchment pocket pressed into the wood: dark inner edge on the top left,
+   light inner edge on the bottom right. */
 .slot {
   position: relative;
   box-sizing: border-box;
   width: var(--slot-size);
   height: var(--slot-size);
-  background: #c9b88f;
+  background: #e0d1a9;
   border: 2px solid #2b1a14;
+  box-shadow:
+    inset 3px 3px 0 rgba(74, 50, 28, 0.36),
+    inset -2px -2px 0 rgba(255, 246, 222, 0.6);
+  transition: transform 0.12s steps(2);
 }
 
 /* Only an occupied slot answers the cursor (to show its label); the empty
@@ -44,16 +88,40 @@
   pointer-events: auto;
 }
 
-.slot[data-empty="true"] {
-  background: #d8cba6;
-  border-color: #6b5238;
+.slot[data-empty="false"]:hover,
+.slot[data-empty="false"]:focus-visible {
+  transform: translateY(-3px);
 }
 
+.slot[data-empty="true"] {
+  background: #cdbd96;
+  border-color: #5e4630;
+  box-shadow: inset 4px 4px 0 rgba(60, 40, 22, 0.34);
+}
+
+/* An item that arrives, or whose number changes, pops in (the icon is
+   re-created when either changes, which restarts the animation). */
 .itemIcon {
   position: absolute;
   inset: 0;
   width: var(--icon-size);
   height: var(--icon-size);
+  animation: slot-pop 0.3s steps(6) both;
+}
+
+@keyframes slot-pop {
+  0% {
+    transform: scale(0.55);
+    filter: brightness(1.8);
+  }
+  60% {
+    transform: scale(1.14);
+    filter: brightness(1.25);
+  }
+  100% {
+    transform: scale(1);
+    filter: none;
+  }
 }
 
 .name {
@@ -68,28 +136,28 @@
   overflow-wrap: break-word;
 }
 
+/* The quantity is an ink-bordered tab on the lower right corner. */
 .quantity {
   position: absolute;
-  right: 2px;
-  bottom: 0;
-  color: #2b1a14;
-  font-size: 22px;
+  right: 3px;
+  bottom: 3px;
+  padding: 1px 5px 2px;
+  color: #f4ead5;
+  background: #2b1a14;
+  border: 1px solid #8a6a4a;
+  font-size: 18px;
   line-height: 1;
   font-weight: 700;
 }
 
-/* Over an icon: dark digits with a cream outline so they read on any art. */
+/* Over an icon the tab keeps the same ink look (readable on any art). */
 .quantityOverIcon {
-  color: #1c110c;
-  text-shadow:
-    1px 0 0 #f4ead5,
-    -1px 0 0 #f4ead5,
-    0 1px 0 #f4ead5,
-    0 -1px 0 #f4ead5;
+  color: #f4ead5;
+  text-shadow: none;
 }
 
 .slot:focus-visible {
-  outline: 2px solid #1c110c;
+  outline: 2px solid #f4ead5;
   outline-offset: 1px;
 }
 
@@ -99,7 +167,22 @@
     --slot-size: 52px;
   }
 
+  .bar {
+    padding: 6px 8px 8px;
+  }
+
   .quantity {
-    font-size: 13px;
+    font-size: 12px;
+    padding: 0 3px 1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .itemIcon {
+    animation: none;
+  }
+
+  .slot {
+    transition: none;
   }
 }

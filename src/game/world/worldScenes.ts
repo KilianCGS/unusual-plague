@@ -136,6 +136,7 @@ export type SceneId =
   | "mountain-path"
   | "quarry"
   | "forest-deep"
+  | "forest-glade"
   | "mine-interior"
   | "mine-natural-cave"
   | "doctor-room";
@@ -206,6 +207,7 @@ export const OLD_WORLD_SCENES: Record<
     | "granary-interior"
     | "quarry"
     | "forest-deep"
+    | "forest-glade"
   >,
   WorldScene
 > = {

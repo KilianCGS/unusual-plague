@@ -60,8 +60,8 @@ const fill = (ids) =>
 
 test("1. the inventory starts with 5 empty slots", () => {
   const state = inv.createEmptyInventory();
-  assert.equal(state.slots.length, 5);
-  assert.equal(state.capacity, 5);
+  assert.equal(state.slots.length, 6);
+  assert.equal(state.capacity, 6);
   assert.equal(inv.countOccupiedSlots(state), 0);
 });
 
@@ -89,25 +89,25 @@ test("4. different item types take different slots", () => {
   assert.equal(inv.countOccupiedSlots(state), 3);
 });
 
-test("5. five different types fill the inventory", () => {
-  const state = fill(types(5));
-  assert.equal(inv.countOccupiedSlots(state), 5);
+test("5. six different types fill the inventory", () => {
+  const state = fill(types(6));
+  assert.equal(inv.countOccupiedSlots(state), 6);
   assert.ok(inv.isValidInventory(state));
 });
 
 test("6. a 7th type cannot be added", () => {
-  const full = fill(types(5));
+  const full = fill(types(6));
   assert.equal(inv.canAddItem(full, "item-7"), false);
   assert.equal(inv.addItem(full, "item-7"), null);
 });
 
 test("7. a full inventory still accepts more of a type it already holds", () => {
-  const full = fill([HERB, ...types(4)]);
-  assert.equal(inv.countOccupiedSlots(full), 5);
+  const full = fill([HERB, ...types(5)]);
+  assert.equal(inv.countOccupiedSlots(full), 6);
   assert.equal(inv.canAddItem(full, HERB), true);
   const more = inv.addItem(full, HERB, 2);
   assert.equal(inv.countItem(more, HERB), 3);
-  assert.equal(inv.countOccupiedSlots(more), 5);
+  assert.equal(inv.countOccupiedSlots(more), 6);
 });
 
 test("8. addItem is immutable", () => {

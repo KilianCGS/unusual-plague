@@ -1,107 +1,98 @@
-# Borrador: más objetos, cocina medicinal y misiones (día 1)
+# Borrador: objetos, cocina medicinal, misiones y noche del capítulo 3
 
-**Estado: BORRADOR para que lo corrijas.** Solo lo marcado con ✅ lo has aprobado
-tú. Todo lo demás son propuestas mías: nombres, precios, usos, líneas de diálogo
-y cantidades están pendientes de tu decisión. No hay nada implementado.
+**Estado: BORRADOR.** Solo lo marcado con ✅ lo has aprobado tú. Lo demás son
+propuestas mías: precios, líneas de diálogo y cantidades siguen pendientes. Nada
+de esto está implementado salvo lo indicado en "Ya hecho".
 
-## 1. Lo decidido (✅)
+## 1. Decidido (✅)
 
 - ✅ Cocina medicinal: más comida además de medicinas.
-- ✅ Hasta 8 objetos nuevos, algunos solo ingredientes. El mercader tendrá más cosas.
-- ✅ El mercader vende **sal** (1 moneda) y el Doctor empieza con **4 monedas** (hoy 3).
-  El agradecimiento de la panadera pasa a ser un extra.
-- ✅ Misiones del día 1: una en cada zona nueva (bosque profundo, cantera) y una
-  del pueblo. Cada una da ingredientes y una conversación que cuente algo.
-- ✅ El leñador pasa al fondo del bosque. El bosque profundo da resina y/o setas.
-- ✅ La cantera: más personajes y más ingredientes.
-- Tus fotos de las dos zonas nuevas ya existen; faltan colliders, salidas, spawns y
-  decoración, que son tuyos.
+- ✅ **4 objetos nuevos** (en lugar de 8): **hueso, seta, azúcar, cebolla**.
+- ✅ Renombrar el de la mina: **Hongo de cueva**; el nuevo del bosque profundo es la **Seta de pino**.
+- ✅ **6 recetas nuevas** (sección 3).
+- ✅ Origen: **regalos de misión en el día 1** (te enseñan las recetas) y **el mercader los vende desde el día 2** (azúcar caro y cebolla).
+- ✅ Inventario de **6 casillas**; se mantiene el límite y se gestiona con el cofre (sin bolsa mejor).
+- ✅ Mercader: sal a 1 moneda y empiezas con 4 monedas.
+- ✅ Misiones del día 1: una en cada zona nueva y una del pueblo; el leñador vive en el campamento del bosque profundo y un personaje se sienta en el banco de la cantera.
+- ✅ Noche del capítulo 3: ChatGPT pinta las versiones nocturnas; **colliders y zonas no cambian**, solo la decoración.
+- Tus dibujos de cantera y bosque profundo ya están integrados como fondo. Faltan colliders, salidas, spawns y decoración (tuyos).
 
-## 2. ¿Cuesta mucho? Lo que sí y lo que no
+## 2. Ya hecho
 
-| Parte | Esfuerzo | Notas |
+- Sal en el mercader, 4 monedas iniciales, inventario a 6, fondos de las zonas nuevas, mapa con Cantera y Bosque profundo.
+- Pruebas automáticas: alcanzabilidad de todas las escenas y viabilidad del día 1.
+- Recorrido real del día 1 de principio a fin: los tres pacientes tratados, cobro exacto (26 monedas) y cierre del día.
+
+## 3. Los 4 objetos y las 6 recetas
+
+| Objeto | Origen | Precio (propuesta, no redondo) |
 |---|---|---|
-| Objetos y recetas en datos (`items.ts`, `recipes.ts`) | Bajo | Las reglas del mortero, la guarda de "no lo necesito" y la guía de ingredientes ya funcionan con datos |
-| Reorganizar tratamientos de pacientes | Bajo-medio | Es cambiar `requiredTreatments`; cuesta más reescribir los diálogos que los nombran |
-| Mercader con más cosas | Bajo | Ya existe la tienda y su pantalla |
-| 8 iconos de inventario y 8 ilustraciones del Compendio | **Medio** | Con Codex, como el mapa. El Compendio tiene las páginas de ingredientes llenas: hace falta una página nueva y ajustar su test |
-| Textos ES/EN (nombres, descripciones, diálogos de misiones) | **Medio** | Los marco todos para tu revisión |
-| Equilibrio entre días | **Lo difícil** | Es tu observación: ingredientes ↔ crafteo ↔ dolencias ↔ motivo para explorar |
+| Hueso | Cocinero del campamento de la cantera (regalo en la misión del día 1) | mercader desde el día 2, por decidir |
+| Seta de pino | Bosque profundo (regalo del leñador y recogible) | no se vende |
+| Azúcar | Mercader desde el día 2 | caro, por decidir |
+| Cebolla | Granja y mercader desde el día 2 | barato, por decidir |
 
-El equilibrio se puede **comprobar con tests**, no solo a ojo. Ya hay uno para el
-día 1 (`tests/day1-solvable.test.mjs`): con las fuentes que existen, los pacientes se
-pueden completar y las monedas alcanzan. Lo ampliaré a los días 2 y 3.
+Todas las recetas son **al fuego** (máximo 3 ingredientes); el mortero no cambia.
 
-## 3. Propuesta de 8 objetos (cocina medicinal)
+| Receta | Ingredientes | Sirve para |
+|---|---|---|
+| Caldo de huesos | hueso + agua + sal | estómago, agotamiento |
+| Crema de setas | seta de pino + leche + sal | estómago, agotamiento |
+| Jarabe de cebolla | cebolla + azúcar | tos (capítulo 3) |
+| Bebida reconstituyente | agua + azúcar + sal | agotamiento |
+| Jarabe cítrico | naranja + azúcar | escorbuto (capítulo 3) |
+| Caldo fuerte | cebolla + hueso + agua | agotamiento, fuerzas |
 
-Edad media: sin patata ni tomate. Origen y precio son propuestas.
-
-| Objeto | Origen | Receta nueva | Para qué dolencia |
-|---|---|---|---|
-| Cebada | Molino / granja | Agua de cebada (cebada + agua), fuego | Fiebre, alternativa a la infusión |
-| Huevo | Mujer de la granja | Yema con miel (huevo + miel), mesa | Agotamiento |
-| Cebolla | Granja o mercader | Jarabe de cebolla (cebolla + miel), fuego | Tos, alternativa al jarabe balsámico |
-| Vinagre | Mercader (monedas) | Compresa de vinagre (vinagre + tela), mesa | Heridas, fiebre alta |
-| Setas de pino | Bosque profundo | Caldo de setas (setas + agua + sal), fuego | Estómago, agotamiento |
-| Bayas | Bosque profundo | Jarabe de bayas (bayas + miel), fuego | Escorbuto |
-| Hueso para caldo | Campamento de la cantera | Caldo de huesos (hueso + agua + sal), fuego | Agotamiento, estómago |
-| Corteza de sauce | Bosque profundo | Infusión de sauce (agua + corteza), fuego; la corteza se tritura en el mortero | Fiebre y dolor |
-
-El mortero sigue la regla acordada: solo tritura (corteza, ajo, hierba, carbón).
-Las mezclas se hacen en la mesa o al fuego.
-
-**Mercader (propuesta):** sal 1, tela 1 (×3), ajo 2 (ya aprobado), vinagre y cebolla
-(precios por decidir; no redondos). Todo lo que vende sirve para avanzar.
+El azúcar existía en la época como especia cara y medicinal, así que encaja como
+objeto que se compra en vez de recoger.
 
 ## 4. Dolencias y tratamientos
 
-El Compendio ya promete más variedad que la que usan los pacientes: "sopa ligera,
-leche con miel o un preparado de carbón" para el estómago; infusión de menta o
-jarabe balsámico para la tos; bebida cítrica para escorbuto y agotamiento. Los
-objetos nuevos se apoyan en eso, sin cambiar el texto del libro.
+El Compendio ya promete variedad: la tos admite infusión de menta o jarabe
+balsámico; el escorbuto, bebida cítrica; el agotamiento, bebida cítrica. Los
+objetos nuevos se apoyan en eso sin cambiar el libro.
 
-| Dolencia | Hoy (requerido) | Alternativas con objetos nuevos |
+| Dolencia | Hoy | Alternativas nuevas |
 |---|---|---|
-| Fiebre común | infusión medicinal + paño frío | agua de cebada, infusión de sauce, compresa de vinagre |
-| Mal del estómago | sopa de setas + leche con miel | caldo de setas, caldo de huesos |
-| Herida infectada | vendaje desinfectado + ungüento | compresa de vinagre |
-| Tos del pecho (día 3) | por definir | jarabe de cebolla, infusión de menta, jarabe balsámico |
-| Escorbuto (día 3) | por definir | jarabe de bayas, bebida cítrica |
-| Agotamiento | bebida cítrica + infusión de menta | yema con miel, caldo de huesos |
+| Fiebre común | infusión medicinal + paño frío | sin cambios |
+| Mal del estómago | sopa de hongo de cueva + leche con miel | caldo de huesos, crema de setas |
+| Herida infectada | vendaje + ungüento | sin cambios |
+| Tos del pecho (cap. 3) | por definir | jarabe de cebolla, infusión de menta, jarabe balsámico |
+| Escorbuto (cap. 3) | por definir | jarabe cítrico, bebida cítrica |
+| Agotamiento | bebida cítrica + infusión de menta | bebida reconstituyente, caldo fuerte, caldo de huesos |
 
-Pregunta de diseño: ¿el paciente exige un tratamiento concreto, o varios valen
-(el jugador elige según lo que tenga)? Lo segundo da más libertad, pero complica
-los diálogos que nombran el objeto.
+Pregunta de diseño abierta: ¿el paciente pide un tratamiento concreto o valen varios?
 
 ## 5. Misiones del día 1 (esbozo, sin texto final)
 
-Todas son **opcionales**: no bloquean a los pacientes.
+Todas son opcionales y no bloquean a los pacientes.
 
-| Dónde | Quién | Pide (idea) | Da (idea) | Conversación |
-|---|---|---|---|---|
-| Fondo del bosque | Leñador | Algo sencillo de la botica para el cansancio | Corteza de sauce y resina | El bosque, la bruja, por qué trabaja tan lejos |
-| Cantera | Capataz | Un recado o un preparado pequeño | Hueso para caldo | Los mineros, los derrumbes, el campamento |
-| Pueblo | Costurera de la calle de la botica | Algo pequeño | Tela (ahorra una moneda) | Noticias de panadera y taberna |
+| Dónde | Quién | Da | Conversación |
+|---|---|---|---|
+| Bosque profundo | Leñador (campamento) | Seta de pino | El bosque y la bruja |
+| Cantera | Cocinero o capataz (banco, hoguera) | Hueso | Los mineros, los derrumbes |
+| Pueblo | Costurera de la calle de la botica | Tela (ahorra una moneda) | Noticias de panadera y taberna |
 
-El leñador de la jornada 2 es un paciente (agotamiento). Si pasa al fondo del bosque,
-su sitio y su ruta cambian también en el capítulo 2; hay que decidirlo.
+## 6. Noche del capítulo 3
 
-## 6. Reglas de equilibrio que vigilarán los tests
+ChatGPT pinta una versión nocturna de cada escena. Lo que hay que cuidar:
 
-1. En cada día, todo lo que piden los pacientes sale de fuentes reales (recogidas,
-   trueques, mercader, misiones) y las monedas cubren el gasto obligatorio.
-2. Las misiones no son obligatorias: sin ellas el día se completa.
-3. Cada zona nueva aporta al menos una cosa útil y alcanzable (lo comprueba el
-   verificador de alcanzabilidad cuando tengan colliders).
-4. Cada objeto nuevo tiene al menos una receta y un uso (paciente, alternativa o misión).
-5. Sin callejones: ningún objeto necesario queda solo detrás de otro opcional.
+- **Misma composición, mismo tamaño y mismo encuadre que el fondo de día.** Así los
+  colliders, las formas de profundidad, las transiciones y los spawns siguen valiendo
+  sin tocarlos. Un desfase de unos píxeles ya se notaría en las colisiones.
+- Antes de integrar cada imagen, una **comprobación automática de alineación** contra
+  el fondo de día (comparación de contornos) para detectar desvíos.
+- La capa de profundidad recorta el fondo de la escena: en capítulo 3 debe leer la
+  versión nocturna. Se resuelve en el juego, no a mano.
+- La decoración (llamas, luces, personajes) se coloca en el Decorator en una
+  composición propia del capítulo 3, que ya es el mecanismo del juego.
+- Peso: unas 13 escenas exteriores a 3 o 4 MB cada una. Se cargan solo en el capítulo 3.
 
 ## 7. Preguntas abiertas
 
-- ¿Qué objetos de los 8 te gustan, cuáles cambiarías y cuáles faltan?
-- ¿Un tratamiento por dolencia o varios válidos?
+- Precios del mercader (azúcar, cebolla, hueso, sal): invento valores no redondos para tu revisión.
+- ¿Un tratamiento concreto por paciente o varios válidos?
 - ¿El leñador sigue siendo paciente el día 2 en el fondo del bosque?
-- ¿La costurera es la vecina del día 1 o prefieres otra persona?
-- Precios del mercader (invento valores no redondos para tu revisión).
-- Orden de trabajo: primero datos y mercader, luego arte (Codex), luego misiones
-  cuando lleguen los colliders de las dos zonas.
+- ¿Quién es el personaje del banco de la cantera y qué da?
+- El agradecimiento de la panadera ahora da una sal sobrante (el mercader ya la vende): ¿lo cambiamos por otra cosa?
+- Detalle de interfaz que he visto: con la pantalla de diagnóstico abierta, pulsar Espacio activa la primera opción (Envenenamiento) sin querer. ¿Lo dejamos o lo evitamos?

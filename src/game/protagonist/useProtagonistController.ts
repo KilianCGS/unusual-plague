@@ -17,8 +17,9 @@ import {
 } from "./useDirectionInput";
 import {
   MAX_FRAME_DELTA_SECONDS,
-  PROTAGONIST_RUN_FRAME_COUNT,
-  PROTAGONIST_RUN_FRAME_DURATION,
+  getFrameDuration,
+  getRunFrameCount,
+  getWalkFrameCount,
   PROTAGONIST_RUN_SPEED,
   PROTAGONIST_WALK_FRAME_DURATION,
   PROTAGONIST_WALK_SPEED,
@@ -27,7 +28,7 @@ import {
 } from "./protagonistRun";
 
 export type { Direction };
-// 0..3 walking (4 frames), 0..7 running (8 frames).
+// 0..3 or 0..7 walking, 0..7 or 0..11 running (see protagonistRun.ts).
 export type AnimationFrame = number;
 
 export type ProtagonistState = {
@@ -82,31 +83,18 @@ const protagonistIdleSprites: Record<Direction, string> = {
   west: "/game/characters/protagonist/idle/west.png",
 };
 
+function walkFrames(direction: Direction): string[] {
+  return Array.from(
+    { length: getWalkFrameCount(direction) },
+    (_, frame) => `/game/characters/protagonist/walk/${direction}/${frame}.png`,
+  );
+}
+
 const protagonistWalkSprites: Record<Direction, string[]> = {
-  north: [
-    "/game/characters/protagonist/walk/north/0.png",
-    "/game/characters/protagonist/walk/north/1.png",
-    "/game/characters/protagonist/walk/north/2.png",
-    "/game/characters/protagonist/walk/north/3.png",
-  ],
-  south: [
-    "/game/characters/protagonist/walk/south/0.png",
-    "/game/characters/protagonist/walk/south/1.png",
-    "/game/characters/protagonist/walk/south/2.png",
-    "/game/characters/protagonist/walk/south/3.png",
-  ],
-  east: [
-    "/game/characters/protagonist/walk/east/0.png",
-    "/game/characters/protagonist/walk/east/1.png",
-    "/game/characters/protagonist/walk/east/2.png",
-    "/game/characters/protagonist/walk/east/3.png",
-  ],
-  west: [
-    "/game/characters/protagonist/walk/west/0.png",
-    "/game/characters/protagonist/walk/west/1.png",
-    "/game/characters/protagonist/walk/west/2.png",
-    "/game/characters/protagonist/walk/west/3.png",
-  ],
+  north: walkFrames("north"),
+  south: walkFrames("south"),
+  east: walkFrames("east"),
+  west: walkFrames("west"),
 };
 
 export function useProtagonistController({
@@ -173,9 +161,6 @@ export function useProtagonistController({
       const running =
         activeDirection !== undefined && directionInput.run?.isArmed() === true;
       const speed = running ? PROTAGONIST_RUN_SPEED : playerSpeed;
-      const frameDuration = running
-        ? PROTAGONIST_RUN_FRAME_DURATION
-        : walkFrameDuration;
 
       if (activeDirection) {
         setPlayer((currentPlayer) => {
@@ -220,18 +205,30 @@ export function useProtagonistController({
             walkFrameElapsedRef.current = 0;
           }
 
-          // Walking has 4 frames and running 8: when the Doctor switches
-          // between them the animation keeps its phase (walk frame n is run
-          // frame 2n), so it never reads a frame that does not exist.
+          // Walking and running (and each direction) have different numbers
+          // of frames: when the Doctor switches between them the animation
+          // keeps its phase (the same fraction of the cycle), so it never
+          // reads a frame that does not exist.
           const frameCount = running
-            ? PROTAGONIST_RUN_FRAME_COUNT
-            : protagonistWalkSprites[activeDirection].length;
+            ? getRunFrameCount(activeDirection)
+            : getWalkFrameCount(activeDirection);
+          const previousFrameCount = currentPlayer.isRunning
+            ? getRunFrameCount(currentPlayer.direction)
+            : getWalkFrameCount(currentPlayer.direction);
+          const frameDuration = getFrameDuration(
+            running,
+            frameCount,
+            walkFrameDuration,
+          );
           const currentFrame =
-            currentPlayer.isRunning === running
+            previousFrameCount === frameCount
               ? currentPlayer.frame
-              : running
-                ? currentPlayer.frame * 2
-                : Math.floor(currentPlayer.frame / 2);
+              : Math.min(
+                  frameCount - 1,
+                  Math.floor(
+                    (currentPlayer.frame * frameCount) / previousFrameCount,
+                  ),
+                );
           let nextFrame: AnimationFrame = 0;
 
           if (didMove) {

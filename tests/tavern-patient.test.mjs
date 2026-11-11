@@ -367,6 +367,7 @@ test("11. the BARTENDER hands over the jar: not before the examination, once, no
     ["alcohol", 1],
     ["water", 1],
     ["mushroom", 1],
+    ["orange", 1],
   ]);
   const blocked = talk(BARTENDER, crowded);
   assert.equal(blocked.conversation.id, "chapter1.tavern.bartender.jarNoRoom");
@@ -720,6 +721,7 @@ test("the generic trade is ATOMIC: no room means no payment taken and nothing ma
       ["salt", 1],
       ["coal", 1],
       ["alcohol", 1],
+      ["mushroom", 1],
     ]),
     claimedRewards: new Set(),
   };
@@ -745,6 +747,7 @@ test("the generic trade is ATOMIC: no room means no payment taken and nothing ma
       ["cloth", 1],
       ["salt", 1],
       ["coal", 1],
+      ["mushroom", 1],
     ]),
     claimedRewards: new Set([ch1.FARM_WOMAN_INTRO_ID]),
   };
@@ -781,6 +784,7 @@ test("19-20. the beekeeper gives Honey x1 once, only while the case is examined;
     ["coal", 1],
     ["alcohol", 1],
     ["mushroom", 1],
+    ["orange", 1],
   ]);
   const blocked = talk(BEE, crowded);
   assert.equal(blocked.conversation.id, "chapter1.mill.beekeeper.noRoom");

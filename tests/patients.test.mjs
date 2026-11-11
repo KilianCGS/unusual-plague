@@ -758,8 +758,9 @@ test("baker: the Salt comes automatically with the delivery; with no room the ca
     ["cloth", 1],
     ["alcohol", 1],
     ["coal", 1],
+    ["orange", 1],
   ]);
-  assert.equal(inv.countOccupiedSlots(crowded), 5);
+  assert.equal(inv.countOccupiedSlots(crowded), 6);
   const noRoom = talk(crowded);
   assert.equal(noRoom.conversation.id, "chapter1.bakery.baker.delivery");
   assert.deepEqual(noRoom.effects, [{ type: "treat", patientId: HUSBAND }]);
@@ -895,7 +896,7 @@ test('the "!" follows the real reward: a full inventory keeps it, a successful r
     if (claim) claimed = new Set([...claimed, claim.rewardId]);
     return out;
   };
-  const full = ["a", "b", "c", "d", "e"].map((id) => [id, 1]);
+  const full = ["a", "b", "c", "d", "e", "f"].map((id) => [id, 1]);
 
   assert.deepEqual(marked(), [BAKER_NPC]); // treated, reward pending
   talk(full); // full inventory: no Salt, nothing claimed
@@ -1105,8 +1106,8 @@ test("the Empty flask starts in the Doctor's Storage (once), not in his pocket",
   const initialFile = at("src/game/inventory/initialInventory.ts");
   const initial = initialFile.createChapter1Inventory();
   const chest = initialFile.createChapter1Storage();
-  assert.equal(initial.capacity, 5);
-  assert.equal(initial.slots.length, 5);
+  assert.equal(initial.capacity, 6);
+  assert.equal(initial.slots.length, 6);
   assert.equal(inv.countOccupiedSlots(initial), 0);
   assert.equal(inv.countItem(initial, "empty-flask"), 0);
   assert.equal(chest.capacity, 10);
@@ -1253,12 +1254,12 @@ test("baker's Salt: an existing Salt stack merges, even in a full inventory", ()
   const out = talkToBaker("treated", [["salt", 2]]);
   assert.deepEqual(out.effects, [SALT, CLAIM]);
   assert.equal(inv.countItem(inv.addItem(withSalt, "salt", 1), "salt"), 3);
-  // all 5 slots taken, one of them Salt: still fits (no new slot needed)
+  // all 6 slots taken, one of them Salt: still fits (no new slot needed)
   const fullWithSalt = stock([
     ["salt", 1],
-    ...["a", "b", "c", "d"].map((id) => [id, 1]),
+    ...["a", "b", "c", "d", "e"].map((id) => [id, 1]),
   ]);
-  assert.equal(inv.countOccupiedSlots(fullWithSalt), 5);
+  assert.equal(inv.countOccupiedSlots(fullWithSalt), 6);
   const merged = talkToBaker("treated", [
     ["salt", 1],
     ...["a", "b", "c", "d"].map((id) => [id, 1]),
@@ -1283,7 +1284,7 @@ test("baker's Salt: exactly once; using the Salt up later does not bring it back
 });
 
 test("baker's Salt: a full inventory gives nothing and records nothing; with room it is given on the next try", () => {
-  const full = ["a", "b", "c", "d", "e"].map((id) => [id, 1]);
+  const full = ["a", "b", "c", "d", "e", "f"].map((id) => [id, 1]);
   const blocked = talkToBaker("treated", full);
   assert.equal(blocked.conversation.id, "chapter1.bakery.baker.rewardNoRoom");
   assert.deepEqual(blocked.effects, []); // no item, no claim, no loss, no duplicate

@@ -27,8 +27,9 @@ import { useBookHotkeys } from "../book/useBookHotkeys";
 import { PlayerBark } from "../bark/PlayerBark";
 import { useRunBark } from "../bark/useRunBark";
 import { CraftingOverlay } from "../crafting/CraftingOverlay";
+import { craftingCopy } from "../i18n/crafting";
 import { moneyCopy } from "../i18n/money";
-import { CoinHud } from "../money/CoinHud";
+import { CoinHud, resetCoinHudMemory } from "../money/CoinHud";
 import { getObjectives } from "../objectives/objectives";
 import { ObjectivesPanel } from "../objectives/ObjectivesPanel";
 import { addCoins, canAfford, spendCoins, STARTING_COINS } from "../money/money";
@@ -293,6 +294,8 @@ export function GameWorld({
   // The copper coins in the Doctor's purse (a counter, not items). The ref
   // mirrors it for the same reason as the inventory's.
   const [coins, setCoins] = useState<number>(() => devStart?.coins ?? STARTING_COINS);
+  // leaving the game forgets what the coin HUD last drew (see CoinHud)
+  useEffect(() => resetCoinHudMemory, []);
   const coinsRef = useRef(coins);
   // The shop interface that is open (the merchant's counter) and its last line.
   const [openShop, setOpenShop] = useState<ShopDefinition | null>(null);
@@ -308,6 +311,20 @@ export function GameWorld({
   const tutorial = useTutorial(devStart?.tutorialStep);
   const notifyTutorial = tutorial.notify;
   // Which interaction the [E] prompt is for right now (null = none).
+  // The word after the E over the Doctor's head: only the crafting stations have
+  // one for now ("Preparar" at the table, "Cocinar" at the stove).
+  const promptLabelFor = useCallback(
+    (interactionId: string) => {
+      const station = CRAFT_STATION_BY_INTERACTION_ID[interactionId];
+
+      if (!station) return undefined;
+
+      const word = craftingCopy[language].action[station];
+
+      return word.charAt(0) + word.slice(1).toLowerCase();
+    },
+    [language],
+  );
   const [availableInteractionId, setAvailableInteractionId] = useState<
     string | null
   >(null);
@@ -1400,6 +1417,7 @@ export function GameWorld({
           onRunningChange={setDoctorRunning}
           onInteract={handleInteract}
           onInteractionAvailable={setAvailableInteractionId}
+          promptLabelFor={promptLabelFor}
         />
       ) : (
         <ExteriorScene
@@ -1419,6 +1437,7 @@ export function GameWorld({
           onPlayerMoved={handlePlayerMoved}
           onRunningChange={setDoctorRunning}
           onInteractionAvailable={setAvailableInteractionId}
+          promptLabelFor={promptLabelFor}
         />
       )}
       {bookOpen ? (

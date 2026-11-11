@@ -4,6 +4,7 @@ import {
   FOREST_COTTAGE_VISUAL,
   NEW_WORLD_VISUALS,
 } from "../../../game/new-world-map/newWorldVisuals";
+import { NEW_WORLD_NIGHT_VISUALS } from "../../../game/new-world-map/newWorldNightVisuals";
 import { plazaColliders } from "../../../game/plaza/plazaGeometry";
 
 // EXPERIMENTAL scale test scenes for /dev/scene. None of these values is an
@@ -330,6 +331,8 @@ export const DEV_SCENES: DevScene[] = [
   ),
   FOREST_COTTAGE_VISUAL,
   FOREST_COTTAGE_INTERIOR_VISUAL,
+  // Night versions of the streets and the forest (authoring only, see the file).
+  ...NEW_WORLD_NIGHT_VISUALS,
 ];
 
 export function getSceneWorld(scene: DevScene) {

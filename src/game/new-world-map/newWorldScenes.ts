@@ -29,6 +29,8 @@ import {
 } from "./geometry/farmGeometry";
 import {
   forestColliders,
+  forestOccluders,
+  forestPolygonColliders,
   forestSpawns,
   forestTransitions,
 } from "./geometry/forestGeometry";
@@ -145,7 +147,8 @@ export const NEW_WORLD_SCENES: Record<
   | "mill-farmland"
   | "mountain-path"
   | "quarry"
-  | "forest-deep",
+  | "forest-deep"
+  | "forest-glade",
   ExteriorWorldScene
 > = {
   // New zones: background only. Their colliders, exits and arrivals come from
@@ -162,6 +165,15 @@ export const NEW_WORLD_SCENES: Record<
     id: "forest-deep",
     kind: "exterior",
     visual: visual("forest-deep"),
+    colliders: [],
+    exits: [],
+    arrivals: {},
+  },
+  // The mushroom glade: where the Witch can also be found, picking mushrooms.
+  "forest-glade": {
+    id: "forest-glade",
+    kind: "exterior",
+    visual: visual("forest-glade"),
     colliders: [],
     exits: [],
     arrivals: {},
@@ -401,15 +413,18 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("forest-v1"),
     colliders: forestColliders,
+    polygonColliders: forestPolygonColliders,
+    occluders: forestOccluders,
     exits: [
+      // West edge: back to the outskirts (the river).
       exit(
         "to-outskirts",
         forestTransitions,
-        "forest-transition-1",
+        "forest-transition-3",
         "outskirts",
         "from-forest",
       ),
-      // NEW: the south path leads to the Casita del bosque.
+      // South path: the Casita del bosque.
       exit(
         "to-forest-cottage",
         forestTransitions,
@@ -417,10 +432,16 @@ export const NEW_WORLD_SCENES: Record<
         "forest-cottage",
         "from-forest",
       ),
+      // forest-transition-1 (east, to the right of the cabin) leads to the
+      // mushroom glade; it gets its exit when the glade has its arrival spawn.
     ],
     arrivals: {
-      "from-outskirts": spawnAt(forestSpawns, "forest-spawn-1"),
-      "from-forest-cottage": spawnAt(forestSpawns, "forest-spawn-2"),
+      // The spawns keep Kilian's exact positions; the arrival faces INTO the
+      // forest (his spawns were exported facing south).
+      "from-outskirts": { ...spawnAt(forestSpawns, "forest-spawn-1"), direction: "east" },
+      // The east spawn is ready for the glade's return trip.
+      "from-forest-glade": { ...spawnAt(forestSpawns, "forest-spawn-2"), direction: "west" },
+      "from-forest-cottage": { ...spawnAt(forestSpawns, "forest-spawn-3"), direction: "north" },
     },
   },
   "forest-cottage": {

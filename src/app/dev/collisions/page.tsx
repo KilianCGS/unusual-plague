@@ -101,6 +101,8 @@ import {
 } from "../../../game/new-world-map/geometry/farmGeometry";
 import {
   forestColliders as nwForestColliders,
+  forestOccluders as nwForestOccluders,
+  forestPolygonColliders as nwForestPolygonColliders,
   forestSpawns as nwForestSpawns,
   forestTransitions as nwForestTransitions,
 } from "../../../game/new-world-map/geometry/forestGeometry";
@@ -162,12 +164,27 @@ import {
   type Point,
   type Rect,
 } from "./geometry";
+import {
+  NIGHT_DAY_IDS,
+  nightIdOf,
+} from "../../../game/new-world-map/newWorldNightVisuals";
 import styles from "./page.module.css";
 
 // Internal scene geometry editor. It shows the whole logical world of each
 // scene (no gameplay camera) and stores everything in world units. Every scene
 // keeps its own colliders, transitions and spawns; the data lives in the page
 // so switching scenes never mixes them.
+// The export names of the day scenes the night ones copy (a night block is exported as
+// e.g. tavernStreetNightColliders).
+const NIGHT_EXPORT_PREFIX: Record<string, string> = {
+  "outskirts-brook-provisional": "outskirts",
+  "apothecary-street": "apothecaryStreet",
+  "bakery-street": "bakeryStreet",
+  "calle-taberna": "tavernStreet",
+  "smithy-street": "smithyStreet",
+  "forest-v1": "forest",
+};
+
 const EDITOR_SCENES: {
   sceneId: string;
   idPrefix: string;
@@ -271,6 +288,18 @@ const EDITOR_SCENES: {
     idPrefix: "forest-deep",
     exportPrefix: "forestDeep",
   },
+  {
+    sceneId: "forest-glade",
+    idPrefix: "forest-glade",
+    exportPrefix: "forestGlade",
+  },
+  // Night versions (chapter 3): they open with the DAY geometry copied in, so
+  // only the extra obstacles of the night have to be drawn. Export names end in Night.
+  ...NIGHT_DAY_IDS.map((dayId) => ({
+    sceneId: nightIdOf(dayId),
+    idPrefix: `${nightIdOf(dayId)}`,
+    exportPrefix: `${NIGHT_EXPORT_PREFIX[dayId]}Night`,
+  })),
 ];
 type EditorSceneConfig = (typeof EDITOR_SCENES)[number];
 const PANEL_WIDTH = 380;
@@ -466,6 +495,8 @@ const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
   },
   "forest-v1": {
     colliders: nwForestColliders,
+    polygons: nwForestPolygonColliders,
+    occluders: nwForestOccluders,
     transitions: nwForestTransitions,
     spawns: nwForestSpawns,
   },
@@ -491,6 +522,15 @@ const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
     spawns: nwMountainPathSpawns,
   },
 };
+
+// The night scenes start with a copy of their day scene's geometry.
+for (const dayId of NIGHT_DAY_IDS) {
+  const dayGeometry = NEW_WORLD_GEOMETRY[dayId];
+
+  if (dayGeometry) {
+    NEW_WORLD_GEOMETRY[nightIdOf(dayId)] = dayGeometry;
+  }
+}
 
 function createInitialData(sceneId: string): SceneData {
   const persisted = NEW_WORLD_GEOMETRY[sceneId] ?? PERSISTED_GEOMETRY[sceneId];

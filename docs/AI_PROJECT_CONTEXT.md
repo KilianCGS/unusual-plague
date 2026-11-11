@@ -833,3 +833,17 @@ and interactions stay rectangles/points exactly as before.
   apothecary-street, outskirts (new world). Manual geometry stays authoritative.
 - Botica (`ApothecaryScene`) now sorts the Doctor by his feet like the other
   scenes (candle flames no longer cover him).
+
+### Interface style: wood and parchment (2026-11-11)
+
+The HUD family now shares one look, close to the Compendium and the map: a dark
+wooden frame (stripe grain, lit top edge, iron rivets) around parchment pockets with
+a bevel; ink-bordered tabs for quantities; hard edges, no blur. Done so far:
+inventory bar (6 slots; an item that arrives or changes its number "pops"), coin HUD
+(the coin turns now and then; a gold "+N" / red "-N" rises when the purse changes,
+even if the HUD was hidden by a shop or a dialogue: it remembers the last number it
+drew), the [E] prompt (a keycap that is pressed), the tutorial hint (parchment note
+with a wax seal and a pressed keycap) and the errands panel (wooden title strip, ink
+tick stamped when an errand is done). All animations respect prefers-reduced-motion.
+Still to do in the same style: the crafting overlay (a backdrop per station and a
+"making" animation), the Storage and Shop overlays.

@@ -1,6 +1,6 @@
-/* Contextual help: low on the screen, small, pointer-transparent. Hard 2px
-   border with stepped corners (same family as the dialogue bubble), flat dark
-   fill, no gradients or soft shadows. */
+/* Contextual help: low on the screen, small, pointer-transparent. A parchment
+   note with stepped corners and an ink border, a red wax seal on the left; it
+   slides up when it appears. No soft shadows. */
 .hint {
   position: fixed;
   bottom: 20px;
@@ -11,7 +11,8 @@
   padding: 2px;
   font-family: var(--ui-font);
   pointer-events: none;
-  background: #8a6a4a;
+  background: #1c110c;
+  animation: hint-in 0.35s steps(7) both;
   clip-path: polygon(
     0 6px,
     2px 6px,
@@ -45,12 +46,43 @@
 }
 
 .inner {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 8px 14px 10px;
-  background: rgba(24, 15, 10, 0.92);
-  color: #f4ead5;
+  padding: 9px 16px 11px 46px;
+  background: #e9dbb9;
+  box-shadow:
+    inset 0 0 0 2px #8a6a4a,
+    inset 0 -4px 0 rgba(120, 90, 55, 0.35);
+  color: #2b1a14;
+}
+
+/* The wax seal that pins the note. */
+.inner::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  background: #b03a2e;
+  border: 2px solid #5c1a14;
+  box-shadow:
+    inset 3px 3px 0 #d86a5a,
+    inset -3px -3px 0 #7c2219;
+}
+
+@keyframes hint-in {
+  0% {
+    transform: translate(-50%, 28px);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
 }
 
 .title {
@@ -64,20 +96,45 @@
   margin: 0;
   font-size: 13px;
   line-height: 1.35;
-  color: #d9c9a3;
+  color: #5b4630;
 }
 
-/* The key to press, drawn as a small keycap. */
+/* The key to press, drawn as a small keycap that is pressed now and then. */
 .key {
   display: inline-block;
   margin: 0 3px;
   padding: 0 6px 2px;
   font: inherit;
   font-weight: 700;
-  color: #2b1a14;
-  background: #e9dbb9;
-  border: 2px solid #2b1a14;
+  color: #f4ead5;
+  background: #3b2a1c;
+  border: 2px solid #1c110c;
   border-bottom-width: 4px;
+  animation: hint-key 1.3s steps(1) infinite;
+}
+
+@keyframes hint-key {
+  0%,
+  70% {
+    transform: translateY(0);
+    border-bottom-width: 4px;
+  }
+  78%,
+  90% {
+    transform: translateY(2px);
+    border-bottom-width: 2px;
+  }
+  100% {
+    transform: translateY(0);
+    border-bottom-width: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hint,
+  .key {
+    animation: none;
+  }
 }
 
 /* Over the Book overlay (z-index 1000) while a Book step is being taught. */
