@@ -445,3 +445,128 @@
   height: 96px;
   margin: 0 auto;
 }
+
+/* ---------------------------------------------------------------------------
+   2026-11-11: the crafting window in the game's wood-and-parchment family (the
+   same wood as the inventory bar and the coin counter): a grained wooden frame
+   with four brass rivets, a wooden title plaque, wooden buttons and slots set
+   into the parchment. Layered on top of the rules above (same selectors, later
+   in the file), so nothing about the behaviour or the layout changes. */
+.border {
+  position: relative;
+  padding: 14px;
+  background-color: #4a3524;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(20, 10, 4, 0.22) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(0deg, rgba(255, 228, 180, 0.07) 0 1px, transparent 1px 6px);
+}
+
+/* the rivets */
+.border::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 8px 8px, #d8a93a 0 2px, #1c110c 2px 3.5px, transparent 3.5px),
+    radial-gradient(circle at calc(100% - 8px) 8px, #d8a93a 0 2px, #1c110c 2px 3.5px, transparent 3.5px),
+    radial-gradient(circle at 8px calc(100% - 8px), #d8a93a 0 2px, #1c110c 2px 3.5px, transparent 3.5px),
+    radial-gradient(circle at calc(100% - 8px) calc(100% - 8px), #d8a93a 0 2px, #1c110c 2px 3.5px, transparent 3.5px);
+}
+
+.paper {
+  box-shadow:
+    inset 0 0 0 2px #fff6de,
+    inset 0 -5px 0 rgba(120, 90, 55, 0.3);
+}
+
+/* the title, on a small wooden plaque */
+.title {
+  padding: 5px 26px 6px;
+  color: #f4ead5;
+  background-color: #4a3524;
+  background-image: repeating-linear-gradient(90deg, rgba(20, 10, 4, 0.22) 0 2px, transparent 2px 9px);
+  border: 3px solid #1c110c;
+  box-shadow:
+    inset 0 0 0 2px #6a4e35,
+    0 3px 0 rgba(10, 5, 2, 0.4);
+  text-shadow: 0 2px 0 #1c110c;
+}
+
+.counter,
+.heading {
+  color: #4a3524;
+}
+
+/* the buttons: little wooden planks */
+.close,
+.back,
+.mortar,
+.action {
+  color: #f4ead5;
+  background-color: #6a4e35;
+  background-image: repeating-linear-gradient(90deg, rgba(20, 10, 4, 0.2) 0 2px, transparent 2px 7px);
+  border-color: #1c110c;
+  box-shadow: inset 0 0 0 2px #8a6a47;
+  text-shadow: 0 2px 0 #1c110c;
+}
+
+.mortar {
+  border-right-color: #1c110c;
+  border-bottom-color: #1c110c;
+}
+
+.close:hover,
+.back:hover:not(:disabled),
+.mortar:hover:not(:disabled),
+.action:hover:not(:disabled) {
+  background-color: #7d5d3f;
+}
+
+.action:disabled {
+  color: #b9a67c;
+  background-color: #8a7a60;
+  background-image: none;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+/* the PREPARE / COOK button asks to be pressed while it can be */
+.action:not(:disabled) {
+  animation: action-ready 1.6s steps(1) infinite;
+}
+
+@keyframes action-ready {
+  0%,
+  70% {
+    transform: translateY(0);
+  }
+  80%,
+  90% {
+    transform: translateY(2px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* the slots: set into the parchment, like the inventory bar */
+.cell,
+.slot {
+  box-shadow:
+    inset 3px 3px 0 rgba(74, 50, 28, 0.3),
+    inset -2px -2px 0 rgba(255, 246, 222, 0.55);
+}
+
+.cell:not(:disabled):hover,
+.slot:not(:disabled):hover {
+  box-shadow:
+    inset 3px 3px 0 rgba(74, 50, 28, 0.2),
+    inset -2px -2px 0 rgba(255, 246, 222, 0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action:not(:disabled) {
+    animation: none;
+  }
+}

@@ -170,8 +170,8 @@ main.title-screen.is-black .title-screen-fade {
 
 .language-flag {
   display: block;
-  width: 36px;
-  height: 27px;
+  width: 32px;
+  height: 24px;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   box-shadow: 0 0 0 2px #1c110c;

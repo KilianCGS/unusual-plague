@@ -845,5 +845,10 @@ even if the HUD was hidden by a shop or a dialogue: it remembers the last number
 drew), the [E] prompt (a keycap that is pressed), the tutorial hint (parchment note
 with a wax seal and a pressed keycap) and the errands panel (wooden title strip, ink
 tick stamped when an errand is done). All animations respect prefers-reduced-motion.
-Still to do in the same style: the crafting overlay (a backdrop per station and a
-"making" animation), the Storage and Shop overlays.
+The crafting, Storage and Shop windows now share it too (2026-11-11): a grained wooden
+frame with four brass rivets, a wooden title plaque, wooden buttons and bevelled slots,
+layered over their parchment panels (the PREPARE / COOK button "asks to be pressed" while
+it can be). Still to do: a backdrop per station and a "making" animation in the crafting
+window. The title screen has its own wooden look (carved-wood letters, a P made of a
+crooked branch with the plague mask hanging from a golden cord, ivy, plank buttons; font
+"UP Gothic", which lacks accents: `GothicText` draws them).
