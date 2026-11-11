@@ -143,9 +143,29 @@ export const NEW_WORLD_SCENES: Record<
   | "granary-interior"
   | "farm"
   | "mill-farmland"
-  | "mountain-path",
+  | "mountain-path"
+  | "quarry"
+  | "forest-deep",
   ExteriorWorldScene
 > = {
+  // New zones: background only. Their colliders, exits and arrivals come from
+  // Kilian's exports; until then they cannot be entered (no scene leads here).
+  quarry: {
+    id: "quarry",
+    kind: "exterior",
+    visual: visual("quarry"),
+    colliders: [],
+    exits: [],
+    arrivals: {},
+  },
+  "forest-deep": {
+    id: "forest-deep",
+    kind: "exterior",
+    visual: visual("forest-deep"),
+    colliders: [],
+    exits: [],
+    arrivals: {},
+  },
   "granary-interior": {
     id: "granary-interior",
     kind: "exterior",

@@ -264,6 +264,13 @@ const EDITOR_SCENES: {
     idPrefix: "mill-farmland",
     exportPrefix: "millFarmland",
   },
+  // New zones: they start empty (nothing is preloaded because nothing is drawn yet).
+  { sceneId: "quarry", idPrefix: "quarry", exportPrefix: "quarry" },
+  {
+    sceneId: "forest-deep",
+    idPrefix: "forest-deep",
+    exportPrefix: "forestDeep",
+  },
 ];
 type EditorSceneConfig = (typeof EDITOR_SCENES)[number];
 const PANEL_WIDTH = 380;

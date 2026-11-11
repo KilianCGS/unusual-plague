@@ -40,6 +40,7 @@ const ICON_GROUND = 450 / 512;
 const ICON_TOP: Record<MapLocationId, number> = {
   pharmacy: 30, plaza: 109, tavern: 114, bakery: 61, smithy: 87, forest: 106,
   cottage: 127, farm: 155, mill: 46, mountain: 132, mine: 150, river: 233,
+  quarry: 154, "forest-deep": 51,
 };
 const iconSrc = (id: MapLocationId) => `/game/ui/map/${id}.png`;
 
@@ -336,7 +337,8 @@ export function MapOverlay({
           </g>
         ) : null}
 
-        <Compass x={290} y={690} />
+        {/* bottom right: the quarry took the bottom-left corner */}
+        <Compass x={1660} y={690} />
       </svg>
     </div>
   );

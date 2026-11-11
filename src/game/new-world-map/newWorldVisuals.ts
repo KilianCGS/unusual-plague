@@ -130,6 +130,34 @@ export const NEW_WORLD_VISUALS: DevScene[] = [
     logicalUnitsPerAssetPixel: 0.8,
     colliders: mountainPathColliders,
   },
+  // NEW ZONES (background only until Kilian paints their colliders, exits and
+  // spawns in /dev/collisions). The quarry is the same 1665x944 size as the mine
+  // path and is reached from its new south exit; the deep forest is the same
+  // size as the forest and is reached from the forest's new east exit. They use
+  // their neighbour's units per pixel so the Doctor has the same size.
+  // initialAsset* is only the preview start of the dev tools, not a spawn.
+  {
+    id: "quarry",
+    label: "Cantera (nuevo mundo)",
+    backgroundSrc: `${DIR}/quarry-background.png`,
+    assetWidth: 1665,
+    assetHeight: 944,
+    initialAssetX: 860,
+    initialAssetY: 140,
+    logicalUnitsPerAssetPixel: 0.8,
+    colliders: [],
+  },
+  {
+    id: "forest-deep",
+    label: "Bosque profundo (nuevo mundo)",
+    backgroundSrc: `${DIR}/forest-deep-background.png`,
+    assetWidth: 1427,
+    assetHeight: 1102,
+    initialAssetX: 110,
+    initialAssetY: 590,
+    logicalUnitsPerAssetPixel: 1,
+    colliders: [],
+  },
 ];
 
 // The inside of the cottage: unmodified copy of the approved 1426x1103 image.

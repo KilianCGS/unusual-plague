@@ -12,6 +12,8 @@ export type MapLocationId =
   | "river"
   | "forest"
   | "cottage"
+  | "quarry"
+  | "forest-deep"
   | "farm"
   | "mill"
   | "bakery"
@@ -31,7 +33,8 @@ export type MapLocation = {
   y: number;
 };
 
-export const MAP_SIZE = { width: 560, height: 270 };
+// Seven columns now: the deep forest sits east of the forest, in the new last one.
+export const MAP_SIZE = { width: 652, height: 270 };
 
 const COLUMN = (index: number) => 44 + 94 * index;
 const ROW = (index: number) => [52, 135, 218][index];
@@ -50,6 +53,10 @@ export const MAP_LOCATIONS: MapLocation[] = [
   { id: "mill", label: "MOLINO", labelEn: "MILL", x: COLUMN(5), y: ROW(0) },
   // The Casita del bosque: south of the Forest.
   { id: "cottage", label: "CASITA", labelEn: "COTTAGE", x: COLUMN(5), y: ROW(2) },
+  // New zones (2026-11-10): the quarry camp south of the mountain path, the
+  // woodcutter's deep forest east of the forest.
+  { id: "quarry", label: "CANTERA", labelEn: "QUARRY", x: COLUMN(0), y: ROW(2) },
+  { id: "forest-deep", label: "BOSQUE PROFUNDO", labelEn: "DEEP FOREST", x: COLUMN(6), y: ROW(1) },
 ];
 
 // Paths between places (undirected), following the real connections.
@@ -65,6 +72,8 @@ export const MAP_LINKS: [MapLocationId, MapLocationId][] = [
   ["river", "farm"],
   ["farm", "mill"],
   ["forest", "cottage"],
+  ["mountain", "quarry"],
+  ["forest", "forest-deep"],
 ];
 
 // Every technical scene belongs to exactly one place (the Record type makes
@@ -91,6 +100,8 @@ export const SCENE_TO_MAP_LOCATION: Record<SceneId, MapLocationId> = {
   "smithy-street": "smithy",
   "smithy-interior": "smithy",
   "mountain-path": "mountain",
+  quarry: "quarry",
+  "forest-deep": "forest-deep",
   "mine-interior": "mine",
   "mine-natural-cave": "mine",
 };

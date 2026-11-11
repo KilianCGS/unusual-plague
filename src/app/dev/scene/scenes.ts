@@ -324,6 +324,10 @@ export const DEV_SCENES: DevScene[] = [
     (scene) =>
       NEW_WORLD_VISUALS.find((visual) => visual.id === scene.id) ?? scene,
   ),
+  // New-world zones that have no old-world scene (the quarry, the deep forest).
+  ...NEW_WORLD_VISUALS.filter(
+    (visual) => !OLD_DEV_SCENES.some((scene) => scene.id === visual.id),
+  ),
   FOREST_COTTAGE_VISUAL,
   FOREST_COTTAGE_INTERIOR_VISUAL,
 ];
