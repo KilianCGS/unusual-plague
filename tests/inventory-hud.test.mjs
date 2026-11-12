@@ -208,7 +208,7 @@ test("the HUD is presentational: no state, no input, no inventory of its own", (
     path.join(root, "src/game/inventory/InventoryHud.tsx"),
     "utf8",
   );
-  assert.ok(!/useState|useEffect|useRef|addEventListener/.test(source));
+  assert.ok(!/useEffect|useRef|addEventListener/.test(source));
   assert.ok(!/createEmptyInventory|addItem|removeItem/.test(source));
   const css = fs.readFileSync(
     path.join(root, "src/game/inventory/InventoryHud.module.css"),
@@ -222,7 +222,7 @@ test("the HUD is presentational: no state, no input, no inventory of its own", (
   assert.ok(!/position:\s*fixed/.test(css));
   // the 48 px icons are shown at an EXACT multiple (2x = 96 px on normal
   // windows, 1x = 48 px on short ones); the slot is the icon plus its border
-  assert.ok(/--icon-size:\s*96px/.test(css) && /--slot-size:\s*100px/.test(css));
+  assert.ok(/--icon-size:\s*96px/.test(css) && /--slot-size:\s*78px/.test(css));
   assert.ok(/--icon-size:\s*48px/.test(css) && /--slot-size:\s*52px/.test(css));
   assert.ok(/width:\s*var\(--icon-size\)/.test(css) && /width:\s*var\(--slot-size\)/.test(css));
 });
@@ -310,7 +310,7 @@ test("GameWorld mounts the bar in the scene overlay layer (the camera frame) in 
   );
   assert.equal(count(world, "renderOverlay={renderSceneOverlay}"), 2);
   assert.ok(world.includes("isInventoryHudVisible("));
-  assert.ok(world.includes("tutorialDone: tutorial.step"));
+  assert.ok(world.includes("tutorialDone: isTutorialHudUnlocked(tutorial.step)"));
   // the frame overlay of both renderers is inside the clipped viewport
   for (const file of [
     "world/ExteriorScene.tsx",

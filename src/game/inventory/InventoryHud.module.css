@@ -7,11 +7,11 @@
      normal windows, 1x on short ones) so the pixels stay even. The slot is the
      icon plus its 2 px border on each side. */
   --icon-size: 96px;
-  --slot-size: 100px;
+  --slot-size: 78px; /* smaller pockets; the icons keep their size and overflow them a little */
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 12px;
+  bottom: 4px;
   z-index: 15;
   display: flex;
   justify-content: center;
@@ -24,9 +24,9 @@
 .bar {
   position: relative;
   display: flex;
-  gap: 4px;
+  gap: 2px;
   margin: 0;
-  padding: 9px 11px 11px;
+  padding: 6px 8px 7px;
   list-style: none;
   background-color: #4a3524;
   background-image:
@@ -103,9 +103,11 @@
    re-created when either changes, which restarts the animation). */
 .itemIcon {
   position: absolute;
-  inset: 0;
+  left: calc((var(--slot-size) - 4px - var(--icon-size)) / 2);
+  top: calc((var(--slot-size) - 4px - var(--icon-size)) / 2);
   width: var(--icon-size);
   height: var(--icon-size);
+  pointer-events: none;
   animation: slot-pop 0.3s steps(6) both;
 }
 
@@ -185,4 +187,33 @@
   .slot {
     transition: none;
   }
+}
+
+/* The eye that shows / hides the bar: a small wooden chip at the left of it. */
+.eye {
+  position: absolute;
+  right: 100%;
+  margin-right: 6px;
+  bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 28px;
+  padding: 0;
+  background-color: #4a3524;
+  border: 3px solid #1c110c;
+  box-shadow: inset 0 0 0 2px #6a4e35, 0 3px 0 rgba(10, 5, 2, 0.55);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.eye:hover {
+  background-color: #5e4630;
+}
+
+.wrap {
+  position: relative;
+  display: flex;
+  min-width: 1px;
 }

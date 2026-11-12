@@ -1,7 +1,6 @@
-// Single place to swap the UI font. The project has no pixel font yet (only
-// Geist via next/font), and none is downloaded arbitrarily: this stack is a
-// monospace FALLBACK. All of it covers the Spanish characters
-// (á é í ó ú ñ ü ¿ ¡). UI components read it through the `--ui-font` CSS
-// variable, so replacing it later means editing only this constant.
+// Single place to swap the UI font. MedievalSharp (SIL OFL, loaded in globals.css):
+// medieval but legible, with the Spanish characters (á é í ó ú ñ ü ¿ ¡) and clear
+// numerals for coins and prices. Candidates for a swap are on /dev/fonts. UI components
+// read it through the `--ui-font` CSS variable. The monospace stack is only the fallback.
 export const PIXEL_FONT_FAMILY =
-  '"Courier New", Courier, ui-monospace, Menlo, Consolas, monospace';
+  '"MedievalSharp", "IM Fell DW Pica", Georgia, "Courier New", serif';

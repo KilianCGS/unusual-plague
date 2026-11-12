@@ -182,6 +182,15 @@ main.title-screen.is-black .title-screen-fade {
   cursor: default;
 }
 
+/* Medieval-but-legible UI fonts (all SIL OFL, with the Spanish accents). The game
+   uses one of them through PIXEL_FONT_FAMILY; the rest stay for /dev/fonts. */
+@font-face { font-family: "Almendra"; src: url("/game/ui/fonts/Almendra-Regular.ttf") format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Almendra"; src: url("/game/ui/fonts/Almendra-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "MedievalSharp"; src: url("/game/ui/fonts/MedievalSharp.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "Metamorphous"; src: url("/game/ui/fonts/Metamorphous-Regular.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "IM Fell DW Pica"; src: url("/game/ui/fonts/IMFePIrm28P.ttf") format("truetype"); font-display: swap; }
+@font-face { font-family: "Grenze Gotisch"; src: url("/game/ui/fonts/GrenzeGotisch.ttf") format("truetype"); font-weight: 100 900; font-display: swap; }
+
 @font-face {
   font-family: "UP Gothic";
   src: url("/game/ui/title/up-gothic.ttf") format("truetype");

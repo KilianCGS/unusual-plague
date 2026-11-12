@@ -11,8 +11,14 @@ import { getSceneInteractionZones } from "../interactions/sceneInteractions";
 import { useInteraction } from "../interactions/useInteraction";
 import { apothecaryMainZoneColliders } from "./apothecaryMainZoneGeometry";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
+import { INDOOR_SPEED_FACTOR } from "../world/worldNoRun";
+import {
+  PROTAGONIST_WALK_FRAME_DURATION,
+  PROTAGONIST_WALK_SPEED,
+} from "../protagonist/protagonistRun";
 import { DOCTOR_SCALE } from "../protagonist/doctorScale";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
+import { getMovementBob } from "../protagonist/protagonistRun";
 import { useReportRunning } from "../protagonist/useReportRunning";
 import { usePlayerMoved } from "../protagonist/usePlayerMoved";
 import type { DirectionInputHandle } from "../protagonist/useDirectionInput";
@@ -75,6 +81,7 @@ export function ApothecaryScene({
   onInteract,
   onInteractionAvailable,
   promptLabelFor,
+  onRunBlocked,
 }: {
   spawn?: { x: number; y: number; direction: Direction };
   input?: DirectionInputHandle;
@@ -94,6 +101,8 @@ export function ApothecaryScene({
   onInteractionAvailable?: (interactionId: string | null) => void;
   // Optional word shown after the E ("Preparar", "Cocinar") for an interaction.
   promptLabelFor?: (interactionId: string) => string | undefined;
+  // Space was pressed: running is never allowed in here (see worldNoRun.ts).
+  onRunBlocked?: () => void;
 }) {
   const [sceneScale, setSceneScale] = useState(1);
   const {
@@ -112,6 +121,12 @@ export function ApothecaryScene({
     sceneColliders: apothecaryMainZoneColliders,
     input,
     inputEnabled: isPlaying,
+    // The Botica is slow and quiet: the Doctor walks ~30% slower, with his steps
+    // slowed to match, and never runs.
+    playerSpeed: PROTAGONIST_WALK_SPEED * INDOOR_SPEED_FACTOR,
+    walkFrameDuration: PROTAGONIST_WALK_FRAME_DURATION / INDOOR_SPEED_FACTOR,
+    runDisabled: true,
+    onRunBlocked,
   });
 
   usePlayerMoved(player.x, player.y, onPlayerMoved);
@@ -191,6 +206,7 @@ export function ApothecaryScene({
               direction={player.direction}
               isWalking={player.isWalking}
               mirrored={spriteMirrored}
+              bob={getMovementBob(player.direction, player.isWalking, player.isRunning, player.frame)}
               // sorted by his feet like every other scene: decor with a smaller
               // Y (candle flames on shelves) is drawn behind him
               zIndex={Math.round(player.y)}

@@ -28,6 +28,7 @@ import { getSceneNpcs } from "../npcs/sceneNpcs";
 import { SceneNpcSprite } from "../npcs/SceneNpcSprite";
 import { DOCTOR_SCALE } from "../protagonist/doctorScale";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
+import { getMovementBob } from "../protagonist/protagonistRun";
 import { useReportRunning } from "../protagonist/useReportRunning";
 import type { DirectionInputHandle } from "../protagonist/useDirectionInput";
 import { usePlayerMoved } from "../protagonist/usePlayerMoved";
@@ -107,6 +108,8 @@ export function ExteriorScene({
   renderOverlay,
   onPlayerMoved,
   onRunningChange,
+  runDisabled,
+  onRunBlocked,
   onInteractionAvailable,
   promptLabelFor,
   collectedInstanceIds,
@@ -136,6 +139,9 @@ export function ExteriorScene({
   onPlayerMoved?: () => void;
   // Reports (never drives): whether the Doctor is running right now.
   onRunningChange?: (running: boolean) => void;
+  // Running is not allowed in this scene (interiors); Space reports it.
+  runDisabled?: boolean;
+  onRunBlocked?: () => void;
   // The interactionId available right now (null = none).
   onInteractionAvailable?: (interactionId: string | null) => void;
   // Optional word shown after the E ("Preparar") for an interaction.
@@ -204,6 +210,8 @@ export function ExteriorScene({
     polygonColliders: scene.polygonColliders,
     input,
     inputEnabled: isPlaying,
+    runDisabled,
+    onRunBlocked,
   });
 
   const sceneZones = getSceneInteractionZones(scene.id);
@@ -404,6 +412,7 @@ export function ExteriorScene({
               direction={player.direction}
               isWalking={player.isWalking}
               mirrored={spriteMirrored}
+              bob={getMovementBob(player.direction, player.isWalking, player.isRunning, player.frame)}
               scale={scene.visual.protagonistScale}
               zIndex={Math.round(player.y)}
             />

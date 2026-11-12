@@ -1,7 +1,9 @@
+import { useState } from "react";
 import type { CSSProperties } from "react";
 
 import { inventoryCopy } from "../i18n/inventory";
 import type { Language } from "../i18n/types";
+import { EyeToggle } from "../ui/EyeToggle";
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
 import type { InventoryState } from "./inventory";
 import { InventorySlotView } from "./InventorySlotView";
@@ -23,6 +25,9 @@ export function InventoryHud({
   language: Language;
 }) {
   const copy = inventoryCopy[language];
+  // The eye hides the bar (it stays in the game, only out of sight), for the
+  // moments the player wants the whole picture. Remembered while the HUD lives.
+  const [shown, setShown] = useState(true);
 
   return (
     <div
@@ -30,6 +35,14 @@ export function InventoryHud({
       style={{ ["--ui-font" as string]: PIXEL_FONT_FAMILY } as CSSProperties}
       data-inventory-hud
     >
+      <div className={styles.wrap}>
+      <EyeToggle
+        shown={shown}
+        label={shown ? copy.hide : copy.show}
+        onToggle={() => setShown((current) => !current)}
+        className={styles.eye}
+      />
+      {shown ? (
       <ul className={styles.bar} aria-label={copy.title}>
         {inventory.slots.map((slot, index) => (
           <InventorySlotView
@@ -44,6 +57,8 @@ export function InventoryHud({
           />
         ))}
       </ul>
+      ) : null}
+      </div>
     </div>
   );
 }

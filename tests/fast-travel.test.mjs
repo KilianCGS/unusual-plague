@@ -150,7 +150,7 @@ test("a started trip takes the offer away by itself: pressing again during the t
     game.indexOf("const handleFastTravel"),
     game.indexOf("const handleExit"),
   );
-  assert.ok(handler.includes("if (!fastTravelAvailable)"));
+  assert.ok(handler.includes("if (!fastTravelAvailable ||"));
 });
 
 test("the destination is the Botica, on the arrival of its street door: free floor, facing the room", () => {
@@ -233,7 +233,7 @@ test("the trip reuses the scene fade: out, the line on black, the swap, in; the 
 test("it only moves the Doctor: no patient, reward, recipe, inventory or chapter state is touched", () => {
   const game = read("src/game/world/GameWorld.tsx");
   const from = game.indexOf("const fastTravelAvailable");
-  const end = game.indexOf("}, [fastTravelAvailable, language, startTransition]);", from);
+  const end = game.indexOf("}, [fastTravelAvailable, fastTravelReadyAt, language, startTransition]);", from);
   assert.ok(end > from, "the fast-travel callback has an identifiable end");
   const handler = game.slice(from, end);
   for (const forbidden of [
@@ -257,3 +257,14 @@ test("it only moves the Doctor: no patient, reward, recipe, inventory or chapter
 });
 
 console.log(`\n${passed} tests passed`);
+
+// Recharge: 120 s after each trip, a bar fills in the button (2026-11-12).
+{
+  const ft = at("src/game/world/fastTravel.ts");
+  assert.equal(ft.FAST_TRAVEL_COOLDOWN_MS, 120000);
+  assert.equal(ft.fastTravelProgress(0, 5000), 1); // never used: ready
+  assert.equal(ft.fastTravelProgress(10000, 10000), 1); // exactly ready
+  assert.equal(ft.fastTravelProgress(130000, 10000), 0); // just used
+  assert.equal(ft.fastTravelProgress(70000, 10000), 0.5); // halfway
+  console.log("ok - fast travel recharge progress");
+}

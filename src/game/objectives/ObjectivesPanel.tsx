@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 
 import type { Language } from "../i18n/types";
+import { EyeIcon } from "../ui/EyeToggle";
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
 import { objectivesCopy, type Objective } from "./objectives";
 import styles from "./ObjectivesPanel.module.css";
@@ -97,7 +98,7 @@ export function ObjectivesPanel({
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
       >
-        <span>{open ? "▾" : "▸"}</span>
+        <EyeIcon shown={open} />
         <span className={styles.title}>{copy.title}</span>
         <span className={styles.hint}>{open ? copy.toggleHint : `${shown.length} ${copy.toggleHint}`}</span>
       </button>

@@ -81,7 +81,7 @@
   display: grid;
   grid-template-columns: repeat(var(--columns), var(--slot-size));
   gap: 6px;
-  --slot-size: clamp(40px, 8vmin, 76px);
+  --slot-size: clamp(52px, 10.5vmin, 104px);
 }
 
 .slot {
@@ -113,7 +113,7 @@
   top: 3px;
   left: 4px;
   right: 4px;
-  font-size: clamp(8px, 1.3vmin, 11px);
+  font-size: clamp(10px, 1.6vmin, 14px);
   line-height: 1.1;
   font-weight: 700;
   overflow-wrap: break-word;
@@ -123,7 +123,7 @@
   position: absolute;
   right: 4px;
   bottom: 2px;
-  font-size: clamp(10px, 1.9vmin, 15px);
+  font-size: clamp(12px, 2.3vmin, 19px);
   font-weight: 700;
 }
 

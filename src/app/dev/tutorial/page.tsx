@@ -3,13 +3,16 @@
 import { useState } from "react";
 
 import type { TutorialHintStep } from "../../../game/i18n/tutorial";
-import { tutorialCopy } from "../../../game/i18n/tutorial";
+import { tutorialContinueCopy, tutorialCopy } from "../../../game/i18n/tutorial";
+import { ACK_STEPS, isTutorialHudUnlocked } from "../../../game/tutorial/tutorialFlow";
 import type { Language } from "../../../game/i18n/types";
 import { TutorialHint } from "../../../game/tutorial/TutorialHint";
 import styles from "./page.module.css";
 
 const STEPS: TutorialHintStep[] = [
+  "goal",
   "book",
+  "book-cover",
   "book-page",
   "book-tab",
   "book-close",
@@ -18,6 +21,11 @@ const STEPS: TutorialHintStep[] = [
   "chest-approach",
   "chest-interact",
   "take-flask",
+  "bar",
+  "exit-room",
+  "botica",
+  "exit-botica",
+  "run",
 ];
 
 // Tutorial preview: every hint of the real component, in both languages,
@@ -28,7 +36,12 @@ export default function TutorialPreviewPage() {
 
   return (
     <>
-      <TutorialHint copy={tutorialCopy[language][step]} />
+      <TutorialHint
+        copy={tutorialCopy[language][step]}
+        onContinue={ACK_STEPS.includes(step) ? () => undefined : undefined}
+        continueLabel={tutorialContinueCopy[language].label}
+        raised={isTutorialHudUnlocked(step)}
+      />
       <aside className={styles.panel}>
         <strong>/dev/tutorial</strong>
         <span>

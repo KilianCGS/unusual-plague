@@ -16,6 +16,16 @@ export const FAST_TRAVEL_HOME_SCENES: readonly SceneId[] = [
   "doctor-room",
 ];
 
+// After a trip the ability recharges (the button shows a filling bar).
+export const FAST_TRAVEL_COOLDOWN_MS = 120_000;
+
+// 0..1: how much of the recharge has passed (1 = ready). `readyAt` is the moment
+// the ability is ready again (0 = never used).
+export function fastTravelProgress(readyAt: number, now: number): number {
+  if (readyAt <= now) return 1;
+  return Math.max(0, 1 - (readyAt - now) / FAST_TRAVEL_COOLDOWN_MS);
+}
+
 // How long the caption stays on the black screen (display time only).
 export const FAST_TRAVEL_CAPTION_MS = 1600;
 

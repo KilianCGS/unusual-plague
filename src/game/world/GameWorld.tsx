@@ -69,7 +69,7 @@ import {
   formatObtainedNotice,
   itemFeedbackCopy,
 } from "../i18n/items";
-import { tutorialCopy } from "../i18n/tutorial";
+import { tutorialContinueCopy, tutorialCopy } from "../i18n/tutorial";
 import type { Language } from "../i18n/types";
 import {
   addItem,
@@ -82,6 +82,7 @@ import {
   createChapter1Inventory,
   createChapter1Storage,
 } from "../inventory/initialInventory";
+import { noRunLines } from "../i18n/noRun";
 import { runBarkLines } from "../i18n/runBarks";
 import { InventoryHud } from "../inventory/InventoryHud";
 import { isInventoryHudVisible } from "../inventory/inventoryHudVisibility";
@@ -110,6 +111,7 @@ import { getLockedDoorNotice } from "./lockedDoors";
 import { FLOUR_SACK_MARK, shouldMarkFlourSack } from "../dialogue/chapter2Supplies";
 import { NARRATIVE_ILLUSTRATIONS } from "../narrative/illustrations";
 import { TutorialHint } from "../tutorial/TutorialHint";
+import { ACK_STEPS, isTutorialHudUnlocked } from "../tutorial/tutorialFlow";
 import { useTutorial } from "../tutorial/useTutorial";
 import { fastTravelCopy } from "../i18n/fastTravel";
 import { FastTravelButton, TravelCaption } from "../ui/FastTravelButton";
@@ -122,6 +124,8 @@ import {
   FAST_TRAVEL_CAPTION_MS,
   FAST_TRAVEL_DESTINATION,
   canFastTravel,
+  FAST_TRAVEL_COOLDOWN_MS,
+  fastTravelProgress,
 } from "./fastTravel";
 import { getChapterStart, getNextChapterId } from "./chapterStart";
 import {
@@ -137,6 +141,7 @@ import {
   type Arrival,
 } from "./day2Opening";
 import type { GameDevStart } from "./devStart";
+import { isRunAllowed } from "./worldNoRun";
 import { WORLD_SCENES } from "./worldScenes";
 import type { SceneId } from "./worldScenes";
 
@@ -474,17 +479,45 @@ export function GameWorld({
     craftingOpen: craftingStation !== null,
     inNarrativeScene,
   });
+  // Recharge: 120 s after each trip. `now` only ticks while the bar is filling.
+  const [fastTravelReadyAt, setFastTravelReadyAt] = useState(0);
+  const [fastTravelNow, setFastTravelNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (fastTravelReadyAt <= Date.now()) return;
+    const id = window.setInterval(() => {
+      setFastTravelNow(Date.now());
+      if (Date.now() >= fastTravelReadyAt) window.clearInterval(id);
+    }, 200);
+    return () => window.clearInterval(id);
+  }, [fastTravelReadyAt]);
+  const fastTravelFill = fastTravelProgress(fastTravelReadyAt, fastTravelNow);
   const handleFastTravel = useCallback(() => {
-    if (!fastTravelAvailable) {
+    if (!fastTravelAvailable || fastTravelProgress(fastTravelReadyAt, Date.now()) < 1) {
       return;
     }
+    setFastTravelReadyAt(Date.now() + FAST_TRAVEL_COOLDOWN_MS);
+    setFastTravelNow(Date.now());
 
     startTransition(
       FAST_TRAVEL_DESTINATION.sceneId,
       FAST_TRAVEL_DESTINATION.spawnName,
       fastTravelCopy[language].caption,
     );
-  }, [fastTravelAvailable, language, startTransition]);
+  }, [fastTravelAvailable, fastTravelReadyAt, language, startTransition]);
+
+  // Space where running is not allowed (interiors): the Doctor says why, one of
+  // several lines, never the same twice running.
+  const lastNoRunLineRef = useRef(-1);
+  const handleRunBlocked = useCallback(() => {
+    const count = noRunLines[language].length;
+    let pick = Math.floor(Math.random() * count);
+    if (pick === lastNoRunLineRef.current) pick = (pick + 1) % count;
+    lastNoRunLineRef.current = pick;
+    setPickupBark((current) => ({
+      id: (current?.id ?? 0) + 1,
+      text: noRunLines[language][pick],
+    }));
+  }, [language]);
 
   const showNotice = useCallback(
     (text: string) =>
@@ -956,6 +989,27 @@ export function GameWorld({
     [notifyTutorial],
   );
 
+  // The later steps, from REAL state: where the Doctor is, and whether he runs.
+  const sceneIdNow = world.sceneId;
+  useEffect(() => {
+    if (!isPlaying) return;
+    if (sceneIdNow === "apothecary-interior") notifyTutorial("botica-entered");
+    if (WORLD_SCENES[sceneIdNow].kind === "exterior") notifyTutorial("street-entered");
+  }, [sceneIdNow, isPlaying, tutorialStepNow, notifyTutorial]);
+
+  useEffect(() => {
+    if (doctorRunning) notifyTutorial("run-started");
+  }, [doctorRunning, notifyTutorial]);
+
+  // The Book's cover is clicked / opened with Space: its own tutorial event.
+  const [bookCoverOpen, setBookCoverOpen] = useState(false);
+  if (!bookOpen && bookCoverOpen) setBookCoverOpen(false);
+  const handleBookCoverOpened = useCallback(() => {
+    setBookCoverOpen(true);
+    notifyTutorial("book-cover-opened");
+  }, [notifyTutorial]);
+  const handleTutorialContinue = useCallback(() => notifyTutorial("continue"), [notifyTutorial]);
+
   // The patient flow of the baker's husband, driven by the end of each
   // conversation: the baker's invitation > fade to the bedroom > examination >
   // (Doctor's thoughts about what he still lacks) > fade back to the bakery.
@@ -1306,7 +1360,7 @@ export function GameWorld({
     phase,
     openingActive: interludeActive,
     inNarrativeScene,
-    tutorialDone: tutorial.step === "done",
+    tutorialDone: isTutorialHudUnlocked(tutorial.step),
     bookOpen,
     storageOpen: storageOpen || openShop !== null,
     craftingOpen: craftingStation !== null,
@@ -1405,20 +1459,32 @@ export function GameWorld({
   // The Book steps only make sense with the Book open; if it is closed again
   // before they are done, the hint goes back to "open the book".
   const inBookStep =
+    tutorialStep === "book-cover" ||
     tutorialStep === "book-page" ||
     tutorialStep === "book-tab" ||
     tutorialStep === "book-close";
-  const hintStep = inBookStep && !bookOpen ? "book" : tutorialStep;
+  const hintStep =
+    inBookStep && !bookOpen
+      ? "book"
+      : inBookStep && !bookCoverOpen
+        ? "book-cover"
+        : tutorialStep;
   // The Storage step is taught with the Storage open (and over it); the
   // "press E" step only while the chest's [E] prompt is showing.
   const hintOverStorage = storageOpen && tutorialStep === "take-flask";
   const hintOverBook = bookOpen && inBookStep;
   const hintCopy =
+    hintStep === "goal" ||
     hintStep === "book" ||
     inBookStep ||
     hintStep === "map" ||
     hintStep === "move" ||
     hintStep === "chest-approach" ||
+    hintStep === "bar" ||
+    hintStep === "exit-room" ||
+    hintStep === "botica" ||
+    hintStep === "exit-botica" ||
+    hintStep === "run" ||
     (hintStep === "chest-interact" &&
       availableInteractionId === STORAGE_INTERACTION_ID) ||
     hintOverStorage
@@ -1452,6 +1518,7 @@ export function GameWorld({
           onInteract={handleInteract}
           onInteractionAvailable={setAvailableInteractionId}
           promptLabelFor={promptLabelFor}
+          onRunBlocked={handleRunBlocked}
         />
       ) : (
         <ExteriorScene
@@ -1472,6 +1539,8 @@ export function GameWorld({
           onRunningChange={setDoctorRunning}
           onInteractionAvailable={setAvailableInteractionId}
           promptLabelFor={promptLabelFor}
+          runDisabled={!isRunAllowed(world.sceneId)}
+          onRunBlocked={handleRunBlocked}
         />
       )}
       {bookOpen ? (
@@ -1483,10 +1552,11 @@ export function GameWorld({
           // DOLENCIAS: its pages are plain descriptions, whereas the ailment
           // pages already spell out future treatments. Only the tab changes.
           initialSectionId={
-            diagnosis !== null ? "ailments" : tutorialStep === "book" || tutorialStep === "book-page"
+            diagnosis !== null ? "ailments" : tutorialStep === "book" || tutorialStep === "book-cover" || tutorialStep === "book-page"
               ? "ingredients"
               : undefined
           }
+          onOpened={handleBookCoverOpened}
           onPageChange={() => notifyTutorial("book-page-changed")}
           onSectionChange={() => notifyTutorial("book-tab-changed")}
         />
@@ -1549,6 +1619,9 @@ export function GameWorld({
         <TutorialHint
           copy={hintCopy}
           aboveOverlays={hintOverBook || hintOverStorage}
+          raised={isTutorialHudUnlocked(tutorialStep)}
+          onContinue={ACK_STEPS.includes(tutorialStep) ? handleTutorialContinue : undefined}
+          continueLabel={tutorialContinueCopy[language].label}
         />
       ) : null}
       {notice ? <ItemFeedback text={notice.text} /> : null}
@@ -1557,6 +1630,7 @@ export function GameWorld({
         <FastTravelButton
           label={fastTravelCopy[language].label}
           onTravel={handleFastTravel}
+          fill={fastTravelFill}
         />
       ) : null}
       {phase === "holding" && travelCaption ? (

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { CSSProperties } from "react";
 
 import type { TutorialHintCopy } from "../i18n/tutorial";
@@ -9,14 +10,34 @@ import styles from "./TutorialHint.module.css";
 export function TutorialHint({
   copy,
   aboveOverlays = false,
+  raised = false,
+  onContinue,
+  continueLabel,
 }: {
   copy: TutorialHintCopy;
+  // Over the inventory bar and the coins (they are on screen from the "bar" step).
+  raised?: boolean;
+  // Steps that wait for "understood": a button, and the Enter key.
+  onContinue?: () => void;
+  continueLabel?: string;
   // Drawn over the Book (its backdrop sits above the normal hint layer).
   aboveOverlays?: boolean;
 }) {
+  useEffect(() => {
+    if (!onContinue) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && !event.repeat) {
+        event.preventDefault();
+        onContinue();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onContinue]);
+
   return (
     <div
-      className={`${styles.hint}${aboveOverlays ? ` ${styles.aboveOverlays}` : ""}`}
+      className={`${styles.hint}${aboveOverlays ? ` ${styles.aboveOverlays}` : ""}${raised ? ` ${styles.raised}` : ""}`}
       style={{ ["--ui-font" as string]: PIXEL_FONT_FAMILY } as CSSProperties}
       data-tutorial-hint
       role="status"
@@ -33,7 +54,25 @@ export function TutorialHint({
             ),
           )}
         </p>
-        <p className={styles.body}>{copy.body}</p>
+        {copy.body.split("\n").map((line, index) => (
+          <p key={index} className={styles.body}>
+            {line}
+          </p>
+        ))}
+        {onContinue ? (
+          <button
+            type="button"
+            className={styles.continue}
+            data-tutorial-continue
+            onClick={(event) => {
+              // Space / Enter belong to the game: never keep focus.
+              event.currentTarget.blur();
+              onContinue();
+            }}
+          >
+            {continueLabel} <kbd className={styles.key}>Enter</kbd>
+          </button>
+        ) : null}
       </div>
     </div>
   );

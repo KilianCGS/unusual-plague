@@ -30,7 +30,9 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
   },
   "bakery-interior-baker-01": {
     interactionId: "chapter1.bakery.baker",
-    zone: { offsetX: -36, offsetY: -77, width: 118, height: 93 },
+    // Also from the FRONT of her kneading table (collider bakery-interior-10, floor
+    // below it from y 222): the zone reaches y 236 (anchor y 167 + 69), 2026-11-12.
+    zone: { offsetX: -36, offsetY: -77, width: 118, height: 146 },
   },
   "bakery-street-villager-man-02-01": {
     interactionId: "chapter1.bakeryStreet.villager",

@@ -47,7 +47,33 @@
   background: #d8c89e;
 }
 
-.button:hover .face,
+/* Recharging: dimmed, with a bar that fills along the bottom edge. */
+.recharging {
+  position: relative;
+  color: #6b5a3f;
+  background: #b9aa84;
+}
+
+.bar {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  bottom: 2px;
+  height: 4px;
+  background: #2b1a14;
+}
+
+.barFill {
+  display: block;
+  height: 100%;
+  background: #d9a441;
+}
+
+.button[data-ready="false"] {
+  cursor: default;
+}
+
+.button[data-ready="true"]:hover .face,
 .button:focus-visible .face {
   background: #f4e9c8;
 }

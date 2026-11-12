@@ -115,3 +115,23 @@ export function preloadRunSprites() {
     }
   }
 }
+
+// A small vertical body bob on top of the frames (visual only: the feet anchor,
+// hitbox and logical position never change). The long coat hides the legs, so the
+// sideways walk and the run to the north read as a slide; a rise and fall twice per
+// cycle (lowest at each foot contact, highest as the legs pass) gives them a gait.
+// Returns the offset in logical pixels (negative = up).
+const BOB_AMPLITUDE = { walk: 1.1, run: 1.6 } as const;
+
+export function getMovementBob(
+  direction: Direction,
+  isWalking: boolean,
+  isRunning: boolean,
+  frame: number,
+): number {
+  if (!isWalking && !isRunning) return 0;
+  const frameCount = isRunning ? getRunFrameCount(direction) : getWalkFrameCount(direction);
+  const phase = (frame % frameCount) / frameCount;
+  const amplitude = isRunning ? BOB_AMPLITUDE.run : BOB_AMPLITUDE.walk;
+  return -amplitude * Math.abs(Math.sin(2 * Math.PI * phase));
+}

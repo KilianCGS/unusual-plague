@@ -61,6 +61,10 @@ type ProtagonistControllerOptions = {
   // While false the player cannot move, but the keyboard state keeps being
   // tracked: a key that is still held resumes walking as soon as it is true.
   inputEnabled?: boolean;
+  // Running is not allowed here (interiors): Space does not run, and the first
+  // press reports `onRunBlocked` so the owner can have the Doctor say why.
+  runDisabled?: boolean;
+  onRunBlocked?: () => void;
 };
 
 const DEFAULT_SPRITE_SIZE = 96;
@@ -111,7 +115,16 @@ export function useProtagonistController({
   feetHitbox = PROTAGONIST_FEET_HITBOX,
   input,
   inputEnabled = true,
+  runDisabled = false,
+  onRunBlocked,
 }: ProtagonistControllerOptions) {
+  const runDisabledRef = useRef(runDisabled);
+  const onRunBlockedRef = useRef(onRunBlocked);
+  const runBlockedShownRef = useRef(false);
+  useEffect(() => {
+    runDisabledRef.current = runDisabled;
+    onRunBlockedRef.current = onRunBlocked;
+  }, [runDisabled, onRunBlocked]);
   const [player, setPlayer] = useState<ProtagonistState>({
     x: initialX,
     y: initialY,
@@ -158,8 +171,19 @@ export function useProtagonistController({
 
       // Running: Space armed while moving in any direction. It only changes
       // the speed and the animation.
+      const runKeyDown = directionInput.run?.isArmed() === true;
+      // Where running is not allowed Space only reports itself (once per press).
+      if (runDisabledRef.current) {
+        if (runKeyDown && !runBlockedShownRef.current) {
+          runBlockedShownRef.current = true;
+          onRunBlockedRef.current?.();
+        }
+      }
+      if (!runKeyDown) {
+        runBlockedShownRef.current = false;
+      }
       const running =
-        activeDirection !== undefined && directionInput.run?.isArmed() === true;
+        activeDirection !== undefined && runKeyDown && !runDisabledRef.current;
       const speed = running ? PROTAGONIST_RUN_SPEED : playerSpeed;
 
       if (activeDirection) {

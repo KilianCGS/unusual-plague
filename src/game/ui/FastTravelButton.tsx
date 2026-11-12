@@ -9,23 +9,36 @@ import styles from "./FastTravelButton.module.css";
 export function FastTravelButton({
   label,
   onTravel,
+  fill = 1,
 }: {
   label: string;
   onTravel: () => void;
+  // 0..1: the recharge bar (1 = ready to use).
+  fill?: number;
 }) {
+  const ready = fill >= 1;
   return (
     <button
       type="button"
       className={styles.button}
       style={{ ["--ui-font" as string]: PIXEL_FONT_FAMILY } as CSSProperties}
       data-fast-travel
+      data-ready={ready}
+      aria-disabled={!ready}
       onClick={(event) => {
         // Space / Enter belong to the game (run, interact): never keep focus.
         event.currentTarget.blur();
-        onTravel();
+        if (ready) onTravel();
       }}
     >
-      <span className={styles.face}>{label}</span>
+      <span className={`${styles.face}${ready ? "" : ` ${styles.recharging}`}`}>
+        {label}
+        {ready ? null : (
+          <span className={styles.bar} aria-hidden>
+            <span className={styles.barFill} style={{ width: `${Math.round(fill * 100)}%` }} />
+          </span>
+        )}
+      </span>
     </button>
   );
 }

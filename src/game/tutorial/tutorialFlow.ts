@@ -6,7 +6,9 @@
 // are ignored; there are no timers.
 export type TutorialStep =
   | "intro" // the opening (illustration + monologue) is still running
+  | "goal" // what the game is about (acknowledged with Enter / a click)
   | "book" // open the Book (Q)
+  | "book-cover" // click the closed Book to open it
   | "book-page" // turn a page
   | "book-tab" // choose another section
   | "book-close" // close it
@@ -15,11 +17,19 @@ export type TutorialStep =
   | "chest-approach" // walk up to the chest in the room
   | "chest-interact" // open it with E
   | "take-flask" // move the Empty flask to the carried inventory
+  | "bar" // what the inventory bar and the coins are (acknowledged)
+  | "exit-room" // go down to the Botica
+  | "botica" // the two crafting interfaces (acknowledged)
+  | "exit-botica" // go out to the street
+  | "run" // hold Space while moving
   | "done";
 
 export type TutorialEvent =
   | "intro-finished"
+  | "continue" // the player acknowledged an information step (Enter / click)
   | "book-opened"
+  | "book-cover-opened" // ...and then opened its cover
+
   | "book-page-changed"
   | "book-tab-changed"
   | "book-closed"
@@ -29,15 +39,20 @@ export type TutorialEvent =
   | "chest-out-of-range"
   | "chest-opened" // the Storage was opened from the chest
   | "storage-closed" // ...and closed again
-  | "flask-taken"; // the Empty flask really reached the carried inventory
+  | "flask-taken" // the Empty flask really reached the carried inventory
+  | "botica-entered"
+  | "street-entered"
+  | "run-started";
 
 // The one event that completes each step, in order.
 const STEP_COMPLETED_BY: Record<
   Exclude<TutorialStep, "done">,
   { event: TutorialEvent; next: TutorialStep }
 > = {
-  intro: { event: "intro-finished", next: "book" },
-  book: { event: "book-opened", next: "book-page" },
+  intro: { event: "intro-finished", next: "goal" },
+  goal: { event: "continue", next: "book" },
+  book: { event: "book-opened", next: "book-cover" },
+  "book-cover": { event: "book-cover-opened", next: "book-page" },
   "book-page": { event: "book-page-changed", next: "book-tab" },
   "book-tab": { event: "book-tab-changed", next: "book-close" },
   "book-close": { event: "book-closed", next: "map" },
@@ -45,8 +60,29 @@ const STEP_COMPLETED_BY: Record<
   move: { event: "player-moved", next: "chest-approach" },
   "chest-approach": { event: "chest-in-range", next: "chest-interact" },
   "chest-interact": { event: "chest-opened", next: "take-flask" },
-  "take-flask": { event: "flask-taken", next: "done" },
+  "take-flask": { event: "flask-taken", next: "bar" },
+  bar: { event: "continue", next: "exit-room" },
+  "exit-room": { event: "botica-entered", next: "botica" },
+  botica: { event: "continue", next: "exit-botica" },
+  "exit-botica": { event: "street-entered", next: "run" },
+  run: { event: "run-started", next: "done" },
 };
+
+// The steps that wait for the player to say "understood" (a button and Enter).
+export const ACK_STEPS: readonly TutorialStep[] = ["goal", "bar", "botica"];
+
+// The inventory bar and the coins are shown from the step that explains them.
+const HUD_STEPS: readonly TutorialStep[] = [
+  "bar",
+  "exit-room",
+  "botica",
+  "exit-botica",
+  "run",
+  "done",
+];
+export function isTutorialHudUnlocked(step: TutorialStep): boolean {
+  return HUD_STEPS.includes(step);
+}
 
 // The only way BACK: the player walks away from the chest, or closes the
 // Storage without the flask. Book, Map and movement are never repeated.
@@ -79,7 +115,13 @@ export function advanceTutorial(
   // The flask is the goal of the three chest steps: if it is already carried
   // (taken before the tutorial got there) there is nothing left to teach.
   if (event === "flask-taken" && CHEST_STEPS.includes(step)) {
-    return "done";
+    return "bar";
+  }
+
+  // A late tutorial never traps a player who already did the thing: the botica
+  // step is skipped if he is already past it (he reached the street).
+  if (event === "street-entered" && (step === "botica" || step === "exit-room")) {
+    return "run";
   }
 
   const rule = STEP_COMPLETED_BY[step];

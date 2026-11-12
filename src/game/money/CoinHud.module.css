@@ -44,31 +44,11 @@
     inset -2px -2px 0 rgba(255, 246, 222, 0.6);
 }
 
-/* The coin turns over now and then (a few stepped frames, then rests). */
+/* A static picture of a few stacked coins (no animation). */
 .coin {
   width: 32px;
   height: 32px;
   image-rendering: pixelated;
-  animation: coin-turn 4.5s steps(1) infinite;
-}
-
-@keyframes coin-turn {
-  0%,
-  86% {
-    transform: scaleX(1);
-  }
-  89% {
-    transform: scaleX(0.6);
-  }
-  92% {
-    transform: scaleX(0.15);
-  }
-  95% {
-    transform: scaleX(0.6);
-  }
-  100% {
-    transform: scaleX(1);
-  }
 }
 
 .count {
@@ -137,7 +117,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .coin,
   .count,
   .delta {
     animation: none;

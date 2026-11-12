@@ -19,6 +19,8 @@ type ProtagonistSpriteProps = {
   // runs with the east frames). The anchor, the logical position and every
   // hitbox are untouched.
   mirrored?: boolean;
+  // Visual only: a small vertical offset (logical px, negative = up) for the gait.
+  bob?: number;
 };
 
 export function ProtagonistSprite({
@@ -31,6 +33,7 @@ export function ProtagonistSprite({
   scale = 1,
   zIndex,
   mirrored = false,
+  bob = 0,
 }: ProtagonistSpriteProps) {
   const anchorStyle: CSSProperties = {
     position: "absolute",
@@ -49,7 +52,7 @@ export function ProtagonistSprite({
     height: spriteSize,
     imageRendering: "pixelated",
     transform:
-      `scale(${scale * DOCTOR_SCALE}) ${mirrored ? "scaleX(-1)" : ""}`.trim(),
+      `translateY(${bob}px) scale(${scale * DOCTOR_SCALE}) ${mirrored ? "scaleX(-1)" : ""}`.trim(),
     transformOrigin: "50% 100%",
   };
 

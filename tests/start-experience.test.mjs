@@ -294,8 +294,10 @@ test("a new game: no Empty flask in the pocket, ONE in the Storage chest", () =>
 
 test("Tutorial V2: open book > page > tab > close > map > move > approach chest > open it > take flask > done", () => {
   const sequence = [
-    ["intro-finished", "book"],
-    ["book-opened", "book-page"],
+    ["intro-finished", "goal"],
+    ["continue", "book"],
+    ["book-opened", "book-cover"],
+    ["book-cover-opened", "book-page"],
     ["book-page-changed", "book-tab"],
     ["book-tab-changed", "book-close"],
     ["book-closed", "map"],
@@ -303,7 +305,12 @@ test("Tutorial V2: open book > page > tab > close > map > move > approach chest 
     ["player-moved", "chest-approach"],
     ["chest-in-range", "chest-interact"],
     ["chest-opened", "take-flask"],
-    ["flask-taken", "done"],
+    ["flask-taken", "bar"],
+    ["continue", "exit-room"],
+    ["botica-entered", "botica"],
+    ["continue", "exit-botica"],
+    ["street-entered", "run"],
+    ["run-started", "done"],
   ];
   let step = INITIAL_TUTORIAL_STEP;
   for (const [event, next] of sequence) {
@@ -313,23 +320,19 @@ test("Tutorial V2: open book > page > tab > close > map > move > approach chest 
   assert.equal(advanceTutorial("done", "book-opened"), "done");
 });
 
-test("the movement hint also teaches running (ES/EN) without a new phase or a new gate", () => {
-  assert.equal(
-    tutorialCopy.es.move.body,
-    "Recorre tu habitación. Mantén ESPACIO mientras te mueves para correr.",
-  );
-  assert.equal(
-    tutorialCopy.en.move.body,
-    "Look around your room. Hold SPACE while moving to run.",
-  );
-  // the title still names the movement keys; no run step exists in the flow
+test("running is taught when leaving the apothecary (its own step), not in the room", () => {
+  assert.equal(tutorialCopy.es.move.body, "Echa un vistazo a tu habitación.");
+  assert.equal(tutorialCopy.en.move.body, "Have a look around your room.");
+  // the title still names the movement keys
   for (const lang of ["es", "en"]) {
     assert.deepEqual(
       tutorialCopy[lang].move.title.filter((p) => typeof p === "object"),
       [{ key: "WASD" }],
     );
     assert.deepEqual(Object.keys(tutorialCopy[lang]), [
+      "goal",
       "book",
+      "book-cover",
       "book-page",
       "book-tab",
       "book-close",
@@ -338,11 +341,17 @@ test("the movement hint also teaches running (ES/EN) without a new phase or a ne
       "chest-approach",
       "chest-interact",
       "take-flask",
+      "bar",
+      "exit-room",
+      "botica",
+      "exit-botica",
+      "run",
     ]);
   }
-  // moving is still the only thing "move" waits for: running is never required
+  // moving is still the only thing "move" waits for: running is never required there
   assert.equal(advanceTutorial("move", "player-moved"), "chest-approach");
   assert.equal(advanceTutorial("move", "run-started"), "move");
+  assert.equal(advanceTutorial("run", "run-started"), "done");
 });
 
 test("the Doctor is drawn ~40% larger in his room by a per-scene VISUAL scale only", () => {
@@ -373,6 +382,7 @@ test("the Doctor is drawn ~40% larger in his room by a per-scene VISUAL scale on
 
 test("opening the book is NOT enough: the page must really change, then the tab, then it must close", () => {
   assert.equal(advanceTutorial("book-page", "book-opened"), "book-page");
+  assert.equal(advanceTutorial("book-cover", "book-page-changed"), "book-cover"); // the cover comes first
   assert.equal(advanceTutorial("book-page", "book-tab-changed"), "book-page"); // out of order
   assert.equal(advanceTutorial("book-page", "book-closed"), "book-page");
   assert.equal(advanceTutorial("book-page", "book-page-changed"), "book-tab");
@@ -429,7 +439,7 @@ test("merely opening the Storage, or closing it without the flask, does not fini
   assert.equal(step, "chest-interact"); // back to "open it"; Book/Map/movement are not repeated
   step = advanceTutorial(step, "chest-opened");
   assert.equal(step, "take-flask");
-  assert.equal(advanceTutorial(step, "flask-taken"), "done");
+  assert.equal(advanceTutorial(step, "flask-taken"), "bar");
   // closing the Storage AFTER taking the flask changes nothing
   assert.equal(advanceTutorial("done", "storage-closed"), "done");
 });
@@ -454,7 +464,7 @@ test("the flask is what counts: another item, a failed transfer or no change nev
   // the real transfer is what completes it
   const taken = transferStack(chest, pocket, "empty-flask");
   assert.equal(carries(taken.destination), true);
-  assert.equal(advanceTutorial("take-flask", "flask-taken"), "done");
+  assert.equal(advanceTutorial("take-flask", "flask-taken"), "bar");
 
   // GameWorld derives that event from the carried inventory, not from the click
   const game = read("src/game/world/GameWorld.tsx");
@@ -462,9 +472,9 @@ test("the flask is what counts: another item, a failed transfer or no change nev
   assert.ok(game.includes('notifyTutorial("flask-taken")'));
 });
 
-test("a flask taken before the tutorial got there finishes the chest steps (nothing left to teach)", () => {
+test("a flask taken before the tutorial got there finishes the chest steps (next: the inventory bar)", () => {
   for (const step of ["chest-approach", "chest-interact", "take-flask"]) {
-    assert.equal(advanceTutorial(step, "flask-taken"), "done", step);
+    assert.equal(advanceTutorial(step, "flask-taken"), "bar", step);
   }
   for (const step of [
     "intro",

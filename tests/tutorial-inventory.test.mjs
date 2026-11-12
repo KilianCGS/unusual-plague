@@ -52,7 +52,9 @@ const test = (name, fn) => {
 
 const ALL_EVENTS = [
   "intro-finished",
+  "continue",
   "book-opened",
+  "book-cover-opened",
   "book-page-changed",
   "book-tab-changed",
   "book-closed",
@@ -63,10 +65,15 @@ const ALL_EVENTS = [
   "chest-opened",
   "storage-closed",
   "flask-taken",
+  "botica-entered",
+  "street-entered",
+  "run-started",
 ];
 const ORDER = [
-  ["intro", "intro-finished", "book"],
-  ["book", "book-opened", "book-page"],
+  ["intro", "intro-finished", "goal"],
+  ["goal", "continue", "book"],
+  ["book", "book-opened", "book-cover"],
+  ["book-cover", "book-cover-opened", "book-page"],
   ["book-page", "book-page-changed", "book-tab"],
   ["book-tab", "book-tab-changed", "book-close"],
   ["book-close", "book-closed", "map"],
@@ -74,7 +81,12 @@ const ORDER = [
   ["move", "player-moved", "chest-approach"],
   ["chest-approach", "chest-in-range", "chest-interact"],
   ["chest-interact", "chest-opened", "take-flask"],
-  ["take-flask", "flask-taken", "done"],
+  ["take-flask", "flask-taken", "bar"],
+  ["bar", "continue", "exit-room"],
+  ["exit-room", "botica-entered", "botica"],
+  ["botica", "continue", "exit-botica"],
+  ["exit-botica", "street-entered", "run"],
+  ["run", "run-started", "done"],
 ];
 // The only other transitions: walking away from the chest / closing the
 // Storage step back one, and the flask (already carried) finishes any chest step.
@@ -82,13 +94,16 @@ const EXTRA = {
   "chest-approach": ["flask-taken"],
   "chest-interact": ["chest-out-of-range", "flask-taken"],
   "take-flask": ["storage-closed"],
+  // reaching the street skips whatever of the apothecary tour is left
+  "exit-room": ["street-entered"],
+  botica: ["street-entered"],
 };
 
 test("the tutorial starts at the monologue", () => {
   assert.equal(INITIAL_TUTORIAL_STEP, "intro");
 });
 
-test("steps go intro > book > page > tab > close > map > move > chest-approach > chest-interact > take-flask > done, each by its own event", () => {
+test("steps go intro > goal > book > cover > page > tab > close > map > move > chest > bar > exit-room > botica > exit-botica > run > done, each by its own event", () => {
   let step = INITIAL_TUTORIAL_STEP;
   for (const [from, event, to] of ORDER) {
     assert.equal(step, from);
@@ -114,7 +129,9 @@ test("any other event does not advance a step", () => {
 test("the chest steps cannot be skipped by early events, and a random E has no event at all", () => {
   for (const step of [
     "intro",
+    "goal",
     "book",
+    "book-cover",
     "book-page",
     "book-tab",
     "book-close",
@@ -150,10 +167,14 @@ test("the chest steps cannot be skipped by early events, and a random E has no e
 });
 
 test("events fired early are not remembered (movement before its step is lost)", () => {
-  let step = advanceTutorial("book", "player-moved");
+  let step = advanceTutorial("goal", "continue");
+  assert.equal(step, "book");
+  step = advanceTutorial(step, "player-moved");
   assert.equal(step, "book");
   for (const event of [
+    "continue",
     "book-opened",
+    "book-cover-opened",
     "book-page-changed",
     "book-tab-changed",
     "book-closed",
@@ -195,7 +216,7 @@ test("every hint step has ES and EN copy with its key", () => {
   }
   // the tab, approach and take-flask steps name no key but still have copy
   for (const lang of ["es", "en"]) {
-    for (const step of ["book-tab", "chest-approach", "take-flask"]) {
+    for (const step of ["goal", "book-cover", "book-tab", "chest-approach", "take-flask", "bar", "exit-room", "botica", "exit-botica"]) {
       assert.ok(
         tutorialCopy[lang][step].title.length &&
           tutorialCopy[lang][step].body.trim(),
@@ -203,6 +224,8 @@ test("every hint step has ES and EN copy with its key", () => {
       );
     }
   }
+  assert.ok(tutorialCopy.es.run.title.some((p) => p.key === "ESPACIO"));
+  assert.ok(tutorialCopy.en.run.title.some((p) => p.key === "SPACE"));
   assert.ok(inventoryCopy.es.title && inventoryCopy.en.title);
 });
 

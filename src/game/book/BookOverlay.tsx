@@ -50,6 +50,7 @@ const EMPTY_CONTEXT: BookContext = {
 export function BookOverlay({
   context = EMPTY_CONTEXT,
   initialSectionId,
+  onOpened,
   onPageChange,
   onSectionChange,
 }: {
@@ -60,11 +61,17 @@ export function BookOverlay({
   // was chosen. The owner (the tutorial) decides what that means.
   onPageChange?: () => void;
   onSectionChange?: () => void;
+  // The cover was opened (click or Space / Enter).
+  onOpened?: () => void;
 }) {
   const copy = bookCopy[context.language];
   const sections = buildBookSections(context);
   const scale = useFitScale(BOOK_WIDTH, STAGE_HEIGHT, VIEWPORT_FRACTION);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpenState] = useState(false);
+  const setIsOpen = (value: boolean) => {
+    if (value && !isOpen) onOpened?.();
+    setIsOpenState(value);
+  };
   const [sectionIndex, setSectionIndex] = useState(() =>
     Math.max(
       0,
