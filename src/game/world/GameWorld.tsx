@@ -49,7 +49,9 @@ import {
 } from "../dialogue/storyInteractions";
 import { day1Closing } from "../dialogue/chapter1Day1Dialogues";
 import { day2Closing } from "../dialogue/chapter2ClosingDialogues";
+import { day3Closing } from "../dialogue/chapter3ClosingDialogues";
 import { DAY2_COMPLETED_ID, shouldCloseDay2 } from "../patients/day2";
+import { DAY3_COMPLETED_ID, shouldCloseDay3 } from "../patients/day3";
 import { messengerOpening } from "../dialogue/chapter2OpeningDialogues";
 import { day2OpeningCopy } from "../i18n/day2Opening";
 import { DOCTOR_SPEAKER } from "../dialogue/dialogueTypes";
@@ -843,17 +845,8 @@ export function GameWorld({
   // and the Doctor wakes in the Doctor's Room. Nothing of Day 1 (inventory,
   // storage, recipes, cases, flags, collected things) is touched.
   const startNextChapter = useCallback(() => {
-    // Day 2 epilogue returns home for aftercare/free exploration. Day 3 has
-    // no approved population yet, so finishing this chapter does not enter it.
-    if (closingChapter === "chapter-2") {
-      if (chapterAdvancedRef.current) return;
-      chapterAdvancedRef.current = true;
-      const home = getChapterStart("chapter-2");
-      pendingRef.current = null;
-      arrivalRef.current = null;
-      setWorld(current => ({ sceneId: home.sceneId, spawnName: home.spawnName, arrival: current.arrival + 1 }));
-      return;
-    }
+    // Every closing (Day 1, 2 and 3) leads to the next chapter (2026-11-12: Day 3
+    // and Day 4 exist now).
     const nextChapterId = getNextChapterId(chapterId);
 
     if (nextChapterId === null || chapterAdvancedRef.current) {
@@ -871,14 +864,18 @@ export function GameWorld({
       spawnName: start.spawnName,
       arrival: current.arrival + 1,
     }));
-  }, [chapterId, closingChapter]);
+  }, [chapterId]);
   const finishClosing = useCallback(() => {
     // Covered already when the interlude ended early (Esc); harmless otherwise.
     startNextChapter();
     setClosingActive(false);
   }, [startNextChapter]);
   const closingConversation = useMemo(
-    () => localizeConversation(closingChapter === "chapter-2" ? day2Closing : day1Closing, language, DOCTOR_SPEAKER),
+    () => localizeConversation(
+      closingChapter === "chapter-3" ? day3Closing : closingChapter === "chapter-2" ? day2Closing : day1Closing,
+      language,
+      DOCTOR_SPEAKER,
+    ),
     [language, closingChapter],
   );
 
@@ -1076,6 +1073,17 @@ export function GameWorld({
       afterDialogueRef.current === null && shouldCloseDay2(patientsRef.current, claimedRewardsRef.current)) {
       claimFlag(DAY2_COMPLETED_ID);
       setClosingChapter("chapter-2");
+      chapterAdvancedRef.current = false;
+      setClosingActive(true);
+    }
+  }, [chapterId, isPlaying, patients, claimedRewards, claimFlag]);
+
+  // The closing of Day 3: the same rule as Day 2, over its own cases.
+  useEffect(() => {
+    if (chapterId === "chapter-3" && isPlaying && phaseRef.current === "playing" &&
+      afterDialogueRef.current === null && shouldCloseDay3(patientsRef.current, claimedRewardsRef.current)) {
+      claimFlag(DAY3_COMPLETED_ID);
+      setClosingChapter("chapter-3");
       chapterAdvancedRef.current = false;
       setClosingActive(true);
     }
@@ -1541,9 +1549,11 @@ export function GameWorld({
       {closingActive ? (
         <div className={dayClosingStyles.fadeIn}>
           <NarrativeInterlude
-            illustration={closingChapter === "chapter-2"
-              ? NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]
-              : NARRATIVE_ILLUSTRATIONS["doctor-eating"]}
+            illustration={closingChapter === "chapter-3"
+              ? NARRATIVE_ILLUSTRATIONS["doctor-writing"]
+              : closingChapter === "chapter-2"
+                ? NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]
+                : NARRATIVE_ILLUSTRATIONS["doctor-eating"]}
             conversation={closingConversation}
             language={language}
             onCovered={startNextChapter}

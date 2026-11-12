@@ -3,7 +3,7 @@ import type { DecorComposition, DecorInstance } from "../../../game/decor/decorT
 
 // Neutral, easy-to-rename ids. Compositions are independent: none inherits
 // from another.
-export const CHAPTER_IDS = ["chapter-1", "chapter-2", "artifacts", "final"];
+export const CHAPTER_IDS = ["chapter-1", "chapter-2", "chapter-3", "artifacts", "final"];
 
 const STORAGE_PREFIX = "unusual-plague:decorator:v1";
 

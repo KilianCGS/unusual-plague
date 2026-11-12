@@ -21,6 +21,8 @@ import { createEmptyStorage } from "../storage/storage";
 import type { TutorialStep } from "../tutorial/tutorialFlow";
 import { WORLD_SCENES } from "./worldScenes";
 import { CHAPTER2_PATIENTS } from "../patients/chapter2Patients";
+import { CHAPTER3_PATIENTS } from "../patients/chapter3Patients";
+import { DAY2_COMPLETED_ID } from "../patients/day2";
 import { FARMER_SAMPLE_ID, FARMER_ANALYSIS_ID, FARMER_RECIPE_IDS } from "../patients/farmerInvestigation";
 import { MESSENGER_MET_ID, MESSENGER_LEFT_ID } from "./day2Opening";
 
@@ -123,5 +125,33 @@ export function createDay2ClosingDevStart(): GameDevStart {
       MESSENGER_MET_ID, MESSENGER_LEFT_ID, "chapter2.witch.leech"]),
     knownRecipeIds: new Set([...start.knownRecipeIds, ...FARMER_RECIPE_IDS,
       ...Object.values(CHAPTER2_PATIENTS).flatMap(definition => definition.revealsRecipeIds)]),
+  };
+}
+
+// TEST DATA: Day 2 completed (every case treated, the closing played), standing at the
+// start of Day 3 (2026-11-12) in the Doctor's Room with the coins and stock Days 1-2 leave.
+export function createDay3DevStart(): GameDevStart {
+  const day2 = createDay2ClosingDevStart();
+  let inventory = day2.inventory;
+  for (const [itemId, quantity] of [["empty-flask", 1], ["mint", 1], ["honey", 1], ["garlic", 1], ["orange", 2]] as const) {
+    inventory = addItem(inventory, itemId, quantity) ?? inventory;
+  }
+  return {
+    ...day2,
+    chapterId: "chapter-3",
+    claimedRewards: new Set([...day2.claimedRewards, DAY2_COMPLETED_ID]),
+    inventory,
+    // TEST FIXTURE: what Days 1 and 2 leave after the purchases
+    coins: 40,
+  };
+}
+
+// TEST DATA: Day 3 finished: only the closing is left to play.
+export function createDay3ClosingDevStart(): GameDevStart {
+  const start = createDay3DevStart();
+  return {
+    ...start,
+    patients: { ...start.patients, ...Object.fromEntries(Object.keys(CHAPTER3_PATIENTS).map(id => [id, "treated" as const])) },
+    knownRecipeIds: new Set([...start.knownRecipeIds, ...Object.values(CHAPTER3_PATIENTS).flatMap(definition => definition.revealsRecipeIds)]),
   };
 }

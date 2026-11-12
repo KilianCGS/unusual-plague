@@ -293,7 +293,9 @@ test("preparation descriptions cover the catalog and indications follow existing
   assert.match(getPreparationUse("mint-infusion", "en"), /Exhaustion/);
   assert.match(getPreparationUse("medicinal-paste", "es"), /intermedio.*Cataplasma/);
   assert.match(getPreparationUse("crushed-coal", "en"), /Intermediate.*Charcoal suspension/);
-  assert.match(getPreparationUse("balsamic-syrup", "es"), /aún no está registrada/);
+  // Day 3 (2026-11-12): the sweeper's chest cough uses it, so its indication is now recorded
+  assert.match(getPreparationUse("balsamic-syrup", "es"), /Tos del pecho/);
+  assert.match(getPreparationUse("bone-broth", "es"), /Escorbuto/);
 });
 
 console.log(`\n${passed} tests passed`);

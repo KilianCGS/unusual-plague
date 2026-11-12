@@ -47,10 +47,10 @@ const inv = at("src/game/inventory/inventory.ts");
 const { checkDiagnosis, getDiagnosisOptions, diagnosisConversation, DIAGNOSIS_SYMPTOMS } = at("src/game/patients/diagnosis.ts");
 const expected = {"baker-husband":"common-fever","tavern-patient":"stomach-ailment","injured-miner":"infected-wound","chapter2-woodcutter":"exhaustion","chapter2-blacksmith":"infected-wound","chapter2-farmer":"poisoning"};
 let passed=0;const test=(name,fn)=>{fn();passed++;console.log("ok - "+name);};
-test("seven localized options cover every patient and preserve an investigable poisoning hypothesis",()=>{
+test("ten localized options cover every patient and preserve an investigable poisoning hypothesis",()=>{
  for(const language of ["es","en"]){
   const options=getDiagnosisOptions(language);
-  assert.equal(options.length,7);assert.equal(new Set(options.map(o=>o.id)).size,7);
+  assert.equal(options.length,10);assert.equal(new Set(options.map(o=>o.id)).size,10);
   assert.equal(options.find(o=>o.id==='poisoning').label,language==='es'?'Envenenamiento':'Poisoning');
   for(const [id,correct] of Object.entries(expected)){
    assert.ok(DIAGNOSIS_SYMPTOMS[id][language].length>40);
@@ -78,7 +78,7 @@ test("the Book records symptoms while a diagnosis is pending and withholds diagn
   const texts=sections[0].spreads[0].texts;
   assert.ok(texts.some(t=>t.id===id+'-symptoms'&&t.content[0]===DIAGNOSIS_SYMPTOMS[id][language]));
   assert.ok(!texts.some(t=>t.id.endsWith('-diagnosis')||t.id.includes('-need-')));
-  const ailments=sections[1].spreads;assert.equal(ailments.length,7);
+  const ailments=sections[1].spreads;assert.equal(ailments.length,10);
   const poisoning=ailments.find(s=>s.id==='ailment-poisoning');
   assert.ok(poisoning.texts.some(t=>t.id==='poisoning-name'&&t.content[0]===(language==='es'?'Envenenamiento':'Poisoning')));
  }
@@ -98,12 +98,12 @@ test("GameWorld confirms only after a correct-answer conversation, and Book cons
  const farmer=require('node:fs').readFileSync(require('node:path').join(root,'src/game/patients/farmerInvestigation.ts'),'utf8');
  assert.ok(farmer.includes('FARMER_SAMPLE_ID')&&farmer.includes('FARMER_ANALYSIS_ID'));
 });
-test("the actual diagnosis dialog renders seven labeled choices and a Book action in both languages",()=>{
+test("the actual diagnosis dialog renders ten labeled choices and a Book action in both languages",()=>{
  const React=require('react');const {renderToStaticMarkup}=require('react-dom/server');
  const {DiagnosisOverlay}=at('src/game/patients/DiagnosisOverlay.tsx');
  for(const language of ['es','en']){
   const html=renderToStaticMarkup(React.createElement(DiagnosisOverlay,{patientId:'chapter2-woodcutter',language,onChoose:()=>{},onConsult:()=>{}}));
-  assert.equal((html.match(/<button/g)||[]).length,8);
+  assert.equal((html.match(/<button/g)||[]).length,11);
   assert.ok(html.includes('role="dialog"')&&html.includes('aria-modal="true"'));
   for(const option of getDiagnosisOptions(language))assert.ok(html.includes(option.label));
   assert.ok(html.includes(language==='es'?'Consultar el Compendio':'Consult the Compendium'));

@@ -28,6 +28,19 @@ export const DIAGNOSIS_SYMPTOMS: Record<string, Record<Language, string>> = {
     es: "Herida en la mano de hace unos días. La zona está roja, hinchada y cada vez más dolorosa.",
     en: "A hand wound from a few days ago. The area is red, swollen and increasingly painful.",
   },
+  // Day 3 (2026-11-12): NEW text, awaiting Kilian's review.
+  "chapter3-sweeper": {
+    es: "Tos persistente, respiración silbante y opresión en el pecho desde que barrió un piso cerrado. Empeora por la noche.",
+    en: "A persistent cough, wheezing and tightness in the chest since she swept a long-closed floor. It is worse at night.",
+  },
+  "chapter3-path-miner": {
+    es: "Cansancio, encías doloridas que sangran y un rasguño que no cierra. Lleva semanas comiendo pan duro y cecina.",
+    en: "Tiredness, sore gums that bleed and a scratch that will not close. He has eaten hard bread and jerky for weeks.",
+  },
+  "chapter3-stonecutter": {
+    es: "Brazo hinchado y desviado tras el golpe de un bloque. Mucho dolor al girarlo o apoyarlo.",
+    en: "A swollen, crooked arm after the blow of a block. Sharp pain on turning or leaning on it.",
+  },
   "chapter2-farmer": {
     es: "Debilidad repentina, sudor frío, náuseas y falta de apetito. Hace poco trabajaba con normalidad.",
     en: "Sudden weakness, cold sweats, nausea and loss of appetite. Until recently he was working normally.",

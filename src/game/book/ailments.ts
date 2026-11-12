@@ -120,4 +120,53 @@ export const AILMENTS: Ailment[] = [
       " puede devolver fuerzas, aunque conviene investigar la causa cuando el agotamiento persista.",
     ],
   },
+  // 2026-11-12: three more ailments (the Compendium now has ten). NEW text, awaiting
+  // Kilian's review; the engravings are provisional.
+  {
+    id: "burn",
+    name: "Quemadura",
+    illustration: { file: "burn-v2", x: 108, y: 26 },
+    symptoms: [
+      "Piel enrojecida, ampollas, dolor punzante y calor en la zona. Aparece tras tocar fuego, metal caliente o agua hirviendo.",
+    ],
+    treatment: [
+      "Enfriar la zona con un ",
+      { emphasis: "paño frío" },
+      ", protegerla del aire con ",
+      { emphasis: "ungüento medicinal" },
+      " y cubrirla con un ",
+      { emphasis: "vendaje desinfectado" },
+      ". No conviene reventar las ampollas.",
+    ],
+  },
+  {
+    id: "fracture",
+    name: "Fractura",
+    illustration: { file: "fracture-v2", x: 108, y: 26 },
+    symptoms: [
+      "Dolor agudo al moverse, hinchazón, deformidad y dificultad para apoyar o usar el miembro. Suele aparecer tras una caída o un golpe fuerte.",
+    ],
+    treatment: [
+      "Inmovilizar el miembro con un ",
+      { emphasis: "vendaje desinfectado" },
+      " y aliviar la hinchazón con una ",
+      { emphasis: "cataplasma" },
+      ". Evitar todo esfuerzo hasta que sane.",
+    ],
+  },
+  {
+    id: "insomnia",
+    name: "Insomnio",
+    illustration: { file: "insomnia-v2", x: 108, y: 26 },
+    symptoms: [
+      "Dificultad para dormir, ojeras, irritabilidad, dolor de cabeza y un cansancio que el descanso no cura. Puede alargarse noches seguidas.",
+    ],
+    treatment: [
+      "Una ",
+      { emphasis: "infusión de menta" },
+      " antes de acostarse y ",
+      { emphasis: "leche con miel" },
+      " suelen ayudar. Conviene descubrir qué mantiene despierto al enfermo.",
+    ],
+  },
 ];

@@ -19,8 +19,9 @@ export function DiagnosisOverlay({ patientId, language, onChoose, onConsult }: {
     panel.current?.querySelector<HTMLButtonElement>("button")?.focus();
     function keyDown(event: KeyboardEvent) {
       if (event.repeat) return;
-      const index = Number(event.key) - 1;
-      if (/^[1-7]$/.test(event.key) && options[index]) {
+      // keys 1-9 pick the first nine options and 0 the tenth
+      const index = event.key === "0" ? 9 : Number(event.key) - 1;
+      if (/^[0-9]$/.test(event.key) && options[index]) {
         event.preventDefault();
         onChoose(options[index].id);
       }
@@ -42,11 +43,11 @@ export function DiagnosisOverlay({ patientId, language, onChoose, onConsult }: {
       <p id="diagnosis-symptoms" className={styles.thought}>({DIAGNOSIS_SYMPTOMS[patientId][language]})</p>
       <div className={styles.options}>
         {options.map((option, index) => <button key={option.id} type="button" onClick={() => onChoose(option.id)}>
-          <span aria-hidden="true">{index + 1}. </span>{option.label}
+          <span aria-hidden="true">{(index + 1) % 10}. </span>{option.label}
         </button>)}
       </div>
       <button className={styles.consult} type="button" onClick={onConsult}>{es ? "Consultar el Compendio [Q]" : "Consult the Compendium [Q]"}</button>
-      <p className={styles.hint}>{es ? "Puedes reconsiderarlo sin penalización. Elige con el ratón o las teclas 1–7." : "You can reconsider without penalty. Choose with the mouse or keys 1–7."}</p>
+      <p className={styles.hint}>{es ? "Puedes reconsiderarlo sin penalización. Elige con el ratón o las teclas 1–0." : "You can reconsider without penalty. Choose with the mouse or keys 1–0."}</p>
     </div>
   </div>;
 }

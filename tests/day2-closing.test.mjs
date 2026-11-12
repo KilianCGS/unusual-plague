@@ -80,17 +80,20 @@ test('epilogue uses the fireplace image, with ES/EN caption and parenthesized Do
     assert.ok(!conversation.lines.some(l=>/smartphone|artifact|artefacto/i.test(l.text)));
   }
 });
-test('closing returns to the existing room without clearing state or entering unfinished Chapter 3',()=>{
-  assert.equal(getNextChapterId('chapter-2'),null);
+test('closing leads to Day 3 in the existing room (2026-11-12: Day 3 exists now) without clearing state',()=>{
+  assert.equal(getNextChapterId('chapter-2'),'chapter-3');
   assert.equal(getChapterStart('chapter-2').sceneId,'doctor-room');
+  assert.equal(getChapterStart('chapter-3').sceneId,'doctor-room');
   const game=fs.readFileSync(path.join(root,'src/game/world/GameWorld.tsx'),'utf8');
-  const start=game.indexOf('if (closingChapter === "chapter-2")');
-  const finish=game.indexOf('const nextChapterId',start);
-  const home=game.slice(start,finish);
-  assert.ok(home.includes('chapterAdvancedRef.current'));
-  assert.ok(home.includes('getChapterStart("chapter-2")'));
-  assert.ok(home.includes('setWorld'));
-  assert.ok(!/setInventory|setStorage|setPatients|setClaimedRewards|setKnownRecipeIds|setChapterId/.test(home));
+  const start=game.indexOf('const startNextChapter');
+  const finish=game.indexOf('const finishClosing',start);
+  const next=game.slice(start,finish);
+  assert.ok(next.includes('chapterAdvancedRef.current'));
+  assert.ok(next.includes('getNextChapterId(chapterId)'));
+  assert.ok(next.includes('setChapterId(nextChapterId)'));
+  assert.ok(next.includes('setWorld'));
+  // only the chapter and the place change: nothing the player owns is touched
+  assert.ok(!/setInventory|setStorage|setPatients|setClaimedRewards|setKnownRecipeIds/.test(next));
 });
 test('preview fixtures are isolated and leave the closing unclaimed, normal Day 2 starts incomplete',()=>{
   const normal=createDay2DevStart(),preview=createDay2ClosingDevStart();

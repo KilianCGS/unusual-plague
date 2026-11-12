@@ -1,6 +1,7 @@
 import type { Language } from "../i18n/types";
 import { BAKER_HUSBAND_ID, INJURED_MINER_ID, TAVERN_PATIENT_ID } from "../patients/chapter1Patients";
 import { BLACKSMITH_DAY2_ID, FARMER_DAY2_ID, WOODCUTTER_DAY2_ID } from "../patients/chapter2Patients";
+import { PATH_MINER_DAY3_ID, STONECUTTER_DAY3_ID, SWEEPER_DAY3_ID } from "../patients/chapter3Patients";
 import { getPatientStatus, type PatientCasesState } from "../patients/patientCases";
 
 // THE ERRANDS PANEL: what the Doctor has pending, derived from the cases (never
@@ -19,6 +20,9 @@ export const PATIENT_OBJECTIVES: Readonly<Record<string, Record<Language, string
   [WOODCUTTER_DAY2_ID]: { es: "Tratar al leñador", en: "Treat the woodcutter" },
   [BLACKSMITH_DAY2_ID]: { es: "Tratar al herrero herido", en: "Treat the injured blacksmith" },
   [FARMER_DAY2_ID]: { es: "Tratar al agricultor del molino", en: "Treat the mill farmer" },
+  [SWEEPER_DAY3_ID]: { es: "Tratar a la barrendera", en: "Treat the sweeper" },
+  [PATH_MINER_DAY3_ID]: { es: "Tratar al minero del camino", en: "Treat the path miner" },
+  [STONECUTTER_DAY3_ID]: { es: "Tratar al picapedrero de la cantera", en: "Treat the quarry stonecutter" },
 };
 
 export const objectivesCopy: Record<Language, { title: string; toggleHint: string }> = {

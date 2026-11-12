@@ -96,4 +96,7 @@ export const ailmentNames: Record<string, Record<Language, string>> = {
   "infected-wound": { es: "Herida infectada", en: "Infected wound" },
   "suspected-poisoning": { es: "Posible envenenamiento", en: "Suspected poisoning" },
   "common-fever": { es: "Fiebre común", en: "Common fever" },
+  burn: { es: "Quemadura", en: "Burn" },
+  fracture: { es: "Fractura", en: "Fracture" },
+  insomnia: { es: "Insomnio", en: "Insomnia" },
 };

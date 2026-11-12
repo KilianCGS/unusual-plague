@@ -228,8 +228,8 @@ test("it fires ONCE: the flag is claimed before the closing starts and Day 2 nev
   assert.equal(day1.getDay1Status(game.claimed), "completed");
   // even back in chapter-1 terms, a re-render with the flag asks for nothing
   assert.equal(day1.shouldCloseDay1(game.patients, game.claimed), false);
-  // and in chapter-2 there is no next chapter: the rule can never start again
-  assert.equal(getNextChapterId("chapter-2"), null);
+  // and Day 2 leads on to Day 3 (the Day 1 rule only runs in chapter-1, so it never starts again)
+  assert.equal(getNextChapterId("chapter-2"), "chapter-3");
   const source = read("src/game/world/GameWorld.tsx");
   const trigger = source.slice(
     source.indexOf("const closingChapterAvailable"),
@@ -272,6 +272,7 @@ test("the closing is ONE sequence: the existing supper interlude whose first lin
   assert.equal((source.match(/<NarrativeInterlude/g) ?? []).length, 2); // opening + closing
   assert.ok(source.includes('NARRATIVE_ILLUSTRATIONS["doctor-eating"]'));
   assert.match(source, /closingChapter === "chapter-2"\s*\? NARRATIVE_ILLUSTRATIONS\["doctor-fireplace"\]\s*: NARRATIVE_ILLUSTRATIONS\["doctor-eating"\]/);
+  assert.ok(source.includes('closingChapter === "chapter-3"'));
   assert.ok(source.includes("onCovered={startNextChapter}"));
   assert.ok(source.includes("onFinished={finishClosing}"));
   // blocks movement and every interface exactly as the opening does
@@ -386,10 +387,11 @@ test("the cases are untouched by the closing and nothing else of Day 2 starts", 
   for (const id of IDS) {
     assert.equal(pc.getPatientStatus(game.patients, id), "treated");
   }
-  // out of scope: Day 2 patients or Days 3-4 (the Day 2 opening encounter
-  // exists since its own task and does not touch the closing)
+  // Day 3 exists since 2026-11-12: it has its own closing rule, and the Day 1 rule
+  // (closingChapterAvailable) still only runs in chapter-1
   const source = read("src/game/world/GameWorld.tsx");
-  assert.ok(!/chapter-3|chapter-4/i.test(source));
+  assert.ok(source.includes('const closingChapterAvailable = chapterId === "chapter-1"'));
+  assert.ok(!/chapter-4/i.test(source));
 });
 
 console.log(`\n${passed} tests passed`);

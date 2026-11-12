@@ -1,6 +1,8 @@
 import type { ItemNeed } from "../crafting/needs";
 import { resolveGranaryInteraction } from "./chapter2GranaryDialogues";
 import { resolveChapter2StoryInteraction } from "./chapter2StoryInteractions";
+import { resolveChapter3Patient } from "./chapter3PatientDialogues";
+import { resolveChapter3Witch } from "./chapter3WitchDialogues";
 import { getPatientDefinitions } from "../patients/patientRegistry";
 import { gatherCopy, itemFeedbackCopy } from "../i18n/items";
 import type { Language } from "../i18n/types";
@@ -580,6 +582,10 @@ export function resolveStoryInteraction(
 ): StoryOutcome | null {
   const granary = resolveGranaryInteraction(interactionId, facts, language, subjectId);
   if (granary) return granary;
+  const chapter3Witch = resolveChapter3Witch(interactionId, facts, language, subjectId);
+  if (chapter3Witch) return chapter3Witch;
+  const chapter3 = resolveChapter3Patient(interactionId, facts, language, subjectId);
+  if (chapter3) return chapter3;
   const chapter2 = resolveChapter2StoryInteraction(interactionId, facts, language, subjectId);
   if (chapter2) return chapter2;
   // The tavern case.

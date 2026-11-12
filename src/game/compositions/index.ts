@@ -3,8 +3,10 @@ import { newWorldChapter1Compositions } from "../new-world-map/newWorldCompositi
 import type { DecorComposition, DecorInteraction } from "../decor/decorTypes";
 import { chapter1Compositions } from "./chapter-1";
 import { chapter2Compositions } from "./chapter-2";
+import { chapter3Compositions } from "./chapter-3";
 import { chapter1Interactions } from "./chapter-1.interactions";
 import { chapter2Interactions } from "./chapter-2.interactions";
+import { chapter3Interactions } from "./chapter-3.interactions";
 import { mergeSharedEnvironmentInstances } from "./shared-environment";
 
 // VERSIONED scene populations, one file per chapter, each produced by
@@ -25,6 +27,7 @@ const ALL_COMPOSITIONS: DecorComposition[] = [
   ...newWorldChapter1Compositions,
   // Day 2 has no legacy placements to exclude: its export is read as it is.
   ...chapter2Compositions,
+  ...chapter3Compositions,
 ];
 
 // A scene + chapter can be listed more than once; their instances are merged.
@@ -52,7 +55,17 @@ export function getComposition(
   chapterId: string,
 ): DecorComposition | undefined {
   const composition = BY_SCENE_AND_CHAPTER.get(`${sceneId}::${chapterId}`);
-  const instances = mergeSharedEnvironmentInstances(sceneId, composition?.instances ?? []);
+  // Day 3 INHERITS the population of Day 2: what is placed for Day 3 is added on top
+  // (the same instance id placed again in Day 3 replaces the Day 2 one).
+  const inherited =
+    chapterId === "chapter-3"
+      ? BY_SCENE_AND_CHAPTER.get(`${sceneId}::chapter-2`)?.instances ?? []
+      : [];
+  const ownIds = new Set((composition?.instances ?? []).map((i) => i.instanceId));
+  const instances = mergeSharedEnvironmentInstances(sceneId, [
+    ...inherited.filter((i) => !ownIds.has(i.instanceId)),
+    ...(composition?.instances ?? []),
+  ]);
   if (!composition && instances.length === 0) return undefined;
   return { ...composition, sceneId, chapterId, instances };
 }
@@ -65,6 +78,8 @@ const INTERACTIONS_BY_CHAPTER: Record<
 > = {
   "chapter-1": chapter1Interactions,
   "chapter-2": chapter2Interactions,
+  // Day 3 inherits Day 2's interactions; its own (the new people) win on a clash.
+  "chapter-3": { ...chapter2Interactions, ...chapter3Interactions },
 };
 
 const NO_INTERACTIONS: Record<string, DecorInteraction> = {};
