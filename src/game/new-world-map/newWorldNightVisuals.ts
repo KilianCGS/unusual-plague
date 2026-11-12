@@ -1,5 +1,5 @@
 import type { DevScene } from "../../app/dev/scene/scenes";
-import { NEW_WORLD_VISUALS } from "./newWorldVisuals";
+import { FOREST_COTTAGE_VISUAL, NEW_WORLD_VISUALS } from "./newWorldVisuals";
 
 // Night versions of six streets and the forest (chapter 3). Each is the SAME image as its
 // day scene repainted at night, lined up on the day one (art/night-maps-prepare.cjs),
@@ -17,11 +17,12 @@ const NIGHTS: [string, string, string][] = [
   ["calle-taberna", "tavern-street-night-background.png", "Calle Taberna"],
   ["smithy-street", "smithy-street-night-background.png", "Calle Herrería"],
   ["forest-v1", "forest-night-background.png", "Bosque"],
+  ["forest-cottage", "forest-cottage-night-background.png", "Casita del bosque"],
 ];
 
 export const NEW_WORLD_NIGHT_VISUALS: DevScene[] = NIGHTS.map(
   ([dayId, file, label]) => {
-    const day = NEW_WORLD_VISUALS.find((visual) => visual.id === dayId);
+    const day = [...NEW_WORLD_VISUALS, FOREST_COTTAGE_VISUAL].find((visual) => visual.id === dayId);
 
     if (!day) {
       throw new Error(`Night scene without a day scene: ${dayId}`);

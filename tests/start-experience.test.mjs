@@ -180,10 +180,12 @@ test("the opening uses writing, Day 1 closes at the fireplace and Day 2 closes o
     assert.equal(header.readUInt32BE(16), illustration.width, id);
     assert.equal(header.readUInt32BE(20), illustration.height, id);
   }
+  // doctor-writing-night is the ending of Day 4 (a night grade of doctor-writing until painted)
   assert.deepEqual(Object.keys(NARRATIVE_ILLUSTRATIONS).sort(), [
     "doctor-eating",
     "doctor-fireplace",
     "doctor-writing",
+    "doctor-writing-night",
   ]);
   const gameWorld = read("src/game/world/GameWorld.tsx");
   // Supper closes Day 1 (the bridge into Day 2); the fireplace closes Day 2.
@@ -257,7 +259,7 @@ test("gameplay is blocked while the opening runs, and its end starts the tutoria
   );
   // (the opening and the closing of the day are both "interludes")
   assert.ok(
-    source.includes("const interludeActive = openingActive || closingActive;"),
+    source.includes("const interludeActive = openingActive || closingActive || endVisible;"),
   );
   assert.ok(canOpen.includes("!interludeActive"));
   assert.ok(playing.includes("!interludeActive"));

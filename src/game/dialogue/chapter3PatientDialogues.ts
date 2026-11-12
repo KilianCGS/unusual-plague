@@ -4,7 +4,7 @@ import {
   CHAPTER3_PATIENTS,
   PATH_MINER_DAY3_ID,
   STONECUTTER_DAY3_ID,
-  SWEEPER_DAY3_ID,
+  DUSTER_DAY3_ID,
 } from "../patients/chapter3Patients";
 import { getPatientStatus, isTreatable } from "../patients/patientCases";
 import { localizeConversation, type LocalizedConversation } from "./localizedConversation";
@@ -12,9 +12,9 @@ import type { StoryFacts, StoryOutcome } from "./storyInteractions";
 
 // DAY 3 PATIENTS (2026-11-12). ALL THE TEXT BELOW IS NEW and awaits Kilian's review.
 // Each person is reached by an interactionId that Kilian gives to his instance in the
-// Decorator (chapter 3): the sweeper, the path miner and the quarry stonecutter.
+// Decorator (chapter 3): the woman with the duster, the path miner and the quarry stonecutter.
 export const CHAPTER3_PATIENT_INTERACTIONS: Readonly<Record<string, string>> = {
-  "chapter3.apothecaryStreet.sweeper": SWEEPER_DAY3_ID,
+  "chapter3.apothecaryStreet.duster": DUSTER_DAY3_ID,
   "chapter3.mountainPath.miner": PATH_MINER_DAY3_ID,
   "chapter3.quarry.stonecutter": STONECUTTER_DAY3_ID,
 };
@@ -32,10 +32,10 @@ type PatientScript = {
 };
 
 const SCRIPTS: Record<string, PatientScript> = {
-  [SWEEPER_DAY3_ID]: {
-    slug: "sweeper",
+  [DUSTER_DAY3_ID]: {
+    slug: "duster",
     exam: [
-      npc("Perdone, Doctor. Llevo toda la mañana barriendo y el polvo me ha pasado factura.", "Pardon me, Doctor. I've been sweeping all morning and the dust has taken its toll."),
+      npc("Perdone, Doctor. Llevo toda la mañana sacudiendo el polvo y me ha pasado factura.", "Pardon me, Doctor. I've been dusting all morning and it has taken its toll."),
       npc("Subí al piso de arriba, que llevaba años cerrado. Se me quedó todo dentro. Cof, cof.", "I went up to the top floor, closed for years. It all stayed inside me. Cough, cough."),
       doctor("Respire hondo y suelte el aire despacio.", "Breathe in deeply and let it out slowly."),
       npc("Me silba el pecho como el hervidor de mi madre.", "My chest whistles like my mother's kettle."),
@@ -50,7 +50,7 @@ const SCRIPTS: Record<string, PatientScript> = {
       npc("Qué exigente.", "How demanding."),
     ],
     after: [
-      npc("He dejado la escoba apoyada en la pared. Es la primera vez que la veo descansar.", "I've left the broom leaning on the wall. It's the first time I've seen it rest."),
+      npc("He dejado el plumero apoyado en la pared. Es la primera vez que lo veo descansar.", "I've left the duster leaning on the wall. It's the first time I've seen it rest."),
       doctor("Que dure.", "May it last."),
     ],
     waiting: [

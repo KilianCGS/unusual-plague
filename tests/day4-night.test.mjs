@@ -50,7 +50,7 @@ const { sceneForChapter, NIGHT_BACKGROUNDS, NIGHT_GRADE, NIGHT_CHAPTER_ID } = at
 const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
 const { getLockedDoorNotice } = at("src/game/world/lockedDoors.ts");
 
-test("Day 4 draws the six scenes that have a night painting with it, and the files exist at the day size", () => {
+test("Day 4 draws the seven scenes that have a night painting with it, and the files exist at the day size", () => {
   const sharpSizes = {
     outskirts: [1546, 1017],
     "apothecary-street": [1120, 1405],
@@ -58,6 +58,7 @@ test("Day 4 draws the six scenes that have a night painting with it, and the fil
     "tavern-street": [1730, 909],
     "smithy-street": [1619, 971],
     forest: [1426, 1103],
+    "forest-cottage": [1426, 1103],
   };
   for (const [id, src] of Object.entries(NIGHT_BACKGROUNDS)) {
     const day = WORLD_SCENES[id];
@@ -93,6 +94,61 @@ test("the Witch's house opens only on Day 4", () => {
     assert.ok(getLockedDoorNotice("forest-cottage", "forest-cottage-interior", chapter, "es"), chapter);
   }
   assert.equal(getLockedDoorNotice("forest-cottage", "forest-cottage-interior", "chapter-4", "es"), null);
+});
+
+test("the Witch's last conversation needs the feather (which is not spent) and happens once; the people absorbed in artifacts only get a thought", () => {
+  const inv = at("src/game/inventory/inventory.ts");
+  const story = at("src/game/dialogue/storyInteractions.ts");
+  const c4 = at("src/game/dialogue/chapter4Dialogues.ts");
+  const facts = (pairs, claimed = []) => ({
+    patients: {},
+    inventory: pairs.reduce((st, [id, q]) => inv.addItem(st, id, q), inv.createEmptyInventory()),
+    claimedRewards: new Set(claimed),
+  });
+  const talk = (id, f) => story.resolveStoryInteraction(id, f, "es", "w");
+  // without the feather: a thought, nothing recorded
+  const without = talk(c4.WITCH_FINAL_INTERACTION_ID, facts([["water", 1]]));
+  assert.equal(without.conversation.id, "chapter4.witch.noFeather");
+  assert.deepEqual(without.effects, []);
+  // with it: the final conversation, only the memory is claimed (the feather stays)
+  const final = talk(c4.WITCH_FINAL_INTERACTION_ID, facts([["black-feather", 1]]));
+  assert.equal(final.conversation.id, "chapter4.witch.final");
+  assert.deepEqual(final.effects, [{ type: "claim-reward", rewardId: c4.WITCH_FINAL_ID }]);
+  assert.ok(final.conversation.lines.length >= 12);
+  // after it: a farewell
+  const farewell = talk(c4.WITCH_FINAL_INTERACTION_ID, facts([["black-feather", 1]], [c4.WITCH_FINAL_ID]));
+  assert.equal(farewell.conversation.id, "chapter4.witch.farewell");
+  // a person with an artifact: one fixed thought, no effects, always the same
+  const a = talk("chapter4.artifact.baker", facts([]));
+  const b = talk("chapter4.artifact.baker", facts([]));
+  assert.equal(a.conversation.id, b.conversation.id);
+  assert.deepEqual(a.effects, []);
+  assert.equal(a.conversation.lines.length, 1);
+  assert.match(a.conversation.lines[0].text, /^\(.+\)$/);
+});
+
+test("the errands panel shows 'see the Witch' on Day 4 and ticks it when she has spoken", () => {
+  const { getObjectives } = at("src/game/objectives/objectives.ts");
+  const c4 = at("src/game/dialogue/chapter4Dialogues.ts");
+  assert.equal(getObjectives({}, "es").length, 0);
+  assert.equal(getObjectives({}, "es", { chapterId: "chapter-3", claimed: new Set() }).length, 0);
+  const pending = getObjectives({}, "es", { chapterId: "chapter-4", claimed: new Set() });
+  assert.deepEqual(pending.map((o) => [o.text, o.done]), [["Ir a ver a la bruja", false]]);
+  const done = getObjectives({}, "en", { chapterId: "chapter-4", claimed: new Set([c4.WITCH_FINAL_ID]) });
+  assert.deepEqual(done.map((o) => [o.text, o.done]), [["Go and see the Witch", true]]);
+});
+
+test("the end card says THE END in both languages and the ending picture exists at its size", () => {
+  const React = require("react");
+  const { renderToStaticMarkup } = require("react-dom/server");
+  const { EndCard } = at("src/game/ui/EndCard.tsx");
+  assert.ok(renderToStaticMarkup(React.createElement(EndCard, { language: "es" })).includes("FIN"));
+  assert.ok(renderToStaticMarkup(React.createElement(EndCard, { language: "en" })).includes("THE END"));
+  const { NARRATIVE_ILLUSTRATIONS } = at("src/game/narrative/illustrations.ts");
+  const picture = NARRATIVE_ILLUSTRATIONS["doctor-writing-night"];
+  const png = fs.readFileSync(path.join(root, "public", picture.src));
+  assert.equal(png.readUInt32BE(16), picture.width);
+  assert.equal(png.readUInt32BE(20), picture.height);
 });
 
 console.log(`

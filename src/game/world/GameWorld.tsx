@@ -51,6 +51,8 @@ import { day1Closing } from "../dialogue/chapter1Day1Dialogues";
 import { day2Closing } from "../dialogue/chapter2ClosingDialogues";
 import { day3Closing } from "../dialogue/chapter3ClosingDialogues";
 import { sceneForChapter } from "./nightScenes";
+import { EndCard } from "../ui/EndCard";
+import { DAY4_COMPLETED_ID, WITCH_FINAL_ID, day4Closing } from "../dialogue/chapter4Dialogues";
 import { DAY2_COMPLETED_ID, shouldCloseDay2 } from "../patients/day2";
 import { DAY3_COMPLETED_ID, shouldCloseDay3 } from "../patients/day3";
 import { messengerOpening } from "../dialogue/chapter2OpeningDialogues";
@@ -202,7 +204,9 @@ export function GameWorld({
   // world exactly as the opening does.
   const [closingActive, setClosingActive] = useState(false);
   const [closingChapter, setClosingChapter] = useState("chapter-1");
-  const interludeActive = openingActive || closingActive;
+  // The end card after the closing of Day 4 (the last screen of the game).
+  const [endVisible, setEndVisible] = useState(false);
+  const interludeActive = openingActive || closingActive || endVisible;
 
   // Main interfaces. They never open on top of each other, of a conversation
   // or during a scene fade, and each one blocks the Doctor while it is up.
@@ -874,10 +878,14 @@ export function GameWorld({
     // Covered already when the interlude ended early (Esc); harmless otherwise.
     startNextChapter();
     setClosingActive(false);
-  }, [startNextChapter]);
+    // Day 4 is the last day: after its closing comes the end card.
+    if (closingChapter === "chapter-4") setEndVisible(true);
+  }, [startNextChapter, closingChapter]);
   const closingConversation = useMemo(
     () => localizeConversation(
-      closingChapter === "chapter-3" ? day3Closing : closingChapter === "chapter-2" ? day2Closing : day1Closing,
+      closingChapter === "chapter-4"
+        ? day4Closing
+        : closingChapter === "chapter-3" ? day3Closing : closingChapter === "chapter-2" ? day2Closing : day1Closing,
       language,
       DOCTOR_SPEAKER,
     ),
@@ -1082,6 +1090,19 @@ export function GameWorld({
       setClosingActive(true);
     }
   }, [chapterId, isPlaying, patients, claimedRewards, claimFlag]);
+
+  // The closing of Day 4 (the end of the game): once the Witch has spoken, when the
+  // conversation is over.
+  useEffect(() => {
+    if (chapterId === "chapter-4" && isPlaying && phaseRef.current === "playing" &&
+      afterDialogueRef.current === null && claimedRewardsRef.current.has(WITCH_FINAL_ID) &&
+      !claimedRewardsRef.current.has(DAY4_COMPLETED_ID)) {
+      claimFlag(DAY4_COMPLETED_ID);
+      setClosingChapter("chapter-4");
+      chapterAdvancedRef.current = false;
+      setClosingActive(true);
+    }
+  }, [chapterId, isPlaying, claimedRewards, claimFlag]);
 
   // The closing of Day 3: the same rule as Day 2, over its own cases.
   useEffect(() => {
@@ -1327,8 +1348,8 @@ export function GameWorld({
   };
   // The errands panel's list: derived from the cases, never stored.
   const objectives = useMemo(
-    () => getObjectives(patients, language),
-    [patients, language],
+    () => getObjectives(patients, language, { chapterId, claimed: claimedRewards }),
+    [patients, language, chapterId, claimedRewards],
   );
   const renderSceneOverlay = (context: SceneOverlayContext) => (
     <>
@@ -1551,10 +1572,13 @@ export function GameWorld({
           transitionDuration: `${SCENE_FADE_MS}ms`,
         }}
       />
+      {endVisible ? <EndCard language={language} /> : null}
       {closingActive ? (
         <div className={dayClosingStyles.fadeIn}>
           <NarrativeInterlude
-            illustration={closingChapter === "chapter-3"
+            illustration={closingChapter === "chapter-4"
+              ? NARRATIVE_ILLUSTRATIONS["doctor-writing-night"]
+              : closingChapter === "chapter-3"
               ? NARRATIVE_ILLUSTRATIONS["doctor-writing"]
               : closingChapter === "chapter-2"
                 ? NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]

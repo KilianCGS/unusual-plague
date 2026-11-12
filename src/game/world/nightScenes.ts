@@ -17,6 +17,8 @@ export const NIGHT_BACKGROUNDS: Readonly<Record<string, string>> = {
   "tavern-street": `${NIGHT_DIR}/tavern-street-night-background.png`,
   "smithy-street": `${NIGHT_DIR}/smithy-street-night-background.png`,
   forest: `${NIGHT_DIR}/forest-night-background.png`,
+  // The Witch's cottage at night (2026-11-12): where the Doctor meets her on Day 4.
+  "forest-cottage": `${NIGHT_DIR}/forest-cottage-night-background.png`,
 };
 
 // The outdoor scenes that have no night painting yet (they get the grade below).
@@ -28,7 +30,6 @@ export const NIGHT_GRADED_OUTDOORS: readonly string[] = [
   "quarry",
   "forest-deep",
   "forest-glade",
-  "forest-cottage",
 ];
 
 // The grade for the scenes that have no painting: dark, cool, a little desaturated.

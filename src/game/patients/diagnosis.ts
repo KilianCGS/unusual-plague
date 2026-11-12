@@ -29,9 +29,9 @@ export const DIAGNOSIS_SYMPTOMS: Record<string, Record<Language, string>> = {
     en: "A hand wound from a few days ago. The area is red, swollen and increasingly painful.",
   },
   // Day 3 (2026-11-12): NEW text, awaiting Kilian's review.
-  "chapter3-sweeper": {
-    es: "Tos persistente, respiración silbante y opresión en el pecho desde que barrió un piso cerrado. Empeora por la noche.",
-    en: "A persistent cough, wheezing and tightness in the chest since she swept a long-closed floor. It is worse at night.",
+  "chapter3-duster": {
+    es: "Tos persistente, respiración silbante y opresión en el pecho desde que limpió el polvo de un piso cerrado. Empeora por la noche.",
+    en: "A persistent cough, wheezing and tightness in the chest since she dusted a long-closed floor. It is worse at night.",
   },
   "chapter3-path-miner": {
     es: "Cansancio, encías doloridas que sangran y un rasguño que no cierra. Lleva semanas comiendo pan duro y cecina.",

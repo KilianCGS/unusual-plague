@@ -4,7 +4,7 @@
 // later. Sizes are the real file sizes: the interlude lays the picture out from
 // its aspect ratio and never stretches it.
 export type NarrativeIllustrationId =
-  "doctor-writing" | "doctor-eating" | "doctor-fireplace";
+  "doctor-writing" | "doctor-writing-night" | "doctor-eating" | "doctor-fireplace";
 
 export type NarrativeIllustration = {
   src: string;
@@ -18,6 +18,13 @@ export const NARRATIVE_ILLUSTRATIONS: Record<
 > = {
   "doctor-writing": {
     src: "/game/narrative/doctor-writing.png",
+    width: 1672,
+    height: 941,
+  },
+  // The ending (Day 4): the same picture as the opening, at night. PLACEHOLDER: a
+  // night grade of doctor-writing.png (art/narrative-night.cjs) until Kilian paints the real one.
+  "doctor-writing-night": {
+    src: "/game/narrative/doctor-writing-night.png",
     width: 1672,
     height: 941,
   },

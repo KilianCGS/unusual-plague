@@ -5,7 +5,7 @@ import { chapter3Compositions } from "./chapter-3";
 // Instance id -> interaction id for the people Kilian places in Day 3. Day 3 inherits the
 // interactions of Day 2 (see compositions/index.ts), so only the NEW ones go here. They
 // are filled in when the instances exist, e.g.
-//   "apothecary-street-woman-sweeping-01": "chapter3.apothecaryStreet.sweeper",
+//   "apothecary-street-woman-dusting-01":  "chapter3.apothecaryStreet.duster",
 //   "mountain-path-miner-pick-swing-01":   "chapter3.mountainPath.miner",
 //   "quarry-miner-01":                     "chapter3.quarry.stonecutter",
 const ids: Record<string, string> = {};

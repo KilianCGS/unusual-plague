@@ -1,21 +1,21 @@
 import type { PatientCaseDefinition } from "./patientCases";
 
 // DAY 3 (2026-11-12): three patients, one per new ailment of the day. The people are
-// reused (the sweeper of the Botica street, the miner of the mountain path, a
-// stonecutter of the quarry); the cases are NEW and all their text awaits Kilian's
+// the woman dusting in the Botica street (a NEW sprite: the sweeper of Day 1 comes back on
+// Day 4 with her broom dropped), the miner of the mountain path and a stonecutter of the quarry; the cases are NEW and all their text awaits Kilian's
 // review. The treatments use the cooking recipes: the bone broth (the Witch's bone)
 // goes to the miner with scurvy.
-export const SWEEPER_DAY3_ID = "chapter3-sweeper";
+export const DUSTER_DAY3_ID = "chapter3-duster";
 export const PATH_MINER_DAY3_ID = "chapter3-path-miner";
 export const STONECUTTER_DAY3_ID = "chapter3-stonecutter";
 
 export const CHAPTER3_PATIENTS: Record<string, PatientCaseDefinition> = {
-  [SWEEPER_DAY3_ID]: {
-    id: SWEEPER_DAY3_ID,
-    name: { es: "BARRENDERA DE LA CALLE", en: "THE STREET SWEEPER" },
+  [DUSTER_DAY3_ID]: {
+    id: DUSTER_DAY3_ID,
+    name: { es: "MUJER DEL PLUMERO", en: "THE WOMAN WITH THE DUSTER" },
     ailmentId: "chest-cough",
-    discovered: { es: "La barrendera tose con la escoba en la mano, en la calle de la botica.", en: "The sweeper coughs, broom in hand, in the apothecary street." },
-    observation: { es: "Tos persistente y respiración silbante tras barrer un piso cerrado mucho tiempo. Necesita despejar el pecho.", en: "A persistent cough and wheezing after sweeping a long-closed floor. She needs to clear her chest." },
+    discovered: { es: "Una mujer sacude el polvo con un plumero, tapándose la boca con un paño, en la calle de la botica.", en: "A woman dusts with a feather duster, a cloth over her mouth, in the apothecary street." },
+    observation: { es: "Tos persistente y respiración silbante tras limpiar el polvo de un piso cerrado mucho tiempo. Necesita despejar el pecho.", en: "A persistent cough and wheezing after dusting a long-closed floor. She needs to clear her chest." },
     requiredTreatments: [{ itemId: "mint-infusion", quantity: 1 }, { itemId: "balsamic-syrup", quantity: 1 }],
     revealsRecipeIds: ["fire.mint-infusion", "fire.balsamic-syrup"],
     examination: "in-place",

@@ -69,7 +69,7 @@ test("every case of Days 1 and 2 has an errand text in both languages", () => {
 
 test("wiring: the panel is derived (not stored), mounted with the HUD, folds with R and ticks then leaves", () => {
   const game = read("src/game/world/GameWorld.tsx");
-  assert.ok(game.includes("getObjectives(patients, language)"));
+  assert.ok(game.includes("getObjectives(patients, language, { chapterId, claimed: claimedRewards })"));
   assert.ok(game.includes("<ObjectivesPanel"));
   const panel = read("src/game/objectives/ObjectivesPanel.tsx");
   assert.ok(panel.includes('event.key === "r"'));

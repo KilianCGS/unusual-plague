@@ -752,6 +752,150 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     collectibleItemId: "mushroom",
   },
   {
+    id: "stonecutter-stool",
+    label: "Stonecutter on a stool",
+    category: "people",
+    sprite: {
+      // 2026-11-12 (PixelLab idle). Seated on a stool, facing the viewer: breathes and nods slowly (quarry).
+      // Five pictures played back and forth (0 1 2 3 4 3 2 1) so the loop has no jump.
+      frames: [0, 1, 2, 3, 4, 3, 2, 1].map((i) => `/game/npcs/stonecutter-stool/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Silhouette of frame 0 (x24-65 y15-81 of the 96x96 frame).
+    defaultCollider: { offsetX: -24, offsetY: -81, width: 42, height: 67 },
+  },
+  {
+    id: "stonecutter-bench-back",
+    label: "Stonecutter seen from behind (on a bench)",
+    category: "people",
+    sprite: {
+      // 2026-11-12 (PixelLab idle). Seen from behind to the waist, placed by hand on the bench by the fire: the bench hides the rest, no feet (quarry).
+      // Five pictures played back and forth (0 1 2 3 4 3 2 1) so the loop has no jump.
+      frames: [0, 1, 2, 3, 4, 3, 2, 1].map((i) => `/game/npcs/stonecutter-bench-back/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Silhouette of frame 0 (x27-63 y43-79 of the 96x96 frame).
+    defaultCollider: { offsetX: -21, offsetY: -53, width: 37, height: 37 },
+  },
+  {
+    id: "stonecutter-shovel",
+    label: "Stonecutter leaning on a shovel",
+    category: "people",
+    sprite: {
+      // 2026-11-12 (PixelLab idle). Arms crossed, leaning on a shovel (quarry).
+      // Five pictures played back and forth (0 1 2 3 4 3 2 1) so the loop has no jump.
+      frames: [0, 1, 2, 3, 4, 3, 2, 1].map((i) => `/game/npcs/stonecutter-shovel/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Silhouette of frame 0 (x26-60 y9-83 of the 96x96 frame).
+    defaultCollider: { offsetX: -22, offsetY: -87, width: 35, height: 75 },
+  },
+  {
+    id: "woman-dusting",
+    label: "Woman dusting (feather duster, cloth over her mouth)",
+    category: "people",
+    sprite: {
+      // 2026-11-12 (PixelLab idle). Dusts with a feather duster, a cloth over her mouth: the Day 3 patient with the chest cough (the sweeper of Day 1 comes back on Day 4).
+      // Five pictures played back and forth (0 1 2 3 4 3 2 1) so the loop has no jump.
+      frames: [0, 1, 2, 3, 4, 3, 2, 1].map((i) => `/game/npcs/woman-dusting/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Silhouette of frame 0 (x22-61 y10-86 of the 96x96 frame).
+    defaultCollider: { offsetX: -26, offsetY: -86, width: 40, height: 77 },
+  },
+  {
+    id: "priest-praying",
+    label: "Priest praying",
+    category: "people",
+    sprite: {
+      // 2026-11-12 (PixelLab idle). The priest who prays in front of the fountain on Day 4.
+      // Five pictures played back and forth (0 1 2 3 4 3 2 1) so the loop has no jump.
+      frames: [0, 1, 2, 3, 4, 3, 2, 1].map((i) => `/game/npcs/priest-praying/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Silhouette of frame 0 (x32-57 y16-83 of the 96x96 frame).
+    defaultCollider: { offsetX: -16, offsetY: -80, width: 26, height: 68 },
+  },
+  {
+    id: "villager-back-man",
+    label: "Villager man from behind",
+    category: "people",
+    sprite: {
+      // 2026-11-12 (PixelLab idle). Listening to the prayer, seen from behind (Day 4 decor).
+      // Five pictures played back and forth (0 1 2 3 4 3 2 1) so the loop has no jump.
+      frames: [0, 1, 2, 3, 4, 3, 2, 1].map((i) => `/game/npcs/villager-back-man/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Silhouette of frame 0 (x33-59 y16-82 of the 96x96 frame).
+    defaultCollider: { offsetX: -15, offsetY: -80, width: 27, height: 67 },
+  },
+  {
+    id: "villager-back-woman",
+    label: "Villager woman from behind",
+    category: "people",
+    sprite: {
+      // 2026-11-12 (PixelLab idle). Listening to the prayer, seen from behind (Day 4 decor).
+      // Five pictures played back and forth (0 1 2 3 4 3 2 1) so the loop has no jump.
+      frames: [0, 1, 2, 3, 4, 3, 2, 1].map((i) => `/game/npcs/villager-back-woman/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Silhouette of frame 0 (x33-58 y20-82 of the 96x96 frame).
+    defaultCollider: { offsetX: -15, offsetY: -76, width: 26, height: 63 },
+  },
+  {
+    id: "villager-back-old",
+    label: "Old villager from behind",
+    category: "people",
+    sprite: {
+      // 2026-11-12 (PixelLab idle). Listening to the prayer, seen from behind, on a stick (Day 4 decor).
+      // Five pictures played back and forth (0 1 2 3 4 3 2 1) so the loop has no jump.
+      frames: [0, 1, 2, 3, 4, 3, 2, 1].map((i) => `/game/npcs/villager-back-old/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Silhouette of frame 0 (x28-60 y20-82 of the 96x96 frame).
+    defaultCollider: { offsetX: -20, offsetY: -76, width: 33, height: 63 },
+  },
+  {
     // 2026-11-11: gathered in the mushroom glade (any time). Placed by Kilian in the Decorator.
     id: "pine-mushroom-world",
     label: "Pine mushroom (world)",

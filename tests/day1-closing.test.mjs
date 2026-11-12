@@ -277,7 +277,7 @@ test("the closing is ONE sequence: the existing supper interlude whose first lin
   assert.ok(source.includes("onFinished={finishClosing}"));
   // blocks movement and every interface exactly as the opening does
   assert.ok(
-    source.includes("const interludeActive = openingActive || closingActive;"),
+    source.includes("const interludeActive = openingActive || closingActive || endVisible;"),
   );
   // the caption is the first line of the closing; there is no second fade/message
   const es = localizeConversation(talk.day1Closing, "es", "doctor").lines;
@@ -391,7 +391,8 @@ test("the cases are untouched by the closing and nothing else of Day 2 starts", 
   // (closingChapterAvailable) still only runs in chapter-1
   const source = read("src/game/world/GameWorld.tsx");
   assert.ok(source.includes('const closingChapterAvailable = chapterId === "chapter-1"'));
-  assert.ok(!/chapter-4/i.test(source));
+  // Day 4 closes the game with its own rule and an end card
+  assert.ok(source.includes("<EndCard"));
 });
 
 console.log(`\n${passed} tests passed`);
