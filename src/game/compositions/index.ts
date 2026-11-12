@@ -3,6 +3,7 @@ import { newWorldChapter1Compositions } from "../new-world-map/newWorldCompositi
 import type { DecorComposition, DecorInteraction } from "../decor/decorTypes";
 import { chapter1Compositions } from "./chapter-1";
 import { chapter2Compositions } from "./chapter-2";
+import { artifactsCompositions } from "./artifacts";
 import { chapter3Compositions } from "./chapter-3";
 import { chapter1Interactions } from "./chapter-1.interactions";
 import { chapter2Interactions } from "./chapter-2.interactions";
@@ -28,6 +29,9 @@ const ALL_COMPOSITIONS: DecorComposition[] = [
   // Day 2 has no legacy placements to exclude: its export is read as it is.
   ...chapter2Compositions,
   ...chapter3Compositions,
+  // Day 4 (the night) is authored in the Decorator as the chapter "artifacts" and read as
+  // "chapter-4": the people absorbed in their artifacts.
+  ...artifactsCompositions.map((composition) => ({ ...composition, chapterId: "chapter-4" })),
 ];
 
 // A scene + chapter can be listed more than once; their instances are merged.

@@ -23,6 +23,7 @@ import { WORLD_SCENES } from "./worldScenes";
 import { CHAPTER2_PATIENTS } from "../patients/chapter2Patients";
 import { CHAPTER3_PATIENTS } from "../patients/chapter3Patients";
 import { DAY2_COMPLETED_ID } from "../patients/day2";
+import { DAY3_COMPLETED_ID } from "../patients/day3";
 import { FARMER_SAMPLE_ID, FARMER_ANALYSIS_ID, FARMER_RECIPE_IDS } from "../patients/farmerInvestigation";
 import { MESSENGER_MET_ID, MESSENGER_LEFT_ID } from "./day2Opening";
 
@@ -153,5 +154,20 @@ export function createDay3ClosingDevStart(): GameDevStart {
     ...start,
     patients: { ...start.patients, ...Object.fromEntries(Object.keys(CHAPTER3_PATIENTS).map(id => [id, "treated" as const])) },
     knownRecipeIds: new Set([...start.knownRecipeIds, ...Object.values(CHAPTER3_PATIENTS).flatMap(definition => definition.revealsRecipeIds)]),
+  };
+}
+
+// TEST DATA: Day 3 completed (all its cases treated, the closing played), standing at the
+// start of Day 4, the night (2026-11-12). The Doctor carries the black feather, which the Witch
+// asks him to bring.
+export function createDay4DevStart(): GameDevStart {
+  const day3 = createDay3ClosingDevStart();
+  const inventory = addItem(day3.inventory, "black-feather", 1) ?? day3.inventory;
+  return {
+    ...day3,
+    chapterId: "chapter-4",
+    claimedRewards: new Set([...day3.claimedRewards, DAY3_COMPLETED_ID]),
+    inventory,
+    coins: 55,
   };
 }

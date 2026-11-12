@@ -42,6 +42,9 @@ export type DevScene = {
   protagonistScale?: number;
   // Colliders in world units, fed to useProtagonistController as-is.
   colliders?: SceneCollider[];
+  // A CSS filter over the whole scene (Day 4's night grade for the scenes that have no
+  // night painting yet). Left out = none.
+  backgroundFilter?: string;
 };
 
 const OLD_DEV_SCENES: DevScene[] = [

@@ -50,6 +50,7 @@ import {
 import { day1Closing } from "../dialogue/chapter1Day1Dialogues";
 import { day2Closing } from "../dialogue/chapter2ClosingDialogues";
 import { day3Closing } from "../dialogue/chapter3ClosingDialogues";
+import { sceneForChapter } from "./nightScenes";
 import { DAY2_COMPLETED_ID, shouldCloseDay2 } from "../patients/day2";
 import { DAY3_COMPLETED_ID, shouldCloseDay3 } from "../patients/day3";
 import { messengerOpening } from "../dialogue/chapter2OpeningDialogues";
@@ -358,7 +359,11 @@ export function GameWorld({
   // that arrival: it is read once, when control is back, and then forgotten.
   const arrivalRef = useRef<Arrival | null>(null);
   const [travelCaption, setTravelCaption] = useState<string | null>(null);
-  const scene = WORLD_SCENES[world.sceneId];
+  // Day 4 is at night: its scenes are drawn with their night paintings (or a night grade).
+  const scene = useMemo(
+    () => sceneForChapter(WORLD_SCENES[world.sceneId], chapterId),
+    [world.sceneId, chapterId],
+  );
   const spawn = getMessengerArrivalSpawn(
     chapterId,
     world,

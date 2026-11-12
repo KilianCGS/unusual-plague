@@ -348,7 +348,10 @@ export function ExteriorScene({
       >
         <div
           className={styles.logicalScene}
-          style={{ backgroundImage: `url("${scene.visual.backgroundSrc}")` }}
+          style={{
+            backgroundImage: `url("${scene.visual.backgroundSrc}")`,
+            ...(scene.visual.backgroundFilter ? { filter: scene.visual.backgroundFilter } : null),
+          }}
         >
           {decor.sprites.map(({ asset, instance }) => (
             <DecorSprite

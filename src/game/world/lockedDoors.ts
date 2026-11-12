@@ -17,7 +17,8 @@ export const LOCKED_DOORS: readonly LockedDoor[] = [
     // the door stays shut.
     fromScene: "forest-cottage",
     targetScene: "forest-cottage-interior",
-    openInChapters: [],
+    // Opens on Day 4 (2026-11-12): the Doctor meets her inside, at night.
+    openInChapters: ["chapter-4"],
     notice: {
       es: "No debería colarme aquí sin permiso.",
       en: "I shouldn't sneak in here without permission.",
