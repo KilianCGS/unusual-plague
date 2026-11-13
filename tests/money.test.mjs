@@ -52,8 +52,8 @@ const test = (name, fn) => {
   console.log(`ok - ${name}`);
 };
 
-test("the purse: starts at 3, caps at 99, never goes negative, a failed payment spends nothing", () => {
-  assert.equal(STARTING_COINS, 4);
+test("the purse: starts at 6, caps at 99, never goes negative, a failed payment spends nothing", () => {
+  assert.equal(STARTING_COINS, 6);
   assert.equal(MAX_COINS, 99);
   assert.equal(addCoins(90, 20), 99);
   assert.equal(addCoins(5, -3), 5, "earning cannot subtract");
@@ -73,17 +73,17 @@ test("every patient of Days 1 and 2 pays something, and the prices are not round
   assert.equal(getPatientPayment("nobody"), 0);
 });
 
-test("the merchant's shop: cloth at one coin, three in stock, sold out after three, units counted by flags", () => {
+test("the merchant's shop: cloth at two coins, four in stock, sold out after four, units counted by flags", () => {
   const shop = shops.getShop("chapter1.plaza.merchant");
   assert.equal(shop.id, "plaza-merchant");
   const [cloth] = shop.entries;
-  assert.deepEqual(cloth, { itemId: "cloth", price: 1, stock: 3 });
+  assert.deepEqual(cloth, { itemId: "cloth", price: 2, stock: 4 });
   let claimed = new Set();
-  for (let i = 0; i < 3; i++) {
-    assert.equal(shops.unitsLeft(claimed, shop, cloth), 3 - i);
+  for (let i = 0; i < 4; i++) {
+    assert.equal(shops.unitsLeft(claimed, shop, cloth), 4 - i);
     const [pay, give, claim] = shops.buyEffects(claimed, shop, cloth);
     assert.deepEqual([pay, give], [
-      { type: "take-coins", amount: 1 },
+      { type: "take-coins", amount: 2 },
       { type: "give-item", itemId: "cloth", quantity: 1 },
     ]);
     claimed = new Set([...claimed, claim.rewardId]);
@@ -92,11 +92,11 @@ test("the merchant's shop: cloth at one coin, three in stock, sold out after thr
   assert.equal(shops.getShop("chapter1.farm.woman"), undefined);
 });
 
-test("Day 1 can never block on money: the four coins buy the cloth and the salt before the first payment and every payment covers the rest", () => {
+test("Day 1 can never block on money: the six coins buy the cloth and the salt before the first payment and every payment covers the rest", () => {
   // Day 1's shop: from Day 2 the merchant also sells sugar, onion and bone
   const shop = shops.shopForChapter(shops.getShop("chapter1.plaza.merchant"), "chapter-1");
   const spendAll = shop.entries.reduce((n, e) => n + e.price * e.stock, 0);
-  assert.equal(spendAll, 4, "everything on sale costs exactly the starting purse");
+  assert.equal(spendAll, 10, "Day 1 sells 4 cloths (8) and the salt (2)");
   // the mandatory purchases of Day 1: two cloths and one salt
   const price = (id) => shop.entries.find((e) => e.itemId === id).price;
   assert.ok(STARTING_COINS >= 2 * price("cloth") + price("salt"), "cloth x2 + salt fit in the starting purse");

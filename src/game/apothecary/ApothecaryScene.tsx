@@ -83,6 +83,7 @@ export function ApothecaryScene({
   promptLabelFor,
   onRunBlocked,
   highlightInteractionIds,
+  backgroundSrc,
 }: {
   spawn?: { x: number; y: number; direction: Direction };
   input?: DirectionInputHandle;
@@ -107,6 +108,8 @@ export function ApothecaryScene({
   // Interactions to point at with a bobbing arrow (the tutorial's crafting tour).
   // The arrow sits above the middle of each interaction zone; it never takes input.
   highlightInteractionIds?: readonly string[];
+  // A different painting for the room (its night version on Day 4); default = the day one.
+  backgroundSrc?: string;
 }) {
   const [sceneScale, setSceneScale] = useState(1);
   const {
@@ -198,7 +201,10 @@ export function ApothecaryScene({
             ["--scene-scale" as string]: sceneScale,
           }}
         >
-          <div className={styles.logicalScene}>
+          <div
+            className={styles.logicalScene}
+            style={backgroundSrc ? { backgroundImage: `url("${backgroundSrc}")` } : undefined}
+          >
             {SHARED_AMBIENT_SPRITES.map(({ asset, instance }) => (
               <DecorSprite key={instance.instanceId} asset={asset} instance={instance} />
             ))}

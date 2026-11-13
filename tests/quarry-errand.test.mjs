@@ -1,4 +1,4 @@
-// The quarry errand (2026-11-11): a bone broth for five coins.
+// The quarry errand (2026-11-11): a bone broth for eight coins.
 //   node tests/quarry-errand.test.mjs
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -63,12 +63,12 @@ test("the quarry miner asks for a bone broth while the Doctor has none, and take
   assert.deepEqual(out.effects, []);
 });
 
-test("with the bone broth: it is taken, five coins are paid, and the errand is marked done", () => {
+test("with the bone broth: it is taken, eight coins are paid, and the errand is marked done", () => {
   const out = talk(facts([["bone-broth", 1], ["water", 1]]));
   assert.equal(out.conversation.id, "chapter2.quarry.miner.ready");
   assert.deepEqual(out.effects, [
     { type: "take-item", itemId: "bone-broth", quantity: 1 },
-    { type: "give-coins", amount: 5 },
+    { type: "give-coins", amount: 8 },
     { type: "claim-reward", rewardId: trades.QUARRY_BROTH_REWARD_ID },
   ]);
 });

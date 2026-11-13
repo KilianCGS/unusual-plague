@@ -10,6 +10,6 @@ export const day3Closing: LocalizedConversation = {
     } },
     doctorThought("Hoy he visto a mucha gente con la mirada baja, atenta a algo pequeño entre las manos.", "Today I saw many people with their eyes lowered, intent on something small in their hands."),
     doctorThought("Ninguno ha levantado la vista cuando he pasado. Ni siquiera para toser.", "None of them looked up as I passed. Not even to cough."),
-    doctorThought("Mañana tendré que preguntar qué sostienen. O a quién.", "Tomorrow I'll have to ask what they are holding. Or who from."),
+    doctorThought("Mañana tendré que preguntar qué sostienen. O a quién. Con calma: todo se aclara.", "Tomorrow I'll have to ask what they are holding. Or who from. Calmly: everything becomes clear."),
   ],
 };

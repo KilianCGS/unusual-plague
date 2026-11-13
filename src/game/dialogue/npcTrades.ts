@@ -163,7 +163,7 @@ export const NPC_TRADES: Record<string, NpcTrade> = {
     rewardId: QUARRY_BROTH_REWARD_ID,
     consumes: [{ itemId: "bone-broth", quantity: 1 }],
     grants: [],
-    payCoins: 5,
+    payCoins: 8,
     ready: quarryMinerReady,
     done: quarryMinerDone,
     missing: { all: quarryMinerAsk },

@@ -50,7 +50,7 @@ const { sceneForChapter, NIGHT_BACKGROUNDS, NIGHT_GRADE, NIGHT_CHAPTER_ID } = at
 const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
 const { getLockedDoorNotice } = at("src/game/world/lockedDoors.ts");
 
-test("Day 4 draws the seven scenes that have a night painting with it, and the files exist at the day size", () => {
+test("Day 4 draws the eight scenes that have a night painting with it, and the files exist at the day size", () => {
   const sharpSizes = {
     outskirts: [1546, 1017],
     "apothecary-street": [1120, 1405],
@@ -59,6 +59,7 @@ test("Day 4 draws the seven scenes that have a night painting with it, and the f
     "smithy-street": [1619, 971],
     forest: [1426, 1103],
     "forest-cottage": [1426, 1103],
+    "doctor-room": [1254, 1254],
   };
   for (const [id, src] of Object.entries(NIGHT_BACKGROUNDS)) {
     const day = WORLD_SCENES[id];
@@ -153,3 +154,17 @@ test("the end card says The end in both languages and the ending picture exists 
 
 console.log(`
 ${passed} tests passed`);
+
+// The Botica has its own night painting (2026-11-13), the same size as the day one.
+{
+  const ns = at("src/game/world/nightScenes.ts");
+  const file = path.join(root, "public", ns.APOTHECARY_NIGHT_BACKGROUND);
+  assert.ok(fs.existsSync(file), ns.APOTHECARY_NIGHT_BACKGROUND);
+  const png = fs.readFileSync(file);
+  const day = fs.readFileSync(path.join(root, "public/game/areas/apothecary/apothecary-main-zone-background.png"));
+  assert.equal(png.readUInt32BE(16), day.readUInt32BE(16));
+  assert.equal(png.readUInt32BE(20), day.readUInt32BE(20));
+  const game = fs.readFileSync(path.join(root, "src/game/world/GameWorld.tsx"), "utf8");
+  assert.ok(game.includes("backgroundSrc={chapterId === NIGHT_CHAPTER_ID ? APOTHECARY_NIGHT_BACKGROUND : undefined}"));
+  console.log("ok - the Botica night painting exists at the day size and Day 4 uses it");
+}

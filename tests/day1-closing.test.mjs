@@ -53,6 +53,7 @@ const { getChapterStart, getNextChapterId } = at(
   "src/game/world/chapterStart.ts",
 );
 const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
+const dayEnd = at("src/game/world/dayEnd.ts");
 const { NARRATIVE_ILLUSTRATIONS } = at("src/game/narrative/illustrations.ts");
 const { getComposition } = at("src/game/compositions/index.ts");
 
@@ -116,11 +117,21 @@ function closeDialogue(game) {
   game.dialogueOpen = false;
   return game;
 }
+function goHome(game) {
+  game.sceneId = "apothecary-interior";
+  return game;
+}
 function tick(game, { playing = true } = {}) {
   if (!playing || game.dialogueOpen) return game;
+  // 1) the last case is done: the Doctor says he should rest (once)
+  if (dayEnd.shouldAnnounceDayEnd(game.chapterId, game.patients, game.claimed)) {
+    game.claimed = new Set([...game.claimed, dayEnd.DAY_WIND_DOWN_FLAGS[game.chapterId]]);
+    game.log.push("dayEnd");
+  }
+  // 2) the day closes only when he is home (the Botica or his room)
   if (
     getNextChapterId(game.chapterId) !== null &&
-    day1.shouldCloseDay1(game.patients, game.claimed)
+    dayEnd.shouldCloseDayNow(game.chapterId, game.patients, game.claimed, game.sceneId)
   ) {
     game.claimed = new Set([...game.claimed, day1.DAY1_COMPLETED_ID]); // flagged first
     game.log.push("closing");
@@ -179,9 +190,12 @@ test("the order does not matter: all six orders close the day the same way, only
       treatAndTalk(game, id);
       closeDialogue(game);
       tick(game);
-      assert.equal(game.log.includes("closing"), i === 2, order.join(">"));
+      assert.equal(game.log.includes("dayEnd"), i === 2, order.join(">"));
+      assert.equal(game.log.includes("closing"), false, "not until he is home");
     });
-    assert.deepEqual(game.log, ["closing", "start:chapter-2"], order.join(">"));
+    goHome(game);
+    tick(game);
+    assert.deepEqual(game.log, ["dayEnd", "closing", "start:chapter-2"], order.join(">"));
     assert.equal(game.chapterId, "chapter-2");
   }
 });
@@ -197,7 +211,12 @@ test("the closing waits for the whole conversation of the last case: nothing hap
   assert.deepEqual(game.log, []);
   closeDialogue(game); // the last line (and its effects) is over
   tick(game);
-  assert.deepEqual(game.log, ["closing", "start:chapter-2"]);
+  assert.deepEqual(game.log, ["dayEnd"], "he says he should rest; the day is not closed yet");
+  tick(game);
+  assert.deepEqual(game.log, ["dayEnd"], "nothing happens while he is out in the street");
+  goHome(game);
+  tick(game);
+  assert.deepEqual(game.log, ["dayEnd", "closing", "start:chapter-2"]);
 
   // and in the game it only fires at a moment of plain play, not over another flow
   const source = read("src/game/world/GameWorld.tsx");
@@ -208,7 +227,7 @@ test("the closing waits for the whole conversation of the last case: nothing hap
   assert.ok(trigger.includes("isPlaying &&"));
   assert.ok(trigger.includes('phaseRef.current === "playing"'));
   assert.ok(trigger.includes("afterDialogueRef.current === null"));
-  assert.ok(trigger.includes("shouldCloseDay1(patientsRef.current"));
+  assert.ok(trigger.includes("shouldCloseDayNow(chapterId, patientsRef.current"));
   // declared after the effect that runs the after-dialogue steps
   assert.ok(
     source.indexOf("const closingChapterAvailable") >
@@ -223,8 +242,10 @@ test("it fires ONCE: the flag is claimed before the closing starts and Day 2 nev
   for (const id of IDS) treatAndTalk(game, id);
   closeDialogue(game);
   tick(game);
+  goHome(game);
+  tick(game);
   for (let i = 0; i < 5; i++) tick(game);
-  assert.deepEqual(game.log, ["closing", "start:chapter-2"]);
+  assert.deepEqual(game.log, ["dayEnd", "closing", "start:chapter-2"]);
   assert.equal(day1.getDay1Status(game.claimed), "completed");
   // even back in chapter-1 terms, a re-render with the flag asks for nothing
   assert.equal(day1.shouldCloseDay1(game.patients, game.claimed), false);
@@ -390,7 +411,7 @@ test("the cases are untouched by the closing and nothing else of Day 2 starts", 
   // Day 3 exists since 2026-11-12: it has its own closing rule, and the Day 1 rule
   // (closingChapterAvailable) still only runs in chapter-1
   const source = read("src/game/world/GameWorld.tsx");
-  assert.ok(source.includes('const closingChapterAvailable = chapterId === "chapter-1"'));
+  assert.ok(source.includes("const closingChapterAvailable = getNextChapterId(chapterId) !== null;"));
   // Day 4 closes the game with its own rule and an end card
   assert.ok(source.includes("<EndCard"));
 });

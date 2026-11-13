@@ -118,31 +118,11 @@ const OLD_DEV_SCENES: DevScene[] = [
     zoomMultiplier: 1.15,
   },
   {
+    // The Doctor's Room (Kilian, 2026-11-13, replaces the 1385x1136 one): a 1254x1254 painting,
+    // 0.375 unit per asset pixel like the other approved interiors, so the world is 470x470.
+    // Its night version (Day 4) is doctor-room-night-background.png, same size.
     id: "doctor-room",
-    label: "Habitaci�n del Doctor",
-    // Unmodified copy of art/references/doctor-room-v6.png (1385x1136), the
-    // Doctor's Room in play. 0.375 unit per asset pixel like the other approved
-    // interiors, so the logical world is 519x426 (1385 x 1136 keeps its 1.219
-    // aspect ratio) and the whole room is in frame at zoomMultiplier 1.5.
-    backgroundSrc: "/game/areas/doctor-room/doctor-room-new-background.png",
-    assetWidth: 1385,
-    assetHeight: 1136,
-    // The middle of the room (only a neutral seed for the dev tools).
-    initialAssetX: 692,
-    initialAssetY: 568,
-    logicalUnitsPerAssetPixel: 0.375,
-    zoomMultiplier: 1.5,
-    // The Doctor reads about 40% too small against this furniture: a VISUAL
-    // scale only (around the feet), hitbox and movement are untouched.
-    protagonistScale: 1.4,
-  },
-  {
-    // The NEW Doctor's Room (Kilian, 2026-11-13): a 1254x1254 painting, same 0.375 unit
-    // per asset pixel, so the world is 470x470. It is ONLY in the editors for now: the game
-    // keeps the old room until its geometry (colliders, exit, spawns, chest zone) is drawn
-    // in /dev/collisions and exported.
-    id: "doctor-room-redesign",
-    label: "Habitacion del Doctor V2",
+    label: "Habitacion del Doctor",
     backgroundSrc: "/game/areas/doctor-room/doctor-room-v2-background.png",
     assetWidth: 1254,
     assetHeight: 1254,

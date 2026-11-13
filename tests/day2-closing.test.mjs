@@ -65,11 +65,13 @@ test('every treatment order triggers only after its last conversation, then neve
     assert.equal(closes,1);assert.equal(shouldCloseDay2(patients,flags),false);
   }
   const game=fs.readFileSync(path.join(root,'src/game/world/GameWorld.tsx'),'utf8');
-  const start=game.indexOf('if (chapterId === "chapter-2" && isPlaying');
-  const trigger=game.slice(start,start+550);
+  // the closing trigger of Days 1-3 is one effect (the Doctor says he should rest, then it closes at home)
+  const start=game.indexOf('shouldCloseDayNow(chapterId, patientsRef.current');
+  const trigger=game.slice(start-300,start+500);
   assert.ok(start>0);assert.ok(trigger.includes('phaseRef.current === "playing"'));
   assert.ok(trigger.includes('afterDialogueRef.current === null'));
-  assert.ok(trigger.indexOf('claimFlag(DAY2_COMPLETED_ID)')<trigger.indexOf('setClosingActive(true)'));
+  assert.ok(game.includes('chapter-2": DAY2_COMPLETED_ID'));
+  assert.ok(trigger.indexOf('claimFlag(dayCompletedIds[chapterId])')<trigger.indexOf('setClosingActive(true)'));
 });
 test('epilogue uses the fireplace image, with ES/EN caption and parenthesized Doctor thoughts',()=>{
   assert.ok(fs.existsSync(path.join(root,'public',NARRATIVE_ILLUSTRATIONS['doctor-fireplace'].src)));

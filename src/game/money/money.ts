@@ -3,7 +3,7 @@
 // the Doctor starts with 4 (cloth x2 + salt for Day 1, with one coin to spare),
 // and the coins carry over from one day to the next.
 export const MAX_COINS = 99;
-export const STARTING_COINS = 4;
+export const STARTING_COINS = 6;
 
 function clamp(coins: number): number {
   return Math.min(MAX_COINS, Math.max(0, Math.floor(coins)));

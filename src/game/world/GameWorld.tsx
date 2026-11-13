@@ -50,11 +50,11 @@ import {
 import { day1Closing } from "../dialogue/chapter1Day1Dialogues";
 import { day2Closing } from "../dialogue/chapter2ClosingDialogues";
 import { day3Closing } from "../dialogue/chapter3ClosingDialogues";
-import { sceneForChapter } from "./nightScenes";
+import { APOTHECARY_NIGHT_BACKGROUND, NIGHT_CHAPTER_ID, sceneForChapter } from "./nightScenes";
 import { EndCard } from "../ui/EndCard";
 import { DAY4_COMPLETED_ID, WITCH_FINAL_ID, day4Closing } from "../dialogue/chapter4Dialogues";
-import { DAY2_COMPLETED_ID, shouldCloseDay2 } from "../patients/day2";
-import { DAY3_COMPLETED_ID, shouldCloseDay3 } from "../patients/day3";
+import { DAY2_COMPLETED_ID } from "../patients/day2";
+import { DAY3_COMPLETED_ID } from "../patients/day3";
 import { messengerOpening } from "../dialogue/chapter2OpeningDialogues";
 import { day2OpeningCopy } from "../i18n/day2Opening";
 import { DOCTOR_SPEAKER } from "../dialogue/dialogueTypes";
@@ -118,7 +118,11 @@ import { useTutorial } from "../tutorial/useTutorial";
 import { fastTravelCopy } from "../i18n/fastTravel";
 import { FastTravelButton, TravelCaption } from "../ui/FastTravelButton";
 import { ItemFeedback } from "../ui/ItemFeedback";
-import { DAY1_COMPLETED_ID, shouldCloseDay1 } from "../patients/day1";
+import { DAY1_COMPLETED_ID } from "../patients/day1";
+import { DAY_END_SCENES, DAY_WIND_DOWN_FLAGS, isDayWindingDown, shouldAnnounceDayEnd, shouldCloseDayNow } from "./dayEnd";
+import { dayEndCopy } from "../i18n/dayEnd";
+import { DayEndSign } from "../ui/DayEndSign";
+import { doctorThought } from "../dialogue/doctorThought";
 import { INITIAL_CHAPTER_ID } from "./currentChapter";
 import dayClosingStyles from "./DayClosing.module.css";
 import { ExteriorScene, type SceneOverlayContext } from "./ExteriorScene";
@@ -181,7 +185,7 @@ export function GameWorld({
   const input = useDirectionInput();
   const [world, setWorld] = useState<WorldState>(() => {
     const start = devStart
-      ? getChapterStart(devStart.chapterId)
+      ? (devStart.scene ?? getChapterStart(devStart.chapterId))
       : CHAPTER_START;
 
     return {
@@ -492,6 +496,10 @@ export function GameWorld({
   // Fast travel to the apothecary: only while plain exploration is available
   // (a pure rule), through the very same fade and the arrival of the street
   // door. It moves the Doctor and nothing else.
+  // The day is over: the Doctor has said he should rest, and he has not gone home yet.
+  const dayOver =
+    claimedRewards.has(DAY_WIND_DOWN_FLAGS[chapterId] ?? "") &&
+    isDayWindingDown(chapterId, patients, claimedRewards);
   const fastTravelAvailable = canFastTravel({
     sceneId: world.sceneId,
     phase,
@@ -503,6 +511,7 @@ export function GameWorld({
     storageOpen: storageOpen || openShop !== null,
     craftingOpen: craftingStation !== null,
     inNarrativeScene,
+    dayOver,
   });
   // Recharge: 120 s after each trip. `now` only ticks while the bar is filling.
   const [fastTravelReadyAt, setFastTravelReadyAt] = useState(0);
@@ -1152,7 +1161,38 @@ export function GameWorld({
   // its goodbye and its effects) has closed, and never over a scripted step of
   // another flow or a fade. It is declared after the effect above so a flow
   // that just started a transition is seen here.
-  const closingChapterAvailable = chapterId === "chapter-1" && getNextChapterId(chapterId) !== null;
+  // 1) The last case of the day is treated: the Doctor says he should rest (once). The fast
+  //    travel goes off and the sign asks him to go to the Botica (see dayEnd.ts).
+  useEffect(() => {
+    if (
+      isPlaying &&
+      phaseRef.current === "playing" &&
+      afterDialogueRef.current === null &&
+      shouldAnnounceDayEnd(chapterId, patientsRef.current, claimedRewardsRef.current)
+    ) {
+      claimFlag(DAY_WIND_DOWN_FLAGS[chapterId]);
+      const line = dayEndCopy.es.thoughts[chapterId];
+      if (line) {
+        startDialogue(
+          localizeConversation(
+            { id: `${chapterId}.dayEnd`, lines: [doctorThought(line, dayEndCopy.en.thoughts[chapterId])] },
+            language,
+            "doctor",
+          ),
+        );
+      }
+    }
+  }, [chapterId, isPlaying, patients, claimedRewards, claimFlag, startDialogue, language]);
+
+  // 2) When he steps into the Botica (or his room) after saying it, the day closes: the black
+  //    veil and the closing of that day, then the next day (Days 1-3; Day 4 ends with the Witch).
+  const closingChapterAvailable = getNextChapterId(chapterId) !== null;
+  const dayCompletedIds: Record<string, string> = {
+    "chapter-1": DAY1_COMPLETED_ID,
+    "chapter-2": DAY2_COMPLETED_ID,
+    "chapter-3": DAY3_COMPLETED_ID,
+  };
+  const sceneIdForClosing = world.sceneId;
 
   useEffect(() => {
     if (
@@ -1160,24 +1200,14 @@ export function GameWorld({
       phaseRef.current === "playing" &&
       afterDialogueRef.current === null &&
       closingChapterAvailable &&
-      shouldCloseDay1(patientsRef.current, claimedRewardsRef.current)
+      shouldCloseDayNow(chapterId, patientsRef.current, claimedRewardsRef.current, sceneIdForClosing)
     ) {
-      claimFlag(DAY1_COMPLETED_ID);
-      setClosingChapter("chapter-1");
+      claimFlag(dayCompletedIds[chapterId]);
+      setClosingChapter(chapterId);
       chapterAdvancedRef.current = false;
       setClosingActive(true);
     }
-  }, [isPlaying, patients, claimedRewards, closingChapterAvailable, claimFlag]);
-
-  useEffect(() => {
-    if (chapterId === "chapter-2" && isPlaying && phaseRef.current === "playing" &&
-      afterDialogueRef.current === null && shouldCloseDay2(patientsRef.current, claimedRewardsRef.current)) {
-      claimFlag(DAY2_COMPLETED_ID);
-      setClosingChapter("chapter-2");
-      chapterAdvancedRef.current = false;
-      setClosingActive(true);
-    }
-  }, [chapterId, isPlaying, patients, claimedRewards, claimFlag]);
+  }, [chapterId, isPlaying, patients, claimedRewards, closingChapterAvailable, sceneIdForClosing, claimFlag]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The closing of Day 4 (the end of the game): once the Witch has spoken, when the
   // conversation is over.
@@ -1191,17 +1221,6 @@ export function GameWorld({
       setClosingActive(true);
     }
   }, [chapterId, isPlaying, claimedRewards, claimFlag]);
-
-  // The closing of Day 3: the same rule as Day 2, over its own cases.
-  useEffect(() => {
-    if (chapterId === "chapter-3" && isPlaying && phaseRef.current === "playing" &&
-      afterDialogueRef.current === null && shouldCloseDay3(patientsRef.current, claimedRewardsRef.current)) {
-      claimFlag(DAY3_COMPLETED_ID);
-      setClosingChapter("chapter-3");
-      chapterAdvancedRef.current = false;
-      setClosingActive(true);
-    }
-  }, [chapterId, isPlaying, patients, claimedRewards, claimFlag]);
 
   // THE OPENING ENCOUNTER OF DAY 2. It belongs to the arrival that follows the
   // Botica's street door: read once, when the transition is over and control is
@@ -1542,6 +1561,7 @@ export function GameWorld({
     <>
       {scene.kind === "interior" ? (
         <ApothecaryScene
+          backgroundSrc={chapterId === NIGHT_CHAPTER_ID ? APOTHECARY_NIGHT_BACKGROUND : undefined}
           key={`${world.sceneId}-${world.arrival}`}
           spawn={spawn}
           input={input}
@@ -1682,6 +1702,13 @@ export function GameWorld({
       ) : null}
       {notice ? <ItemFeedback text={notice.text} /> : null}
       <CompendiumNotice context={{ language, patients, inventory, knownRecipeIds, storyFlags: claimedRewards, diagnosisPatientId: diagnosis?.patientId }} />
+      {dayOver &&
+      !DAY_END_SCENES.includes(world.sceneId) &&
+      !interludeActive &&
+      phase === "playing" &&
+      !inNarrativeScene ? (
+        <DayEndSign text={dayEndCopy[language].sign} />
+      ) : null}
       {fastTravelAvailable ? (
         <FastTravelButton
           label={fastTravelCopy[language].label}

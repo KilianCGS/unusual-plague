@@ -1,5 +1,5 @@
 import type { InteractionZone } from "../interactions/interactionZone";
-import { doctorRoomNewInteractions } from "../doctor-room/doctorRoomNewGeometry";
+import { doctorRoomRedesignInteractions } from "../doctor-room/doctorRoomRedesignGeometry";
 import {
   addItem,
   countItem,
@@ -20,11 +20,11 @@ export const STORAGE_INTERACTION_ID = "storage.doctor-room";
 
 // WHERE the Doctor's Storage can be opened: the chest in the Doctor's Room, an
 // interaction zone (never a collider) authored by hand in /dev/collisions (see
-// doctorRoomNewGeometry.ts). No requiredDirection: any facing. It is the ONLY
+// doctorRoomRedesignGeometry.ts). No requiredDirection: any facing. It is the ONLY
 // access point; the id names the access point, not a second storage (there is
 // one Doctor Storage state).
 export const doctorRoomStorageInteractions: InteractionZone[] =
-  doctorRoomNewInteractions;
+  doctorRoomRedesignInteractions;
 
 export function createEmptyStorage(): InventoryState {
   return createEmptyInventory(STORAGE_CAPACITY);

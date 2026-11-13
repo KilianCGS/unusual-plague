@@ -151,7 +151,8 @@ export const RECIPES: Recipe[] = [
   {
     id: "fire.citrus-drink",
     station: "fire",
-    inputs: [{ itemId: "orange", quantity: 1 }, { itemId: "water", quantity: 1 }],
+    // 2026-11-13: sugar added: it is bought from the merchant (money has to be NEEDED)
+    inputs: [{ itemId: "orange", quantity: 1 }, { itemId: "water", quantity: 1 }, { itemId: "sugar", quantity: 1 }],
     output: { itemId: "citrus-drink", quantity: 1 },
   },
   // 2026-11-11: the cooking-medicinal family. The patients keep their own

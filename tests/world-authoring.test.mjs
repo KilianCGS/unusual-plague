@@ -279,11 +279,11 @@ test("Doctor Room chest: the hand-drawn zone of the new room uses the existing S
   assert.equal(STORAGE_INTERACTION_ID, "storage.doctor-room");
   assert.deepEqual(doctorRoomStorageInteractions, [
     {
-      id: "doctor-room-new-interaction-1",
-      x: 411,
-      y: 287,
+      id: "doctor-room-redesign-interaction-1",
+      x: 337,
+      y: 277,
       width: 38,
-      height: 88,
+      height: 95,
       interactionId: "storage.doctor-room",
     },
   ]);
@@ -300,11 +300,11 @@ test("Doctor Room chest: the hand-drawn zone of the new room uses the existing S
   );
   const zones = getSceneInteractionZones("doctor-room");
   assert.equal(
-    findAvailableInteraction(zones, feetAt(420, 340), "south")?.interactionId,
+    findAvailableInteraction(zones, feetAt(341, 330), "south")?.interactionId,
     "storage.doctor-room",
   );
   assert.equal(
-    findAvailableInteraction(zones, feetAt(425, 340), "west")?.interactionId,
+    findAvailableInteraction(zones, feetAt(345, 330), "west")?.interactionId,
     "storage.doctor-room",
   );
   // neither the game-start spawn nor the Apothecary arrival is in range

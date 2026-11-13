@@ -6,16 +6,17 @@ import { PATH_MINER_DAY3_ID, STONECUTTER_DAY3_ID, DUSTER_DAY3_ID } from "../pati
 // Invented, not round, and to be balanced by Kilian: the coins a chapter earns
 // must always cover what that chapter forces the Doctor to buy.
 export const PATIENT_PAYMENTS: Readonly<Record<string, number>> = {
-  [BAKER_HUSBAND_ID]: 6,
-  [TAVERN_PATIENT_ID]: 8,
-  [INJURED_MINER_ID]: 11,
-  [WOODCUTTER_DAY2_ID]: 7,
-  [BLACKSMITH_DAY2_ID]: 9,
-  [FARMER_DAY2_ID]: 13,
-  // Day 3 (invented, to balance)
-  [DUSTER_DAY3_ID]: 8,
-  [PATH_MINER_DAY3_ID]: 9,
-  [STONECUTTER_DAY3_ID]: 12,
+  // 2026-11-13: lowered so that money is a NEED, not a surplus (see docs/ECONOMY_REVIEW_NOV13.md):
+  // a day earns about what the next day's forced purchases cost.
+  [BAKER_HUSBAND_ID]: 3,
+  [TAVERN_PATIENT_ID]: 4,
+  [INJURED_MINER_ID]: 6,
+  [WOODCUTTER_DAY2_ID]: 3,
+  [BLACKSMITH_DAY2_ID]: 4,
+  [FARMER_DAY2_ID]: 6,
+  [DUSTER_DAY3_ID]: 3,
+  [PATH_MINER_DAY3_ID]: 4,
+  [STONECUTTER_DAY3_ID]: 6,
 };
 
 export function getPatientPayment(patientId: string): number {

@@ -19,7 +19,7 @@ import type { PatientCasesState } from "../patients/patientCases";
 import { DAY1_COMPLETED_ID } from "../patients/day1";
 import { createEmptyStorage } from "../storage/storage";
 import type { TutorialStep } from "../tutorial/tutorialFlow";
-import { WORLD_SCENES } from "./worldScenes";
+import { WORLD_SCENES, type SceneId } from "./worldScenes";
 import { CHAPTER2_PATIENTS } from "../patients/chapter2Patients";
 import { CHAPTER3_PATIENTS } from "../patients/chapter3Patients";
 import { DAY2_COMPLETED_ID } from "../patients/day2";
@@ -42,6 +42,9 @@ export type GameDevStart = {
   tutorialStep: TutorialStep;
   // TEST DATA: the copper coins the Doctor carries (a real game starts with 3).
   coins?: number;
+  // TEST DATA: begin in this scene instead of the chapter's start (for testing the end of a day
+  // out in the street).
+  scene?: { sceneId: SceneId; spawnName: string };
 };
 
 // The resources Day 1's treatments consume: taken, so their instances are in
@@ -143,7 +146,7 @@ export function createDay3DevStart(): GameDevStart {
     claimedRewards: new Set([...day2.claimedRewards, DAY2_COMPLETED_ID]),
     inventory,
     // TEST FIXTURE: what Days 1 and 2 leave after the purchases
-    coins: 40,
+    coins: 20,
   };
 }
 

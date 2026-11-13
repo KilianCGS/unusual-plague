@@ -18,10 +18,17 @@ export default function Day2DevPage() {
   const [language, setLanguage] = useState<Language>("es");
   const [run, setRun] = useState(0);
   const [closingPreview, setClosingPreview] = useState(false);
+  const [streetEnd, setStreetEnd] = useState(false);
 
   return (
     <>
-      {isClient && closingPreview ? (
+      {isClient && streetEnd ? (
+        <GameWorld
+          key={`street-${run}-${language}`}
+          language={language}
+          devStart={{ ...createDay2ClosingDevStart(), scene: { sceneId: "plaza", spawnName: "from-apothecary-street" } }}
+        />
+      ) : isClient && closingPreview ? (
         <GameWorld key={`closing-${run}-${language}`} language={language} devStart={createDay2ClosingDevStart()} />
       ) : isClient ? (
         <GameWorld
@@ -49,12 +56,15 @@ export default function Day2DevPage() {
           ))}
           <button
             type="button"
-            onClick={() => { setClosingPreview(false); setRun((current) => current + 1); }}
+            onClick={() => { setClosingPreview(false); setStreetEnd(false); setRun((current) => current + 1); }}
           >
             Reiniciar
           </button>
-          <button type="button" onClick={() => { setClosingPreview(true); setRun(current => current + 1); }}>
+          <button type="button" onClick={() => { setClosingPreview(true); setStreetEnd(false); setRun(current => current + 1); }}>
             Probar cierre
+          </button>
+          <button type="button" onClick={() => { setStreetEnd(true); setRun(current => current + 1); }}>
+            Fin de día (en la plaza)
           </button>
         </span>
       </aside>

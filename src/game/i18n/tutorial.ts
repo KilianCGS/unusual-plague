@@ -79,7 +79,7 @@ export const tutorialCopy: Record<
     },
     "chest-approach": {
       title: ["Acércate al cofre."],
-      body: "Es tu almacén personal, junto a la cama.",
+      body: "Es tu almacén personal, en la esquina de la habitación.",
     },
     "chest-interact": {
       title: ["Pulsa ", { action: "interact" }, " para interactuar."],
@@ -160,7 +160,7 @@ export const tutorialCopy: Record<
     },
     "chest-approach": {
       title: ["Approach the chest."],
-      body: "It is your personal storage, beside the bed.",
+      body: "It is your personal storage, in the corner of the room.",
     },
     "chest-interact": {
       title: ["Press ", { action: "interact" }, " to interact."],

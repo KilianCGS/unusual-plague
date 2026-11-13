@@ -609,7 +609,7 @@ test("P3 3. recipes: ointment = Medicinal herb + Crushed coal (manual); bandage 
   assert.equal(wrapped.recipe.output.itemId, "disinfected-bandage");
 });
 
-test("P3 4. Cloth: the merchant sells it (one coin each, three in stock), whatever Patient 1 did", () => {
+test("P3 4. Cloth: the merchant sells it (two coins each, four in stock), whatever Patient 1 did", () => {
   const needs = (f) =>
     getActiveMissingIngredients(f.patients, ch1.CHAPTER1_PATIENTS, f.inventory)
       .map((n) => `${n.itemId}x${n.quantity}`)
@@ -633,18 +633,19 @@ test("P3 4. Cloth: the merchant sells it (one coin each, three in stock), whatev
   let coins = money.STARTING_COINS;
   let inventory = world({ p3: "examined" }).inventory;
   for (let i = 1; i <= 3; i++) {
-    assert.equal(shops.unitsLeft(claimed, shop, cloth), 4 - i);
+    assert.equal(shops.unitsLeft(claimed, shop, cloth), 5 - i);
     const effects = shops.buyEffects(claimed, shop, cloth);
     assert.deepEqual(effects.map((e) => e.type), ["take-coins", "give-item", "claim-reward"]);
     coins = money.spendCoins(coins, cloth.price);
     inventory = inv.addItem(inventory, "cloth", 1);
     claimed = new Set([...claimed, effects[2].rewardId]);
   }
-  assert.equal(shops.unitsLeft(claimed, shop, cloth), 0, "sold out after three");
-  assert.equal(coins, money.STARTING_COINS - 3, "three cloths cost three of the starting coins");
+  assert.equal(shops.unitsLeft(claimed, shop, cloth), 1, "one of the four is left after three");
+  assert.equal(coins, money.STARTING_COINS - 6, "three cloths cost six of the starting coins");
   assert.equal(inv.countItem(inventory, "cloth"), 3, "two now, one left over for Day 2");
   // with nothing left, a purchase that cannot be paid takes nothing
   assert.equal(money.spendCoins(0, cloth.price), null, "no coins, nothing is spent");
+  assert.equal(money.spendCoins(coins, cloth.price), null, "the purse is empty after three cloths");
 });
 
 test("P3 5. Alcohol: the bartender gives it once the miner is examined, first of all, once, atomically", () => {

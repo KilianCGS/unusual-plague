@@ -1,0 +1,54 @@
+/* A wooden sign (the same plank and frame as the inventory and the buttons) at the top right,
+   where the fast travel chip sits. Hard edges, no blur; the arrow nudges in whole pixels. */
+.sign {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px 10px 12px;
+  font-family: var(--ui-font);
+  color: #f4ead5;
+  background-color: #4a3524;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(20, 10, 4, 0.2) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(0deg, rgba(255, 228, 180, 0.07) 0 1px, transparent 1px 6px);
+  border: 3px solid #1c110c;
+  box-shadow: inset 0 0 0 2px #6a4e35, inset 0 4px 0 #8a6a47, 0 4px 0 rgba(10, 5, 2, 0.55);
+  pointer-events: none;
+}
+
+.text {
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  text-shadow: 0 2px 0 #1c110c;
+}
+
+/* A gold arrow that points at where to go (down and to the left, towards the world). */
+.arrow {
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
+  border-right: 14px solid #e6b34a;
+  filter: drop-shadow(0 2px 0 #1c110c) drop-shadow(0 -2px 0 #1c110c) drop-shadow(-2px 0 0 #1c110c);
+  animation: sign-nudge 1s steps(3) infinite;
+}
+
+@keyframes sign-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow {
+    animation: none;
+  }
+}

@@ -216,11 +216,11 @@ test("the Doctor's Storage is reached ONLY from the chest in his room: exact zon
   assert.equal(st.STORAGE_INTERACTION_ID, "storage.doctor-room");
   assert.deepEqual(st.doctorRoomStorageInteractions, [
     {
-      id: "doctor-room-new-interaction-1",
-      x: 411,
-      y: 287,
+      id: "doctor-room-redesign-interaction-1",
+      x: 337,
+      y: 277,
       width: 38,
-      height: 88,
+      height: 95,
       interactionId: "storage.doctor-room",
     },
   ]);
@@ -244,12 +244,12 @@ test("the Doctor's Storage is reached ONLY from the chest in his room: exact zon
   assert.equal(st.apothecaryStorageInteractions, undefined);
 
   // a zone, not a collider
-  const { doctorRoomNewColliders } = at(
-    "src/game/doctor-room/doctorRoomNewGeometry.ts",
+  const { doctorRoomRedesignColliders: doctorRoomNewColliders } = at(
+    "src/game/doctor-room/doctorRoomRedesignGeometry.ts",
   );
   assert.ok(
     !doctorRoomNewColliders.some(
-      (c) => c.x === 411 && c.y === 287 && c.width === 38 && c.height === 88,
+      (c) => c.x === 337 && c.y === 277 && c.width === 38 && c.height === 95,
     ),
   );
 });

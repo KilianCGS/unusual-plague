@@ -19,6 +19,8 @@ export const NIGHT_BACKGROUNDS: Readonly<Record<string, string>> = {
   forest: `${NIGHT_DIR}/forest-night-background.png`,
   // The Witch's cottage at night (2026-11-12): where the Doctor meets her on Day 4.
   "forest-cottage": `${NIGHT_DIR}/forest-cottage-night-background.png`,
+  // The Doctor's Room at night (2026-11-13): where Day 4 begins.
+  "doctor-room": "/game/areas/doctor-room/doctor-room-night-background.png",
 };
 
 // The outdoor scenes that have no night painting yet (they get the grade below).
@@ -51,3 +53,8 @@ export function sceneForChapter(scene: WorldScene, chapterId: string): WorldScen
 
   return { ...scene, visual: { ...scene.visual, backgroundFilter: NIGHT_GRADE } };
 }
+
+// The Botica is drawn by its own scene, not by the generic renderer: its night painting
+// (2026-11-13, same 1606x979 size as the day one) is chosen here for Day 4.
+export const APOTHECARY_NIGHT_BACKGROUND =
+  "/game/areas/apothecary/apothecary-main-zone-night-background.png";

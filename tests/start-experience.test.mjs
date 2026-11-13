@@ -41,10 +41,10 @@ const at = (rel) => load(path.join(root, rel));
 const { getChapterStart } = at("src/game/world/chapterStart.ts");
 const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
 const {
-  doctorRoomNewColliders: doctorRoomColliders,
-  doctorRoomNewTransitions: doctorRoomTransitions,
-  doctorRoomNewSpawns: doctorRoomSpawns,
-} = at("src/game/doctor-room/doctorRoomNewGeometry.ts");
+  doctorRoomRedesignColliders: doctorRoomColliders,
+  doctorRoomRedesignTransitions: doctorRoomTransitions,
+  doctorRoomRedesignSpawns: doctorRoomSpawns,
+} = at("src/game/doctor-room/doctorRoomRedesignGeometry.ts");
 const { rectsIntersect } = at("src/game/collision.ts");
 const flow = at("src/game/narrative/interludeFlow.ts");
 const { NARRATIVE_ILLUSTRATIONS } = at("src/game/narrative/illustrations.ts");
@@ -96,12 +96,12 @@ test("a fresh Chapter 1 begins with the writing interlude, then the Doctor's Roo
   );
 });
 
-test("the game starts at doctor-room-new-spawn-2 (262,204,south), clear of furniture and the exit; spawn-1 is the arrival from the Apothecary", () => {
+test("the game starts at doctor-room-redesign-spawn-2 (236,263,south), clear of furniture and the exit; spawn-1 is the arrival from the Apothecary", () => {
   const arrival = WORLD_SCENES["doctor-room"].arrivals["chapter-start"];
   const spawn1 = doctorRoomSpawns.find(
-    (s) => s.id === "doctor-room-new-spawn-2",
+    (s) => s.id === "doctor-room-redesign-spawn-2",
   );
-  assert.deepEqual(arrival, { x: 262, y: 204, direction: "south" });
+  assert.deepEqual(arrival, { x: 236, y: 263, direction: "south" });
   assert.deepEqual(arrival, { x: spawn1.x, y: spawn1.y, direction: "south" });
   assert.equal(arrival.direction, "south");
   for (const collider of doctorRoomColliders) {
@@ -116,13 +116,13 @@ test("the game starts at doctor-room-new-spawn-2 (262,204,south), clear of furni
   // the walk-in arrival from the Apothecary and the exit are unchanged
   assert.deepEqual(
     WORLD_SCENES["doctor-room"].arrivals["from-apothecary-interior"],
-    { x: 260, y: 371, direction: "north" },
+    { x: 233, y: 366, direction: "south" },
   );
   assert.deepEqual(doctorRoomSpawns[0], {
-    id: "doctor-room-new-spawn-1",
-    x: 260,
-    y: 371,
-    direction: "north",
+    id: "doctor-room-redesign-spawn-1",
+    x: 233,
+    y: 366,
+    direction: "south",
   });
   // the two are different spawns, not an alias
   assert.notDeepEqual(
@@ -511,7 +511,7 @@ test("the chest: proximity comes from the real interaction zone; opening reports
     feetAt(zone.x + 4, zone.y + 40),
     "west",
   );
-  const far = findAvailableInteraction(zones, feetAt(262, 204), "south");
+  const far = findAvailableInteraction(zones, feetAt(236, 263), "south");
   assert.equal(near?.interactionId, "storage.doctor-room");
   assert.equal(far, null);
   const game = read("src/game/world/GameWorld.tsx");
@@ -643,42 +643,48 @@ test("starting the game unlocks nothing: only the baker's husband is known, no r
 console.log(`\n${passed} tests passed`);
 
 test("the new Doctor's Room: exact hand-drawn geometry, the only runtime room, and the chest is reachable from the start", () => {
-  const geo = at("src/game/doctor-room/doctorRoomNewGeometry.ts");
+  const geo = at("src/game/doctor-room/doctorRoomRedesignGeometry.ts");
   assert.deepEqual(
-    geo.doctorRoomNewColliders.map((c) => [c.x, c.y, c.width, c.height]),
+    geo.doctorRoomRedesignColliders.map((c) => [c.x, c.y, c.width, c.height]),
     [
-      [306, 376, 213, 46],
-      [452, 0, 67, 375],
-      [387, 62, 74, 206],
-      [4, 0, 509, 81],
-      [13, 77, 138, 61],
-      [223, 81, 44, 20],
-      [297, 76, 26, 13],
-      [0, 135, 80, 198],
-      [6, 338, 27, 88],
-      [36, 382, 176, 43],
+      [387, 13, 59, 212],
+      [326, 9, 65, 138],
+      [30, 17, 299, 151],
+      [324, 155, 82, 41],
+      [346, 187, 50, 31],
+      [283, 373, 186, 51],
+      [420, 225, 50, 178],
+      [383, 267, 40, 96],
+      [36, 303, 39, 68],
+      [0, 373, 183, 57],
+      [270, 379, 15, 49],
+      [182, 383, 14, 45],
+      [171, 168, 133, 15],
+      [124, 168, 27, 23],
+      [7, 168, 112, 129],
+      [10, 295, 66, 9],
     ],
   );
-  assert.deepEqual(geo.doctorRoomNewTransitions, [
+  assert.deepEqual(geo.doctorRoomRedesignTransitions, [
     {
-      id: "doctor-room-new-transition-1",
-      x: 215,
-      y: 389,
-      width: 91,
-      height: 35,
+      id: "doctor-room-redesign-transition-1",
+      x: 199,
+      y: 392,
+      width: 72,
+      height: 39,
     },
   ]);
   // the lower exit still leads to the Apothecary
   const exit = WORLD_SCENES["doctor-room"].exits[0];
-  assert.deepEqual(exit.zone, geo.doctorRoomNewTransitions[0]);
+  assert.deepEqual(exit.zone, geo.doctorRoomRedesignTransitions[0]);
   assert.equal(exit.targetScene, "apothecary-interior");
   assert.equal(exit.targetSpawn, "from-doctor-room");
-  // the world is the new background, 519x426
+  // the world is the redesigned background, 1254x1254 asset pixels = 470x470 units
   const visual = WORLD_SCENES["doctor-room"].visual;
-  assert.equal(visual.assetWidth * visual.logicalUnitsPerAssetPixel, 519.375);
+  assert.equal(visual.assetWidth * visual.logicalUnitsPerAssetPixel, 470.25);
   assert.equal(
     visual.backgroundSrc,
-    "/game/areas/doctor-room/doctor-room-new-background.png",
+    "/game/areas/doctor-room/doctor-room-v2-background.png",
   );
   // old geometry and background are gone; no second runtime Doctor Room
   assert.ok(
@@ -700,7 +706,7 @@ test("the new Doctor's Room: exact hand-drawn geometry, the only runtime room, a
   );
   // BFS on a 1-unit grid: from the game start the feet reach the chest zone
   // and the exit, and from the Apothecary arrival too
-  const [w, h] = [519, 426];
+  const [w, h] = [470, 470];
   const free = (x, y) => {
     const f = feet({ x, y });
     return (
@@ -708,7 +714,7 @@ test("the new Doctor's Room: exact hand-drawn geometry, the only runtime room, a
       y >= 19 &&
       x <= w &&
       y <= h &&
-      !geo.doctorRoomNewColliders.some((c) => rectsIntersect(f, c))
+      !geo.doctorRoomRedesignColliders.some((c) => rectsIntersect(f, c))
     );
   };
   const reach = (from) => {
@@ -732,7 +738,7 @@ test("the new Doctor's Room: exact hand-drawn geometry, the only runtime room, a
     return seen;
   };
   const chest = doctorRoomStorageInteractions[0];
-  for (const spawn of geo.doctorRoomNewSpawns) {
+  for (const spawn of geo.doctorRoomRedesignSpawns) {
     const seen = reach(spawn);
     const inZone = (z) =>
       [...seen].some((k) => {
@@ -741,7 +747,7 @@ test("the new Doctor's Room: exact hand-drawn geometry, the only runtime room, a
       });
     assert.ok(inZone(chest), spawn.id + " reaches the chest");
     assert.ok(
-      inZone(geo.doctorRoomNewTransitions[0]),
+      inZone(geo.doctorRoomRedesignTransitions[0]),
       spawn.id + " reaches the exit",
     );
   }

@@ -486,13 +486,13 @@ test("the merchant SELLS cloth: he never gives it through the story any more", (
   assert.ok(!(MERCHANT in story.PATIENT_INTERACTION_IDS));
   const shops = at("src/game/shop/shops.ts");
   assert.deepEqual(shops.getShop(MERCHANT).entries, [
-    { itemId: "cloth", price: 1, stock: 3 },
-    { itemId: "salt", price: 1, stock: 1 },
-    // Day 2 onwards (sugar 3, bone 1, onion 1: Kilian's prices)
-    { itemId: "sugar", price: 3, stock: 3, fromChapter: "chapter-2" },
-    { itemId: "onion", price: 1, stock: 3, fromChapter: "chapter-2" },
-    { itemId: "bone", price: 1, stock: 3, fromChapter: "chapter-2" },
-    { itemId: "garlic", price: 2, stock: 2, fromChapter: "chapter-3" },
+    { itemId: "cloth", price: 2, stock: 4 },
+    { itemId: "salt", price: 2, stock: 1 },
+    // Day 2 onwards (prices raised on 2026-11-13 so that money is needed)
+    { itemId: "sugar", price: 6, stock: 4, fromChapter: "chapter-2" },
+    { itemId: "onion", price: 2, stock: 3, fromChapter: "chapter-2" },
+    { itemId: "bone", price: 3, stock: 3, fromChapter: "chapter-2" },
+    { itemId: "garlic", price: 5, stock: 2, fromChapter: "chapter-3" },
   ]);
   // on Day 1 only the cloth and the salt are on sale
   assert.deepEqual(

@@ -25,10 +25,10 @@ import type {
 } from "../collision";
 import type { OcclusionShape } from "../occlusion";
 import {
-  doctorRoomNewColliders,
-  doctorRoomNewSpawns,
-  doctorRoomNewTransitions,
-} from "../doctor-room/doctorRoomNewGeometry";
+  doctorRoomRedesignColliders,
+  doctorRoomRedesignSpawns,
+  doctorRoomRedesignTransitions,
+} from "../doctor-room/doctorRoomRedesignGeometry";
 import {
   farmColliders,
   farmSpawns,
@@ -112,7 +112,7 @@ import { DEV_SCENES, type DevScene } from "../../app/dev/scene/scenes";
 //   mill-farmland-transition-1  (Barn door, future Barn interior)
 // Their reserved spawns are not registered as arrivals either:
 //   mill-farmland-spawn-2 (future barn exit).
-// doctor-room-new-spawn-2 is deliberately never used as a walk-in arrival: it
+// doctor-room-redesign-spawn-2 is deliberately never used as a walk-in arrival: it
 // is the chapter-start / narrative wake spawn.
 
 export type SceneId =
@@ -257,11 +257,11 @@ export const OLD_WORLD_SCENES: Record<
     id: "doctor-room",
     kind: "exterior",
     visual: visualOf("doctor-room"),
-    colliders: doctorRoomNewColliders,
+    colliders: doctorRoomRedesignColliders,
     exits: [
       {
         name: "to-apothecary-interior",
-        zone: pick(doctorRoomNewTransitions, "doctor-room-new-transition-1"),
+        zone: pick(doctorRoomRedesignTransitions, "doctor-room-redesign-transition-1"),
         targetScene: "apothecary-interior",
         targetSpawn: "from-doctor-room",
       },
@@ -269,13 +269,13 @@ export const OLD_WORLD_SCENES: Record<
     arrivals: {
       // Physical arrival from the Botica, facing into the room.
       "from-apothecary-interior": spawnAt(
-        doctorRoomNewSpawns,
-        "doctor-room-new-spawn-1",
+        doctorRoomRedesignSpawns,
+        "doctor-room-redesign-spawn-1",
       ),
       // The start of a chapter: the Doctor has just got up, facing south.
-      // doctor-room-new-spawn-2 is deliberately NOT a walk-in arrival; only a
+      // doctor-room-redesign-spawn-2 is deliberately NOT a walk-in arrival; only a
       // chapter start (see chapterStart.ts) uses it.
-      "chapter-start": spawnAt(doctorRoomNewSpawns, "doctor-room-new-spawn-2"),
+      "chapter-start": spawnAt(doctorRoomRedesignSpawns, "doctor-room-redesign-spawn-2"),
     },
   },
   "apothecary-street": {

@@ -23,10 +23,10 @@ import type { OcclusionShape } from "../../../game/occlusion";
 import { getSceneInteractionZones } from "../../../game/interactions/sceneInteractions";
 import { ENVIRONMENT_INTERACTIONS, STORY_ZONE_INTERACTIONS } from "../../../game/interactions/environmentCatalog";
 import {
-  doctorRoomNewColliders,
-  doctorRoomNewSpawns,
-  doctorRoomNewTransitions,
-} from "../../../game/doctor-room/doctorRoomNewGeometry";
+  doctorRoomRedesignColliders,
+  doctorRoomRedesignSpawns,
+  doctorRoomRedesignTransitions,
+} from "../../../game/doctor-room/doctorRoomRedesignGeometry";
 import {
   farmColliders,
   farmSpawns,
@@ -238,11 +238,6 @@ const EDITOR_SCENES: {
   { sceneId: "forest-v1", idPrefix: "forest", exportPrefix: "forest" },
   {
     sceneId: "doctor-room",
-    idPrefix: "doctor-room-new",
-    exportPrefix: "doctorRoomNew",
-  },
-  {
-    sceneId: "doctor-room-redesign",
     idPrefix: "doctor-room-redesign",
     exportPrefix: "doctorRoomRedesign",
   },
@@ -423,9 +418,9 @@ const PERSISTED_GEOMETRY: Record<
     spawns: apothecaryMainZoneSpawns,
   },
   "doctor-room": {
-    colliders: doctorRoomNewColliders,
-    transitions: doctorRoomNewTransitions,
-    spawns: doctorRoomNewSpawns,
+    colliders: doctorRoomRedesignColliders,
+    transitions: doctorRoomRedesignTransitions,
+    spawns: doctorRoomRedesignSpawns,
   },
   "tavern-interior": {
     colliders: tavernInteriorColliders,

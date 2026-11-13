@@ -777,10 +777,10 @@ export const sharedEnvironmentCompositions: Pick<DecorComposition, "sceneId" | "
     "sceneId": "doctor-room",
     "instances": [
       {
-        "instanceId": "doctor-room-candle-flame-01",
+        "instanceId": "doctor-room-candle-flame-02",
         "assetId": "candle-flame",
-        "x": 56,
-        "y": 59,
+        "x": 342,
+        "y": 98,
         "scale": 1,
         "flipX": false,
         "colliderEnabled": false,

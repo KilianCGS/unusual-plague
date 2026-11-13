@@ -43,6 +43,8 @@ export type FastTravelContext = {
   storageOpen: boolean;
   craftingOpen: boolean;
   inNarrativeScene: boolean;
+  // The day is over (the Doctor said he should rest): he has to walk home.
+  dayOver?: boolean;
 };
 
 // Pure rule: plain exploration, outside the Botica and the Doctor's Room.
@@ -57,6 +59,7 @@ export function canFastTravel(context: FastTravelContext): boolean {
     !context.storageOpen &&
     !context.craftingOpen &&
     !context.inNarrativeScene &&
+    !context.dayOver &&
     !FAST_TRAVEL_HOME_SCENES.includes(context.sceneId)
   );
 }

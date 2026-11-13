@@ -228,7 +228,7 @@ test("the Witch of the glade: a bone once, then a bad omen for a pine mushroom o
     { type: "claim-reward", rewardId: w.WITCH_OMEN_REWARD_ID },
   ]);
   const text = omen.conversation.lines.map((l) => l.text);
-  assert.ok(text.includes("Ven a verme cuando todo se haya apagado. Y trae la pluma."));
+  assert.ok(text.includes("Ven a verme cuando todo se haya apagado. Y trae la pluma. Te estaré esperando."));
   const done = talk([["pine-mushroom", 1]], [w.WITCH_BONE_REWARD_ID, w.WITCH_OMEN_REWARD_ID]);
   assert.equal(done.conversation.id, "chapter3.glade.witch.farewell");
   assert.deepEqual(done.effects, []);

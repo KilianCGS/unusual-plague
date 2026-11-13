@@ -83,6 +83,8 @@ function complete(facts,id){
     const water=interact('gather.water',facts);
     assert.equal(water.effects.find(e=>e.type==='give-item').quantity,2);
     apply(facts,water);
+    // the sugar of the citrus drink is BOUGHT from the merchant (money has to be needed)
+    stash(facts,'empty-flask');facts.inventory=addItem(facts.inventory,'sugar',1);assert.ok(facts.inventory);
     make(facts,'fire.citrus-drink');make(facts,'fire.mint-infusion');
   }else{
     // Day 1 leftovers and the chest: the carried inventory only holds five types

@@ -51,17 +51,17 @@ export const MERCHANT_SHOP: ShopDefinition = {
   // tavern man's soup) is sold too, so that case never waits for the baker's
   // thank-you: Day 1 spends 2 + 1 of the 4 starting coins.
   entries: [
-    { itemId: "cloth", price: 1, stock: 3 },
-    { itemId: "salt", price: 1, stock: 1 },
+    { itemId: "cloth", price: 2, stock: 4 },
+    { itemId: "salt", price: 2, stock: 1 },
     // From Day 2 (prices decided by Kilian, 2026-11-11: sugar 3, bone 1, onion 1).
     // None of these is needed to cure a patient: they feed the cooking recipes and
     // the errands. The stock (3 each) is a proposal, to be balanced.
-    { itemId: "sugar", price: 3, stock: 3, fromChapter: "chapter-2" },
-    { itemId: "onion", price: 1, stock: 3, fromChapter: "chapter-2" },
-    { itemId: "bone", price: 1, stock: 3, fromChapter: "chapter-2" },
+    { itemId: "sugar", price: 6, stock: 4, fromChapter: "chapter-2" },
+    { itemId: "onion", price: 2, stock: 3, fromChapter: "chapter-2" },
+    { itemId: "bone", price: 3, stock: 3, fromChapter: "chapter-2" },
     // From Day 3: garlic, which the balsamic syrup of the sweeper's cough needs. It has no
     // other source in the world; 2 coins is Kilian's earlier decision (2026-11-09).
-    { itemId: "garlic", price: 2, stock: 2, fromChapter: "chapter-3" },
+    { itemId: "garlic", price: 5, stock: 2, fromChapter: "chapter-3" },
   ],
 };
 
