@@ -10,7 +10,9 @@ export type TutorialStep =
   | "book" // open the Book (Q)
   | "book-cover" // click the closed Book to open it
   | "book-page" // turn a page
-  | "book-tab" // choose another section
+  | "book-preparations" // open the PREPARADOS section
+  | "book-ailments" // ...then DOLENCIAS
+  | "book-patients" // ...then PACIENTES
   | "book-close" // close it
   | "map"
   | "move"
@@ -31,7 +33,9 @@ export type TutorialEvent =
   | "book-cover-opened" // ...and then opened its cover
 
   | "book-page-changed"
-  | "book-tab-changed"
+  | "book-section-preparations" // the Book showed that section
+  | "book-section-ailments"
+  | "book-section-patients"
   | "book-closed"
   | "map-opened"
   | "player-moved"
@@ -53,8 +57,10 @@ const STEP_COMPLETED_BY: Record<
   goal: { event: "continue", next: "book" },
   book: { event: "book-opened", next: "book-cover" },
   "book-cover": { event: "book-cover-opened", next: "book-page" },
-  "book-page": { event: "book-page-changed", next: "book-tab" },
-  "book-tab": { event: "book-tab-changed", next: "book-close" },
+  "book-page": { event: "book-page-changed", next: "book-preparations" },
+  "book-preparations": { event: "book-section-preparations", next: "book-ailments" },
+  "book-ailments": { event: "book-section-ailments", next: "book-patients" },
+  "book-patients": { event: "book-section-patients", next: "book-close" },
   "book-close": { event: "book-closed", next: "map" },
   map: { event: "map-opened", next: "move" },
   move: { event: "player-moved", next: "chest-approach" },

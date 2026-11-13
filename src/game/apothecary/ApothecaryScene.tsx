@@ -82,6 +82,7 @@ export function ApothecaryScene({
   onInteractionAvailable,
   promptLabelFor,
   onRunBlocked,
+  highlightInteractionIds,
 }: {
   spawn?: { x: number; y: number; direction: Direction };
   input?: DirectionInputHandle;
@@ -103,6 +104,9 @@ export function ApothecaryScene({
   promptLabelFor?: (interactionId: string) => string | undefined;
   // Space was pressed: running is never allowed in here (see worldNoRun.ts).
   onRunBlocked?: () => void;
+  // Interactions to point at with a bobbing arrow (the tutorial's crafting tour).
+  // The arrow sits above the middle of each interaction zone; it never takes input.
+  highlightInteractionIds?: readonly string[];
 }) {
   const [sceneScale, setSceneScale] = useState(1);
   const {
@@ -211,6 +215,22 @@ export function ApothecaryScene({
               // Y (candle flames on shelves) is drawn behind him
               zIndex={Math.round(player.y)}
             />
+            {(highlightInteractionIds ?? []).flatMap((interactionId) =>
+              getSceneInteractionZones("apothecary-interior")
+                .filter((zone) => zone.interactionId === interactionId)
+                .map((zone) => (
+                  <span
+                    key={zone.id}
+                    className={styles.pointer}
+                    data-tutorial-pointer={interactionId}
+                    aria-hidden
+                    style={{
+                      left: zone.x + zone.width / 2,
+                      top: zone.y,
+                    }}
+                  />
+                )),
+            )}
             {SHOW_COLLISION_DEBUG ? (
               <>
                 {apothecaryMainZoneColliders.map((collider) => (

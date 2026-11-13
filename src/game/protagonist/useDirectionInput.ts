@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MutableRefObject } from "react";
 
+import { getBindings } from "../controls/controlsStore";
+import { matchesAction, type Bindings } from "../controls/keybindings";
 import { createRunInput, type RunInput } from "./runInput";
 
 export type Direction = "north" | "south" | "east" | "west";
@@ -19,16 +21,14 @@ export type DirectionInputHandle = {
   run?: RunInput;
 };
 
-const directionKeys: Record<string, Direction> = {
-  ArrowUp: "north",
-  w: "north",
-  ArrowDown: "south",
-  s: "south",
-  ArrowLeft: "west",
-  a: "west",
-  ArrowRight: "east",
-  d: "east",
-};
+// The direction a key moves the Doctor in, by the player's bindings (null = none).
+function directionOfKey(bindings: Bindings, key: string): Direction | null {
+  if (matchesAction(bindings, "up", key)) return "north";
+  if (matchesAction(bindings, "down", key)) return "south";
+  if (matchesAction(bindings, "left", key)) return "west";
+  if (matchesAction(bindings, "right", key)) return "east";
+  return null;
+}
 
 function createPressedState(): Record<Direction, boolean> {
   return { north: false, south: false, east: false, west: false };
@@ -60,7 +60,7 @@ export function useDirectionInput({
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.code === "Space") {
+      if (matchesAction(getBindings(), "run", event.key)) {
         // Only while the game takes input: dialogues, books and the other
         // interfaces keep Space for themselves, with their own handlers.
         if (run.keyDown(event.repeat)) {
@@ -70,7 +70,7 @@ export function useDirectionInput({
         return;
       }
 
-      const direction = directionKeys[event.key];
+      const direction = directionOfKey(getBindings(), event.key);
 
       if (!direction) {
         return;
@@ -87,12 +87,12 @@ export function useDirectionInput({
     }
 
     function handleKeyUp(event: KeyboardEvent) {
-      if (event.code === "Space") {
+      if (matchesAction(getBindings(), "run", event.key)) {
         run.keyUp();
         return;
       }
 
-      const direction = directionKeys[event.key];
+      const direction = directionOfKey(getBindings(), event.key);
 
       if (!direction) {
         return;

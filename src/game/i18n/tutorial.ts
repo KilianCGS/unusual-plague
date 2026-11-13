@@ -3,7 +3,13 @@ import type { Language } from "./types";
 
 // A piece of a hint: plain text, or a key to draw as a keycap. Keys are not
 // translated.
-export type TutorialPart = string | { key: string };
+// "key" = a fixed key (the arrows that turn pages, Esc); "action" = the key the player
+// has chosen for that action; "move" = the four movement keys of slot 0 (main) or 1.
+export type TutorialPart =
+  | string
+  | { key: string }
+  | { action: "interact" | "run" | "book" | "map" | "objectives" }
+  | { move: 0 | 1 };
 
 export type TutorialHintCopy = {
   title: TutorialPart[];
@@ -29,7 +35,7 @@ export const tutorialCopy: Record<
       body: "Esa es tu misión, Doctor. Te enseñaré lo imprescindible por el camino.",
     },
     book: {
-      title: ["Pulsa ", { key: "Q" }, " para abrir tu libro."],
+      title: ["Pulsa ", { action: "book" }, " para abrir tu libro."],
       body: "El Compendio es tu herramienta más importante: lo consultarás una y otra vez para reconocer dolencias, recordar preparados y repasar a tus pacientes.",
     },
     "book-cover": {
@@ -38,16 +44,25 @@ export const tutorialCopy: Record<
     },
     "book-page": {
       title: ["Pasa de página con ", { key: "←" }, " ", { key: "→" }, "."],
-      body: "También puedes usar las flechas que hay junto a las páginas.",
+      body:
+      "Estás en INGREDIENTES: todo lo que puedes recoger o comprar y para qué sirve cada cosa.\nTambién puedes usar las flechas que hay junto a las páginas.",
     },
-    "book-tab": {
-      title: ["Elige otra sección del libro."],
-      body: "Haz clic en una pestaña: pacientes, dolencias, ingredientes o preparados.",
+    "book-preparations": {
+      title: ["Abre la pestaña PREPARADOS."],
+      body: "Aquí se apuntan las recetas que vayas aprendiendo: qué mezclar, en qué estación y qué resulta.",
+    },
+    "book-ailments": {
+      title: ["Ahora, la pestaña DOLENCIAS."],
+      body: "Todas las enfermedades que conoces: sus síntomas para reconocerlas y cómo se tratan. Te hará falta para diagnosticar.",
+    },
+    "book-patients": {
+      title: ["Y por último, PACIENTES."],
+      body: "La ficha de cada persona a la que atiendas: qué le pasa, qué necesita y cómo va su tratamiento.",
     },
     "book-close": {
       title: [
         "Pulsa ",
-        { key: "Q" },
+        { action: "book" },
         " o ",
         { key: "Esc" },
         " para cerrar el libro.",
@@ -55,11 +70,11 @@ export const tutorialCopy: Record<
       body: "Podrás volver a abrirlo siempre que lo necesites.",
     },
     map: {
-      title: ["Mantén ", { key: "TAB" }, " para consultar el mapa."],
+      title: ["Mantén ", { action: "map" }, " para consultar el mapa."],
       body: "Te mostrará dónde estás y te ayudará a orientarte por la ciudad.",
     },
     move: {
-      title: ["Usa ", { key: "WASD" }, " o las flechas para moverte."],
+      title: ["Usa ", { move: 0 }, " o ", { move: 1 }, " para moverte."],
       body: "Echa un vistazo a tu habitación.",
     },
     "chest-approach": {
@@ -67,8 +82,8 @@ export const tutorialCopy: Record<
       body: "Es tu almacén personal, junto a la cama.",
     },
     "chest-interact": {
-      title: ["Pulsa ", { key: "E" }, " para interactuar."],
-      body: "Con E hablas con las personas y usas los objetos del mundo.\nPrueba con el cofre: ábrelo y toma el frasco vacío.",
+      title: ["Pulsa ", { action: "interact" }, " para interactuar."],
+      body: "Con {interact} hablas con las personas y usas los objetos del mundo.\nPrueba con el cofre: ábrelo y toma el frasco vacío.",
     },
     "take-flask": {
       title: ["Selecciona el frasco vacío para llevarlo contigo."],
@@ -84,14 +99,14 @@ export const tutorialCopy: Record<
     },
     botica: {
       title: ["Dos lugares para preparar remedios."],
-      body: "La mesa de alquimia (izquierda) sirve para mezclar y preparar a mano; el mortero se abre desde ella.\nLa cocina (arriba a la derecha) sirve para cocer y hervir. Acércate y pulsa E.",
+      body: "La mesa de alquimia (izquierda) sirve para mezclar y preparar a mano; el mortero se abre desde ella.\nLa cocina (arriba a la derecha) sirve para cocer y hervir. Acércate y pulsa {interact}.",
     },
     "exit-botica": {
       title: ["Sal a la calle."],
       body: "Hay mucha ciudad por recorrer.",
     },
     run: {
-      title: ["Mantén ", { key: "ESPACIO" }, " mientras te mueves para correr."],
+      title: ["Mantén ", { action: "run" }, " mientras te mueves para correr."],
       body: "En interiores, mejor ir despacio.",
     },
   },
@@ -101,7 +116,7 @@ export const tutorialCopy: Record<
       body: "That is your mission, Doctor. I will teach you the essentials along the way.",
     },
     book: {
-      title: ["Press ", { key: "Q" }, " to open your book."],
+      title: ["Press ", { action: "book" }, " to open your book."],
       body: "The Compendium is your most important tool: you will consult it again and again to recognise ailments, recall preparations and review your patients.",
     },
     "book-cover": {
@@ -110,16 +125,25 @@ export const tutorialCopy: Record<
     },
     "book-page": {
       title: ["Turn the page with ", { key: "←" }, " ", { key: "→" }, "."],
-      body: "You can also use the arrows beside the pages.",
+      body:
+      "You are in INGREDIENTS: everything you can gather or buy, and what each thing is for.\nYou can also use the arrows beside the pages.",
     },
-    "book-tab": {
-      title: ["Choose another section of the book."],
-      body: "Click a tab: patients, ailments, ingredients or preparations.",
+    "book-preparations": {
+      title: ["Open the PREPARATIONS tab."],
+      body: "Here go the recipes you learn: what to mix, at which station, and what comes out.",
+    },
+    "book-ailments": {
+      title: ["Now, the AILMENTS tab."],
+      body: "Every illness you know: its symptoms, so you can recognise it, and how it is treated. You will need it to diagnose.",
+    },
+    "book-patients": {
+      title: ["And last, PATIENTS."],
+      body: "The file of each person you treat: what is wrong, what they need and how the treatment is going.",
     },
     "book-close": {
       title: [
         "Press ",
-        { key: "Q" },
+        { action: "book" },
         " or ",
         { key: "Esc" },
         " to close the book.",
@@ -127,11 +151,11 @@ export const tutorialCopy: Record<
       body: "You can open it again whenever you need it.",
     },
     map: {
-      title: ["Hold ", { key: "TAB" }, " to check the map."],
+      title: ["Hold ", { action: "map" }, " to check the map."],
       body: "It shows where you are and helps you find your way around town.",
     },
     move: {
-      title: ["Use ", { key: "WASD" }, " or the arrow keys to move."],
+      title: ["Use ", { move: 0 }, " or ", { move: 1 }, " to move."],
       body: "Have a look around your room.",
     },
     "chest-approach": {
@@ -139,8 +163,8 @@ export const tutorialCopy: Record<
       body: "It is your personal storage, beside the bed.",
     },
     "chest-interact": {
-      title: ["Press ", { key: "E" }, " to interact."],
-      body: "With E you talk to people and use the objects of the world.\nTry it on the chest: open it and take the empty flask.",
+      title: ["Press ", { action: "interact" }, " to interact."],
+      body: "With {interact} you talk to people and use the objects of the world.\nTry it on the chest: open it and take the empty flask.",
     },
     "take-flask": {
       title: ["Select the empty flask to carry it with you."],
@@ -156,14 +180,14 @@ export const tutorialCopy: Record<
     },
     botica: {
       title: ["Two places to prepare remedies."],
-      body: "The alchemy table (left) is for mixing and preparing by hand; the mortar opens from it.\nThe stove (top right) is for cooking and boiling. Step up and press E.",
+      body: "The alchemy table (left) is for mixing and preparing by hand; the mortar opens from it.\nThe stove (top right) is for cooking and boiling. Step up and press {interact}.",
     },
     "exit-botica": {
       title: ["Head out to the street."],
       body: "There is a whole town to explore.",
     },
     run: {
-      title: ["Hold ", { key: "SPACE" }, " while moving to run."],
+      title: ["Hold ", { action: "run" }, " while moving to run."],
       body: "Indoors, better take it slow.",
     },
   },

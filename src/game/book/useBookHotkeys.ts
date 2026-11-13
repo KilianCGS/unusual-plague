@@ -2,7 +2,10 @@
 
 import { useEffect } from "react";
 
-// Q toggles the Compendium, Esc closes it. Edge-triggered (key repeat is
+import { getBindings } from "../controls/controlsStore";
+import { matchesAction } from "../controls/keybindings";
+
+// The book key (Q by default) toggles the Compendium, Esc closes it. Edge-triggered (key repeat is
 // ignored). TAB is deliberately NOT handled: it is reserved for the future map.
 export function useBookHotkeys({
   open,
@@ -17,7 +20,7 @@ export function useBookHotkeys({
         return;
       }
 
-      if (event.key === "q" || event.key === "Q") {
+      if (matchesAction(getBindings(), "book", event.key)) {
         setOpen(!open);
       } else if (event.key === "Escape" && open) {
         setOpen(false);

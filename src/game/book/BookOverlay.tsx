@@ -19,14 +19,14 @@ import { useFitScale } from "./useFitScale";
 // decides what its spreads contain; the shell only draws them.
 
 // The tabs stick out above the book, so the stage is taller than the art.
-const BOOK_TOP = 22;
+const BOOK_TOP = 36;
 const STAGE_HEIGHT = BOOK_TOP + BOOK_HEIGHT;
 // Fraction of the window the stage may occupy. V1 used 0.85; the book is now
 // ~25% smaller (0.85 * 0.75).
 const VIEWPORT_FRACTION = 0.64;
 
-const TAB_WIDTH = 112;
-const TAB_GAP = 8;
+const TAB_WIDTH = 140;
+const TAB_GAP = 10;
 // The book always has four tabs (PACIENTES, DOLENCIAS, INGREDIENTES, PREPARADOS).
 const TAB_COUNT = 4;
 const TAB_GROUP_WIDTH = TAB_COUNT * TAB_WIDTH + (TAB_COUNT - 1) * TAB_GAP;
@@ -60,7 +60,7 @@ export function BookOverlay({
   // REPORT real navigation, nothing else: a page was turned / another section
   // was chosen. The owner (the tutorial) decides what that means.
   onPageChange?: () => void;
-  onSectionChange?: () => void;
+  onSectionChange?: (sectionId: string) => void;
   // The cover was opened (click or Space / Enter).
   onOpened?: () => void;
 }) {
@@ -87,7 +87,7 @@ export function BookOverlay({
 
   function selectSection(index: number) {
     if (index !== sectionIndex) {
-      onSectionChange?.();
+      onSectionChange?.(sections[index].id);
     }
 
     setSectionIndex(index);

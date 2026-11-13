@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 
 import type { LogicalRect } from "../collision";
+import { getBindings } from "../controls/controlsStore";
+import { matchesAction } from "../controls/keybindings";
 import type { Direction } from "../protagonist/useProtagonistController";
 import {
   findAvailableInteraction,
@@ -47,7 +49,7 @@ export function useInteraction({
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key !== "e" && event.key !== "E") {
+      if (!matchesAction(getBindings(), "interact", event.key)) {
         return;
       }
 
@@ -65,7 +67,7 @@ export function useInteraction({
     }
 
     function handleKeyUp(event: KeyboardEvent) {
-      if (event.key === "e" || event.key === "E") {
+      if (matchesAction(getBindings(), "interact", event.key)) {
         eHeldRef.current = false;
       }
     }

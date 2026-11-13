@@ -84,6 +84,8 @@ import {
 } from "../inventory/initialInventory";
 import { noRunLines } from "../i18n/noRun";
 import { runBarkLines } from "../i18n/runBarks";
+import { ControlsPanel } from "../controls/ControlsPanel";
+import { PauseMenu } from "../controls/PauseMenu";
 import { InventoryHud } from "../inventory/InventoryHud";
 import { isInventoryHudVisible } from "../inventory/inventoryHudVisibility";
 import { storageCopy } from "../i18n/storage";
@@ -143,6 +145,9 @@ import {
 import type { GameDevStart } from "./devStart";
 import { isRunAllowed } from "./worldNoRun";
 import { WORLD_SCENES } from "./worldScenes";
+
+// The two crafting stations the tutorial points at in the Botica.
+const CRAFT_STATION_INTERACTIONS = ["craft.manual", "craft.fire"] as const;
 import type { SceneId } from "./worldScenes";
 
 // Scene changes fade to black and back. The scene swap happens while the
@@ -165,8 +170,11 @@ type WorldState = { sceneId: SceneId; spawnName: string; arrival: number };
 export function GameWorld({
   language,
   devStart,
+  onQuit,
 }: {
   language: Language;
+  // Back to the title screen (from the pause menu). Absent = no such option.
+  onQuit?: () => void;
   // A development start (see /dev/day2). The real game never passes it.
   devStart?: GameDevStart;
 }) {
@@ -208,6 +216,9 @@ export function GameWorld({
   // The closing of Day 1 (a narrative interlude, like the opening) blocks the
   // world exactly as the opening does.
   const [closingActive, setClosingActive] = useState(false);
+  // The pause menu (Esc) and the controls screen opened from it.
+  const [pauseOpen, setPauseOpen] = useState(false);
+  const [controlsOpen, setControlsOpen] = useState(false);
   const [closingChapter, setClosingChapter] = useState("chapter-1");
   // The end card after the closing of Day 4 (the last screen of the game).
   const [endVisible, setEndVisible] = useState(false);
@@ -351,6 +362,7 @@ export function GameWorld({
     craftingStation === null &&
     !storageOpen &&
     openShop === null &&
+    !pauseOpen &&
     !inNarrativeScene;
   const mapVisible = mapHeld && canOpenInterface && !bookOpen;
   const pendingRef = useRef<{
@@ -391,7 +403,20 @@ export function GameWorld({
     craftingStation === null &&
     !storageOpen &&
     openShop === null &&
+    !pauseOpen &&
     !inNarrativeScene;
+
+  // Esc opens the pause menu when nothing else is open (Esc closes the other
+  // interfaces first: they are the ones that are open when it is pressed).
+  const canPause = isPlaying;
+  useEffect(() => {
+    if (!canPause) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape" && !event.repeat) setPauseOpen(true);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [canPause]);
 
   // A scene change takes the input away for a moment. Tell the run key that
   // THIS pause is a transition (so whoever was running and keeps Space held
@@ -994,7 +1019,9 @@ export function GameWorld({
   useEffect(() => {
     if (!isPlaying) return;
     if (sceneIdNow === "apothecary-interior") notifyTutorial("botica-entered");
-    if (WORLD_SCENES[sceneIdNow].kind === "exterior") notifyTutorial("street-entered");
+    // the street: an outdoor scene (the Doctor's room and the other interiors are painted
+    // scenes too, but they are not "outside")
+    if (isRunAllowed(sceneIdNow)) notifyTutorial("street-entered");
   }, [sceneIdNow, isPlaying, tutorialStepNow, notifyTutorial]);
 
   useEffect(() => {
@@ -1461,7 +1488,9 @@ export function GameWorld({
   const inBookStep =
     tutorialStep === "book-cover" ||
     tutorialStep === "book-page" ||
-    tutorialStep === "book-tab" ||
+    tutorialStep === "book-preparations" ||
+    tutorialStep === "book-ailments" ||
+    tutorialStep === "book-patients" ||
     tutorialStep === "book-close";
   const hintStep =
     inBookStep && !bookOpen
@@ -1519,6 +1548,9 @@ export function GameWorld({
           onInteractionAvailable={setAvailableInteractionId}
           promptLabelFor={promptLabelFor}
           onRunBlocked={handleRunBlocked}
+          highlightInteractionIds={
+            tutorial.step === "botica" ? CRAFT_STATION_INTERACTIONS : undefined
+          }
         />
       ) : (
         <ExteriorScene
@@ -1558,7 +1590,11 @@ export function GameWorld({
           }
           onOpened={handleBookCoverOpened}
           onPageChange={() => notifyTutorial("book-page-changed")}
-          onSectionChange={() => notifyTutorial("book-tab-changed")}
+          onSectionChange={(sectionId) => {
+            if (sectionId === "preparations") notifyTutorial("book-section-preparations");
+            else if (sectionId === "ailments") notifyTutorial("book-section-ailments");
+            else if (sectionId === "patients") notifyTutorial("book-section-patients");
+          }}
         />
       ) : null}
       {diagnosis?.stage === "choose" && !dialogue.active && !bookOpen ? (
@@ -1622,7 +1658,20 @@ export function GameWorld({
           raised={isTutorialHudUnlocked(tutorialStep)}
           onContinue={ACK_STEPS.includes(tutorialStep) ? handleTutorialContinue : undefined}
           continueLabel={tutorialContinueCopy[language].label}
+          language={language}
         />
+      ) : null}
+      {pauseOpen ? (
+        <PauseMenu
+          language={language}
+          controlsOpen={controlsOpen}
+          onResume={() => setPauseOpen(false)}
+          onControls={() => setControlsOpen(true)}
+          onQuit={onQuit}
+        />
+      ) : null}
+      {controlsOpen ? (
+        <ControlsPanel language={language} onClose={() => setControlsOpen(false)} />
       ) : null}
       {notice ? <ItemFeedback text={notice.text} /> : null}
       <CompendiumNotice context={{ language, patients, inventory, knownRecipeIds, storyFlags: claimedRewards, diagnosisPatientId: diagnosis?.patientId }} />

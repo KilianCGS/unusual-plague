@@ -298,8 +298,10 @@ test("Tutorial V2: open book > page > tab > close > map > move > approach chest 
     ["continue", "book"],
     ["book-opened", "book-cover"],
     ["book-cover-opened", "book-page"],
-    ["book-page-changed", "book-tab"],
-    ["book-tab-changed", "book-close"],
+    ["book-page-changed", "book-preparations"],
+    ["book-section-preparations", "book-ailments"],
+    ["book-section-ailments", "book-patients"],
+    ["book-section-patients", "book-close"],
     ["book-closed", "map"],
     ["map-opened", "move"],
     ["player-moved", "chest-approach"],
@@ -327,14 +329,16 @@ test("running is taught when leaving the apothecary (its own step), not in the r
   for (const lang of ["es", "en"]) {
     assert.deepEqual(
       tutorialCopy[lang].move.title.filter((p) => typeof p === "object"),
-      [{ key: "WASD" }],
+      [{ move: 0 }, { move: 1 }],
     );
     assert.deepEqual(Object.keys(tutorialCopy[lang]), [
       "goal",
       "book",
       "book-cover",
       "book-page",
-      "book-tab",
+      "book-preparations",
+      "book-ailments",
+      "book-patients",
       "book-close",
       "map",
       "move",
@@ -383,12 +387,16 @@ test("the Doctor is drawn ~40% larger in his room by a per-scene VISUAL scale on
 test("opening the book is NOT enough: the page must really change, then the tab, then it must close", () => {
   assert.equal(advanceTutorial("book-page", "book-opened"), "book-page");
   assert.equal(advanceTutorial("book-cover", "book-page-changed"), "book-cover"); // the cover comes first
-  assert.equal(advanceTutorial("book-page", "book-tab-changed"), "book-page"); // out of order
+  assert.equal(advanceTutorial("book-page", "book-section-ailments"), "book-page"); // out of order
   assert.equal(advanceTutorial("book-page", "book-closed"), "book-page");
-  assert.equal(advanceTutorial("book-page", "book-page-changed"), "book-tab");
-  assert.equal(advanceTutorial("book-tab", "book-page-changed"), "book-tab");
-  assert.equal(advanceTutorial("book-tab", "book-closed"), "book-tab");
-  assert.equal(advanceTutorial("book-tab", "book-tab-changed"), "book-close");
+  assert.equal(advanceTutorial("book-page", "book-page-changed"), "book-preparations");
+  assert.equal(advanceTutorial("book-preparations", "book-page-changed"), "book-preparations");
+  assert.equal(advanceTutorial("book-preparations", "book-closed"), "book-preparations");
+  // each section is asked for BY NAME: another tab does not count
+  assert.equal(advanceTutorial("book-preparations", "book-section-ailments"), "book-preparations");
+  assert.equal(advanceTutorial("book-preparations", "book-section-preparations"), "book-ailments");
+  assert.equal(advanceTutorial("book-ailments", "book-section-ailments"), "book-patients");
+  assert.equal(advanceTutorial("book-patients", "book-section-patients"), "book-close");
   assert.equal(advanceTutorial("book-close", "map-opened"), "book-close");
   assert.equal(advanceTutorial("book-close", "book-closed"), "map");
 });
@@ -480,7 +488,9 @@ test("a flask taken before the tutorial got there finishes the chest steps (next
     "intro",
     "book",
     "book-page",
-    "book-tab",
+    "book-preparations",
+    "book-ailments",
+    "book-patients",
     "book-close",
     "map",
     "move",
@@ -567,7 +577,9 @@ test("the Book edge case: PACIENTES has one page at the start, so the tutorial o
   assert.ok(book.includes("onPageChange") && book.includes("onSectionChange"));
   assert.ok(book.includes('"ArrowLeft"') && book.includes('"ArrowRight"'));
   assert.ok(game.includes('notifyTutorial("book-page-changed")'));
-  assert.ok(game.includes('notifyTutorial("book-tab-changed")'));
+  assert.ok(game.includes('notifyTutorial("book-section-preparations")'));
+  assert.ok(game.includes('notifyTutorial("book-section-ailments")'));
+  assert.ok(game.includes('notifyTutorial("book-section-patients")'));
   assert.ok(game.includes('notifyTutorial("book-closed")'));
 });
 
@@ -576,7 +588,9 @@ test("every tutorial hint exists in both languages and only names keys that do s
     for (const step of [
       "book",
       "book-page",
-      "book-tab",
+      "book-preparations",
+      "book-ailments",
+      "book-patients",
       "book-close",
       "map",
       "move",
@@ -595,8 +609,8 @@ test("every tutorial hint exists in both languages and only names keys that do s
         .filter((p) => typeof p === "object")
         .map((p) => p.key);
     assert.deepEqual(keys("book-page"), ["←", "→"]);
-    assert.deepEqual(keys("book-close"), ["Q", "Esc"]);
-    assert.deepEqual(keys("chest-interact"), ["E"]);
+    assert.deepEqual(keys("book-close"), [undefined, "Esc"]); // the book key is the player's own (action)
+    assert.deepEqual(keys("chest-interact"), [undefined]); // the player's own interact key (action)
     // no hint advertises drag and drop
     for (const step of ["chest-approach", "chest-interact", "take-flask"]) {
       const text = JSON.stringify(tutorialCopy[lang][step]).toLowerCase();
@@ -732,3 +746,15 @@ test("the new Doctor's Room: exact hand-drawn geometry, the only runtime room, a
     );
   }
 });
+
+// Regression (2026-11-13, found by the automated Day 1 run): the Doctor's room is a painted
+// "exterior"-kind scene, so "street-entered" must NOT be derived from the scene kind: it
+// skipped the botica steps straight to "run". It is derived from the no-run interiors list.
+{
+  const game = read("src/game/world/GameWorld.tsx");
+  assert.ok(game.includes('if (isRunAllowed(sceneIdNow)) notifyTutorial("street-entered")'));
+  assert.ok(!/kind === "exterior"\) notifyTutorial/.test(game));
+  const noRun = read("src/game/world/worldNoRun.ts");
+  assert.ok(noRun.includes('"doctor-room"') && noRun.includes('"apothecary-interior"'));
+  console.log("ok - street-entered comes from the outdoor scenes, not the scene kind");
+}

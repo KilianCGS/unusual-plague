@@ -1,0 +1,31 @@
+/* A pixel keycap: dark outline, pale top, lit upper-left edge, shaded lower-right edge,
+   and a 3 px dark base. The base is a box-shadow, so the key takes no extra line height. */
+.cap {
+  display: inline-block;
+  box-sizing: border-box;
+  min-width: 30px;
+  height: 28px;
+  margin: 0 5px 4px;
+  padding: 0 7px;
+  vertical-align: middle;
+  font: inherit;
+  font-size: 17px;
+  line-height: 22px;
+  text-align: center;
+  white-space: nowrap;
+  color: #2b1a14;
+  background: #f0e4c2;
+  border: 2px solid #1c110c;
+  box-shadow:
+    inset 2px 2px 0 #fff8e2,
+    inset -2px -3px 0 #b89c68,
+    0 3px 0 #1c110c;
+}
+
+/* Words (TAB, ESPACIO...) get a longer key and smaller letters. */
+.wide {
+  min-width: 52px;
+  padding: 0 9px;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}

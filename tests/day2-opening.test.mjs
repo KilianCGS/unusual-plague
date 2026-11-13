@@ -519,7 +519,7 @@ test("dev start: chapter 2, the Doctor's Room, Day 1 finished, tutorial done, th
 test("the real game starts as always: only the dev page hands GameWorld a start", () => {
   const home = read("src/app/page.tsx");
 
-  assert.ok(home.includes("<GameWorld language={language} />"));
+  assert.ok(home.includes("<GameWorld language={language}"));
   assert.ok(!home.includes("devStart"));
   const game = read("src/game/world/GameWorld.tsx");
 

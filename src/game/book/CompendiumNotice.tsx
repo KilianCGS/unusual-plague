@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useBindings } from "../controls/controlsStore";
+import { keyLabel } from "../controls/keybindings";
 import type { BookContext } from "./dynamicPages";
 import { getPatientDefinitions } from "../patients/patientRegistry";
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
@@ -40,6 +42,7 @@ export function CompendiumNotice({ context }: { context: BookContext }) {
   }, [revision]);
 
   const es = context.language === "es";
+  const bookKey = keyLabel(useBindings().book[0], context.language);
   return (
     <div className={styles.region} style={{ fontFamily: PIXEL_FONT_FAMILY }} role="status" aria-live="polite" aria-atomic="true">
       {visible && (
@@ -47,7 +50,7 @@ export function CompendiumNotice({ context }: { context: BookContext }) {
           <span className={styles.symbol} aria-hidden="true">✎</span>
           <div>
             <strong>{es ? "Compendio actualizado" : "Compendium updated"}</strong>
-            <span>{es ? "Nuevas anotaciones · Consultar [Q]" : "New notes · Read [Q]"}</span>
+            <span>{es ? `Nuevas anotaciones · Consultar [${bookKey}]` : `New notes · Read [${bookKey}]`}</span>
           </div>
         </div>
       )}

@@ -56,7 +56,9 @@ const ALL_EVENTS = [
   "book-opened",
   "book-cover-opened",
   "book-page-changed",
-  "book-tab-changed",
+  "book-section-preparations",
+  "book-section-ailments",
+  "book-section-patients",
   "book-closed",
   "map-opened",
   "player-moved",
@@ -74,8 +76,10 @@ const ORDER = [
   ["goal", "continue", "book"],
   ["book", "book-opened", "book-cover"],
   ["book-cover", "book-cover-opened", "book-page"],
-  ["book-page", "book-page-changed", "book-tab"],
-  ["book-tab", "book-tab-changed", "book-close"],
+  ["book-page", "book-page-changed", "book-preparations"],
+  ["book-preparations", "book-section-preparations", "book-ailments"],
+  ["book-ailments", "book-section-ailments", "book-patients"],
+  ["book-patients", "book-section-patients", "book-close"],
   ["book-close", "book-closed", "map"],
   ["map", "map-opened", "move"],
   ["move", "player-moved", "chest-approach"],
@@ -133,7 +137,9 @@ test("the chest steps cannot be skipped by early events, and a random E has no e
     "book",
     "book-cover",
     "book-page",
-    "book-tab",
+    "book-preparations",
+    "book-ailments",
+    "book-patients",
     "book-close",
     "map",
     "move",
@@ -176,7 +182,9 @@ test("events fired early are not remembered (movement before its step is lost)",
     "book-opened",
     "book-cover-opened",
     "book-page-changed",
-    "book-tab-changed",
+    "book-section-preparations",
+    "book-section-ailments",
+    "book-section-patients",
     "book-closed",
     "map-opened",
   ]) {
@@ -195,28 +203,36 @@ test("done is final", () => {
     assert.equal(advanceTutorial("done", event), "done");
 });
 
-test("every hint step has ES and EN copy with its key", () => {
-  const keys = {
-    book: "Q",
-    "book-page": "→",
-    "book-close": "Esc",
-    map: "TAB",
-    move: "WASD",
-    "chest-interact": "E",
+test("every hint step has ES and EN copy with its key (the player's own keys are named by ACTION)", () => {
+  const parts = {
+    book: ["action", "book"],
+    "book-page": ["key", "→"],
+    "book-close": ["action", "book"],
+    map: ["action", "map"],
+    move: ["move", 0],
+    "chest-interact": ["action", "interact"],
+    run: ["action", "run"],
   };
   for (const lang of ["es", "en"]) {
-    for (const [step, key] of Object.entries(keys)) {
+    for (const [step, [prop, value]] of Object.entries(parts)) {
       const copy = tutorialCopy[lang][step];
       assert.ok(copy.body.trim());
       assert.ok(
-        copy.title.some((p) => typeof p === "object" && p.key === key),
+        copy.title.some((p) => typeof p === "object" && p[prop] === value),
         `${lang}/${step}`,
       );
+    }
+    // Esc closes the book and is a fixed key
+    assert.ok(tutorialCopy[lang]["book-close"].title.some((p) => p.key === "Esc"));
+    // the keys the player can change are never written as a letter in the copy
+    for (const step of Object.keys(tutorialCopy[lang])) {
+      const text = JSON.stringify(tutorialCopy[lang][step]);
+      assert.ok(!/ (Q|E|WASD|TAB)[ .,"]/.test(text.replace(/"key":"[^"]*"/g, "")), `${lang}/${step} names a fixed key`);
     }
   }
   // the tab, approach and take-flask steps name no key but still have copy
   for (const lang of ["es", "en"]) {
-    for (const step of ["goal", "book-cover", "book-tab", "chest-approach", "take-flask", "bar", "exit-room", "botica", "exit-botica"]) {
+    for (const step of ["goal", "book-cover", "book-preparations", "book-ailments", "book-patients", "chest-approach", "take-flask", "bar", "exit-room", "botica", "exit-botica"]) {
       assert.ok(
         tutorialCopy[lang][step].title.length &&
           tutorialCopy[lang][step].body.trim(),
@@ -224,8 +240,6 @@ test("every hint step has ES and EN copy with its key", () => {
       );
     }
   }
-  assert.ok(tutorialCopy.es.run.title.some((p) => p.key === "ESPACIO"));
-  assert.ok(tutorialCopy.en.run.title.some((p) => p.key === "SPACE"));
   assert.ok(inventoryCopy.es.title && inventoryCopy.en.title);
 });
 

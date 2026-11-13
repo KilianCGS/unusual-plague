@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 
+import { getBindings } from "../controls/controlsStore";
+import { matchesAction } from "../controls/keybindings";
+
 // True while TAB is physically held. Press = show the map, release = hide it
 // at once. The browser's own TAB (focus change) is suppressed. If the window
 // loses focus while TAB is down, the keyup would never arrive, so the map is
@@ -11,7 +14,7 @@ export function useMapHold() {
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
-      if (event.key !== "Tab") {
+      if (!matchesAction(getBindings(), "map", event.key)) {
         return;
       }
 
@@ -20,7 +23,7 @@ export function useMapHold() {
     }
 
     function handleKeyUp(event: KeyboardEvent) {
-      if (event.key === "Tab") {
+      if (matchesAction(getBindings(), "map", event.key)) {
         event.preventDefault();
         setHeld(false);
       }

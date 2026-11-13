@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { useBindings } from "../controls/controlsStore";
+import { keyLabel } from "../controls/keybindings";
 import type { Language } from "../i18n/types";
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
 import { DIAGNOSIS_SYMPTOMS, getDiagnosisOptions } from "./diagnosis";
@@ -15,6 +17,7 @@ export function DiagnosisOverlay({ patientId, language, onChoose, onConsult }: {
   const panel = useRef<HTMLDivElement>(null);
   const options = useMemo(() => getDiagnosisOptions(language), [language]);
   const es = language === "es";
+  const bookKey = keyLabel(useBindings().book[0], language);
   useEffect(() => {
     panel.current?.querySelector<HTMLButtonElement>("button")?.focus();
     function keyDown(event: KeyboardEvent) {
@@ -39,15 +42,17 @@ export function DiagnosisOverlay({ patientId, language, onChoose, onConsult }: {
 
   return <div className={styles.backdrop} style={{ fontFamily: PIXEL_FONT_FAMILY }}>
     <div ref={panel} className={styles.panel} role="dialog" aria-modal="true" aria-labelledby="diagnosis-title" aria-describedby="diagnosis-symptoms">
-      <h2 id="diagnosis-title">{es ? "¿Qué dolencia sospechas?" : "Which ailment do you suspect?"}</h2>
-      <p id="diagnosis-symptoms" className={styles.thought}>({DIAGNOSIS_SYMPTOMS[patientId][language]})</p>
-      <div className={styles.options}>
-        {options.map((option, index) => <button key={option.id} type="button" onClick={() => onChoose(option.id)}>
-          <span aria-hidden="true">{(index + 1) % 10}. </span>{option.label}
-        </button>)}
+      <div className={styles.paper}>
+        <h2 id="diagnosis-title">{es ? "¿Qué dolencia sospechas?" : "Which ailment do you suspect?"}</h2>
+        <p id="diagnosis-symptoms" className={styles.thought}>({DIAGNOSIS_SYMPTOMS[patientId][language]})</p>
+        <div className={styles.options}>
+          {options.map((option, index) => <button key={option.id} type="button" onClick={() => onChoose(option.id)}>
+            <span className={styles.key} aria-hidden="true">{(index + 1) % 10}</span>{option.label}
+          </button>)}
+        </div>
+        <button className={styles.consult} type="button" onClick={onConsult}>{es ? `Consultar el Compendio [${bookKey}]` : `Consult the Compendium [${bookKey}]`}</button>
+        <p className={styles.hint}>{es ? "Puedes reconsiderarlo sin penalización. Elige con el ratón o las teclas 1–0." : "You can reconsider without penalty. Choose with the mouse or keys 1–0."}</p>
       </div>
-      <button className={styles.consult} type="button" onClick={onConsult}>{es ? "Consultar el Compendio [Q]" : "Consult the Compendium [Q]"}</button>
-      <p className={styles.hint}>{es ? "Puedes reconsiderarlo sin penalización. Elige con el ratón o las teclas 1–0." : "You can reconsider without penalty. Choose with the mouse or keys 1–0."}</p>
     </div>
   </div>;
 }

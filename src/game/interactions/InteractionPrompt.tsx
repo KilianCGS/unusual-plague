@@ -1,5 +1,7 @@
 import type { CSSProperties } from "react";
 
+import { useBindings } from "../controls/controlsStore";
+import { keyLabel } from "../controls/keybindings";
 import { DOCTOR_SCALE } from "../protagonist/doctorScale";
 import styles from "./InteractionPrompt.module.css";
 
@@ -39,6 +41,7 @@ export function InteractionPrompt({
   // key alone otherwise. The prompt itself still knows nothing about interactions.
   label?: string;
 }) {
+  const interactKey = keyLabel(useBindings().interact[0], "es");
   const headTopY =
     feetY - (spriteSize - SPRITE_TOP_PADDING) * spriteScale * DOCTOR_SCALE;
 
@@ -52,7 +55,7 @@ export function InteractionPrompt({
 
   return (
     <div className={styles.prompt} style={style} data-interaction-prompt="true">
-      <span>E</span>
+      <span>{interactKey}</span>
       {label ? <span className={styles.label}>{label}</span> : null}
     </div>
   );

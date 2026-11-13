@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 
+import { getBindings, useBindings } from "../controls/controlsStore";
+import { keyLabel, matchesAction } from "../controls/keybindings";
 import type { Language } from "../i18n/types";
 import { EyeIcon } from "../ui/EyeToggle";
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
@@ -27,6 +29,7 @@ export function ObjectivesPanel({
   keyboardActive: boolean;
 }) {
   const copy = objectivesCopy[language];
+  const toggleHint = `[${keyLabel(useBindings().objectives[0], language)}]`;
   const [open, setOpen] = useState(true);
   // The errands that were open and have just been completed (shown ticked).
   const [justDone, setJustDone] = useState<readonly string[]>([]);
@@ -70,7 +73,7 @@ export function ObjectivesPanel({
     }
 
     function handleKeyDown(event: KeyboardEvent) {
-      if ((event.key === "r" || event.key === "R") && !event.repeat && !event.ctrlKey && !event.metaKey) {
+      if (matchesAction(getBindings(), "objectives", event.key) && !event.repeat && !event.ctrlKey && !event.metaKey) {
         setOpen((current) => !current);
       }
     }
@@ -100,7 +103,7 @@ export function ObjectivesPanel({
       >
         <EyeIcon shown={open} />
         <span className={styles.title}>{copy.title}</span>
-        <span className={styles.hint}>{open ? copy.toggleHint : `${shown.length} ${copy.toggleHint}`}</span>
+        <span className={styles.hint}>{open ? toggleHint : `${shown.length} ${toggleHint}`}</span>
       </button>
       {open ? (
         <ul className={styles.list}>

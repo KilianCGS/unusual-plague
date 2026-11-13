@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { GameWorld } from "../game/world/GameWorld";
+import { ControlsPanel } from "../game/controls/ControlsPanel";
+import { controlsCopy } from "../game/i18n/controls";
 import { IntroScreen } from "../game/intro/IntroScreen";
 import { introScreenCopy } from "../game/i18n/introScreen";
 import { GothicText } from "../game/ui/GothicText";
@@ -16,6 +18,7 @@ type FadePhase = "idle" | "out" | "in";
 export default function Home() {
   const [gamePhase, setGamePhase] = useState<GamePhase>("title");
   const [isAboutPanelOpen, setIsAboutPanelOpen] = useState(false);
+  const [isControlsOpen, setIsControlsOpen] = useState(false);
   const [language, setLanguage] = useState<Language>("es");
   const [fadePhase, setFadePhase] = useState<FadePhase>("idle");
   const [queuedPhase, setQueuedPhase] = useState<GamePhase | null>(null);
@@ -119,7 +122,7 @@ export default function Home() {
   if (gamePhase === "apothecary") {
     return (
       <>
-        <GameWorld language={language} />
+        <GameWorld language={language} onQuit={() => transitionToPhase("title")} />
         <div
           className="title-screen-fade"
           style={{
@@ -217,7 +220,19 @@ export default function Home() {
         >
           {copy.aboutButton}
         </button>
+        <button
+          className="begin-button secondary-title-button controls-title-button"
+          type="button"
+          disabled={isInteractionLocked}
+          onClick={() => setIsControlsOpen(true)}
+        >
+          {controlsCopy[language].openButton}
+        </button>
       </div>
+
+      {isControlsOpen ? (
+        <ControlsPanel language={language} onClose={() => setIsControlsOpen(false)} />
+      ) : null}
 
       {isAboutPanelOpen ? (
         <div
@@ -234,6 +249,8 @@ export default function Home() {
             <p>{copy.aboutPanel.paragraphs[0]}</p>
             <p>{copy.aboutPanel.paragraphs[1]}</p>
             <p>{copy.aboutPanel.paragraphs[2]}</p>
+            <p>{copy.aboutPanel.paragraphs[3]}</p>
+            <p>{copy.aboutPanel.paragraphs[4]}</p>
             <button
               className="begin-button about-panel-close"
               type="button"

@@ -14,7 +14,9 @@ const STEPS: TutorialHintStep[] = [
   "book",
   "book-cover",
   "book-page",
-  "book-tab",
+  "book-preparations",
+  "book-ailments",
+  "book-patients",
   "book-close",
   "map",
   "move",
@@ -40,6 +42,7 @@ export default function TutorialPreviewPage() {
         copy={tutorialCopy[language][step]}
         onContinue={ACK_STEPS.includes(step) ? () => undefined : undefined}
         continueLabel={tutorialContinueCopy[language].label}
+        language={language}
         raised={isTutorialHudUnlocked(step)}
       />
       <aside className={styles.panel}>
