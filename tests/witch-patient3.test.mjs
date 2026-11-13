@@ -172,8 +172,8 @@ test("Witch 1. first talk without Mushroom: the whole conversation, the favour i
     { type: "claim-reward", rewardId: ch1.WITCH_MET_ID },
   ]);
   const es = lines(first);
-  assert.equal(es[0], "Tienes peor cara que la última vez.");
-  assert.equal(es[1], "Llevo una máscara.");
+  assert.equal(es[0], "Tienes peor cara que la última vez. Pasa, siéntate, que me alegra verte.");
+  assert.equal(es[1], "Llevo una máscara, y aun así me lo notas. Qué ojo.");
   assert.ok(es.includes("Voy por la segunda jarra."));
   assert.ok(
     es.includes(
@@ -182,7 +182,7 @@ test("Witch 1. first talk without Mushroom: the whole conversation, the favour i
   );
   assert.equal(
     es.at(-1),
-    "Empiezas a entender cómo funcionan nuestras conversaciones.",
+    "Empiezas a entender cómo funcionan nuestras conversaciones. Me siento orgullosa.",
   );
   assert.ok(es.length >= 24, "a substantial conversation, not a 3-line one");
   // the speakers: Witch is "subject" (the bubble follows her), the Doctor himself
@@ -211,7 +211,7 @@ test("Witch 2. first talk already carrying a Mushroom: she is annoyed and the sw
   assert.equal(es[ask + 1], "¿Uno de estos?");
   assert.equal(es[ask + 5], "¿Estar preparado?");
   assert.equal(es[ask + 6], "Arruinarme el misterio.");
-  assert.equal(es[ask + 7], "Tu hongo.");
+  assert.equal(es[ask + 7], "¡Aquí está tu hongo!");
   assert.ok(!es.includes("Quiero un hongo."), "no 'what for' branch");
   const done = apply(f, first);
   assert.equal(count(done, "mushroom"), 0);
@@ -226,7 +226,7 @@ test("Witch 3. waiting: one short reminder, then small talk; the long conversati
   assert.equal(waiting.conversation.id, "chapter1.tavern.witch.waiting");
   assert.deepEqual(lines(waiting), [
     "¿Mi hongo?",
-    "Todavía no.",
+    "Todavía no, pero voy en ello.",
     "Qué decepción tan manejable.",
   ]);
   f = apply(f, waiting);
@@ -261,7 +261,7 @@ test("Witch 4. the swap: exactly Mushroom x1 for Medicinal herb x1, once, never 
     { type: "claim-reward", rewardId: ch1.WITCH_HERB_REWARD_ID },
   ]);
   const es = lines(trade);
-  assert.equal(es[0], "Tu hongo.");
+  assert.equal(es[0], "¡Aquí está tu hongo!");
   // the herb scene ends with "Demasiado tarde." and the feather lines follow
   const late = es.indexOf("Demasiado tarde.");
   assert.equal(es[late + 1], "Y esto.");
@@ -355,12 +355,12 @@ test("Witch 6. small talk: 8 exchanges, never the same twice in a row, all of th
   }
   const first = witchTalk.WITCH_QUOTES[0].lines.map((l) => l.text.es);
   assert.deepEqual(first, [
-    "¿Siempre estás donde menos espero encontrarte?",
+    "¿Siempre apareces donde menos te espero? Me alegra, la verdad.",
     "Eso dice más de tus expectativas que de mí.",
   ]);
   assert.deepEqual(
     witchTalk.WITCH_QUOTES[7].lines.map((l) => l.text.es),
-    ["¿No tienes ningún sitio al que ir?", "Sí.", "¿Y?", "Estoy aquí."],
+    ["¿No tienes ningún sitio al que ir?", "Sí.", "¿Y?", "Estoy aquí. Contigo, por ejemplo."],
   );
 });
 
@@ -391,9 +391,9 @@ test("Witch 7. ES and EN on every line, and the English is its own writing", () 
   }
   assert.equal(
     lines(talk(WITCH, world(), "en"))[0],
-    "You look worse than last time.",
+    "You look worse than last time. Come in, sit down, I'm glad to see you.",
   );
-  assert.equal(lines(talk(WITCH, world(), "en"))[1], "I'm wearing a mask.");
+  assert.equal(lines(talk(WITCH, world(), "en"))[1], "I'm wearing a mask, and you still notice. Sharp eye.");
   assert.ok(
     lines(talk(WITCH, world({ pairs: [["mushroom", 1]] }), "en")).includes(
       "Too late.",

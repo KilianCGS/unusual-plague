@@ -10,38 +10,40 @@ import { BEEKEEPER_INTERACTION_ID, FLOUR_OFFERED_ID, FLOUR_SACK_INTERACTION_ID, 
 import { doctorThought } from "./doctorThought";
 import { FARMER_SAMPLE_ID } from "../patients/farmerInvestigation";
 
+// 2026-11-13: voice pass: the Witch is warm with the Doctor and sometimes sarcastic; the Doctor is
+// cheerful, close and serene. New text, awaiting Kilian's review; the story beats are unchanged.
 export const DAY2_LEECH_REWARD_ID = "chapter2.witch.leech";
 const npc = (es: string, en: string) => ({ speaker: "subject", text: { es, en } });
 const doctor = (es: string, en: string) => ({ speaker: "doctor", text: { es, en } });
 const talk = (id: string, lines: LocalizedConversation["lines"]): LocalizedConversation => ({ id, lines });
 
 const witchInvestigation = talk("chapter2.cave.witch.investigation", [
-  doctor("El agricultor del molino está enfermo. Sospecho un envenenamiento, pero necesito una muestra para comprobarlo.", "The mill farmer is ill. I suspect poisoning, but I need a sample to investigate it."),
+  doctor("Me alegra encontrarte. El agricultor del molino está enfermo. Sospecho un envenenamiento, pero necesito una muestra para comprobarlo.", "Good to find you. The mill farmer is ill. I suspect poisoning, but I need a sample to investigate it."),
   npc("¿Ya sabes de dónde viene?", "Do you know where it came from?"),
   doctor("No. Y prefiero no darles una sospecha a los vecinos para que la conviertan en un culpable.", "No. And I'd rather not give the neighbours a suspicion they can turn into a culprit."),
-  npc("Entonces aún estamos de acuerdo en algo.", "Then there's still something we agree on."),
+  npc("Entonces aún estamos de acuerdo en algo. Menos mal.", "Then there's still something we agree on. Thank goodness."),
 ]);
 
 const leechGift = [
   npc("He encontrado una sanguijuela junto al agua. La he guardado en un frasco; quizá te sirva más a ti.", "I found a leech by the water. I've kept it in a jar; perhaps it'll be more useful to you."),
   npc("Estos bichejos se pirran por la sangre ajena.", "These little creatures have quite a taste for other people's blood."),
-  doctor("¿La has recogido sin necesitarla?", "You picked it up without needing it?"),
+  doctor("¿La has recogido sin necesitarla? Qué detalle.", "You picked it up without needing it? How thoughtful."),
   npc("Tú llevas un libro entero por si acaso. Yo, un frasco.", "You carry a whole book just in case. I carry a jar."),
-  doctor("Me la llevaré. Gracias.", "I'll take it. Thank you."),
+  doctor("¡Me la llevo, con mucho gusto! Gracias.", "I'll take her, gladly! Thank you."),
   npc("Por donde yo vivo no se dan las sanguijuelas, pero hay un arroyo con tanta menta alrededor que se huele desde el camino. Por si te hace falta.", "Leeches don't live where I do, but there's a stream with so much mint around it you can smell it from the path. In case you ever need some."),
 ];
 
 const leechNoRoom = [
   npc("Tengo una sanguijuela guardada, pero veo que no puedes llevar más cosas.", "I've kept a leech, but I can see you can't carry anything else."),
-  doctor("Haré sitio y volveré a buscarla.", "I'll make room and come back for it."),
+  doctor("Hago sitio y vuelvo a por ella enseguida.", "I'll make room and come right back for her."),
   npc("No tiene mucha prisa. Yo tampoco.", "She's in no particular hurry. Neither am I."),
 ];
 
 const witchAfter = talk("chapter2.cave.witch.afterGift", [
   npc("¿Tu nueva compañera sigue en el frasco?", "Is your new companion still in her jar?"),
-  doctor("Sigo buscando respuestas sobre el agricultor.", "I'm still looking for answers about the farmer."),
+  doctor("Sigo buscando respuestas sobre el agricultor, con calma.", "I'm still looking for answers about the farmer, calmly."),
   npc("Busca despacio donde haga falta. Las respuestas rápidas suelen parecerse mucho a lo que uno ya pensaba.", "Take your time where you need to. Quick answers tend to look rather like what you already thought."),
-  doctor("En eso también estamos de acuerdo.", "We agree on that too."),
+  doctor("En eso también estamos de acuerdo, ¡qué casualidad!", "We agree on that too, what a coincidence!"),
 ]);
 
 const farmAfterExam = talk("chapter2.farm.woman.afterExam", [
