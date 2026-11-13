@@ -116,13 +116,13 @@ test("the game starts at doctor-room-redesign-spawn-2 (236,263,south), clear of 
   // the walk-in arrival from the Apothecary and the exit are unchanged
   assert.deepEqual(
     WORLD_SCENES["doctor-room"].arrivals["from-apothecary-interior"],
-    { x: 233, y: 366, direction: "south" },
+    { x: 233, y: 366, direction: "north" },
   );
   assert.deepEqual(doctorRoomSpawns[0], {
     id: "doctor-room-redesign-spawn-1",
     x: 233,
     y: 366,
-    direction: "south",
+    direction: "north",
   });
   // the two are different spawns, not an alias
   assert.notDeepEqual(

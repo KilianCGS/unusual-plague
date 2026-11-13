@@ -39,6 +39,7 @@ export default function TutorialPreviewPage() {
   return (
     <>
       <TutorialHint
+        key={`${step}-${language}`}
         copy={tutorialCopy[language][step]}
         onContinue={ACK_STEPS.includes(step) ? () => undefined : undefined}
         continueLabel={tutorialContinueCopy[language].label}

@@ -793,6 +793,11 @@ export function GameWorld({
           }
         } else {
           showNotice(copy.inventoryFull);
+          // the Doctor says it out loud, too
+          setPickupBark((current) => ({
+            id: (current?.id ?? 0) + 1,
+            text: copy.inventoryFull,
+          }));
         }
 
         return;
@@ -1681,6 +1686,7 @@ export function GameWorld({
       ) : null}
       {showHint ? (
         <TutorialHint
+          key={`${hintStep}-${language}`}
           copy={hintCopy}
           aboveOverlays={hintOverBook || hintOverStorage}
           raised={isTutorialHudUnlocked(tutorialStep)}

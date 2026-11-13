@@ -23,7 +23,7 @@ const BOOK_TOP = 36;
 const STAGE_HEIGHT = BOOK_TOP + BOOK_HEIGHT;
 // Fraction of the window the stage may occupy. V1 used 0.85; the book is now
 // ~25% smaller (0.85 * 0.75).
-const VIEWPORT_FRACTION = 0.64;
+const VIEWPORT_FRACTION = 0.68;
 
 const TAB_WIDTH = 140;
 const TAB_GAP = 10;

@@ -10,6 +10,7 @@ import { InteractionPrompt } from "../interactions/InteractionPrompt";
 import { getSceneInteractionZones } from "../interactions/sceneInteractions";
 import { useInteraction } from "../interactions/useInteraction";
 import { apothecaryMainZoneColliders } from "./apothecaryMainZoneGeometry";
+import { BOTICA_STATION_POINTERS } from "./tutorialPointers";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { INDOOR_SPEED_FACTOR } from "../world/worldNoRun";
 import {
@@ -221,22 +222,20 @@ export function ApothecaryScene({
               // Y (candle flames on shelves) is drawn behind him
               zIndex={Math.round(player.y)}
             />
-            {(highlightInteractionIds ?? []).flatMap((interactionId) =>
-              getSceneInteractionZones("apothecary-interior")
-                .filter((zone) => zone.interactionId === interactionId)
-                .map((zone) => (
-                  <span
-                    key={zone.id}
-                    className={styles.pointer}
-                    data-tutorial-pointer={interactionId}
-                    aria-hidden
-                    style={{
-                      left: zone.x + zone.width / 2,
-                      top: zone.y,
-                    }}
-                  />
-                )),
-            )}
+            {(highlightInteractionIds ?? []).flatMap((interactionId) => {
+              const at = BOTICA_STATION_POINTERS[interactionId];
+              return at
+                ? [
+                    <span
+                      key={interactionId}
+                      className={styles.pointer}
+                      data-tutorial-pointer={interactionId}
+                      aria-hidden
+                      style={{ left: at.x, top: at.y }}
+                    />,
+                  ]
+                : [];
+            })}
             {SHOW_COLLISION_DEBUG ? (
               <>
                 {apothecaryMainZoneColliders.map((collider) => (

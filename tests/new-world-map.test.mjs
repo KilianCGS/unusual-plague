@@ -619,8 +619,8 @@ test("the Decorator export is applied literally (x, y, scale, flipX, colliderEna
     },
     "mill-farmland": {
       "mill-farmland-beekeeper-01": [1909, 850, 1.08, true],
-      "mill-farmland-orange-world-01": [860, 483, 1, false],
-      "mill-farmland-orange-world-02": [1844, 872, 1, false],
+      "mill-farmland-orange-world-01": [1844, 872, 1, false],
+      "mill-farmland-orange-world-02": [860, 483, 1, false],
     },
     "tavern-street": {
       "tavern-street-fruit-vegetable-seller-stall-01": [187, 446, 1.49, true],

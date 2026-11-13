@@ -17,8 +17,12 @@
   inset: 0;
   z-index: 1000;
   display: flex;
-  align-items: center;
+  /* the book sits in the upper part of the screen (2026-11-14): more comfortable to read, and
+     the tutorial note fits below it instead of covering it */
+  align-items: flex-start;
   justify-content: center;
+  padding-top: 8vh;
+  box-sizing: border-box;
   /* the world stays visible behind, slightly darkened */
   background: rgba(0, 0, 0, 0.58);
   font-family: var(--ui-font);

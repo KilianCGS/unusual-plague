@@ -171,11 +171,11 @@ test("11. texts exist in ES and EN", () => {
   );
   assert.equal(
     itemFeedbackCopy.es.inventoryFull,
-    "No tengo espacio para llevar esto.",
+    "Ya no me cabe nada más. Voy al límite.",
   );
   assert.equal(
     itemFeedbackCopy.en.inventoryFull,
-    "I don't have room to carry this.",
+    "I can't carry any more. I'm at my limit.",
   );
   for (const item of Object.values(ITEMS))
     assert.ok(item.name.es && item.name.en);

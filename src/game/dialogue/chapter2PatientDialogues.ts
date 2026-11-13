@@ -2,7 +2,9 @@ import type { Language } from "../i18n/types";
 import { getItemName } from "../items/items";
 import { CHAPTER2_PATIENTS, WOODCUTTER_DAY2_ID, BLACKSMITH_DAY2_ID } from "../patients/chapter2Patients";
 import { getPatientStatus, isTreatable } from "../patients/patientCases";
+import { DAY2_COMPLETED_ID } from "../patients/day2";
 import { chapter2AmbientDialogues } from "./chapter2AmbientDialogues";
+import { chapter3AmbientDialogues } from "./chapter34AmbientDialogues";
 import { localizeConversation, type LocalizedConversation } from "./localizedConversation";
 import type { StoryFacts, StoryOutcome } from "./storyInteractions";
 
@@ -94,7 +96,14 @@ export function resolveChapter2Patient(
     }
     return { conversation: local(wood ? woodCure : smithCure), effects: [{ type: "treat", patientId: id }] };
   }
-  if (status === "treated") return { conversation: local(after[id]), effects: [] };
+  if (status === "treated") {
+    // From Day 3 on (Day 2 is closed) he is no longer the patient of yesterday: he says his
+    // Day 3 lines (2026-11-13), in place of the "after the treatment" ones.
+    const later = facts.claimedRewards?.has(DAY2_COMPLETED_ID)
+      ? chapter3AmbientDialogues[interactionId.replace("chapter2.", "chapter3.")]
+      : undefined;
+    return { conversation: local(later ?? after[id]), effects: [] };
+  }
   const preparations = (lang: Language) => CHAPTER2_PATIENTS[id].requiredTreatments.map(t => getItemName(t.itemId, lang)).join(lang === "es" ? " y " : " and ");
   return {
     conversation: local(talk(`chapter2.${wood ? "woodcutter" : "blacksmith"}.waiting`, [

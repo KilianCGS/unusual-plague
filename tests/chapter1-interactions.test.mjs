@@ -96,11 +96,11 @@ const NOT_INTERACTABLE = [
   "plaza-merchant-table-01",
 ];
 
-test("29 interactable instances, all of them real chapter-1 instances", () => {
+test("30 interactable instances, all of them real chapter-1 instances", () => {
   const ids = Object.keys(chapter1Interactions);
-  // (the fruit seller has no interaction yet; the Tavern Street woman keeps hers;
+  // (the fruit seller joined with his rectangle; the Tavern Street woman keeps hers;
   // the beekeeper joined for Patient 2, Witch for Patient 3)
-  assert.equal(ids.length, 29);
+  assert.equal(ids.length, 30);
   for (const id of ids) assert.ok(byId.has(id), `${id} is not in chapter-1.ts`);
 });
 
@@ -121,6 +121,8 @@ test("interactionIds are stable names, unique per instance, never coordinates", 
 test("zones are sane rectangles relative to the anchor", () => {
   for (const [id, { zone }] of Object.entries(chapter1Interactions)) {
     assert.ok(zone.width > 0 && zone.height > 0, id);
+    // the fruit seller's zone is the rectangle he drew in front of her stall: it does not wrap the anchor
+    if (id === "tavern-street-fruit-vegetable-seller-stall-01") continue;
     assert.ok(
       zone.offsetX < 0 && zone.offsetX + zone.width > 0,
       `${id}: spans the anchor in x`,

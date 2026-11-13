@@ -6,7 +6,7 @@
 // East and west show it hanging off the back of the head, north shows it down the middle
 // of the back; south shows nothing (the head hides it). Idle, walk and run frames all get it.
 //
-//   node art/doctor-v3/build.cjs <downloads>   then   node art/doctor-v3/ponytail.cjs
+//   node art/doctor-v3/build.cjs <downloads>   then   node art/doctor-v3/ponytail.cjs [folder ...]
 const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
@@ -71,6 +71,11 @@ async function paint(file) {
 
 (async () => {
   let n = 0;
-  for (const f of files(ROOT)) if (await paint(f)) n++;
+  // optional: only some folders (e.g. "walk/east run/north", the ones replaced on 2026-11-13)
+  const only = process.argv.slice(2).map((p) => path.join(ROOT, ...p.split("/")));
+  for (const f of files(ROOT)) {
+    if (only.length && !only.some((dir) => f.startsWith(dir + path.sep))) continue;
+    if (await paint(f)) n++;
+  }
   console.log("frames with ponytail:", n);
 })();

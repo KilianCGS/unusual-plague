@@ -141,6 +141,11 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.tavernStreet.woman",
     zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },
   },
+  // Fruit seller behind her stall: the zone is the rectangle he drew (280,299, 119x27), as offsets from the stall (158,334).
+  "tavern-street-fruit-vegetable-seller-stall-01": {
+    interactionId: "chapter1.tavernStreet.seller",
+    zone: { offsetX: 122, offsetY: -35, width: 119, height: 27 },
+  },
   "tavern-street-villager-man-01-01": {
     interactionId: "chapter1.tavernStreet.man",
     zone: { offsetX: -33, offsetY: -95, width: 60, height: 111 },

@@ -35,7 +35,7 @@ export const doctorRoomRedesignTransitions: (LogicalRect & { id: string })[] = [
 // SPAWNS (blue): exact feet position on arrival, plus facing.
 // spawn-1: arrival from the Apothecary. spawn-2: the start of every day.
 export const doctorRoomRedesignSpawns: { id: string; x: number; y: number; direction: Direction }[] = [
-  { id: "doctor-room-redesign-spawn-1", x: 233, y: 366, direction: "south" },
+  { id: "doctor-room-redesign-spawn-1", x: 233, y: 366, direction: "north" },
   { id: "doctor-room-redesign-spawn-2", x: 236, y: 263, direction: "south" },
 ];
 

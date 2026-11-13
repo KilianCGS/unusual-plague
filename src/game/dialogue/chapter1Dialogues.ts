@@ -239,6 +239,17 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
       doctor("¿Y hoy? ¿Cómo lleva la promesa?", "And today? How's the promise holding?"),
       subject("Hoy todavía es pronto.", "It's still early."),
     ]),
+    conversation("chapter1.tavernStreet.seller", [
+      subject(
+        "Fruta fresca, doctor. Hoy la manzana está más tranquila que la gente de la taberna.",
+        "Fresh fruit, doctor. Today the apples are calmer than the folk at the tavern.",
+      ),
+      doctor("¿Algo para el estómago?", "Anything for the stomach?"),
+      subject(
+        "Una manzana al día. Lo demás, hágaselo mirar a usted.",
+        "An apple a day. For the rest, you're the doctor.",
+      ),
+    ]),
     conversation("chapter1.tavernStreet.man", [
       subject(
         "Dicen que beber solo trae problemas.",

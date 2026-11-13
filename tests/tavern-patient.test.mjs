@@ -421,9 +421,9 @@ test("12-15. ONE orange branch gives Orange x3 in one slot; the second branch st
     (i) => i.instanceId === "mill-farmland-orange-world-02",
   );
   assert.equal(one.assetId, "orange-world");
-  assert.deepEqual([one.x, one.y], [860, 483], "the group stays where it was");
+  assert.deepEqual([one.x, one.y], [1844, 872], "the collectible branch is the one on the ground by the bee path");
   assert.equal(two.assetId, "orange-world-ambient");
-  assert.deepEqual([two.x, two.y], [1844, 872], "and so does the other branch");
+  assert.deepEqual([two.x, two.y], [860, 483], "and the decoration is the one by the house");
   const resolved = resolveDecorInstances(
     composition.instances,
     getChapterInteractions("chapter-1"),
@@ -482,11 +482,11 @@ test("12b. the orange group goes through the REAL runtime path: sprite -> collec
     resolved.sprites.find((s) => s.instance.instanceId === id);
   assert.deepEqual(
     [sprite(one).instance.x, sprite(one).instance.y],
-    [860, 483],
+    [1844, 872],
   );
   assert.deepEqual(
     [sprite(two).instance.x, sprite(two).instance.y],
-    [1844, 872],
+    [860, 483],
   );
   assert.equal(sprite(one).asset.collectibleItemId, "orange");
   assert.equal(sprite(two).asset.collectibleItemId, undefined);
@@ -501,10 +501,10 @@ test("12b. the orange group goes through the REAL runtime path: sprite -> collec
     !colliders.some((c) => rectsIntersect(feet(x, y), c));
   // the Doctor standing on / around the sprite of the main group gets [E] ...
   const spots = [
-    [860, 500],
-    [847, 501],
-    [840, 470],
-    [900, 530],
+    [1844, 889],
+    [1831, 890],
+    [1824, 859],
+    [1884, 919],
   ].filter(([x, y]) => standable(x, y));
   assert.ok(spots.length >= 3, "he can really stand there");
   for (const [x, y] of spots) {
@@ -517,9 +517,9 @@ test("12b. the orange group goes through the REAL runtime path: sprite -> collec
   }
   // ... and around the ambient branch he gets nothing
   for (const [x, y] of [
-    [1844, 880],
-    [1830, 872],
-    [1860, 860],
+    [860, 491],
+    [846, 483],
+    [876, 471],
   ]) {
     // (the beekeeper's own zone may reach there: it is not an orange)
     assert.notEqual(

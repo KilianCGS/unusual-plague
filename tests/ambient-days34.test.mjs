@@ -75,3 +75,23 @@ test("the run to the north is lighter: longer frames (720 ms a stride) and a sma
 });
 
 console.log(`\n${passed} tests passed`);
+
+// From Day 3 on, the Day 2 patients (woodcutter, blacksmith) talk in their Day 3 way once treated.
+{
+  const { resolveChapter2Patient } = at("src/game/dialogue/chapter2PatientDialogues.ts");
+  const { WOODCUTTER_DAY2_ID, BLACKSMITH_DAY2_ID } = at("src/game/patients/chapter2Patients.ts");
+  const { DAY2_COMPLETED_ID } = at("src/game/patients/day2.ts");
+  const treated = { [WOODCUTTER_DAY2_ID]: "treated", [BLACKSMITH_DAY2_ID]: "treated" };
+  const facts = (closed) => ({ patients: treated, inventory: { capacity: 6, slots: [] }, claimedRewards: new Set(closed ? [DAY2_COMPLETED_ID] : []) });
+  for (const [interaction, day2Text, day3Text] of [
+    ["chapter2.forest.woodcutter", /anillos del tocón/, /tocón y yo seguimos amigos/],
+    ["chapter2.smithy.blacksmith", /ruido nuevo en el taller/, /Mano buena, martillo contento/],
+  ]) {
+    const d2 = resolveChapter2Patient(interaction, facts(false), "es", "x");
+    const d3 = resolveChapter2Patient(interaction, facts(true), "es", "x");
+    assert.match(d2.conversation.lines[0].text, day2Text, interaction + " keeps its Day 2 line on Day 2");
+    assert.match(d3.conversation.lines[0].text, day3Text, interaction + " says its Day 3 line once Day 2 is closed");
+    assert.deepEqual(d3.effects, []);
+  }
+  console.log("ok - the Day 2 patients speak their Day 3 lines once Day 2 is closed");
+}

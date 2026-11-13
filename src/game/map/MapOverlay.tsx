@@ -278,7 +278,6 @@ export function MapOverlay({
           const { x, y } = groundOf(location);
           const isHere = location.id === currentLocationId;
           const name = titleCase(language === "es" ? location.label : location.labelEn);
-          const half = Math.max(30, name.length * 7.6);
 
           return (
             <g key={location.id} data-map-node={location.id} transform={`translate(${x} ${y})`}>
@@ -305,14 +304,6 @@ export function MapOverlay({
               >
                 {name}
               </text>
-              <path
-                d={`M${-half} 57 q${half * 0.5} 5 ${half} 1 q${half * 0.5} -4 ${half} 0`}
-                fill="none"
-                stroke={isHere ? RED : MAP_INK}
-                strokeWidth={1.8}
-                strokeLinecap="round"
-                opacity={0.85}
-              />
             </g>
           );
         })}
@@ -323,16 +314,21 @@ export function MapOverlay({
             data-map-marker
             transform={`translate(${hereGround.x + 78} ${hereGround.y - ((ICON_GROUND * 512 - ICON_TOP[currentLocationId]) / 512) * ICON_SIZE * 0.55})`}
           >
+            {/* a ground shadow and a ripple under the tip, then a bigger pin with a gold edge */}
+            <ellipse cx={0} cy={8} rx={16} ry={5} fill="#000" opacity={0.28} />
+            <circle cx={0} cy={8} r={10} fill="none" stroke={RED} strokeWidth={2.4} className={styles.ripple} />
             <g className={styles.pin}>
-              <path
-                d="M0 0 C-14 -16 -14 -34 0 -34 C14 -34 14 -16 0 0 Z"
-                transform="translate(0 6)"
-                fill={RED}
-                stroke={PAPER}
-                strokeWidth={2.4}
-                strokeLinejoin="round"
-              />
-              <circle cx={0} cy={-22} r={4.4} fill={PAPER} />
+              <g transform="translate(0 8) scale(1.7)">
+                <path
+                  d="M0 0 C-14 -16 -14 -34 0 -34 C14 -34 14 -16 0 0 Z"
+                  fill={RED}
+                  stroke="#d9a441"
+                  strokeWidth={2.6}
+                  strokeLinejoin="round"
+                />
+                <path d="M-6 -26 C-6 -30 -2 -31 0 -31" fill="none" stroke="#f4b8a8" strokeWidth={2} strokeLinecap="round" opacity={0.8} />
+                <circle cx={0} cy={-22} r={5.2} fill={PAPER} stroke="#7e221c" strokeWidth={1.2} />
+              </g>
             </g>
           </g>
         ) : null}

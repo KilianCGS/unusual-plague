@@ -12,11 +12,11 @@ type ItemFeedbackCopy = {
 export const itemFeedbackCopy: Record<Language, ItemFeedbackCopy> = {
   es: {
     obtained: "Has obtenido: ",
-    inventoryFull: "No tengo espacio para llevar esto.",
+    inventoryFull: "Ya no me cabe nada más. Voy al límite.",
   },
   en: {
     obtained: "Obtained: ",
-    inventoryFull: "I don't have room to carry this.",
+    inventoryFull: "I can't carry any more. I'm at my limit.",
   },
 };
 

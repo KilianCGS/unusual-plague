@@ -53,8 +53,27 @@
   }
 }
 
+/* a ripple that spreads from the tip of the pin, so the place reads at a glance */
+.ripple {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: map-pin-ripple 1.6s ease-out infinite;
+}
+
+@keyframes map-pin-ripple {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .pin {
+  .pin,
+  .ripple {
     animation: none;
   }
 }

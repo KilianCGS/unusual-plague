@@ -83,7 +83,10 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  width: min(460px, 80vw);
+  width: min(640px, 92vw);
+  /* more goods will be sold as the game goes on: the list scrolls instead of growing */
+  max-height: 58vh;
+  overflow-y: auto;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -91,7 +94,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: 56px 1fr auto auto auto;
+  grid-template-columns: 100px 1fr auto auto auto;
   align-items: center;
   gap: 12px;
   padding: 6px 10px;
@@ -111,20 +114,21 @@
   color: #8c2a1f;
 }
 
+/* the 48 px icons are shown at exactly 2x (96 px): bigger, and the pixels stay even */
 .icon {
   position: relative;
-  width: 48px;
-  height: 48px;
+  width: 96px;
+  height: 96px;
 }
 
 .itemIcon {
-  width: 48px;
-  height: 48px;
+  width: 96px;
+  height: 96px;
   image-rendering: pixelated;
 }
 
 .name {
-  font-size: 15px;
+  font-size: 19px;
   font-weight: 700;
 }
 
@@ -135,20 +139,20 @@
 .price {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 16px;
+  gap: 6px;
+  font-size: 20px;
   font-weight: 700;
 }
 
 .coin {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   image-rendering: pixelated;
 }
 
 .buy {
-  padding: 6px 12px;
-  font: 700 13px/1 var(--ui-font);
+  padding: 8px 16px;
+  font: 700 16px/1 var(--ui-font);
   color: #2b1a14;
   background: #d9c9a3;
   border: 2px solid #2b1a14;

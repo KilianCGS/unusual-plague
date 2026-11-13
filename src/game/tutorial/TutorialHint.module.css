@@ -134,3 +134,60 @@
 .aboveOverlays {
   z-index: 1100;
 }
+
+/* The note writes itself: what is not written yet keeps its place but cannot be seen. */
+.unwritten {
+  visibility: hidden;
+}
+
+/* A keycap appears with a small stepped pop. */
+.keyIn {
+  display: inline-block;
+  animation: key-pop 0.24s steps(4) both;
+}
+
+@keyframes key-pop {
+  0% {
+    transform: translateY(-5px) scale(0.6);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Finishing touches: gold studs at the top and bottom of the wax-seal side, and a thin
+   double rule between the title and the text. */
+.studTop,
+.studBottom {
+  position: absolute;
+  left: 25px;
+  width: 8px;
+  height: 8px;
+  background: #d9a441;
+  border: 1px solid #5c3a1e;
+  box-shadow: inset 1px 1px 0 #ffe9a8;
+}
+
+.studTop {
+  top: 12px;
+}
+
+.studBottom {
+  bottom: 12px;
+}
+
+.rule {
+  display: block;
+  height: 5px;
+  margin: -2px 0 1px;
+  border-top: 2px solid #8a6a4a;
+  border-bottom: 1px solid rgba(138, 106, 74, 0.55);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .keyIn {
+    animation: none;
+  }
+}
