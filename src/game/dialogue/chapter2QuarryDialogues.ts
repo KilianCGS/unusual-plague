@@ -31,17 +31,17 @@ export const quarryMinerAsk = conversation("ask", [
     "¿Sabrías hacerme un caldo de huesos? Caliente, con algo de sal. Te lo pago.",
     "Could you make me a bone broth? Hot, with a bit of salt. I'll pay you.",
   ),
-  doctor("Veré qué puedo hacer.", "I'll see what I can do."),
+  doctor("Claro que sí, déjalo en mis manos. Veré qué puedo preparar.", "Of course, leave it with me. I'll see what I can prepare."),
 ]);
 
 // The delivery.
 export const quarryMinerReady = conversation("ready", [
-  doctor("Caldo de huesos. Todavía está caliente.", "Bone broth. Still hot."),
+  doctor("¡Caldo de huesos! Todavía está calentito.", "Bone broth! Still nice and hot."),
   miner(
     "Eso huele a casa. Toma: cinco monedas.",
     "That smells like home. Here: five coins.",
   ),
-  doctor("No hacía falta pagar tanto.", "You didn't have to pay that much."),
+  doctor("No hacía falta pagar tanto, de verdad.", "You really didn't have to pay that much."),
   miner(
     "Aquí se paga el caldo, no las palabras.",
     "Here you pay for the broth, not for words.",
