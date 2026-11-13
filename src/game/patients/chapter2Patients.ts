@@ -7,7 +7,7 @@ export const BLACKSMITH_DAY2_ID = "chapter2-blacksmith";
 export const CHAPTER2_PATIENTS: Record<string, PatientCaseDefinition> = {
   [WOODCUTTER_DAY2_ID]: {
     id: WOODCUTTER_DAY2_ID,
-    name: { es: "LEÑADOR DEL BOSQUE", en: "THE WOODCUTTER" },
+    name: { es: "Leñador del bosque", en: "The woodcutter" },
     ailmentId: "exhaustion",
     discovered: { es: "El leñador descansa junto al hacha en el bosque.", en: "The woodcutter is resting beside his axe in the forest." },
     observation: { es: "Agotamiento tras trabajar sin pausas, sed y mareo. Necesita descansar y recuperar fuerzas.", en: "Exhaustion after working without breaks, thirst and dizziness. He needs rest and time to regain his strength." },
@@ -17,7 +17,7 @@ export const CHAPTER2_PATIENTS: Record<string, PatientCaseDefinition> = {
   },
   [BLACKSMITH_DAY2_ID]: {
     id: BLACKSMITH_DAY2_ID,
-    name: { es: "HERRERO HERIDO", en: "THE INJURED BLACKSMITH" },
+    name: { es: "Herrero herido", en: "The injured blacksmith" },
     ailmentId: "infected-wound",
     discovered: { es: "El herrero espera en el taller, sujetándose una mano.", en: "The blacksmith is waiting in his workshop, cradling one hand." },
     observation: { es: "Pequeña herida en la mano, inflamada y dolorosa. Ha seguido trabajando pese a las molestias.", en: "A small, swollen and painful wound on his hand. He has continued working despite the discomfort." },
@@ -27,7 +27,7 @@ export const CHAPTER2_PATIENTS: Record<string, PatientCaseDefinition> = {
   },
   [FARMER_DAY2_ID]: {
     id: FARMER_DAY2_ID,
-    name: { es: "AGRICULTOR DEL MOLINO", en: "THE MILL FARMER" },
+    name: { es: "Agricultor del molino", en: "The mill farmer" },
     ailmentId: "suspected-poisoning",
     discovered: {
       es: "El agricultor descansa en el granero. Una anciana lo acompaña.",

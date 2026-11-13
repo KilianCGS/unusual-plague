@@ -4,6 +4,8 @@ import type { LocalizedConversation } from "./localizedConversation";
 // rewards): what an NPC says when the Doctor presses E. Keyed by the stable
 // interactionId that the chapter's interaction zones name. Every line has ES
 // and EN; "subject" is whoever started the conversation.
+// 2026-11-13: enriched pass in the Doctor's new voice (cheerful, close, serene). New text,
+// awaiting Kilian's review; the conversations keep their ids and their missions.
 const subject = (es: string, en: string) => ({
   speaker: "subject",
   text: { es, en },
@@ -27,7 +29,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Barro por la mañana y por la tarde vuelve todo el polvo.",
         "I sweep in the morning, and by afternoon all the dust is back.",
       ),
-      doctor("Podría dejar de barrer.", "You could stop sweeping."),
+      doctor("¿Y si se toma un respiro? Se lo ha ganado.", "Why not take a breather? You've earned it."),
       subject(
         "¿Y darle la victoria? Ni hablar.",
         "And let it win? Not a chance.",
@@ -38,7 +40,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Dicen que el pan recién hecho arregla cualquier mañana.",
         "They say fresh bread can fix any morning.",
       ),
-      doctor("¿Cualquier mañana?", "Any morning?"),
+      doctor("¿Cualquier mañana? ¡Pues habrá que probarlo!", "Any morning? Well, we'll have to try it!"),
       subject(
         "Las realmente malas necesitan dos panes.",
         "The really bad ones need two loaves.",
@@ -49,7 +51,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Este año la tierra está dando guerra.",
         "The soil's putting up a fight this year.",
       ),
-      doctor("¿Quién gana?", "Who's winning?"),
+      doctor("¡Qué ánimo! ¿Y quién va ganando?", "What spirit! And who's winning?"),
       subject("Pregúnteme cuando haya comido.", "Ask me once I've eaten."),
     ]),
     conversation("chapter1.farm.dog", [subject("¡Guau!", "Woof!")]),
@@ -61,14 +63,14 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Si oye un árbol caer, procure que no sea hacia usted.",
         "If you hear a tree falling, make sure it isn't falling toward you.",
       ),
-      doctor("Consejo médico impecable.", "Impeccable medical advice."),
+      doctor("¡Buen consejo! Lo tendré muy presente, gracias.", "Good advice! I'll keep it well in mind, thank you."),
     ]),
     conversation("chapter1.forest.sittingVillager", [
       subject(
         "Hay quien dice que sentarse a mirar pasar el día es perder el tiempo.",
         "Some say sitting around watching the day go by is a waste of time.",
       ),
-      doctor("¿Y usted qué dice?", "And what do you say?"),
+      doctor("Yo creo que mirar también es una forma de aprender. ¿Y usted qué dice?", "I think looking is a way of learning too. What do you say?"),
       subject(
         "Que pueden decírmelo de pie.",
         "They're welcome to tell me while standing.",
@@ -80,8 +82,8 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "The chickens eat better than I do.",
       ),
       doctor(
-        "¿Ha probado a quitarles la comida?",
-        "Have you tried taking their food?",
+        "¿Y si prueba a quitarles un poquito, con cariño?",
+        "What if you took a little of it away, kindly?",
       ),
       subject(
         "¿Y despertar mañana? Ni hablar.",
@@ -95,7 +97,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Las abejas y yo tenemos un acuerdo: yo no las molesto.",
         "The bees and I have an arrangement: I don't bother them.",
       ),
-      doctor("¿Y ellas?", "And them?"),
+      doctor("¿Y ellas lo respetan?", "And do they respect it?"),
       subject("Ellas deciden si se cumple.", "They decide whether it holds."),
     ]),
     conversation("chapter1.mill.youngVillager", [
@@ -103,7 +105,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "El viejo dice que el molino escucha.",
         "The old man says the mill listens.",
       ),
-      doctor("¿Y usted le cree?", "Do you believe him?"),
+      doctor("¿Y usted lo cree?", "And do you believe it?"),
       subject(
         "Trabajo aquí todos los días. Prefiero no arriesgarme.",
         "I work here every day. I'd rather not risk it.",
@@ -111,12 +113,12 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
     ]),
     conversation("chapter1.mine.injuredMiner", [
       subject("Ah... despacio. La pierna.", "Ah... easy. My leg."),
-      doctor("Déjeme verla.", "Let me see it."),
+      doctor("Tranquilo, déjeme verla.", "Easy now, let me see it."),
       // Shadowed by his case (storyInteractions.ts), which starts the first
       // time the Doctor talks to him; kept as the ambient fallback.
       doctor(
-        "Aguante. Volveré enseguida con algo para tratarla.",
-        "Hold on. I'll be back soon with something to treat it.",
+        "Aguante un poquito. Vuelvo enseguida con algo para tratarla.",
+        "Hang in there. I'll be right back with something to treat it.",
       ),
     ]),
     // A miner at work: no quest of his own. He has a piece of coal for the
@@ -126,7 +128,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Si viene buscando trabajo, ha elegido mal la ropa.",
         "If you're here looking for work, you picked the wrong clothes.",
       ),
-      doctor("No vengo buscando trabajo.", "I'm not here looking for work."),
+      doctor("No vengo buscando trabajo, solo a saludar.", "I'm not looking for work, just saying hello."),
       subject(
         "Entonces ha elegido muy bien la ropa.",
         "Then you picked exactly the right clothes.",
@@ -138,7 +140,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
     ]),
     conversation("chapter1.outskirts.fisherman", [
       subject("Hoy no pican.", "They're not biting today."),
-      doctor("Quizá no tengan hambre.", "Perhaps they're not hungry."),
+      doctor("Quizá hoy no tengan hambre. ¡Más suerte la próxima!", "Maybe they're not hungry today. Better luck next time!"),
       subject(
         "Doctor, no empiece a diagnosticarme los peces.",
         "Doctor, please don't start diagnosing my fish.",
@@ -149,7 +151,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Doctor, con esa ropa negra debe de ser imposible saber cuándo está sucia.",
         "Doctor, with all those black clothes, it must be impossible to tell when they're dirty.",
       ),
-      doctor("Tiene sus ventajas.", "It has its advantages."),
+      doctor("Tiene sus ventajas. ¡Y mucho estilo, ¿no cree?!", "It has its advantages. And plenty of style, don't you think?"),
       subject(
         "Eso explica más cosas de las que debería.",
         "That explains more than it should.",
@@ -160,7 +162,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Hay días en los que uno debería hacer absolutamente nada.",
         "Some days a man should do absolutely nothing.",
       ),
-      doctor("¿Hoy es uno de esos días?", "Is today one of those days?"),
+      doctor("¿Hoy es uno de esos días? Pues disfrútelo.", "Is today one of those days? Then enjoy it."),
       subject(
         "Estoy realizando una investigación exhaustiva.",
         "I'm conducting extensive research.",
@@ -172,7 +174,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Amuletos contra la mala suerte. Garantía de tres días.",
         "Charms against bad luck. Three-day guarantee.",
       ),
-      doctor("¿Y al cuarto?", "And on the fourth?"),
+      doctor("¿Y al cuarto día?", "And on the fourth day?"),
       subject("Ya sería mala suerte.", "That would be bad luck."),
     ]),
     conversation("chapter1.plaza.merchantCustomer", [
@@ -180,7 +182,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Llevo diez minutos intentando decidir si ese hombre es un estafador.",
         "I've spent ten minutes trying to decide whether that man is a fraud.",
       ),
-      doctor("¿Y?", "And?"),
+      doctor("¿Y? ¿Qué tal ha ido?", "And? How did it go?"),
       subject("He comprado dos amuletos.", "I bought two charms."),
     ]),
     conversation("chapter1.smithy.blacksmith", [
@@ -188,7 +190,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Si viene a decirme que el ruido es malo para los oídos, llega tarde.",
         "If you're here to tell me the noise is bad for my ears, you're too late.",
       ),
-      doctor("Venía a saludar.", "I came to say hello."),
+      doctor("Venía a saludar, nada más.", "I only came to say hello."),
       subject("Ah. Eso sí puedo oírlo.", "Ah. That I can still hear."),
     ]),
     conversation("chapter1.smithyStreet.child", [
@@ -197,8 +199,8 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "When I'm older, I'm going to have a real sword.",
       ),
       doctor(
-        "Procure conservar todos los dedos hasta entonces.",
-        "Try to keep all your fingers until then.",
+        "Pues cuide mucho esos dedos hasta entonces.",
+        "Then take good care of those fingers until then.",
       ),
       subject("Lo intentaré.", "I'll try."),
     ]),
@@ -207,7 +209,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "El herrero lleva golpeando metal desde que salió el sol.",
         "The blacksmith's been hammering metal since sunrise.",
       ),
-      doctor("Eso hacen los herreros.", "That's what blacksmiths do."),
+      doctor("Eso hacen los herreros: ¡con muchas ganas!", "That's what blacksmiths do: and with gusto!"),
       subject(
         "Sí, pero podría hacerlo más bajo.",
         "Yes, but he could do it more quietly.",
@@ -218,7 +220,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Doctor, échele un vistazo al hombre del suelo. Antes estaba bebiendo. Ahora solo se queja.",
         "Doctor, take a look at the man on the floor. He was drinking earlier. Now he just groans.",
       ),
-      doctor("¿Cuánto ha bebido?", "How much did he drink?"),
+      doctor("¿Cuánto ha bebido, más o menos?", "How much has he had, roughly?"),
       subject(
         "Menos de lo necesario para explicar eso.",
         "Not enough to explain that.",
@@ -234,7 +236,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Anoche juré que no volvería a entrar en esa taberna.",
         "Last night I swore I'd never set foot in that tavern again.",
       ),
-      doctor("¿Y hoy?", "And today?"),
+      doctor("¿Y hoy? ¿Cómo lleva la promesa?", "And today? How's the promise holding?"),
       subject("Hoy todavía es pronto.", "It's still early."),
     ]),
     conversation("chapter1.tavernStreet.man", [

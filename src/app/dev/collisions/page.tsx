@@ -242,6 +242,11 @@ const EDITOR_SCENES: {
     exportPrefix: "doctorRoomNew",
   },
   {
+    sceneId: "doctor-room-redesign",
+    idPrefix: "doctor-room-redesign",
+    exportPrefix: "doctorRoomRedesign",
+  },
+  {
     sceneId: "tavern-interior",
     idPrefix: "tavern-interior",
     exportPrefix: "tavernInterior",

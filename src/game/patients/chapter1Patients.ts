@@ -16,7 +16,7 @@ export const INJURED_MINER_ID = "injured-miner";
 export const CHAPTER1_PATIENTS: Record<string, PatientCaseDefinition> = {
   [BAKER_HUSBAND_ID]: {
     id: BAKER_HUSBAND_ID,
-    name: { es: "MARIDO DE LA PANADERA", en: "THE BAKER'S HUSBAND" },
+    name: { es: "Marido de la panadera", en: "The baker's husband" },
     ailmentId: "common-fever",
     discovered: {
       es: "La panadera ha solicitado una visita. Su marido no se encuentra bien.",
@@ -34,7 +34,7 @@ export const CHAPTER1_PATIENTS: Record<string, PatientCaseDefinition> = {
   },
   [TAVERN_PATIENT_ID]: {
     id: TAVERN_PATIENT_ID,
-    name: { es: "HOMBRE DE LA TABERNA", en: "THE MAN IN THE TAVERN" },
+    name: { es: "Hombre de la taberna", en: "The man in the tavern" },
     ailmentId: "stomach-ailment",
     discovered: {
       es: "El tabernero dice que un hombre lleva un buen rato en el suelo, quejándose.",
@@ -54,7 +54,7 @@ export const CHAPTER1_PATIENTS: Record<string, PatientCaseDefinition> = {
   },
   [INJURED_MINER_ID]: {
     id: INJURED_MINER_ID,
-    name: { es: "MINERO HERIDO", en: "THE INJURED MINER" },
+    name: { es: "Minero herido", en: "The injured miner" },
     ailmentId: "infected-wound",
     discovered: {
       es: "Un minero herido espera sentado dentro de la mina.",

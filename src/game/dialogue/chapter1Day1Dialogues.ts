@@ -17,20 +17,20 @@ export const day1Closing: LocalizedConversation = {
   lines: [
     // The caption of the closing: the narrator, not the Doctor.
     doctor(
-      "Con los pacientes atendidos, regresas a casa para descansar.",
-      "With your patients cared for, you return home to rest.",
+      "Con los tres pacientes atendidos, regresas a casa para descansar. Ha sido un buen día.",
+      "With all three patients cared for, you return home to rest. It has been a good day.",
     ),
     doctor(
-      "Tres enfermos atendidos. Ningún milagro, solo trabajo.",
-      "Three patients seen to. No miracles, just work.",
+      "Tres enfermos atendidos. Ningún milagro: solo trabajo, paciencia y buena compañía.",
+      "Three patients seen to. No miracles: just work, patience and good company.",
     ),
     doctor(
-      "La botica huele a hierbas y a humo. Casi resulta agradable.",
-      "The apothecary smells of herbs and smoke. It's almost pleasant.",
+      "La botica huele a hierbas y a humo. Huele a hogar.",
+      "The apothecary smells of herbs and smoke. It smells like home.",
     ),
     doctor(
-      "Mañana habrá más gente que necesite algo.",
-      "Tomorrow there will be more people who need something.",
+      "Mañana habrá más gente que me necesite. Y aquí estaré, con ganas.",
+      "Tomorrow there will be more people who need me. And I'll be here, glad to help.",
     ),
   ],
 };

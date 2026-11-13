@@ -277,25 +277,25 @@ test("washerwoman and injured miner conversations", () => {
   );
   assert.equal(
     m.lines[2].text,
-    "Hold on. I'll be back soon with something to treat it.",
+    "Hang in there. I'll be right back with something to treat it.",
   );
 });
 
-test("chapter 1 opening monologue: seven Doctor lines, ES and EN", () => {
+test("chapter 1 opening monologue (draft B, voice of 2026-11-13): ten Doctor lines, ES and EN", () => {
   for (const lang of ["es", "en"]) {
     const intro = resolveChapterIntro("chapter-1", lang);
-    assert.equal(intro.lines.length, 7);
+    assert.equal(intro.lines.length, 10);
     assert.ok(
       intro.lines.every((l) => l.speaker === "doctor" && l.text.trim()),
     );
   }
   assert.equal(
     resolveChapterIntro("chapter-1", "en").lines[0].text,
-    "Another day.",
+    "Another day. And what luck to have it.",
   );
   assert.equal(
     resolveChapterIntro("chapter-1", "es").lines[0].text,
-    "Otro día.",
+    "Otro día más. Y qué suerte tenerlo.",
   );
   // the Doctor only knows about the baker's visit: no three patients, tavern or miner
   for (const lang of ["es", "en"]) {
@@ -303,14 +303,14 @@ test("chapter 1 opening monologue: seven Doctor lines, ES and EN", () => {
       .lines.map((l) => l.text)
       .join(" ")
       .toLowerCase();
-    assert.ok(!/tres|three|taberna|tavern|minero|miner/.test(text), lang);
+    // (the town's places may be named; the patients of the tavern and the mine may not)
+    assert.ok(!/tres|three|minero|miner|herido|injured/.test(text), lang);
     assert.ok(/panadera|baker/.test(text), lang);
-    assert.ok(/frasco|flask/.test(text), lang); // the flask line closes the monologue
+    assert.ok(/frasco|flask/.test(text), lang); // the flask is mentioned before he leaves
   }
   assert.ok(
     resolveChapterIntro("chapter-1", "es")
-      .lines.at(-1)
-      .text.includes("frasco vacío"),
+      .lines.some((l) => l.text.includes("frasco vacío")),
   );
   assert.equal(resolveChapterIntro("chapter-9", "es"), null);
 });

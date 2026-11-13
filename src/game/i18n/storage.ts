@@ -12,16 +12,16 @@ type StorageCopy = {
 
 export const storageCopy: Record<Language, StorageCopy> = {
   es: {
-    storageTitle: "ALMACÉN",
-    inventoryTitle: "INVENTARIO",
+    storageTitle: "Almacén",
+    inventoryTitle: "Inventario",
     close: "Cerrar",
     emptySlot: "Hueco vacío",
     noRoomInInventory: "No tengo espacio para llevar esto.",
     noRoomInStorage: "El almacén está lleno.",
   },
   en: {
-    storageTitle: "STORAGE",
-    inventoryTitle: "INVENTORY",
+    storageTitle: "Storage",
+    inventoryTitle: "Inventory",
     close: "Close",
     emptySlot: "Empty slot",
     noRoomInInventory: "I don't have room to carry this.",

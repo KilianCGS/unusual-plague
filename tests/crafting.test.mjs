@@ -555,10 +555,10 @@ test("20. every visible crafting text exists in ES and EN", () => {
     craftingCopy.en.noRecipe,
     "These ingredients don't seem to combine well here.",
   );
-  assert.equal(craftingCopy.es.action.manual, "PREPARAR");
-  assert.equal(craftingCopy.es.action.fire, "COCINAR");
-  assert.equal(craftingCopy.en.action.manual, "PREPARE");
-  assert.equal(craftingCopy.en.action.fire, "COOK");
+  assert.equal(craftingCopy.es.action.manual, "Preparar");
+  assert.equal(craftingCopy.es.action.fire, "Cocinar");
+  assert.equal(craftingCopy.en.action.manual, "Prepare");
+  assert.equal(craftingCopy.en.action.fire, "Cook");
   assert.equal(craftingCopy.es.noSpace, "No tengo sitio para llevar esto.");
   assert.equal(craftingCopy.en.noSpace, "I don't have room to carry this.");
   assert.equal(craftingCopy.es.limitReached, "Ya no caben más ingredientes.");

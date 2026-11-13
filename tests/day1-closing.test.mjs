@@ -284,11 +284,11 @@ test("the closing is ONE sequence: the existing supper interlude whose first lin
   const en = localizeConversation(talk.day1Closing, "en", "doctor").lines;
   assert.equal(
     es[0].text,
-    "Con los pacientes atendidos, regresas a casa para descansar.",
+    "Con los tres pacientes atendidos, regresas a casa para descansar. Ha sido un buen día.",
   );
   assert.equal(
     en[0].text,
-    "With your patients cared for, you return home to rest.",
+    "With all three patients cared for, you return home to rest. It has been a good day.",
   );
   assert.ok(es.length >= 2 && es.length === en.length);
   assert.ok(!/regresas a casa|return home to rest/.test(source));

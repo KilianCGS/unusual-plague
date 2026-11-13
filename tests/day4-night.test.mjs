@@ -138,12 +138,12 @@ test("the errands panel shows 'see the Witch' on Day 4 and ticks it when she has
   assert.deepEqual(done.map((o) => [o.text, o.done]), [["Go and see the Witch", true]]);
 });
 
-test("the end card says THE END in both languages and the ending picture exists at its size", () => {
+test("the end card says The end in both languages and the ending picture exists at its size", () => {
   const React = require("react");
   const { renderToStaticMarkup } = require("react-dom/server");
   const { EndCard } = at("src/game/ui/EndCard.tsx");
   assert.ok(renderToStaticMarkup(React.createElement(EndCard, { language: "es" })).includes("FIN"));
-  assert.ok(renderToStaticMarkup(React.createElement(EndCard, { language: "en" })).includes("THE END"));
+  assert.ok(renderToStaticMarkup(React.createElement(EndCard, { language: "en" })).includes("The end"));
   const { NARRATIVE_ILLUSTRATIONS } = at("src/game/narrative/illustrations.ts");
   const picture = NARRATIVE_ILLUSTRATIONS["doctor-writing-night"];
   const png = fs.readFileSync(path.join(root, "public", picture.src));

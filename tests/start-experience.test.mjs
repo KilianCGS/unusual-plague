@@ -201,17 +201,17 @@ test("the opening uses writing, Day 1 closes at the fireplace and Day 2 closes o
 test("the opening monologue is the approved Chapter 1 intro, in both languages", () => {
   const es = resolveChapterIntro("chapter-1", "es");
   const en = resolveChapterIntro("chapter-1", "en");
-  assert.equal(es.lines.length, 7);
-  assert.equal(en.lines.length, 7);
-  assert.equal(es.lines[0].text, "Otro día.");
-  assert.ok(es.lines.at(-1).text.includes("frasco vacío"));
-  assert.ok(en.lines.at(-1).text.toLowerCase().includes("flask"));
+  assert.equal(es.lines.length, 10);
+  assert.equal(en.lines.length, 10);
+  assert.equal(es.lines[0].text, "Otro día más. Y qué suerte tenerlo.");
+  assert.ok(es.lines.some((l) => l.text.includes("frasco vacío")));
+  assert.ok(en.lines.some((l) => l.text.toLowerCase().includes("flask")));
   for (const line of [...es.lines, ...en.lines]) assert.ok(line.text.trim());
   // the hints under the text are localized
   for (const lang of ["es", "en"]) {
     assert.ok(narrativeCopy[lang].continue && narrativeCopy[lang].skip);
   }
-  assert.ok(narrativeCopy.es.skip.startsWith("ESC"));
+  assert.ok(narrativeCopy.es.skip.startsWith("Esc"));
 });
 
 test("interlude: the phases run fade-in > reading > fade-out > reveal > done", () => {
@@ -555,7 +555,7 @@ test("movement is a real event: only reported when the Doctor really changed pos
   );
 });
 
-test("the Book edge case: PACIENTES has one page at the start, so the tutorial opens it on a multi-page section the Doctor knows", () => {
+test("the Book edge case: Pacientes has one page at the start, so the tutorial opens it on a multi-page section the Doctor knows", () => {
   const sections = buildBookSections({
     language: "es",
     patients: ch1.CHAPTER1_INITIAL_PATIENTS,

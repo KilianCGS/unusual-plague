@@ -103,7 +103,7 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
       if (context.diagnosisPatientId === id && DIAGNOSIS_SYMPTOMS[id]) {
         texts.push(
           text(`${id}-symptoms-title`, "heading", RIGHT, 46,
-            language === "es" ? "SÍNTOMAS OBSERVADOS" : "OBSERVED SYMPTOMS"),
+            language === "es" ? "Síntomas observados" : "Observed symptoms"),
           text(`${id}-symptoms`, "body", RIGHT, LINES_Y, DIAGNOSIS_SYMPTOMS[id][language]),
           text(`${id}-pending`, "note", RIGHT, 214,
             language === "es" ? "Diagnóstico pendiente. Contrastar con Dolencias." : "Diagnosis pending. Compare with Ailments."),
@@ -127,7 +127,7 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
           definition.observation[language],
         ),
         text(`${id}-treatment`, "heading", RIGHT, 46,
-          definition.investigation ? (language === "es" ? "INVESTIGACIÓN" : "INVESTIGATION") : copy.treatment),
+          definition.investigation ? (language === "es" ? "Investigación" : "Investigation") : copy.treatment),
       );
 
       if (definition.investigation) {

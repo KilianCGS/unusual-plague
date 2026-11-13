@@ -41,7 +41,7 @@ export type ShopDefinition = {
 export const MERCHANT_SHOP: ShopDefinition = {
   id: "plaza-merchant",
   interactionId: "chapter1.plaza.merchant",
-  title: { es: "MERCADER", en: "MERCHANT" },
+  title: { es: "Mercader", en: "Merchant" },
   greeting: {
     es: "Poco género, pero honrado. Lo que no vea aquí, no lo tengo.",
     en: "Not much stock, but honest. If you don't see it here, I don't have it.",

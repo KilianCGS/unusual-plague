@@ -250,7 +250,6 @@ export default function Home() {
             <p>{copy.aboutPanel.paragraphs[1]}</p>
             <p>{copy.aboutPanel.paragraphs[2]}</p>
             <p>{copy.aboutPanel.paragraphs[3]}</p>
-            <p>{copy.aboutPanel.paragraphs[4]}</p>
             <button
               className="begin-button about-panel-close"
               type="button"

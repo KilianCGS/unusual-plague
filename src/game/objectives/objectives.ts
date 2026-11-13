@@ -26,8 +26,8 @@ export const PATIENT_OBJECTIVES: Readonly<Record<string, Record<Language, string
 };
 
 export const objectivesCopy: Record<Language, { title: string; toggleHint: string }> = {
-  es: { title: "RECADOS", toggleHint: "[R]" },
-  en: { title: "ERRANDS", toggleHint: "[R]" },
+  es: { title: "Recados", toggleHint: "[R]" },
+  en: { title: "Errands", toggleHint: "[R]" },
 };
 
 export function getObjectives(

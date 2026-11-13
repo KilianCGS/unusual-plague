@@ -108,6 +108,12 @@ const CHEST_STEPS: TutorialStep[] = [
   "take-flask",
 ];
 
+// The way out of the Doctor's room stays shut until the tutorial has got him to the
+// "go down to the Botica" step: the player cannot leave without having done it.
+export function isRoomExitBlocked(step: TutorialStep): boolean {
+  return !["exit-room", "botica", "exit-botica", "run", "done"].includes(step);
+}
+
 export const INITIAL_TUTORIAL_STEP: TutorialStep = "intro";
 
 export function advanceTutorial(

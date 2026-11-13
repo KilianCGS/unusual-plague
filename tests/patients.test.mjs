@@ -129,9 +129,9 @@ test("HIDDEN cases are not in PACIENTES; DISCOVERED cases are", () => {
   assert.ok(
     patientTexts("hidden").some((t) => t.includes("Todavía no hay pacientes")),
   );
-  assert.ok(!patientTexts("hidden").some((t) => t.includes("MARIDO")));
+  assert.ok(!patientTexts("hidden").some((t) => t.includes("Marido")));
   assert.ok(
-    patientTexts("discovered").some((t) => t.includes("MARIDO DE LA PANADERA")),
+    patientTexts("discovered").some((t) => t.includes("Marido de la panadera")),
   );
 });
 
@@ -142,12 +142,12 @@ test("DISCOVERED shows no diagnosis or treatment; EXAMINED shows them; TREATED i
   );
   assert.ok(
     !discovered.some(
-      (t) => t.includes("Fiebre común") || t.includes("TRATAMIENTO"),
+      (t) => t.includes("Fiebre común") || t.includes("Tratamiento"),
     ),
   );
   const examined = patientTexts("examined");
   assert.ok(examined.includes("Fiebre común"));
-  assert.ok(examined.includes("TRATAMIENTO"));
+  assert.ok(examined.includes("Tratamiento"));
   assert.ok(examined.some((t) => t.includes("Infusión medicinal")));
   assert.ok(examined.some((t) => t.includes("Paño frío")));
   assert.ok(patientTexts("treated").includes("✓ TRATADO"));
@@ -253,9 +253,9 @@ test("a TREATED case shows the final state whatever the inventory holds", () => 
 test("PACIENTES and PREPARADOS exist in English too", () => {
   const en = patientTexts("examined", [], "en");
   assert.ok(
-    en.includes("THE BAKER'S HUSBAND") &&
+    en.includes("The baker's husband") &&
       en.includes("Common fever") &&
-      en.includes("TREATMENT"),
+      en.includes("Treatment"),
   );
   assert.ok(
     en.includes("☐ Medicinal infusion") && en.includes("☐ Cold compress"),
@@ -1166,7 +1166,7 @@ test("only the baker's husband is known at the start: PACIENTES lists just him, 
     .spreads.flatMap((s) => s.texts ?? [])
     .map((t) => t.content.join(""));
   assert.deepEqual(texts, [
-    "MARIDO DE LA PANADERA",
+    "Marido de la panadera",
     "La panadera ha solicitado una visita. Su marido no se encuentra bien.",
   ]);
 });

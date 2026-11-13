@@ -1,5 +1,7 @@
 import type { LocalizedConversation } from "./localizedConversation";
 
+// 2026-11-13: enriched pass in the Doctor's new voice (cheerful, close, serene). New text,
+// awaiting Kilian's review; missions, items and effects are unchanged.
 // Conversations of the tavern case (the man on the floor and the bartender who
 // points him out) and of the trades that feed it. "subject" is whoever started
 // the conversation.
@@ -18,15 +20,15 @@ export const bartenderIntro: LocalizedConversation = {
   id: "chapter1.tavern.bartender.intro",
   lines: [
     subject(
-      "Doctor, échele un vistazo al hombre del suelo. Antes estaba bebiendo. Ahora solo se queja.",
-      "Doctor, take a look at the man on the floor. He was drinking earlier. Now he just groans.",
+      "Doctor, échele un vistazo al hombre del suelo. Antes estaba bebiendo y cantando. Ahora solo se queja, y las canciones eran mejores.",
+      "Doctor, take a look at the man on the floor. He was drinking and singing earlier. Now he just groans, and the songs were better.",
     ),
-    doctor("¿Cuánto ha bebido?", "How much did he drink?"),
+    doctor("¿Cuánto ha bebido, más o menos?", "How much has he had, roughly?"),
     subject(
-      "Menos de lo necesario para explicar eso.",
-      "Not enough to explain that.",
+      "Menos de lo necesario para explicar eso. Por eso me preocupa.",
+      "Not enough to explain that. That's why I'm worried.",
     ),
-    doctor("Lo miraré.", "I'll take a look."),
+    doctor("Ahora mismo lo veo. Gracias por avisarme.", "I'll see him right now. Thank you for letting me know."),
   ],
 };
 
@@ -35,10 +37,10 @@ export const bartenderWaiting: LocalizedConversation = {
   id: "chapter1.tavern.bartender.waiting",
   lines: [
     subject(
-      "Sigue donde lo dejó, Doctor. Y sigue quejándose.",
-      "He's right where you left him, Doctor. Still groaning.",
+      "Sigue donde lo dejó, Doctor. Y sigue quejándose, pero ahora con más sentimiento.",
+      "He's right where you left him, Doctor. Still groaning, but now with more feeling.",
     ),
-    doctor("Voy.", "On my way."),
+    doctor("Voy enseguida.", "On my way."),
   ],
 };
 
@@ -48,12 +50,12 @@ export const bartenderDuring: LocalizedConversation = {
   lines: [
     subject("¿Sabe ya qué le pasa?", "Do you know what's wrong with him yet?"),
     doctor(
-      "Se le pasará. Déjeme prepararle algo.",
-      "He'll get over it. Let me prepare him something.",
+      "Seguro que se le pasa. Déjeme prepararle algo que lo alivie.",
+      "I'm sure it will pass. Let me prepare something to ease it.",
     ),
     subject(
-      "Tiempo es lo que le sobra. De aquí no se mueve.",
-      "Time is all he has. He isn't going anywhere.",
+      "Tiempo es lo que le sobra. De aquí no se mueve, y yo tampoco: puede contar conmigo.",
+      "Time is all he has. He isn't going anywhere, and neither am I: you can count on me.",
     ),
   ],
 };
@@ -62,10 +64,10 @@ export const bartenderDuring: LocalizedConversation = {
 export const bartenderJarReady: LocalizedConversation = {
   id: "chapter1.tavern.bartender.jar",
   lines: [
-    doctor("Necesitaré algo de leche.", "I'll need some milk."),
+    doctor("Necesitaré un poco de leche, si es tan amable.", "I'll need a little milk, if you'd be so kind."),
     subject(
-      "Llévese esta jarra. En la granja podrán llenársela.",
-      "Take this jar. They can fill it at the farm.",
+      "Llévese esta jarra. En la granja podrán llenársela, y la leche allí es de la buena.",
+      "Take this jar. They can fill it at the farm, and the milk there is the good kind.",
     ),
   ],
 };
@@ -79,8 +81,8 @@ export const bartenderJarNoRoom: LocalizedConversation = {
       "Take a jar for the milk, Doctor.",
     ),
     doctor(
-      "Ahora mismo no puedo cargar nada más. Haré sitio y vuelvo.",
-      "I can't carry anything else right now. I'll make room and be back.",
+      "Gracias, pero llevo las manos llenas. Hago sitio y vuelvo.",
+      "Thanks, but my hands are full. I'll make room and come back.",
     ),
   ],
 };
@@ -93,7 +95,7 @@ export const bartenderAfter: LocalizedConversation = {
       "Hasta ha pedido agua. Eso sí que es nuevo en esta casa.",
       "He even asked for water. That's a first in this house.",
     ),
-    doctor("Dele tiempo.", "Give it time."),
+    doctor("Todo llegará. Dele tiempo.", "It will all come. Give it time."),
   ],
 };
 
@@ -105,12 +107,12 @@ export const tavernPatientExam: LocalizedConversation = {
   lines: [
     subject("Mi vientre...", "My stomach..."),
     doctor(
-      "Dolor de estómago. El exceso de bebida tampoco parece haber ayudado.",
-      "Stomach pain. The drink doesn't seem to have helped either.",
+      "Dolor de estómago. Y la bebida no ayuda, la verdad. Pero tiene arreglo.",
+      "A stomach ache. And the drink doesn't help, truth be told. But it can be fixed.",
     ),
     doctor(
-      "Necesita algo ligero para recuperar el estómago... y algo que lo calme.",
-      "He needs something light to settle the stomach... and something to soothe it.",
+      "Necesita algo ligero para el estómago... y algo que lo calme. Vamos a cuidarlo.",
+      "He needs something light for the stomach... and something to calm him. Let's take care of him.",
     ),
     subject("Ughh... Haga lo que sea...", "Ughh... Do whatever you must..."),
   ],
@@ -132,18 +134,18 @@ const waitingFor = (
 export const tavernPatientWaiting = {
   all: waitingFor(
     "all",
-    "Todavía no tengo nada preparado. Aguante un poco.",
-    "I don't have anything ready yet. Hold on a little.",
+    "Todavía no tengo nada preparado, pero ya voy de camino. Aguante un poco.",
+    "I don't have anything ready yet, but I'm on my way. Hold on a little.",
   ),
   "mushroom-soup": waitingFor(
     "soup",
-    "Me falta la sopa ligera. Aguante un poco.",
-    "I'm missing the light soup. Hold on a little.",
+    "Me falta la sopa ligera, pero ya casi la tengo. Aguante un poco.",
+    "I'm missing the light soup, but I almost have it. Hold on a little.",
   ),
   "milk-with-honey": waitingFor(
     "milk",
-    "Me falta la leche con miel. Aguante un poco.",
-    "I'm missing the milk with honey. Hold on a little.",
+    "Me falta la leche con miel, pero ya casi la tengo. Aguante un poco.",
+    "I'm missing the milk with honey, but I almost have it. Hold on a little.",
   ),
 };
 
@@ -152,14 +154,14 @@ export const tavernPatientCure: LocalizedConversation = {
   id: "chapter1.tavern.sickPatient.cure",
   lines: [
     doctor(
-      "Beba despacio. Primero la sopa, después la leche.",
-      "Drink slowly. The soup first, then the milk.",
+      "Despacito. Primero la sopa, después la leche. Así, muy bien.",
+      "Slowly now. Soup first, then the milk. That's it, very good.",
     ),
     subject(
       "Creo que... puedo respirar sin quejarme.",
       "I think... I can breathe without complaining.",
     ),
-    doctor("Empiece por beber menos.", "Start by drinking less."),
+    doctor("Ya que está mejor, quizá beba un poquito menos. Solo un consejo de amigo.", "Now that you're better, perhaps drink a little less. Just a friend's advice."),
   ],
 };
 
@@ -172,8 +174,8 @@ export const tavernPatientAfter: LocalizedConversation = {
       "I'm still alive. I'm not sure I deserve it.",
     ),
     doctor(
-      "Eso lo decidirá su próxima noche.",
-      "Your next night out will settle that.",
+      "Claro que se lo merece. Y su próxima noche puede ser mejor.",
+      "Of course you do. And your next night can be a better one.",
     ),
   ],
 };
@@ -192,12 +194,12 @@ const farmIntro = (withJar: boolean): LocalizedConversation => ({
   id: `chapter1.farm.woman.intro${withJar ? "WithJar" : ""}`,
   lines: [
     doctor(
-      "Necesito algo de leche para un enfermo.",
-      "I need some milk for a sick man.",
+      "Necesito un poco de leche para un enfermo, si puede ser.",
+      "I need a little milk for a sick man, if possible.",
     ),
     subject(
-      "Puedo darle un poco. Si va hacia los frutales, tráigame una naranja.",
-      "I can spare a little. If you're heading to the orchards, bring me an orange.",
+      "Puedo darle un poco, claro. Si va hacia los frutales, tráigame una naranja: llevo todo el día soñando con una.",
+      "I can spare a little, of course. If you're heading to the orchards, bring me an orange: I've been dreaming of one all day.",
     ),
     withJar
       ? subject(
@@ -243,7 +245,7 @@ export const farmWomanReady: LocalizedConversation = {
       "Una naranja y una jarra. Trato hecho.",
       "An orange and a jar. Deal.",
     ),
-    doctor("Se lo agradezco.", "I appreciate it."),
+    doctor("Muchas gracias.", "Thank you very much."),
     subject("Tome. Recién ordeñada.", "Here. Fresh from the cow."),
   ],
 };
@@ -262,8 +264,8 @@ export const farmWomanDone: LocalizedConversation = {
   id: "chapter1.farm.woman.done",
   lines: [
     subject(
-      "Cuide a ese enfermo. Y no me pida más leche hoy, que la vaca tiene su carácter.",
-      "Look after that sick man. And no more milk today; the cow has her moods.",
+      "Cuide a ese enfermo. Y no me pida más leche hoy, que la vaca tiene su carácter y su horario.",
+      "Look after that sick man. And no more milk today; the cow has her moods and her schedule.",
     ),
   ],
 };
@@ -277,7 +279,7 @@ export const beekeeperReady: LocalizedConversation = {
       "¿Miel? Claro. Para un enfermo no voy a ponerme a regatear.",
       "Honey? Of course. I won't haggle over a sick man.",
     ),
-    doctor("Gracias.", "Thank you."),
+    doctor("¡Muchas gracias!", "Thank you so much!"),
   ],
 };
 

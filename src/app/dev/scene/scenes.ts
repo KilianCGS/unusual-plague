@@ -137,6 +137,22 @@ const OLD_DEV_SCENES: DevScene[] = [
     protagonistScale: 1.4,
   },
   {
+    // The NEW Doctor's Room (Kilian, 2026-11-13): a 1254x1254 painting, same 0.375 unit
+    // per asset pixel, so the world is 470x470. It is ONLY in the editors for now: the game
+    // keeps the old room until its geometry (colliders, exit, spawns, chest zone) is drawn
+    // in /dev/collisions and exported.
+    id: "doctor-room-redesign",
+    label: "Habitacion del Doctor V2",
+    backgroundSrc: "/game/areas/doctor-room/doctor-room-v2-background.png",
+    assetWidth: 1254,
+    assetHeight: 1254,
+    initialAssetX: 627,
+    initialAssetY: 800,
+    logicalUnitsPerAssetPixel: 0.375,
+    zoomMultiplier: 1.5,
+    protagonistScale: 1.4,
+  },
+  {
     id: "tavern-interior",
     label: "Interior Taberna",
     // Unmodified copy of the approved 1536x1024 tavern interior. The room is

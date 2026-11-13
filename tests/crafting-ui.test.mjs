@@ -99,13 +99,13 @@ const SAMPLE = stock([
 test("manual shows 2 ingredient slots and the counter 0/2; fire shows 3 and 0/3", () => {
   const manual = render("manual", SAMPLE);
   assert.equal(count(manual, "data-selection-slot"), 2);
-  assert.ok(manual.includes("INGREDIENTES 0/2"));
+  assert.ok(manual.includes("Ingredientes 0/2"));
   assert.ok(manual.includes('data-crafting-station="manual"'));
   const fire = render("fire", SAMPLE);
   assert.equal(count(fire, "data-selection-slot"), 3);
-  assert.ok(fire.includes("INGREDIENTES 0/3"));
+  assert.ok(fire.includes("Ingredientes 0/3"));
   assert.ok(fire.includes('data-crafting-station="fire"'));
-  assert.ok(render("manual", SAMPLE, "en").includes("INGREDIENTS 0/2"));
+  assert.ok(render("manual", SAMPLE, "en").includes("Ingredients 0/2"));
 });
 
 test("the header and the button name the action of the station, and the button starts disabled", () => {
@@ -121,13 +121,13 @@ test("the header and the button name the action of the station, and the button s
       );
     }
   }
-  assert.equal(craftingCopy.es.action.manual, "PREPARAR");
-  assert.equal(craftingCopy.es.action.fire, "COCINAR");
+  assert.equal(craftingCopy.es.action.manual, "Preparar");
+  assert.equal(craftingCopy.es.action.fire, "Cocinar");
 });
 
 test("the Doctor's inventory: the 6 carried slots in order, with quantities and hover labels", () => {
   const markup = render("manual", SAMPLE);
-  assert.ok(markup.includes(">INVENTARIO DEL DOCTOR</h3>"));
+  assert.ok(markup.includes(">Inventario del Doctor</h3>"));
   assert.equal(count(markup, "data-inventory-slot"), 6);
   assert.deepEqual(
     [...markup.matchAll(/data-inventory-slot[^>]*data-item-id="([^"]*)"/g)].map(

@@ -45,18 +45,18 @@ export const tutorialCopy: Record<
     "book-page": {
       title: ["Pasa de página con ", { key: "←" }, " ", { key: "→" }, "."],
       body:
-      "Estás en INGREDIENTES: todo lo que puedes recoger o comprar y para qué sirve cada cosa.\nTambién puedes usar las flechas que hay junto a las páginas.",
+      "Estás en Ingredientes: todo lo que puedes recoger o comprar y para qué sirve cada cosa.\nTambién puedes usar las flechas que hay junto a las páginas.",
     },
     "book-preparations": {
-      title: ["Abre la pestaña PREPARADOS."],
+      title: ["Abre la pestaña Preparados."],
       body: "Aquí se apuntan las recetas que vayas aprendiendo: qué mezclar, en qué estación y qué resulta.",
     },
     "book-ailments": {
-      title: ["Ahora, la pestaña DOLENCIAS."],
+      title: ["Ahora, la pestaña Dolencias."],
       body: "Todas las enfermedades que conoces: sus síntomas para reconocerlas y cómo se tratan. Te hará falta para diagnosticar.",
     },
     "book-patients": {
-      title: ["Y por último, PACIENTES."],
+      title: ["Y por último, Pacientes."],
       body: "La ficha de cada persona a la que atiendas: qué le pasa, qué necesita y cómo va su tratamiento.",
     },
     "book-close": {
@@ -126,18 +126,18 @@ export const tutorialCopy: Record<
     "book-page": {
       title: ["Turn the page with ", { key: "←" }, " ", { key: "→" }, "."],
       body:
-      "You are in INGREDIENTS: everything you can gather or buy, and what each thing is for.\nYou can also use the arrows beside the pages.",
+      "You are in Ingredients: everything you can gather or buy, and what each thing is for.\nYou can also use the arrows beside the pages.",
     },
     "book-preparations": {
-      title: ["Open the PREPARATIONS tab."],
+      title: ["Open the Remedies tab."],
       body: "Here go the recipes you learn: what to mix, at which station, and what comes out.",
     },
     "book-ailments": {
-      title: ["Now, the AILMENTS tab."],
+      title: ["Now, the Ailments tab."],
       body: "Every illness you know: its symptoms, so you can recognise it, and how it is treated. You will need it to diagnose.",
     },
     "book-patients": {
-      title: ["And last, PATIENTS."],
+      title: ["And last, Patients."],
       body: "The file of each person you treat: what is wrong, what they need and how the treatment is going.",
     },
     "book-close": {
@@ -191,4 +191,17 @@ export const tutorialCopy: Record<
       body: "Indoors, better take it slow.",
     },
   },
+};
+
+// What the Doctor says when he tries to leave his room before the tutorial lets him.
+// New text, awaiting Kilian's review.
+export const tutorialExitBlockedCopy: Record<Language, readonly string[]> = {
+  es: [
+    "Antes de salir, repasaré mis cosas con calma.",
+    "Con las prisas se olvidan las cosas. Un momento.",
+  ],
+  en: [
+    "Before I go, I'll go over my things calmly.",
+    "Hurrying is how things get forgotten. One moment.",
+  ],
 };

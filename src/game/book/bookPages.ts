@@ -149,7 +149,7 @@ function ailmentSpread(ailment: Ailment, language: Language = "es"): BookSpread 
         x: RIGHT_COLUMN_X,
         y: SYMPTOMS_HEADING_Y,
         width: RIGHT_COLUMN_WIDTH,
-        content: [language === "es" ? "SÍNTOMAS" : "SYMPTOMS"],
+        content: [language === "es" ? "Síntomas" : "Symptoms"],
       },
       {
         id: `${id}-symptoms`,
@@ -165,7 +165,7 @@ function ailmentSpread(ailment: Ailment, language: Language = "es"): BookSpread 
         x: RIGHT_COLUMN_X,
         y: TREATMENT_HEADING_Y,
         width: RIGHT_COLUMN_WIDTH,
-        content: [language === "es" ? "TRATAMIENTO" : "TREATMENT"],
+        content: [language === "es" ? "Tratamiento" : "Treatment"],
       },
       {
         id: `${id}-treatment`,
@@ -224,7 +224,7 @@ function fullSpread(id: string, src: string, alt: string): BookSpread {
 export const BOOK_SECTIONS: BookSection[] = [
   {
     id: "patients",
-    label: "PACIENTES",
+    label: "Pacientes",
     spreads: [
       placeholderSpread(
         "patients-placeholder",
@@ -235,18 +235,18 @@ export const BOOK_SECTIONS: BookSection[] = [
   },
   {
     id: "ailments",
-    label: "DOLENCIAS",
+    label: "Dolencias",
     spreads: AILMENTS.map(ailment => ailmentSpread(ailment)),
   },
   {
     id: "ingredients",
-    label: "INGREDIENTES",
+    label: "Ingredientes",
     // (Spanish here; buildBookSections picks the language of the game.)
     spreads: ingredientSpreads("es"),
   },
   {
     id: "preparations",
-    label: "PREPARADOS",
+    label: "Preparados",
     spreads: [
       placeholderSpread(
         "preparations-placeholder",

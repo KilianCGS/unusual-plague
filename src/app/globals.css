@@ -233,10 +233,12 @@ main.title-screen.is-black .title-screen-fade {
 
 /* The P: a post with the mask hanging from it. It is taller than the letters
    and its foot goes below the baseline, like the stem of a P. */
+/* The picture has 2 px of margin on every side (art/title-p-fatten.cjs); it is made
+   that much bigger and pulled back with the margins, so the P keeps its old size and place. */
 .title-p {
-  height: 0.7em;
+  height: calc(0.7em * 113 / 109);
   width: auto;
-  margin: 0 0.01em 0.23em 0.02em;
+  margin: 0 -0.0028em 0.2172em 0.0072em;
   image-rendering: pixelated;
   /* -webkit-text-fill is transparent in the title; the image is drawn as is, and
      the title's own drop-shadow gives it the same outline as the letters */
@@ -296,6 +298,7 @@ main.title-screen.is-black .title-screen-fade {
   font-size: clamp(1.2rem, 1.8vw, 1.8rem);
   font-weight: 700;
   letter-spacing: 0.08em;
+  /* white letters with the hard dark outline (Kilian, 2026-11-13: white after all) */
   color: #ffffff;
   text-shadow: 0 2px 0 #1c110c, 2px 0 0 #1c110c, -2px 0 0 #1c110c, 0 -2px 0 #1c110c;
   background:
@@ -326,9 +329,8 @@ main.title-screen.is-black .title-screen-fade {
   position: absolute;
   left: clamp(18px, 2vw, 34px);
   bottom: clamp(20px, 3vh, 34px);
-  padding: 0.5rem 1.3rem 0.6rem;
-  font-size: clamp(0.95rem, 1.2vw, 1.2rem);
-  letter-spacing: 0.06em;
+  /* the same size as the start button (2026-11-13): it shares .begin-button's padding
+     and font size */
 }
 
 /* Narrower windows: the title block takes the width (clear of the languages

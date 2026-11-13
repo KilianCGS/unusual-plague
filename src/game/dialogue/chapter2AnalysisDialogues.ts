@@ -3,7 +3,7 @@ import type { LocalizedConversation } from "./localizedConversation";
 import { doctorThought } from "./doctorThought";
 
 export const farmerAnalysisLabel: Record<Language, string> = {
-  es: "ANALIZAR MUESTRA DEL AGRICULTOR", en: "ANALYZE THE FARMER'S SAMPLE",
+  es: "Analizar muestra del agricultor", en: "Analyze the farmer's sample",
 };
 export const farmerAnalysisResult: LocalizedConversation = {
   id: "chapter2.farmer.analysis", lines: [

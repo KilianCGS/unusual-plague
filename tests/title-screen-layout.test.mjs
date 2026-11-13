@@ -109,8 +109,8 @@ test("start sits right under the subtitle; about is secondary in the lower-left;
   assert.ok(/left:\s*clamp\(/.test(about));
   assert.ok(/bottom:\s*clamp\(/.test(about));
   assert.ok(
-    /font-size:\s*clamp\(0\.95rem/.test(about),
-    "smaller than the start button",
+    !/font-size:/.test(about) && !/padding:/.test(about),
+    "the same size as the start button (it shares .begin-button's font size and padding)",
   );
   const languages = rule(".language-selector");
   assert.ok(/position:\s*absolute/.test(languages));
@@ -165,12 +165,12 @@ test("the behaviour and the texts are the existing ones: same buttons, handlers 
   );
   assert.ok(copy.includes('title: "UNUSUAL PLAGUE"'));
   assert.ok(
-    copy.includes('beginButton: "EMPEZAR"') &&
-      copy.includes('beginButton: "BEGIN"'),
+    copy.includes('beginButton: "Empezar"') &&
+      copy.includes('beginButton: "Begin"'),
   );
   assert.ok(
-    copy.includes('aboutButton: "SOBRE EL JUEGO"') &&
-      copy.includes('aboutButton: "ABOUT THE GAME"'),
+    copy.includes('aboutButton: "Sobre el juego"') &&
+      copy.includes('aboutButton: "About the game"'),
   );
   // the game after the title is untouched by this layout
   assert.ok(

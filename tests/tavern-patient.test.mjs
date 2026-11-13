@@ -244,7 +244,7 @@ test("5-6. examining reveals BOTH recipes through revealsRecipeIds, nothing glob
   assert.ok(texts("en").includes("LIGHT SOUP"));
   assert.ok(texts("en").includes("MILK WITH HONEY"));
   assert.ok(!texts("es").includes("SOPA DE HONGOS"));
-  assert.ok(texts("es").includes(DEF.name.es));
+  assert.ok(texts("es").includes(DEF.name.es.toUpperCase()));
 });
 
 // ------------------------------------------------------------ RECIPES / ITEMS
@@ -584,8 +584,8 @@ test("16a. the farm woman PRESENTS the deal first: ambient before the examinatio
   const empty = talk(FARM, facts("examined"));
   assert.equal(empty.conversation.id, "chapter1.farm.woman.intro");
   assert.deepEqual(lines(empty), [
-    "Necesito algo de leche para un enfermo.",
-    "Puedo darle un poco. Si va hacia los frutales, tráigame una naranja.",
+    "Necesito un poco de leche para un enfermo, si puede ser.",
+    "Puedo darle un poco, claro. Si va hacia los frutales, tráigame una naranja: llevo todo el día soñando con una.",
     "Y necesitará algo donde llevársela.",
   ]);
   const withJar = talk(FARM, facts("examined", [["empty-jar", 1]]));
@@ -598,7 +598,7 @@ test("16a. the farm woman PRESENTS the deal first: ambient before the examinatio
   const en = talk(FARM, facts("examined"), "en");
   assert.equal(
     en.conversation.lines[0].text,
-    "I need some milk for a sick man.",
+    "I need a little milk for a sick man, if possible.",
   );
   assert.equal(
     talk(FARM, facts("examined", [["empty-jar", 1]]), "en").conversation

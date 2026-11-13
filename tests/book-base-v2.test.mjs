@@ -160,8 +160,8 @@ test("one single base for every language and every section: the React text is wh
       [id].spreads.flatMap((x) => x.texts ?? [])
       .map((t) => t.content.join(""))
       .join(" | ");
-  assert.ok(text("es", "patients").includes("MINERO HERIDO"));
-  assert.ok(text("en", "patients").includes("INJURED MINER"));
+  assert.ok(text("es", "patients").includes("Minero herido"));
+  assert.ok(text("en", "patients").includes("The injured miner"));
   assert.ok(text("es", "preparations").includes("Hierba medicinal + Carbón triturado"));
   assert.ok(text("en", "preparations").includes("Medicinal herb + Crushed coal"));
 });

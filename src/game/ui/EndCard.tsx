@@ -10,7 +10,7 @@ import { PIXEL_FONT_FAMILY } from "./pixelFont";
 // title screen (a full reload: nothing is saved).
 const COPY: Record<Language, { end: string; thanks: string; again: string }> = {
   es: { end: "FIN", thanks: "Gracias por jugar.", again: "Volver al inicio" },
-  en: { end: "THE END", thanks: "Thank you for playing.", again: "Back to the start" },
+  en: { end: "The end", thanks: "Thank you for playing.", again: "Back to the start" },
 };
 
 export function EndCard({ language }: { language: Language }) {

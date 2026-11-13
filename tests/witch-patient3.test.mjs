@@ -495,7 +495,7 @@ test("P3 1. the injured miner is there from the start: examined where he sits, w
   assert.deepEqual(first.effects, []);
   const es = lines(first);
   assert.equal(es[0], "Ah... despacio. La pierna.");
-  assert.ok(es.includes("La zona está roja, hinchada y supura. El dolor no ha remitido."));
+  assert.ok(es.includes("Está roja, hinchada y supura, y sigue doliendo. Lo veo, no te preocupes: tiene arreglo."));
   assert.ok(!es.includes("La herida está infectada."), "the examination leaves diagnosis to the player");
   assert.equal(es.at(-1), "Intentaré colaborar.");
   // the same with any state of the other cases, in any order
@@ -662,7 +662,7 @@ test("P3 5. Alcohol: the bartender gives it once the miner is examined, first of
     { type: "claim-reward", rewardId: ch1.BARTENDER_ALCOHOL_REWARD_ID },
   ]);
   const es = lines(alcohol);
-  assert.equal(es[0], "Necesito algo de alcohol. Cuanto más fuerte, mejor.");
+  assert.equal(es[0], "Hola de nuevo. Necesito algo de alcohol, cuanto más fuerte, mejor.");
   assert.equal(es.at(-1), "Nada. Pero si el minero pregunta, era del barato.");
   const done = apply(f, alcohol);
   assert.equal(count(done, "alcohol"), 1);
@@ -712,7 +712,7 @@ test("P3 6. Coal: the Mountain Path miner is only ambient until the case is exam
   ]);
   assert.equal(
     lines(coal)[0],
-    "Tu compañero de la mina se ha hecho una herida bastante fea.",
+    "Tu compañero de la mina se ha hecho una herida bastante fea, pero tiene arreglo.",
   );
   const done = apply(f, coal);
   assert.equal(count(done, "coal"), 1);
@@ -757,7 +757,7 @@ test("P3 7. treatment: both preparations or nothing, consumed together, once; th
   assert.deepEqual(cure.effects, [{ type: "treat", patientId: P3 }]);
   assert.equal(
     lines(cure)[0],
-    "Voy a limpiar la herida primero. Esto va a escocer.",
+    "Voy a limpiar primero la herida. Te aviso: va a escocer un poco.",
   );
   const treated = apply(both, cure);
   assert.equal(pc.getPatientStatus(treated.patients, P3), "treated");

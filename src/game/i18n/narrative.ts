@@ -7,6 +7,6 @@ type NarrativeCopy = {
 };
 
 export const narrativeCopy: Record<Language, NarrativeCopy> = {
-  es: { continue: "ESPACIO — Continuar", skip: "ESC — Saltar" },
-  en: { continue: "SPACE — Continue", skip: "ESC — Skip" },
+  es: { continue: "Espacio — Continuar", skip: "Esc — Saltar" },
+  en: { continue: "Space — Continue", skip: "Esc — Skip" },
 };

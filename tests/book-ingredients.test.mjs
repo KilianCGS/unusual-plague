@@ -208,12 +208,12 @@ test("the other tabs and the tutorial Book are untouched", () => {
   );
   assert.deepEqual(
     es.map((s) => s.label),
-    ["PACIENTES", "DOLENCIAS", "INGREDIENTES", "PREPARADOS"],
+    ["Pacientes", "Dolencias", "Ingredientes", "Preparados"],
   );
   const en = buildBookSections(context("en"));
   assert.deepEqual(
     en.map((s) => s.label),
-    ["PATIENTS", "AILMENTS", "INGREDIENTS", "REMEDIES"],
+    ["Patients", "Ailments", "Ingredients", "Remedies"],
   );
   // PACIENTES and PREPARADOS stay text pages built from the game state;
   // DOLENCIAS keeps its two layers, with smooth ink illustrations on parchment.

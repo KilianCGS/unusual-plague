@@ -69,7 +69,7 @@ import {
   formatObtainedNotice,
   itemFeedbackCopy,
 } from "../i18n/items";
-import { tutorialContinueCopy, tutorialCopy } from "../i18n/tutorial";
+import { tutorialContinueCopy, tutorialCopy, tutorialExitBlockedCopy } from "../i18n/tutorial";
 import type { Language } from "../i18n/types";
 import {
   addItem,
@@ -113,7 +113,7 @@ import { getLockedDoorNotice } from "./lockedDoors";
 import { FLOUR_SACK_MARK, shouldMarkFlourSack } from "../dialogue/chapter2Supplies";
 import { NARRATIVE_ILLUSTRATIONS } from "../narrative/illustrations";
 import { TutorialHint } from "../tutorial/TutorialHint";
-import { ACK_STEPS, isTutorialHudUnlocked } from "../tutorial/tutorialFlow";
+import { ACK_STEPS, isRoomExitBlocked, isTutorialHudUnlocked } from "../tutorial/tutorialFlow";
 import { useTutorial } from "../tutorial/useTutorial";
 import { fastTravelCopy } from "../i18n/fastTravel";
 import { FastTravelButton, TravelCaption } from "../ui/FastTravelButton";
@@ -878,6 +878,13 @@ export function GameWorld({
       );
 
       if (exit) {
+        // The way out of the Doctor's room: shut until the tutorial allows it.
+        if (world.sceneId === "doctor-room" && isRoomExitBlocked(tutorial.step)) {
+          const lines = tutorialExitBlockedCopy[language];
+          const text = lines[Math.floor(Math.random() * lines.length)];
+          setPickupBark((current) => ({ id: (current?.id ?? 0) + 1, text }));
+          return;
+        }
         // A shut door (the Witch's house): a short notice, no transition.
         const locked = getLockedDoorNotice(world.sceneId, exit.targetScene, chapterId, language);
         if (locked) {
@@ -902,7 +909,7 @@ export function GameWorld({
         );
       }
     },
-    [world.sceneId, chapterId, language, claimFlag, startTransition, showNotice],
+    [world.sceneId, chapterId, language, claimFlag, startTransition, showNotice, tutorial.step],
   );
 
   // The closing is ONE sequence: the narrative interlude over the supper

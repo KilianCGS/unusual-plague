@@ -47,6 +47,40 @@ como en las referencias:
 6. **strong-broth.png: Caldo fuerte.** Olla pequeña de hierro con vapor y una cuchara de madera;
    al lado hueso, cebolla y una seta.
 
+## Ingredientes nuevos: una página doble más (5.ª del apartado Ingredientes)
+
+Hoy el apartado Ingredientes tiene 4 páginas dobles pintadas (4 objetos cada una, con el texto
+incluido en la imagen, en español y en inglés). Faltan los ingredientes añadidos después:
+**Hueso, Seta de pino, Azúcar y Cebolla**. Una quinta página doble con los cuatro.
+
+- Archivos: `public/game/ui/book/ingredients/es/ingredients-05.png` y `.../en/ingredients-05.png`.
+- Tamaño: **1678x937**, igual que `ingredients-01.png`..`04.png` (pegar de referencia al menos
+  `ingredients-03.png` y `ingredients-04.png`, una en español y otra en inglés).
+- Composición: la misma que las otras páginas dobles: libro abierto sobre pergamino, dos objetos por
+  página (cuatro en total), cada uno con su dibujo a tinta sepia con toques de color suave, el nombre
+  en caligrafía manuscrita grande y debajo una descripción de dos líneas.
+- Texto exacto a incluir (revisable, es texto nuevo):
+
+| Objeto | Español | Inglés |
+|---|---|---|
+| Hueso | **Hueso** · Hueso limpio de carne. Con él se cuecen caldos de verdadera sustancia. | **Bone** · A bone picked clean. Broths of real substance are cooked with it. |
+| Seta de pino | **Seta de pino** · Seta carnosa y aromática del pinar. Da cuerpo a sopas y cremas. | **Pine mushroom** · A fleshy, fragrant mushroom of the pinewood. It gives body to soups and creams. |
+| Azúcar | **Azúcar** · Cristales dulces que endulzan y conservan. Base de jarabes. | **Sugar** · Sweet crystals that sweeten and preserve. The base of syrups. |
+| Cebolla | **Cebolla** · Bulbo de sabor fuerte. Cocida con azúcar da un jarabe para la tos. | **Onion** · A strong-flavoured bulb. Cooked with sugar it makes a cough syrup. |
+
+Después de instalarlas hay que subir el contador de páginas a 5 y añadir los textos alternativos
+(lo hace Claude: `INGREDIENT_SPREAD_COUNT` en `src/game/book/bookPages.ts`, `ingredientSpreadAlts` en
+`src/game/i18n/book.ts` y los tests). **No es necesario ahora**: hasta que existan, el libro sigue
+con 4 páginas.
+
+La **pluma negra** de la bruja queda fuera del libro a propósito (es un objeto de la historia, no de
+una receta); si quieres que tenga página, dímelo y la añado como 6.ª.
+
+## Iconos de objetos (por si los quieres hacer también)
+
+Los iconos del inventario son de 48x48 px (arte de píxel); los nuevos ya los tiene el juego
+(generados antes con PixelLab). No hace falta nada de Codex para ellos.
+
 ## Recordatorio
 
 - Los grabados que entregue Codex hay que revisarlos contra las referencias (misma línea).

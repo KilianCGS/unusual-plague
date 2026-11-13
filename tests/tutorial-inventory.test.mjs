@@ -292,3 +292,17 @@ test("each inventory is independent (no shared slots array)", () => {
 });
 
 console.log(`\n${passed} tests passed`);
+
+// The way out of the Doctor's room is shut until the tutorial reaches "go down to the Botica".
+{
+  const flow = at("src/game/tutorial/tutorialFlow.ts");
+  for (const step of ["intro", "goal", "book", "book-cover", "book-page", "book-preparations", "book-ailments", "book-patients", "book-close", "map", "move", "chest-approach", "chest-interact", "take-flask", "bar"]) {
+    assert.equal(flow.isRoomExitBlocked(step), true, step);
+  }
+  for (const step of ["exit-room", "botica", "exit-botica", "run", "done"]) {
+    assert.equal(flow.isRoomExitBlocked(step), false, step);
+  }
+  const game = fs.readFileSync(path.resolve(root, "src/game/world/GameWorld.tsx"), "utf8");
+  assert.ok(game.includes('world.sceneId === "doctor-room" && isRoomExitBlocked(tutorial.step)'));
+  console.log("ok - the room exit is blocked until the 'exit-room' step");
+}
