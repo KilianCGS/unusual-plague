@@ -1,6 +1,7 @@
 import type { Language } from "../i18n/types";
 import { chapter1AmbientDialogues } from "./chapter1Dialogues";
 import { chapter2AmbientDialogues } from "./chapter2AmbientDialogues";
+import { ambientForChapter } from "./chapter34AmbientDialogues";
 import { environmentDialogues } from "./environmentDialogues";
 import { chapter1Intro } from "./chapter1Intro";
 import { DOCTOR_SPEAKER, type Conversation } from "./dialogueTypes";
@@ -36,8 +37,12 @@ export function resolveInteractionConversation(
   interactionId: string,
   language: Language,
   subjectId: string,
+  chapterId?: string,
 ): Conversation | null {
-  const conversation = CONVERSATIONS[interactionId];
+  // Days 3 and 4: the people say their own lines instead of the Day 2 ones they inherit.
+  const conversation =
+    (chapterId ? ambientForChapter(chapterId, interactionId) : undefined) ??
+    CONVERSATIONS[interactionId];
 
   return conversation
     ? localizeConversation(conversation, language, subjectId)

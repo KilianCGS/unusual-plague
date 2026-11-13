@@ -1,6 +1,6 @@
 # Textos ambientales de los días 3 y 4: borradores para revisar
 
-Todo es texto NUEVO, sin aplicar al juego. Hoy los días 3 y 4 heredan las conversaciones sueltas del
+**APLICADO el 13-nov** (src/game/dialogue/chapter34AmbientDialogues.ts; solo se muestran donde no hay una historia pendiente con esa persona). Todo es texto NUEVO pendiente de tu revisión. Hoy los días 3 y 4 heredan las conversaciones sueltas del
 día 2. La idea: en el día 3 la gente empieza a estar "en otra parte" (mira algo pequeño entre las
 manos, contesta tarde), pero sin decir nunca qué es (el día 4 lo nombra con la bruja). En el día 4
 (de noche) hay pocas personas despejadas: las demás son las de los "artefactos", que ya tienen su

@@ -843,13 +843,14 @@ export function GameWorld({
         interactionId,
         language,
         source.instanceId ?? "",
+        chapterId,
       );
 
       if (conversation) {
         startDialogue(conversation);
       }
     },
-    [language, startDialogue, applyStoryEffects, showNotice, rememberRecipes],
+    [language, chapterId, startDialogue, applyStoryEffects, showNotice, rememberRecipes],
   );
 
   // The notice only needs to disappear after a while.

@@ -243,6 +243,7 @@ export function useProtagonistController({
             running,
             frameCount,
             walkFrameDuration,
+            activeDirection,
           );
           const currentFrame =
             previousFrameCount === frameCount

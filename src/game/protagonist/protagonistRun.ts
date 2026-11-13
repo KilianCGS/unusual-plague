@@ -11,6 +11,8 @@ export const PROTAGONIST_WALK_FRAME_DURATION = 120;
 // per leg): 8 x 60 ms = 480 ms, the same cadence as the 4 x 120 ms walk.
 export const PROTAGONIST_RUN_FRAME_DURATION = 60;
 export const PROTAGONIST_RUN_FRAME_COUNT = 8;
+// 12 frames x 60 ms = 720 ms a stride: a lighter, less hurried run to the north.
+export const PROTAGONIST_RUN_NORTH_FRAME_DURATION = 60;
 
 // Not every direction has the same number of frames: the sideways steps and the
 // run to the east and north got more frames so they read smoother. West walks
@@ -43,8 +45,15 @@ export function getFrameDuration(
   running: boolean,
   frameCount: number,
   walkFrameDuration: number = PROTAGONIST_WALK_FRAME_DURATION,
+  direction?: Direction,
 ): number {
   if (running) {
+    // The 12-frame run to the north (2026-11-13) read as hurried next to the south one: its
+    // frames last longer, so the whole cycle is ~720 ms (the south run is 480 ms).
+    if (direction === "north" && frameCount > PROTAGONIST_RUN_FRAME_COUNT) {
+      return PROTAGONIST_RUN_NORTH_FRAME_DURATION;
+    }
+
     return frameCount > PROTAGONIST_RUN_FRAME_COUNT
       ? Math.round((PROTAGONIST_RUN_FRAME_DURATION * 3) / 4)
       : PROTAGONIST_RUN_FRAME_DURATION;
@@ -121,7 +130,7 @@ export function preloadRunSprites() {
 // sideways walk and the run to the north read as a slide; a rise and fall twice per
 // cycle (lowest at each foot contact, highest as the legs pass) gives them a gait.
 // Returns the offset in logical pixels (negative = up).
-const BOB_AMPLITUDE = { walk: 1.1, run: 1.6 } as const;
+const BOB_AMPLITUDE = { walk: 1.1, run: 1.6, runNorth: 1.0 } as const;
 
 export function getMovementBob(
   direction: Direction,
@@ -132,6 +141,10 @@ export function getMovementBob(
   if (!isWalking && !isRunning) return 0;
   const frameCount = isRunning ? getRunFrameCount(direction) : getWalkFrameCount(direction);
   const phase = (frame % frameCount) / frameCount;
-  const amplitude = isRunning ? BOB_AMPLITUDE.run : BOB_AMPLITUDE.walk;
+  const amplitude = isRunning
+    ? direction === "north"
+      ? BOB_AMPLITUDE.runNorth
+      : BOB_AMPLITUDE.run
+    : BOB_AMPLITUDE.walk;
   return -amplitude * Math.abs(Math.sin(2 * Math.PI * phase));
 }
