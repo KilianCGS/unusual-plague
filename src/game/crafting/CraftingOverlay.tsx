@@ -72,6 +72,7 @@ export function CraftingOverlay({
   activeTreatments,
   onOpenMortar,
   onBackToTable,
+  onCookingChange,
 }: {
   station: CraftStation;
   inventory: InventoryState;
@@ -90,6 +91,8 @@ export function CraftingOverlay({
   // The mortar button of the work table, and the way back from the mortar.
   onOpenMortar?: () => void;
   onBackToTable?: () => void;
+  // Tells the scene behind that the kitchen is cooking (steam and a livelier fire).
+  onCookingChange?: (cooking: boolean) => void;
 }) {
   const copy = craftingCopy[language];
   const [selection, setSelection] = useState<CraftSelection>(() =>
@@ -107,6 +110,13 @@ export function CraftingOverlay({
 
   // Esc: closes the success modal first, otherwise the station. Space closes
   // the modal. (Q and TAB are blocked by the owner while this is open.)
+  // The scene behind shows steam while the pot works (and always stops when this closes).
+  const isPreparing = preparing !== null;
+  useEffect(() => {
+    onCookingChange?.(isPreparing);
+    return () => onCookingChange?.(false);
+  }, [isPreparing, onCookingChange]);
+
   // The wait is over: the stock changes and the success modal shows.
   useEffect(() => {
     if (!preparing) return;
@@ -205,7 +215,7 @@ export function CraftingOverlay({
   if (preparing) {
     return (
       <div
-        className={styles.backdrop}
+        className={`${styles.backdrop} ${styles.backdropPreparing}`}
         style={{ ["--ui-font" as string]: PIXEL_FONT_FAMILY } as CSSProperties}
         data-crafting-preparing
       >

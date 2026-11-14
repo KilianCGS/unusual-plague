@@ -10,7 +10,7 @@ import { InteractionPrompt } from "../interactions/InteractionPrompt";
 import { getSceneInteractionZones } from "../interactions/sceneInteractions";
 import { useInteraction } from "../interactions/useInteraction";
 import { apothecaryMainZoneColliders } from "./apothecaryMainZoneGeometry";
-import { BOTICA_STATION_POINTERS, BOTICA_STATION_RINGS } from "./tutorialPointers";
+import { BOTICA_POT_STEAM, BOTICA_STATION_POINTERS, BOTICA_STATION_RINGS, BOTICA_STOVE_FIRE } from "./tutorialPointers";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { INDOOR_SPEED_FACTOR } from "../world/worldNoRun";
 import {
@@ -87,6 +87,7 @@ export function ApothecaryScene({
   promptLabelFor,
   onRunBlocked,
   highlightInteractionIds,
+  cooking = false,
   backgroundSrc,
 }: {
   spawn?: { x: number; y: number; direction: Direction };
@@ -112,6 +113,8 @@ export function ApothecaryScene({
   // Interactions to point at with a bobbing arrow (the tutorial's crafting tour).
   // The arrow sits above the middle of each interaction zone; it never takes input.
   highlightInteractionIds?: readonly string[];
+  // The kitchen is cooking: steam over the pot and a livelier fire.
+  cooking?: boolean;
   // A different painting for the room (its night version on Day 4); default = the day one.
   backgroundSrc?: string;
 }) {
@@ -226,6 +229,17 @@ export function ApothecaryScene({
               // Y (candle flames on shelves) is drawn behind him
               zIndex={Math.round(player.y)}
             />
+            {cooking ? (
+              <>
+                <span className={styles.fireGlow} style={{ left: BOTICA_STOVE_FIRE.x, top: BOTICA_STOVE_FIRE.y }} aria-hidden data-kitchen-fire />
+                <span className={styles.steam} style={{ left: BOTICA_POT_STEAM.x, top: BOTICA_POT_STEAM.y }} aria-hidden data-kitchen-steam>
+                  <i className={`${styles.puff} ${styles.puffA}`} />
+                  <i className={`${styles.puff} ${styles.puffB}`} />
+                  <i className={`${styles.puff} ${styles.puffC}`} />
+                  <i className={`${styles.puff} ${styles.puffD}`} />
+                </span>
+              </>
+            ) : null}
             {Object.entries(BOTICA_STATION_RINGS).map(([interactionId, ring]) => (
               <span
                 key={`${interactionId}-ring`}

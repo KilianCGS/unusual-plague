@@ -14,3 +14,8 @@ export const BOTICA_STATION_RINGS: Readonly<Record<string, { x: number; y: numbe
   "craft.manual": { x: 136, y: 136, width: 32, height: 16 },
   "craft.fire": { x: 365, y: 124, width: 36, height: 16 },
 };
+
+// While the kitchen cooks: where the steam leaves the cauldron and where the stove fire burns
+// (logical units, read from the painting like the arrows: the cauldron's rim and the oven mouth).
+export const BOTICA_POT_STEAM = { x: 364, y: 68 };
+export const BOTICA_STOVE_FIRE = { x: 362, y: 103 };

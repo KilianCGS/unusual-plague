@@ -261,6 +261,17 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "At this hour they still sing. Later on, they argue.",
       ),
     ]),
+    conversation("chapter1.quarry.backMan", [
+      subject(
+        "No se vuelva, doctor. Estoy mirando cómo parten la piedra y me da vergüenza que se note.",
+        "Don't turn me around, doctor. I'm watching them split the stone and I'd hate for it to show.",
+      ),
+      doctor("¿Mirar trabajar a otros es un oficio?", "Is watching others work a trade?"),
+      subject(
+        "Es el único que llevo bien. Y ellos trabajan más contentos con público.",
+        "It's the only one I'm good at. And they work happier with an audience.",
+      ),
+    ]),
     conversation("chapter1.tavernStreet.man", [
       subject(
         "Dicen que beber solo trae problemas.",

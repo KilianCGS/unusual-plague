@@ -152,3 +152,92 @@
     opacity: 0.7;
   }
 }
+
+/* Cooking: a warm flickering glow on the oven mouth and pale pixel puffs rising from the pot. */
+.fireGlow {
+  position: absolute;
+  z-index: 2;
+  width: 40px;
+  height: 22px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 190, 90, 0.75) 0%, rgba(255, 130, 40, 0.3) 55%, rgba(255, 110, 30, 0) 100%);
+  pointer-events: none;
+  animation: fire-flicker 0.5s steps(2) infinite;
+}
+
+@keyframes fire-flicker {
+  0% {
+    opacity: 0.65;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.12);
+  }
+  100% {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+}
+
+.steam {
+  position: absolute;
+  z-index: 9000;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.puff {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: rgba(245, 245, 240, 0.85);
+  box-shadow: 2px 0 0 rgba(245, 245, 240, 0.6), -2px 0 0 rgba(245, 245, 240, 0.6), 0 -2px 0 rgba(245, 245, 240, 0.6);
+  opacity: 0;
+  animation: puff-rise 2s linear infinite;
+}
+
+.puffA {
+  left: -8px;
+}
+
+.puffB {
+  left: 0;
+  animation-delay: 0.5s;
+}
+
+.puffC {
+  left: 7px;
+  animation-delay: 1s;
+}
+
+.puffD {
+  left: -3px;
+  animation-delay: 1.5s;
+}
+
+@keyframes puff-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(4px, -26px) scale(1.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fireGlow,
+  .puff {
+    animation: none;
+  }
+  .puff {
+    opacity: 0.6;
+  }
+}

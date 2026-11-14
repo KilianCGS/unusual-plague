@@ -242,6 +242,8 @@ export function GameWorld({
   // The Apothecary storage chest interface (another main interface).
   const [storageOpen, setStorageOpen] = useState(false);
   // The crafting station being used (null = none). Another main interface.
+  // The kitchen is cooking (the Botica draws steam over the pot).
+  const [cooking, setCooking] = useState(false);
   const [craftingStation, setCraftingStation] = useState<CraftStation | null>(
     null,
   );
@@ -1585,6 +1587,7 @@ export function GameWorld({
           highlightInteractionIds={
             tutorial.step === "botica" ? CRAFT_STATION_INTERACTIONS : undefined
           }
+          cooking={cooking}
         />
       ) : (
         <ExteriorScene
@@ -1648,6 +1651,7 @@ export function GameWorld({
           activeTreatments={activeTreatments}
           onOpenMortar={() => setCraftingStation("mortar")}
           onBackToTable={() => setCraftingStation("manual")}
+          onCookingChange={setCooking}
           onInventoryChange={(next) => {
             inventoryRef.current = next;
             setInventory(next);
