@@ -768,7 +768,7 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
     // Silhouette of frame 0 (x24-65 y15-81 of the 96x96 frame).
     defaultCollider: { offsetX: -24, offsetY: -81, width: 42, height: 67 },
-  },
+  },
   {
     id: "stonecutter-bench-back",
     label: "Stonecutter seen from behind (on a bench)",
@@ -786,7 +786,26 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
     // Silhouette of frame 0 (x27-63 y43-79 of the 96x96 frame).
     defaultCollider: { offsetX: -21, offsetY: -53, width: 37, height: 37 },
-  },
+  },
+  {
+    id: "villager-back-man-seated",
+    label: "Villager man seen from behind, seated (waist and one knee)",
+    category: "people",
+    sprite: {
+      // 2026-11-14 (PixelLab: stonecutter-bench-back re-dressed like villager-back-man, plus a knee
+      // at his left side, then animated). Sits on a bench seen from behind: the bench hides the rest.
+      // Eight pictures of a slow breath, first = last, so the loop has no jump.
+      frames: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `/game/npcs/villager-back-man-seated/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Silhouette of frame 0 (x24-62 y43-79 of the 96x96 frame).
+    defaultCollider: { offsetX: -24, offsetY: -53, width: 39, height: 37 },
+  },
   {
     id: "stonecutter-shovel",
     label: "Stonecutter leaning on a shovel",
@@ -804,7 +823,7 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
     // Silhouette of frame 0 (x26-60 y9-83 of the 96x96 frame).
     defaultCollider: { offsetX: -22, offsetY: -87, width: 35, height: 75 },
-  },
+  },
   {
     id: "woman-dusting",
     label: "Woman dusting (feather duster, cloth over her mouth)",
@@ -822,7 +841,7 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
     // Silhouette of frame 0 (x22-61 y10-86 of the 96x96 frame).
     defaultCollider: { offsetX: -26, offsetY: -86, width: 40, height: 77 },
-  },
+  },
   {
     id: "priest-praying",
     label: "Priest praying",
@@ -840,7 +859,7 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
     // Silhouette of frame 0 (x32-57 y16-83 of the 96x96 frame).
     defaultCollider: { offsetX: -16, offsetY: -80, width: 26, height: 68 },
-  },
+  },
   {
     id: "villager-back-man",
     label: "Villager man from behind",
@@ -858,7 +877,7 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
     // Silhouette of frame 0 (x33-59 y16-82 of the 96x96 frame).
     defaultCollider: { offsetX: -15, offsetY: -80, width: 27, height: 67 },
-  },
+  },
   {
     id: "villager-back-woman",
     label: "Villager woman from behind",
@@ -876,7 +895,7 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
     // Silhouette of frame 0 (x33-58 y20-82 of the 96x96 frame).
     defaultCollider: { offsetX: -15, offsetY: -76, width: 26, height: 63 },
-  },
+  },
   {
     id: "villager-back-old",
     label: "Old villager from behind",
