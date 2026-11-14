@@ -569,3 +569,58 @@
     animation: none;
   }
 }
+
+/* The kitchen wait: the interface closes into a small plate with a filling bar. */
+.preparing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  min-width: min(440px, 86vw);
+  padding: 34px 40px 28px;
+  background: #e9dbb9;
+  color: #2b1a14;
+  box-shadow:
+    inset 0 0 0 3px #5a3a1f,
+    inset 0 0 0 5px #d9a441,
+    inset 0 0 0 8px #e9dbb9;
+}
+
+.preparingText {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+}
+
+.preparingHint {
+  margin: 0;
+  font-size: 14px;
+  color: #7a6246;
+}
+
+.barTrack {
+  width: 100%;
+  height: 22px;
+  padding: 3px;
+  background: #3b2a1c;
+  border: 3px solid #1c110c;
+  box-sizing: border-box;
+}
+
+.barFill {
+  width: 100%;
+  height: 100%;
+  background: #d9a441;
+  box-shadow: inset 0 3px 0 #ffe9a8, inset 0 -3px 0 #a8741c;
+  transform-origin: left center;
+  animation: craft-fill linear both;
+}
+
+@keyframes craft-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

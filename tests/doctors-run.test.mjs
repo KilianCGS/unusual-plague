@@ -528,10 +528,10 @@ test("run barks: 15 phrases in both languages, in the specified order", () => {
   assert.equal(runBarkLines.en.length, 15);
   assert.equal(
     runBarkLines.es[0],
-    "Creo que hoy ya he hecho bastante ejercicio.",
+    "Mi médico me recomendó ejercicio. Mi médico soy yo, y me ignoro.",
   );
-  assert.equal(runBarkLines.es[11], "Soy médico. No atleta.");
-  assert.equal(runBarkLines.es[14], "Insisto: caminar sigue disponible.");
+  assert.equal(runBarkLines.es[11], "Soy médico, no gacela. Que conste en el expediente.");
+  assert.equal(runBarkLines.es[14], "Insisto: caminar sigue disponible, y es gratis.");
   for (const lang of ["es", "en"]) {
     assert.equal(new Set(runBarkLines[lang]).size, 15);
     assert.ok(runBarkLines[lang].every((line) => line.trim().length > 0));

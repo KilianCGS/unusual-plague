@@ -10,7 +10,7 @@ import { InteractionPrompt } from "../interactions/InteractionPrompt";
 import { getSceneInteractionZones } from "../interactions/sceneInteractions";
 import { useInteraction } from "../interactions/useInteraction";
 import { apothecaryMainZoneColliders } from "./apothecaryMainZoneGeometry";
-import { BOTICA_STATION_POINTERS } from "./tutorialPointers";
+import { BOTICA_STATION_POINTERS, BOTICA_STATION_RINGS } from "./tutorialPointers";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { INDOOR_SPEED_FACTOR } from "../world/worldNoRun";
 import {
@@ -18,6 +18,9 @@ import {
   PROTAGONIST_WALK_SPEED,
 } from "../protagonist/protagonistRun";
 import { DOCTOR_SCALE } from "../protagonist/doctorScale";
+
+// Inside the Botica he looked huge next to the furniture: 15% smaller here only.
+const BOTICA_DOCTOR_SCALE = 0.85;
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
 import { getMovementBob } from "../protagonist/protagonistRun";
 import { useReportRunning } from "../protagonist/useReportRunning";
@@ -187,7 +190,7 @@ export function ApothecaryScene({
       ? {
           x: Math.round(player.x * sceneScale),
           y: Math.round(
-            (player.y - (spriteSize - SPEAKER_TOP_PADDING) * DOCTOR_SCALE) *
+            (player.y - (spriteSize - SPEAKER_TOP_PADDING) * DOCTOR_SCALE * BOTICA_DOCTOR_SCALE) *
               sceneScale,
           ),
         }
@@ -214,6 +217,7 @@ export function ApothecaryScene({
               y={player.y}
               spriteSrc={currentSpriteSrc}
               spriteSize={spriteSize}
+              scale={BOTICA_DOCTOR_SCALE}
               direction={player.direction}
               isWalking={player.isWalking}
               mirrored={spriteMirrored}
@@ -222,15 +226,34 @@ export function ApothecaryScene({
               // Y (candle flames on shelves) is drawn behind him
               zIndex={Math.round(player.y)}
             />
+            {Object.entries(BOTICA_STATION_RINGS).map(([interactionId, ring]) => (
+              <span
+                key={`${interactionId}-ring`}
+                className={styles.ring}
+                data-station-ring={interactionId}
+                aria-hidden
+                style={{ left: ring.x, top: ring.y, width: ring.width, height: ring.height }}
+              >
+                <i className={`${styles.mote} ${styles.moteA}`} />
+                <i className={`${styles.mote} ${styles.moteB}`} />
+                <i className={`${styles.mote} ${styles.moteC}`} />
+                <i className={`${styles.mote} ${styles.moteD}`} />
+                <i className={`${styles.mote} ${styles.moteE}`} />
+              </span>
+            ))}
             {(highlightInteractionIds ?? []).flatMap((interactionId) => {
               const at = BOTICA_STATION_POINTERS[interactionId];
               return at
                 ? [
-                    <span
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
                       key={interactionId}
+                      src="/game/ui/tutorial/wood-arrow.png"
+                      alt=""
                       className={styles.pointer}
                       data-tutorial-pointer={interactionId}
                       aria-hidden
+                      draggable={false}
                       style={{ left: at.x, top: at.y }}
                     />,
                   ]
@@ -291,7 +314,7 @@ export function ApothecaryScene({
               feetX={player.x}
               feetY={player.y}
               spriteSize={spriteSize}
-              spriteScale={1}
+              spriteScale={BOTICA_DOCTOR_SCALE}
               label={promptLabelFor?.(availableInteraction.interactionId)}
               zoom={sceneScale}
               cameraOffsetX={0}

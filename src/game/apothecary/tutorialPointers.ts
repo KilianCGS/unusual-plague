@@ -6,3 +6,11 @@ export const BOTICA_STATION_POINTERS: Readonly<Record<string, { x: number; y: nu
   "craft.manual": { x: 87, y: 84 },
   "craft.fire": { x: 363, y: 74 },
 };
+
+// The white ovals on the floor where the Doctor stands to use each station (centre and size in
+// logical units). Read from the ovals Kilian drew on a screenshot, checked against the hand-drawn
+// interaction zones: the stove zone (x323-415, y116-127) and the table zone (x115-134, y98-168).
+export const BOTICA_STATION_RINGS: Readonly<Record<string, { x: number; y: number; width: number; height: number }>> = {
+  "craft.manual": { x: 136, y: 136, width: 32, height: 16 },
+  "craft.fire": { x: 365, y: 124, width: 36, height: 16 },
+};

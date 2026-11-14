@@ -64,10 +64,12 @@ export function TutorialHint({
 
   const [revealed, setRevealed] = useState(0);
   useEffect(() => {
+    // With "reduce motion" on (Windows: animations off) it still writes itself, only faster:
+    // an instant note looked like it had not been animated at all.
     const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     const id = window.setInterval(
-      () => setRevealed((current) => (reduced ? total : Math.min(total, current + 1))),
-      reduced ? 0 : REVEAL_MS,
+      () => setRevealed((current) => Math.min(total, current + 1)),
+      reduced ? REVEAL_MS / 2 : REVEAL_MS,
     );
     return () => window.clearInterval(id);
   }, [total]);
@@ -128,8 +130,10 @@ export function TutorialHint({
       role="status"
     >
       <div className={styles.inner}>
-        <span className={styles.studTop} aria-hidden />
-        <span className={styles.studBottom} aria-hidden />
+        <span className={`${styles.corner} ${styles.cornerTl}`} aria-hidden />
+        <span className={`${styles.corner} ${styles.cornerTr}`} aria-hidden />
+        <span className={`${styles.corner} ${styles.cornerBl}`} aria-hidden />
+        <span className={`${styles.corner} ${styles.cornerBr}`} aria-hidden />
         <p className={styles.title}>{titleNodes}</p>
         <span className={styles.rule} aria-hidden />
         {bodyNodes}

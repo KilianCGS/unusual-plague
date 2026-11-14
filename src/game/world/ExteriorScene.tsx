@@ -16,6 +16,7 @@ import { getChapterInteractions, getComposition } from "../compositions";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { AttentionMark } from "../ui/AttentionMark";
 import { PickupAura } from "../ui/PickupAura";
+import { environmentGlowsByScene } from "../interactions/environmentGlows";
 import { DecorSprite } from "../decor/DecorSprite";
 import { DOCTOR_NARRATIVE_ASSET_ID } from "../decor/decorAssets";
 import { resolveDecorInstances } from "../decor/decorRuntime";
@@ -397,6 +398,9 @@ export function ExteriorScene({
               />
             );
           })}
+          {(environmentGlowsByScene[scene.id] ?? []).map((glow) => (
+            <PickupAura key={glow.id} x={glow.x} y={glow.y} width={glow.width} height={glow.height} zIndex={Math.round(glow.y) - 1} />
+          ))}
           {attentionPoints?.map((point) => (
             <AttentionMark key={point.id} x={point.x} y={point.y} zIndex={Math.round(point.y) + 1000} />
           ))}

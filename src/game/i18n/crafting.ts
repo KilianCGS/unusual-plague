@@ -25,6 +25,9 @@ type CraftingCopy = {
   // Success modal: the heading, then the localized item name.
   created: string;
   closeModal: string;
+  // The wait of the kitchen: the bar's text and how to cancel it.
+  preparing: string;
+  preparingHint: string;
 };
 
 export const craftingCopy: Record<Language, CraftingCopy> = {
@@ -40,6 +43,8 @@ export const craftingCopy: Record<Language, CraftingCopy> = {
     neededElsewhere: "(Eso me hace falta para otra cosa.)",
     mortar: { label: "Triturar", back: "← Mesa", ingredient: "Ingrediente" },
     limitReached: "Ya no caben más ingredientes.",
+    preparing: "Preparando...",
+    preparingHint: "Esc para cancelar",
     created: "Has preparado",
     closeModal: "Cerrar",
   },
@@ -55,6 +60,8 @@ export const craftingCopy: Record<Language, CraftingCopy> = {
     neededElsewhere: "(I need that for something else.)",
     mortar: { label: "Grind", back: "← Table", ingredient: "Ingredient" },
     limitReached: "No more ingredients fit.",
+    preparing: "Preparing...",
+    preparingHint: "Esc to cancel",
     created: "Prepared",
     closeModal: "Close",
   },

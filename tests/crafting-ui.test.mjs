@@ -158,11 +158,14 @@ test("the inventory is drawn from the real state: a different stock shows differ
   assert.equal(count(markup, "data-slot-tooltip"), 1);
 });
 
-test("source: derived quantities, limit feedback, no-space feedback and no timers", () => {
+test("source: derived quantities, limit feedback, no-space feedback and only the kitchen wait", () => {
   const source = read("src/game/crafting/CraftingOverlay.tsx");
   // the numbers are the real stock minus the selection (never a mutation)
   assert.ok(source.includes("availableUnits(inventory, selection"));
-  assert.ok(!/setTimeout|setInterval/.test(source));
+  // the only wait is the kitchen's "Preparing..." bar (5 s), nothing else is timed
+  assert.ok(!/setInterval/.test(source));
+  assert.equal((source.match(/setTimeout/g) ?? []).length, 1);
+  assert.ok(source.includes("{ fire: 5000 }"));
   // the three feedback lines, picked from the result of combine()
   assert.ok(
     source.includes("copy.noRecipe") && source.includes("copy.noSpace"),
@@ -176,7 +179,7 @@ test("source: derived quantities, limit feedback, no-space feedback and no timer
   // crafting never reads which recipes the Doctor knows
   assert.ok(!/knownRecipe/.test(source.replace(/\/\/.*$/gm, "")));
   // the result goes through the same inventory callback, once, on success only
-  assert.equal(count(source, "onInventoryChange("), 1);
+  assert.equal(count(source, "onInventoryChange("), 2); // at once, or when the kitchen wait ends
 });
 
 test("source: the hover label is the shared one (no copy of it in Crafting)", () => {

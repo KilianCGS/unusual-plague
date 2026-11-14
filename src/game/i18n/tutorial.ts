@@ -93,6 +93,10 @@ export const tutorialCopy: Record<
       title: ["Tu inventario y tu dinero."],
       body: "La barra de abajo es lo que llevas encima: tiene pocas casillas, así que elige bien.\nLas monedas, abajo a la derecha, sirven para comprar ingredientes a los comerciantes.",
     },
+    eye: {
+      title: ["Ojo abierto, ojo cerrado."],
+      body: "El ojo de la barra de abajo la esconde cuando te estorba y la vuelve a mostrar. Los objetos siguen contigo aunque no los veas.",
+    },
     "exit-room": {
       title: ["Baja a la botica."],
       body: "Sal de tu habitación por la puerta.",
@@ -173,6 +177,10 @@ export const tutorialCopy: Record<
     bar: {
       title: ["Your inventory and your money."],
       body: "The bar below is what you carry: it has few slots, so choose wisely.\nThe coins, bottom right, are for buying ingredients from the merchants.",
+    },
+    eye: {
+      title: ["Eye open, eye closed."],
+      body: "The eye on the bar below hides it when it gets in your way and shows it again. Your items stay with you even when you cannot see them.",
     },
     "exit-room": {
       title: ["Go down to the apothecary."],

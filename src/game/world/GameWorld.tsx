@@ -1542,6 +1542,7 @@ export function GameWorld({
     hintStep === "move" ||
     hintStep === "chest-approach" ||
     hintStep === "bar" ||
+    hintStep === "eye" ||
     hintStep === "exit-room" ||
     hintStep === "botica" ||
     hintStep === "exit-botica" ||

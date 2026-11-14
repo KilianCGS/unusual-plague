@@ -1,6 +1,5 @@
 /* Contextual help: low on the screen, small, pointer-transparent. A parchment
-   note with stepped corners and an ink border, a red wax seal on the left; it
-   slides up when it appears. No soft shadows. */
+   note with stepped corners and an ink border, a double frame with gold corner rivets. No soft shadows. */
 .hint {
   position: fixed;
   bottom: 32px;
@@ -50,28 +49,15 @@
   display: flex;
   flex-direction: column;
   gap: 9px;
-  padding: 18px 24px 20px 62px;
+  padding: 20px 30px 22px;
   background: #e9dbb9;
+  /* medieval frame: dark wood, a gold line, a parchment gap and a thin brown inner rule */
   box-shadow:
-    inset 0 0 0 2px #8a6a4a,
-    inset 0 -4px 0 rgba(120, 90, 55, 0.35);
+    inset 0 0 0 3px #5a3a1f,
+    inset 0 0 0 5px #d9a441,
+    inset 0 0 0 8px #e9dbb9,
+    inset 0 0 0 9px #8a6a4a;
   color: #2b1a14;
-}
-
-/* The wax seal that pins the note. */
-.inner::before {
-  content: "";
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  width: 18px;
-  height: 18px;
-  margin-top: -9px;
-  background: #b03a2e;
-  border: 2px solid #5c1a14;
-  box-shadow:
-    inset 3px 3px 0 #d86a5a,
-    inset -3px -3px 0 #7c2219;
 }
 
 /* It appears in place (a short stepped fade): it never slides up or down. */
@@ -157,25 +143,35 @@
   }
 }
 
-/* Finishing touches: gold studs at the top and bottom of the wax-seal side, and a thin
-   double rule between the title and the text. */
-.studTop,
-.studBottom {
+/* Finishing touches: a gold rivet in each corner of the frame, and a thin double rule
+   between the title and the text. */
+.corner {
   position: absolute;
-  left: 25px;
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   background: #d9a441;
-  border: 1px solid #5c3a1e;
+  border: 1px solid #3b2410;
   box-shadow: inset 1px 1px 0 #ffe9a8;
 }
 
-.studTop {
-  top: 12px;
+.cornerTl {
+  top: 3px;
+  left: 3px;
 }
 
-.studBottom {
-  bottom: 12px;
+.cornerTr {
+  top: 3px;
+  right: 3px;
+}
+
+.cornerBl {
+  bottom: 3px;
+  left: 3px;
+}
+
+.cornerBr {
+  right: 3px;
+  bottom: 3px;
 }
 
 .rule {

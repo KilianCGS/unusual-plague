@@ -250,6 +250,17 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "An apple a day. For the rest, you're the doctor.",
       ),
     ]),
+    conversation("chapter1.tavernStreet.neighbour", [
+      subject(
+        "Vivo a dos pasos de la taberna y ya no necesito reloj: sé la hora por los gritos.",
+        "I live two steps from the tavern and I no longer need a clock: I tell the hour by the shouting.",
+      ),
+      doctor("¿Y a esta hora?", "And at this hour?"),
+      subject(
+        "A esta hora todavía cantan. Más tarde, discuten.",
+        "At this hour they still sing. Later on, they argue.",
+      ),
+    ]),
     conversation("chapter1.tavernStreet.man", [
       subject(
         "Dicen que beber solo trae problemas.",

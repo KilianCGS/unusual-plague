@@ -40,14 +40,11 @@
 .pointer {
   position: absolute;
   z-index: 9000;
-  width: 0;
-  height: 0;
-  margin: -26px 0 0 -9px;
-  border-left: 9px solid transparent;
-  border-right: 9px solid transparent;
-  border-top: 14px solid #e6b34a;
-  filter: drop-shadow(0 2px 0 #1c110c) drop-shadow(0 -2px 0 #1c110c)
-    drop-shadow(2px 0 0 #1c110c) drop-shadow(-2px 0 0 #1c110c);
+  width: 16px;
+  height: 20px;
+  /* the tip of the arrow lands on the point; it was a flat triangle, now a carved wooden arrow */
+  margin: -32px 0 0 -8px;
+  image-rendering: pixelated;
   pointer-events: none;
   animation: pointer-bob 0.9s steps(4) infinite;
 }
@@ -65,5 +62,93 @@
 @media (prefers-reduced-motion: reduce) {
   .pointer {
     animation: none;
+  }
+}
+
+/* The oval on the floor where the Doctor stands to use a station: a thin white ring that
+   breathes, with a few white motes floating up from it. Under the Doctor, never over him. */
+.ring {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.06) 70%, rgba(255, 255, 255, 0) 100%);
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+  animation: ring-breathe 2.8s ease-in-out infinite;
+}
+
+@keyframes ring-breathe {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.mote {
+  position: absolute;
+  width: 1.5px;
+  height: 1.5px;
+  background: #ffffff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: mote-rise 3.2s linear infinite;
+}
+
+.moteA {
+  left: 22%;
+  top: 60%;
+}
+
+.moteB {
+  left: 42%;
+  top: 70%;
+  animation-delay: 0.7s;
+}
+
+.moteC {
+  left: 62%;
+  top: 55%;
+  animation-delay: 1.5s;
+}
+
+.moteD {
+  left: 78%;
+  top: 68%;
+  animation-delay: 2.1s;
+}
+
+.moteE {
+  left: 52%;
+  top: 48%;
+  animation-delay: 2.6s;
+}
+
+@keyframes mote-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  20% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring,
+  .mote {
+    animation: none;
+  }
+  .mote {
+    opacity: 0.7;
   }
 }

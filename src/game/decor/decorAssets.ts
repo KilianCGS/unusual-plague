@@ -1509,10 +1509,12 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     label: "Miner - pick swing (knee height)",
     category: "people",
     sprite: {
-      frames: [0, 1, 2, 2, 3, 3, 1].map((i) => `/game/npcs/miner-pick-swing/idle/${i}.png`),
+      // 12 in-betweens (PixelLab, pinned on the four original poses): ready, lift, overhead,
+      // swing down, strike, recover. The original four poses stay in /idle.
+      frames: Array.from({ length: 12 }, (_, i) => `/game/npcs/miner-pick-swing/smooth/${i}.png`),
       frameWidth: 96,
       frameHeight: 96,
-      fps: 6,
+      fps: 10,
       loop: true,
     },
     // Boots at y80/81 of the 96x96 frame, like the original miner.

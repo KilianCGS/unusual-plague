@@ -146,6 +146,11 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.tavernStreet.seller",
     zone: { offsetX: 122, offsetY: -35, width: 119, height: 27 },
   },
+  // The woman standing left of the Tavern in the new Tavern Street (villager-woman-01).
+  "tavern-street-villager-woman-01-01": {
+    interactionId: "chapter1.tavernStreet.neighbour",
+    zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },
+  },
   "tavern-street-villager-man-01-01": {
     interactionId: "chapter1.tavernStreet.man",
     zone: { offsetX: -33, offsetY: -95, width: 60, height: 111 },

@@ -58,6 +58,9 @@ type Created = { itemId: string; quantity: number };
 // component only draws and forwards clicks. It does not check which recipes
 // the Doctor knows (see combine). Mount it with key={station} so a different
 // station starts with a clean selection (closing the overlay always does).
+// How long a station takes to make something (the kitchen simmers; the others are instant).
+export const CRAFT_DURATION_MS: Partial<Record<CraftStation, number>> = { fire: 5000 };
+
 export function CraftingOverlay({
   station,
   inventory,
@@ -94,6 +97,9 @@ export function CraftingOverlay({
   );
   const [message, setMessage] = useState<Message>(null);
   const [created, setCreated] = useState<Created | null>(null);
+  // A successful recipe of a station that takes time (the kitchen) does not give the item at
+  // once: the interface closes into a "Preparing..." bar, and only then the stock changes.
+  const [preparing, setPreparing] = useState<{ inventory: InventoryState; created: Created } | null>(null);
   const modalOpen = created !== null;
   const selectedCount = selection.filter(
     (selected) => selected !== null,
@@ -101,6 +107,18 @@ export function CraftingOverlay({
 
   // Esc: closes the success modal first, otherwise the station. Space closes
   // the modal. (Q and TAB are blocked by the owner while this is open.)
+  // The wait is over: the stock changes and the success modal shows.
+  useEffect(() => {
+    if (!preparing) return;
+    const id = window.setTimeout(() => {
+      onInventoryChange(preparing.inventory);
+      setCreated(preparing.created);
+      setPreparing(null);
+    }, CRAFT_DURATION_MS[station] ?? 0);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preparing]);
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.repeat) {
@@ -110,7 +128,10 @@ export function CraftingOverlay({
       if (event.key === "Escape") {
         event.preventDefault();
 
-        if (modalOpen) {
+        if (preparing) {
+          // cancelling the wait gives nothing and consumes nothing
+          setPreparing(null);
+        } else if (modalOpen) {
           setCreated(null);
         } else {
           onClose();
@@ -124,7 +145,7 @@ export function CraftingOverlay({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [modalOpen, onClose]);
+  }, [modalOpen, onClose, preparing]);
 
   function handleInventoryClick(itemId: string) {
     if (!selection.includes(null)) {
@@ -163,17 +184,42 @@ export function CraftingOverlay({
     ) {
       setMessage("needed-elsewhere");
     } else if (result.kind === "success") {
-      onInventoryChange(result.inventory);
-      setSelection(createEmptySelection(station));
-      setMessage(null);
-      setCreated({
+      const made = {
         itemId: result.recipe.output.itemId,
         quantity: result.recipe.output.quantity,
-      });
+      };
+      setSelection(createEmptySelection(station));
+      setMessage(null);
+      if (CRAFT_DURATION_MS[station]) {
+        setPreparing({ inventory: result.inventory, created: made });
+      } else {
+        onInventoryChange(result.inventory);
+        setCreated(made);
+      }
     } else {
       // Nothing is consumed and the selection stays so it can be corrected.
       setMessage(result.kind);
     }
+  }
+
+  if (preparing) {
+    return (
+      <div
+        className={styles.backdrop}
+        style={{ ["--ui-font" as string]: PIXEL_FONT_FAMILY } as CSSProperties}
+        data-crafting-preparing
+      >
+        <div className={styles.border}>
+          <div className={styles.preparing}>
+            <p className={styles.preparingText}>{copy.preparing}</p>
+            <div className={styles.barTrack}>
+              <div className={styles.barFill} style={{ animationDuration: `${CRAFT_DURATION_MS[station]}ms` }} />
+            </div>
+            <p className={styles.preparingHint}>{copy.preparingHint}</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

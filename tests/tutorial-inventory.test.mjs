@@ -86,7 +86,8 @@ const ORDER = [
   ["chest-approach", "chest-in-range", "chest-interact"],
   ["chest-interact", "chest-opened", "take-flask"],
   ["take-flask", "flask-taken", "bar"],
-  ["bar", "continue", "exit-room"],
+  ["bar", "continue", "eye"],
+  ["eye", "continue", "exit-room"],
   ["exit-room", "botica-entered", "botica"],
   ["botica", "continue", "exit-botica"],
   ["exit-botica", "street-entered", "run"],
@@ -107,7 +108,7 @@ test("the tutorial starts at the monologue", () => {
   assert.equal(INITIAL_TUTORIAL_STEP, "intro");
 });
 
-test("steps go intro > goal > book > cover > page > tab > close > map > move > chest > bar > exit-room > botica > exit-botica > run > done, each by its own event", () => {
+test("steps go intro > goal > book > cover > page > tab > close > map > move > chest > bar > eye > exit-room > botica > exit-botica > run > done, each by its own event", () => {
   let step = INITIAL_TUTORIAL_STEP;
   for (const [from, event, to] of ORDER) {
     assert.equal(step, from);
@@ -232,7 +233,7 @@ test("every hint step has ES and EN copy with its key (the player's own keys are
   }
   // the tab, approach and take-flask steps name no key but still have copy
   for (const lang of ["es", "en"]) {
-    for (const step of ["goal", "book-cover", "book-preparations", "book-ailments", "book-patients", "chest-approach", "take-flask", "bar", "exit-room", "botica", "exit-botica"]) {
+    for (const step of ["goal", "book-cover", "book-preparations", "book-ailments", "book-patients", "chest-approach", "take-flask", "bar", "eye", "exit-room", "botica", "exit-botica"]) {
       assert.ok(
         tutorialCopy[lang][step].title.length &&
           tutorialCopy[lang][step].body.trim(),

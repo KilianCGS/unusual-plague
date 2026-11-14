@@ -20,6 +20,7 @@ export type TutorialStep =
   | "chest-interact" // open it with E
   | "take-flask" // move the Empty flask to the carried inventory
   | "bar" // what the inventory bar and the coins are (acknowledged)
+  | "eye" // the eye that hides / shows the bar (acknowledged)
   | "exit-room" // go down to the Botica
   | "botica" // the two crafting interfaces (acknowledged)
   | "exit-botica" // go out to the street
@@ -67,7 +68,8 @@ const STEP_COMPLETED_BY: Record<
   "chest-approach": { event: "chest-in-range", next: "chest-interact" },
   "chest-interact": { event: "chest-opened", next: "take-flask" },
   "take-flask": { event: "flask-taken", next: "bar" },
-  bar: { event: "continue", next: "exit-room" },
+  bar: { event: "continue", next: "eye" },
+  eye: { event: "continue", next: "exit-room" },
   "exit-room": { event: "botica-entered", next: "botica" },
   botica: { event: "continue", next: "exit-botica" },
   "exit-botica": { event: "street-entered", next: "run" },
@@ -75,11 +77,12 @@ const STEP_COMPLETED_BY: Record<
 };
 
 // The steps that wait for the player to say "understood" (a button and Enter).
-export const ACK_STEPS: readonly TutorialStep[] = ["goal", "bar", "botica"];
+export const ACK_STEPS: readonly TutorialStep[] = ["goal", "bar", "eye", "botica"];
 
 // The inventory bar and the coins are shown from the step that explains them.
 const HUD_STEPS: readonly TutorialStep[] = [
   "bar",
+  "eye",
   "exit-room",
   "botica",
   "exit-botica",
