@@ -55,7 +55,7 @@ const p1Attention = (...args) =>
           ch1.TAVERN_BARTENDER_INSTANCE_ID,
           ch1.TAVERN_PATIENT_INSTANCE_ID,
           ch1.INJURED_MINER_INSTANCE_ID,
-          ch1.MOUNTAIN_MINER_INSTANCE_ID,
+          ch1.COAL_GIVER_INSTANCE_ID,
           ch1.FARM_WOMAN_INSTANCE_ID,
           ch1.BEEKEEPER_INSTANCE_ID,
         ].includes(id),

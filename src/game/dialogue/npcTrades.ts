@@ -127,11 +127,11 @@ export const NPC_TRADES: Record<string, NpcTrade> = {
     ready: bartenderAlcoholReady,
     noRoom: bartenderAlcoholNoRoom,
   },
-  // The miner of the Mountain Path has a small piece of clean coal for the
+  // The man at the quarry (seen from behind) has a small piece of clean coal for the
   // injured one's ointment. He is not a quest giver: until the case is
   // examined he is only the ambient miner (resolver returns null).
-  "chapter1.mountainPath.miner": {
-    interactionId: "chapter1.mountainPath.miner",
+  "chapter1.quarry.backMan": {
+    interactionId: "chapter1.quarry.backMan",
     rewardId: MOUNTAIN_MINER_COAL_REWARD_ID,
     requiresPatient: { patientId: INJURED_MINER_ID, status: "examined" },
     consumes: [],

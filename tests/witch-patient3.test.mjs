@@ -71,7 +71,7 @@ const test = (name, fn) => {
 const MINER = "chapter1.mine.injuredMiner";
 const WITCH = "chapter1.tavern.witch";
 const BARTENDER = "chapter1.tavern.bartender";
-const MOUNTAIN = "chapter1.mountainPath.miner";
+const MOUNTAIN = "chapter1.quarry.backMan";
 const MERCHANT = "chapter1.plaza.merchant";
 const P3 = ch1.INJURED_MINER_ID;
 const P3DEF = ch1.CHAPTER1_PATIENTS[P3];
@@ -689,7 +689,7 @@ test("P3 5. Alcohol: the bartender gives it once the miner is examined, first of
   );
 });
 
-test("P3 6. Coal: the Mountain Path miner is only ambient until the case is examined, then gives it once", () => {
+test("P3 6. Coal: the quarry man (seen from behind) is only ambient until the case is examined, then gives it once", () => {
   for (const p3 of [undefined, "discovered"]) {
     assert.equal(talk(MOUNTAIN, world({ p3 })), null, "ambient, no quest");
   }
@@ -702,29 +702,29 @@ test("P3 6. Coal: the Mountain Path miner is only ambient until the case is exam
   );
   assert.equal(
     chapter1AmbientDialogues[MOUNTAIN].lines[0].text.es,
-    "Si viene buscando trabajo, ha elegido mal la ropa.",
+    "No se vuelva, doctor. Estoy mirando cómo parten la piedra y me da vergüenza que se note.",
   );
   const f = world({ p3: "examined" });
   const coal = talk(MOUNTAIN, f);
-  assert.equal(coal.conversation.id, "chapter1.mountainPath.miner.coal");
+  assert.equal(coal.conversation.id, "chapter1.quarry.backMan.coal");
   assert.deepEqual(coal.effects, [
     { type: "give-item", itemId: "coal", quantity: 1 },
     { type: "claim-reward", rewardId: ch1.MOUNTAIN_MINER_COAL_REWARD_ID },
   ]);
   assert.equal(
     lines(coal)[0],
-    "Tu compañero de la mina se ha hecho una herida bastante fea, pero tiene arreglo.",
+    "Tu amigo el minero se ha hecho una herida bastante fea, pero tiene arreglo.",
   );
   const done = apply(f, coal);
   assert.equal(count(done, "coal"), 1);
   const again = talk(MOUNTAIN, done);
-  assert.equal(again.conversation.id, "chapter1.mountainPath.miner.coalDone");
+  assert.equal(again.conversation.id, "chapter1.quarry.backMan.coalDone");
   assert.deepEqual(again.effects, []);
   const full = { ...f, inventory: crowded([["mushroom", 1], ["alcohol", 1]]) };
   const blocked = talk(MOUNTAIN, full);
   assert.equal(
     blocked.conversation.id,
-    "chapter1.mountainPath.miner.coalNoRoom",
+    "chapter1.quarry.backMan.coalNoRoom",
   );
   assert.deepEqual(blocked.effects, []);
   assert.ok(
@@ -809,10 +809,10 @@ test('P3 8. the "!": the miner until he is examined and again when both preparat
     "examined: no more '!' until he can be treated",
   );
   assert.ok(examined.has(ch1.TAVERN_BARTENDER_INSTANCE_ID), "alcohol pending");
-  assert.ok(examined.has(ch1.MOUNTAIN_MINER_INSTANCE_ID), "coal pending");
+  assert.ok(examined.has(ch1.COAL_GIVER_INSTANCE_ID), "coal pending");
   assert.ok(
     ids("examined", [], [ch1.BARTENDER_ALCOHOL_REWARD_ID]).has(
-      ch1.MOUNTAIN_MINER_INSTANCE_ID,
+      ch1.COAL_GIVER_INSTANCE_ID,
     ),
   );
   assert.ok(
@@ -820,7 +820,7 @@ test('P3 8. the "!": the miner until he is examined and again when both preparat
       "examined",
       [],
       [ch1.BARTENDER_ALCOHOL_REWARD_ID, ch1.MOUNTAIN_MINER_COAL_REWARD_ID],
-    ).has(ch1.MOUNTAIN_MINER_INSTANCE_ID),
+    ).has(ch1.COAL_GIVER_INSTANCE_ID),
   );
   assert.ok(
     !ids("examined", [], [ch1.BARTENDER_ALCOHOL_REWARD_ID]).has(
@@ -836,7 +836,7 @@ test('P3 8. the "!": the miner until he is examined and again when both preparat
   );
   const treated = ids("treated", [["disinfected-bandage", 1]]);
   assert.ok(!treated.has(MINERI));
-  assert.ok(!treated.has(ch1.MOUNTAIN_MINER_INSTANCE_ID));
+  assert.ok(!treated.has(ch1.COAL_GIVER_INSTANCE_ID));
   assert.ok(!treated.has(ch1.WITCH_INSTANCE_ID));
 });
 
@@ -1109,7 +1109,7 @@ test("everything involved can be reached on foot, with the coordinates as author
     2,
   );
   check("mine-interior", "from-mine-natural-cave", [MINER, "collect.mushroom"]);
-  check("mountain-path", "from-smithy-street", [MOUNTAIN]);
+  check("quarry", "from-mountain-path", [MOUNTAIN]); // the coal-giver stands at the quarry
 });
 
 console.log(`\n${passed} tests passed`);

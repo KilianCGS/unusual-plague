@@ -129,10 +129,10 @@ export const TAVERN_PATIENT_INSTANCE_ID =
 export const TAVERN_BARTENDER_INSTANCE_ID = "tavern-interior-bartender-01";
 export const FARM_WOMAN_INSTANCE_ID = "farm-villager-woman-01-01";
 export const BEEKEEPER_INSTANCE_ID = "mill-farmland-beekeeper-01";
-// The injured miner inside the mine, the miner on the Mountain Path who has
+// The injured miner inside the mine, the man at the quarry (seen from behind) who has
 // the coal, and Witch at the bar.
 export const INJURED_MINER_INSTANCE_ID = "mine-interior-injured-miner-01";
-export const MOUNTAIN_MINER_INSTANCE_ID = "mountain-path-miner-pick-swing-01";
+export const COAL_GIVER_INSTANCE_ID = "quarry-villager-back-man-01";
 export const WITCH_INSTANCE_ID = "tavern-interior-witch-tavern-sitting-01";
 
 // The placed characters that show the "!". Derived from the cases, the claimed
@@ -219,7 +219,7 @@ export function getAttentionInstanceIds(
     }
 
     if (!claimedRewards.has(MOUNTAIN_MINER_COAL_REWARD_ID)) {
-      instances.add(MOUNTAIN_MINER_INSTANCE_ID);
+      instances.add(COAL_GIVER_INSTANCE_ID);
     }
   }
 

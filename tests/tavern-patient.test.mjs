@@ -897,7 +897,7 @@ test('25. the "!" follows what can progress and then goes away', () => {
       .filter(
         (id) =>
           id !== ch1.INJURED_MINER_INSTANCE_ID &&
-          id !== ch1.MOUNTAIN_MINER_INSTANCE_ID,
+          id !== ch1.COAL_GIVER_INSTANCE_ID,
       )
       .sort();
   const BART = ch1.TAVERN_BARTENDER_INSTANCE_ID;

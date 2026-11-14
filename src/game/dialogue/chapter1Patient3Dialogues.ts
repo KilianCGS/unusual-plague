@@ -194,16 +194,16 @@ export const bartenderAlcoholNoRoom = conversation(
 
 // ---- the miner of the Mountain Path: coal -----------------------------------
 
-export const mountainMinerCoalReady = conversation("mountainPath.miner.coal", [
+export const mountainMinerCoalReady = conversation("quarry.backMan.coal", [
   doctor(
-    "Tu compañero de la mina se ha hecho una herida bastante fea, pero tiene arreglo.",
-    "Your fellow miner has a rather nasty wound, but it can be fixed.",
+    "Tu amigo el minero se ha hecho una herida bastante fea, pero tiene arreglo.",
+    "Your friend the miner has a rather nasty wound, but it can be fixed.",
   ),
   subject("¿Otra vez?", "Again?"),
   doctor("¿Otra vez? ¡Vaya!", "Again? Oh dear!"),
   subject(
-    "No es bueno sabiendo cuándo parar.",
-    "He's no good at knowing when to stop.",
+    "Le pasa por no saber cuándo parar. Yo, al menos, miro cómo trabajan los demás.",
+    "That's what comes of not knowing when to stop. I, at least, just watch the others work.",
   ),
   doctor(
     "Eso ya me lo había parecido. Y por eso mismo necesito tu ayuda.",
@@ -215,13 +215,13 @@ export const mountainMinerCoalReady = conversation("mountainPath.miner.coal", [
   ),
   subject("Eso sí puedo conseguirlo.", "That I can get you."),
   subject(
-    "Por una vez tengo exactamente lo que busca.",
-    "For once I have exactly what you're looking for.",
+    "Por una vez tengo exactamente lo que busca. Lo guardaba para la hoguera, pero él lo necesita más.",
+    "For once I have exactly what you're looking for. I was keeping it for the fire, but he needs it more.",
   ),
 ]);
 
 export const mountainMinerCoalNoRoom = conversation(
-  "mountainPath.miner.coalNoRoom",
+  "quarry.backMan.coalNoRoom",
   [
     subject(
       "Lleva las manos llenas, Doctor. Haga sitio y el carbón es suyo.",
@@ -231,11 +231,11 @@ export const mountainMinerCoalNoRoom = conversation(
 );
 
 export const mountainMinerCoalDone = conversation(
-  "mountainPath.miner.coalDone",
+  "quarry.backMan.coalDone",
   [
     subject(
-      "Cuide de mi compañero. Y dígale que la próxima vez mire dónde pisa.",
-      "Look after my partner. And tell him to watch where he steps next time.",
+      "Cuide de mi amigo. Y dígale que la próxima vez mire dónde pisa. Yo, desde aquí, lo vería venir.",
+      "Look after my friend. And tell him to watch where he steps next time. From here, I'd see it coming.",
     ),
   ],
 );
