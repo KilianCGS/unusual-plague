@@ -271,6 +271,40 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "It's the only one I'm good at. And they work happier with an audience.",
       ),
     ]),
+    // The quarry camp (2026-11-15). New text, awaiting Kilian's review.
+    conversation("chapter1.quarry.woman", [
+      subject(
+        "Les traigo el almuerzo a estos. Si no, la piedra les sabe a pan, y el pan, a piedra.",
+        "I bring these lads their lunch. Otherwise the stone tastes like bread, and the bread like stone.",
+      ),
+      doctor("¿Alguno anda con tos o con dolores?", "Is anyone coughing or aching?"),
+      subject(
+        "Todos, un poco. Pero hoy ninguno se ha quejado, y eso por aquí ya es salud.",
+        "All of them, a little. But today nobody has complained, and around here that counts as health.",
+      ),
+    ]),
+    conversation("chapter1.quarry.stonecutterShovel", [
+      subject(
+        "Apoyado en la pala se lleva mejor la mañana. La pala no se queja.",
+        "Leaning on the shovel the morning goes easier. The shovel doesn't complain.",
+      ),
+      doctor("¿Y la espalda?", "And your back?"),
+      subject(
+        "La espalda sí. Pero a ella no le pregunta nadie.",
+        "My back does. But nobody asks it anything.",
+      ),
+    ]),
+    conversation("chapter1.quarry.stonecutterStool", [
+      subject(
+        "Me siento un momento y el taburete ya me da la razón.",
+        "I sit for a moment and the stool already agrees with me.",
+      ),
+      doctor("¿Tanto cansa partir piedra?", "Does splitting stone tire you that much?"),
+      subject(
+        "Cansa no partirla. Cuando uno para, es cuando se entera de todo.",
+        "What tires is not splitting it. It's when you stop that you notice everything.",
+      ),
+    ]),
     conversation("chapter1.tavernStreet.man", [
       subject(
         "Dicen que beber solo trae problemas.",

@@ -147,6 +147,7 @@ import {
   smithyStreetSpawns as nwSmithyStreetSpawns,
   smithyStreetTransitions as nwSmithyStreetTransitions,
 } from "../../../game/new-world-map/geometry/smithyStreetGeometry";
+import { STEP_MIX_ZONES } from "../../../game/audio/stepZones";
 import { DEV_SCENES, getSceneWorld, type DevScene } from "../scene/scenes";
 import { GRANARY_INTERIOR_VISUAL } from "../../../game/new-world-map/newWorldVisuals";
 import {
@@ -342,7 +343,8 @@ type Kind =
   | "spawn"
   | "interaction"
   | "polygon"
-  | "occluder";
+  | "occluder"
+  | "stepzone";
 type Shape = "rect" | "free";
 // SELECT draws nothing: it only picks existing items (to delete them).
 type Mode = Kind | "select";
@@ -355,6 +357,7 @@ const KINDS: { kind: Mode; label: string; color: string }[] = [
   { kind: "spawn", label: "🔵 SPAWN", color: "#4da3ff" },
   { kind: "interaction", label: "🟢 INTERACTION", color: "#3ddc84" },
   { kind: "occluder", label: "🟣 DEPTH", color: "#a855f7" },
+  { kind: "stepzone", label: "🟠 STEPS", color: "#ff8c1a" },
 ];
 
 // `editorId` is stable while editing and never reused (one counter for all
@@ -371,6 +374,8 @@ type EditorPolygon = { editorId: string; points: Point[] };
 // above depthY.
 type EditorOccluder = EditorPolygon & { depthY: number };
 type SceneData = {
+  // Orange step-mix zones: stone and earth mixed, the steps alternate there.
+  stepZones: EditorPolygon[];
   occluders: EditorOccluder[];
   polygons: EditorPolygon[];
   colliders: EditorRect[];
@@ -578,8 +583,14 @@ function createInitialData(sceneId: string): SceneData {
     requiredDirection: item.requiredDirection ?? null,
   }));
 
+  const stepZones: EditorPolygon[] = (STEP_MIX_ZONES[sceneId] ?? []).map((item) => ({
+    editorId: newEditorId("stepzone"),
+    points: item.points.map((p) => ({ x: p.x, y: p.y })),
+  }));
+
   if (persisted) {
     return {
+      stepZones,
       occluders: (persisted.occluders ?? []).map((item) => ({
         editorId: newEditorId("occluder"),
         depthY: item.depthY,
@@ -614,6 +625,7 @@ function createInitialData(sceneId: string): SceneData {
   }
 
   return {
+    stepZones,
     occluders: [],
     polygons: [],
     colliders: [],
@@ -724,7 +736,7 @@ function SceneGeometryEditor({
   const [draftPoints, setDraftPoints] = useState<Point[]>([]);
   // index -1 on a depth shape is its depth line.
   const [vertexDrag, setVertexDrag] = useState<{
-    kind: "polygon" | "occluder";
+    kind: "polygon" | "occluder" | "stepzone";
     editorId: string;
     index: number;
   } | null>(null);
@@ -732,7 +744,7 @@ function SceneGeometryEditor({
   const [history, setHistory] = useState<Selection[]>([]);
   const [cursor, setCursor] = useState<Point | null>(null);
   const [copyStatus, setCopyStatus] = useState("");
-  const { colliders, transitions, spawns, interactions, polygons, occluders } =
+  const { colliders, transitions, spawns, interactions, polygons, occluders, stepZones } =
     data;
 
   // Functional updaters over this scene's data (immutable: spread / filter).
@@ -820,6 +832,10 @@ function SceneGeometryEditor({
           kind === "occluder"
             ? previous.occluders.filter(keep)
             : previous.occluders,
+        stepZones:
+          kind === "stepzone"
+            ? previous.stepZones.filter(keep)
+            : previous.stepZones,
       }));
       setSelection((current) =>
         current?.kind === kind && current.editorId === editorId
@@ -834,6 +850,25 @@ function SceneGeometryEditor({
   // mode a violet shape whose depth line starts at its lowest point.
   const closeDraft = useCallback(() => {
     if (draftPoints.length < 3 || polygonArea(draftPoints) < MIN_POLYGON_AREA) {
+      return;
+    }
+
+    if (mode === "stepzone") {
+      const created: EditorPolygon = {
+        editorId: newEditorId("stepzone"),
+        points: draftPoints,
+      };
+
+      onDataChange((previous) => ({
+        ...previous,
+        stepZones: [...previous.stepZones, created],
+      }));
+      setHistory((current) => [
+        ...current,
+        { kind: "stepzone", editorId: created.editorId },
+      ]);
+      setDraftPoints([]);
+      setSelection({ kind: "stepzone", editorId: created.editorId });
       return;
     }
 
@@ -889,6 +924,7 @@ function SceneGeometryEditor({
       interaction: interactions,
       polygon: polygons,
       occluder: occluders,
+      stepzone: stepZones,
     };
     const live = history.filter((entry) =>
       lists[entry.kind].some((item) => item.editorId === entry.editorId),
@@ -908,6 +944,7 @@ function SceneGeometryEditor({
     interactions,
     polygons,
     occluders,
+    stepZones,
     history,
     removeItem,
   ]);
@@ -1033,6 +1070,14 @@ function SceneGeometryEditor({
         });
       }
     });
+    stepZones.forEach((item) => {
+      if (pointInPolygon(point, item.points)) {
+        found.push({
+          entry: { kind: "stepzone", editorId: item.editorId },
+          area: polygonArea(item.points),
+        });
+      }
+    });
 
     return found.sort((a, b) => a.area - b.area).map((hit) => hit.entry);
   }
@@ -1103,7 +1148,9 @@ function SceneGeometryEditor({
       onDataChange((previous) =>
         vertexDrag.kind === "occluder"
           ? { ...previous, occluders: previous.occluders.map(moveVertex) }
-          : { ...previous, polygons: previous.polygons.map(moveVertex) },
+          : vertexDrag.kind === "stepzone"
+            ? { ...previous, stepZones: previous.stepZones.map(moveVertex) }
+            : { ...previous, polygons: previous.polygons.map(moveVertex) },
       );
       return;
     }
@@ -1146,7 +1193,7 @@ function SceneGeometryEditor({
       return;
     }
 
-    if ((mode === "collider" && shape === "free") || mode === "occluder") {
+    if ((mode === "collider" && shape === "free") || mode === "occluder" || mode === "stepzone") {
       // Free-hand: every click adds a point; a click on the first point (or
       // Enter) closes the shape.
       if (Math.hypot(end.x - drag.start.x, end.y - drag.start.y) > SPAWN_CLICK_TOLERANCE) {
@@ -1272,8 +1319,8 @@ function SceneGeometryEditor({
     setMode(nextMode);
   }
 
-  const freeHand = (mode === "collider" && shape === "free") || mode === "occluder";
-  const draftColor = mode === "occluder" ? "#a855f7" : "#ff5c5c";
+  const freeHand = (mode === "collider" && shape === "free") || mode === "occluder" || mode === "stepzone";
+  const draftColor = mode === "occluder" ? "#a855f7" : mode === "stepzone" ? "#ff8c1a" : "#ff5c5c";
   const previewRect =
     drag && mode !== "spawn" && mode !== "select" && !freeHand
       ? normalizeRect(drag.start, drag.current)
@@ -1282,6 +1329,10 @@ function SceneGeometryEditor({
     selection?.kind === "occluder"
       ? occluders.find((item) => item.editorId === selection.editorId)
       : undefined;
+  const selectedStepZone =
+    selection?.kind === "stepzone"
+      ? stepZones.find((item) => item.editorId === selection.editorId)
+      : undefined;
   const selectedPolygon =
     selection?.kind === "polygon"
       ? polygons.find((item) => item.editorId === selection.editorId)
@@ -1289,7 +1340,7 @@ function SceneGeometryEditor({
   const modeColor = KINDS.find((entry) => entry.kind === mode)?.color;
   const effScale = scale * zoom;
   const exportText = formatSceneExport(
-    { colliders, transitions, spawns, interactions, polygons, occluders },
+    { colliders, transitions, spawns, interactions, polygons, occluders, stepZones },
     config.idPrefix,
     {
       colliders: `${config.exportPrefix}Colliders`,
@@ -1298,6 +1349,7 @@ function SceneGeometryEditor({
       interactions: `${config.exportPrefix}Interactions`,
       polygons: `${config.exportPrefix}PolygonColliders`,
       occluders: `${config.exportPrefix}Occluders`,
+      stepZones: `${config.exportPrefix}StepZones`,
     },
   );
 
@@ -1400,6 +1452,16 @@ function SceneGeometryEditor({
                   </g>
                 );
               })}
+              {stepZones.map((item) => (
+                <polygon
+                  key={item.editorId}
+                  points={item.points.map((p) => `${p.x},${p.y}`).join(" ")}
+                  fill="rgba(255, 140, 26, 0.3)"
+                  vectorEffect="non-scaling-stroke"
+                  stroke={isSelected("stepzone", item.editorId) ? "#ffffff" : "#ff8c1a"}
+                  strokeWidth={isSelected("stepzone", item.editorId) ? 2 : 1}
+                />
+              ))}
               {draftPoints.length > 0 ? (
                 <>
                   <polyline
@@ -1466,6 +1528,23 @@ function SceneGeometryEditor({
                 }}
               />
             ) : null}
+            {selectedStepZone?.points.map((p, index) => (
+              <div
+                key={index}
+                className={styles.vertexHandle}
+                style={{ left: p.x, top: p.y, borderColor: "#ff8c1a" }}
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                  event.preventDefault();
+                  layerRef.current?.setPointerCapture(event.pointerId);
+                  setVertexDrag({
+                    kind: "stepzone",
+                    editorId: selectedStepZone.editorId,
+                    index,
+                  });
+                }}
+              />
+            ))}
             {selectedPolygon?.points.map((p, index) => (
               <div
                 key={index}
@@ -1706,6 +1785,8 @@ function SceneGeometryEditor({
             ? "Click once to place the exact point where the feet will appear. The facing is the initial idle direction: arriving from the left → east, right → west, top → south, bottom → north."
             : mode === "select"
               ? "Nothing is drawn in this mode: click an item on the map to select it (click the same spot again to cycle through stacked items, click empty floor to deselect), then press Delete or use the delete button. Colliders, free shapes, depth shapes, transitions, interactions and spawns can all be picked."
+              : mode === "stepzone"
+              ? "Click points to outline ground where stone path and earth MIX (the river bank before the forest, the mountain path). Inside it the Doctor steps alternate between the stone and the earth sound. Click the first point (or Enter) to close the shape. Export the scene and paste it into src/game/audio/stepZones.ts."
               : mode === "occluder"
               ? "Click points to outline the part of the picture that must cover the Doctor (a treetop, a roof). The dashed line is the depth line: the Doctor is behind the shape while the soles of his feet (the bottom edge of his collision box, where the red colliders stop him) are above it. It starts at the lowest point; drag its square handle or type depthY."
               : `Drag on the map to draw a ${mode}.`}{" "}
@@ -1737,7 +1818,7 @@ function SceneGeometryEditor({
           </div>
           <div>
             colliders {colliders.length} · free shapes {polygons.length} · depth{" "}
-            {occluders.length} ·
+            {occluders.length} · steps {stepZones.length} ·
             transitions {transitions.length} ·
             spawns {spawns.length} · interactions {interactions.length}
           </div>
@@ -1773,6 +1854,18 @@ function SceneGeometryEditor({
           rows={occluders.map((item, index) => ({
             editorId: item.editorId,
             label: `${config.idPrefix}-depth-${index + 1} · ${item.points.length} points · depth y ${item.depthY}`,
+          }))}
+          selection={selection}
+          onSelect={(kind, editorId) => setSelection({ kind, editorId })}
+          onDelete={removeItem}
+        />
+        <ListSection
+          title="Step zones (orange)"
+          kind="stepzone"
+          color="#ff8c1a"
+          rows={stepZones.map((item, index) => ({
+            editorId: item.editorId,
+            label: `${config.idPrefix}-steps-${index + 1} · ${item.points.length} points`,
           }))}
           selection={selection}
           onSelect={(kind, editorId) => setSelection({ kind, editorId })}

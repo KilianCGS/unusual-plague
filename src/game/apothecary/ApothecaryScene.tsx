@@ -144,7 +144,7 @@ export function ApothecaryScene({
     onRunBlocked,
   });
 
-  useFootsteps(player, "steps.interior");
+  useFootsteps(player, "apothecary-interior");
 
   usePlayerMoved(player.x, player.y, onPlayerMoved);
   useReportRunning(player.isRunning, onRunningChange);

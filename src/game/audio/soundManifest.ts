@@ -33,15 +33,17 @@ export type SoundDef = {
 };
 
 const BASE = "/game/audio";
+// The steps are half as loud as the rest (Kilian, 2026-11-15).
+const STEP_GAIN = 0.5;
 
-function def(id: SoundId, path: string, category: SoundCategory, loop = false): SoundDef {
-  return { id, src: `${BASE}/${path}`, category, loop, gain: 1 };
+function def(id: SoundId, path: string, category: SoundCategory, loop = false, gain = 1): SoundDef {
+  return { id, src: `${BASE}/${path}`, category, loop, gain };
 }
 
 export const SOUNDS: Record<SoundId, SoundDef> = {
-  "steps.interior": def("steps.interior", "steps/interior.mp3", "steps"),
-  "steps.cityRock": def("steps.cityRock", "steps/city-rock.mp3", "steps"),
-  "steps.woodPath": def("steps.woodPath", "steps/wood-path.mp3", "steps"),
+  "steps.interior": def("steps.interior", "steps/interior.mp3", "steps", false, STEP_GAIN),
+  "steps.cityRock": def("steps.cityRock", "steps/city-rock.mp3", "steps", false, STEP_GAIN),
+  "steps.woodPath": def("steps.woodPath", "steps/wood-path.mp3", "steps", false, STEP_GAIN),
   "loop.blacksmith": def("loop.blacksmith", "loops/blacksmith.mp3", "loops", true),
   "loop.woodChop": def("loop.woodChop", "loops/wood-chop.mp3", "loops", true),
   "craft.cooking": def("craft.cooking", "crafting/cooking-5s.mp3", "crafting"),

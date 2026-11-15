@@ -4,17 +4,28 @@ import { useEffect, useRef } from "react";
 
 import type { Direction } from "../protagonist/useDirectionInput";
 import { getRunFrameCount, getWalkFrameCount } from "../protagonist/protagonistRun";
+import type { SceneId } from "../world/worldScenes";
 import { playSound } from "./audioPlayer";
-import type { SoundId } from "./soundManifest";
+import { footstepSoundAt } from "./footstepSurface";
 
-// One step sound per footfall: the Doctor's walk cycle has two footfalls, at its first
-// frame and at its middle frame, so the sound follows the animation (and its speed) on
-// its own. Nothing plays while he stands still or is blocked.
+// The frames of the walk where a foot is planted on the ground (picked by eye from the sprites;
+// tune here). The 4-frame walks (north, south) plant a foot on frames 0 and 2; the 8-frame side
+// walks (east, west) on 2 and 6. Running plants one foot per half cycle.
+const WALK_FOOTFALLS: Record<Direction, readonly number[]> = {
+  north: [0, 2],
+  south: [0, 2],
+  east: [2, 6],
+  west: [2, 6],
+};
+
+// One step sound per footfall, only on the frames where the Doctor's foot lands. Nothing plays
+// while he stands still or is blocked.
 export function useFootsteps(
-  player: { frame: number; isWalking: boolean; isRunning: boolean; direction: Direction },
-  sound: SoundId,
+  player: { x: number; y: number; frame: number; isWalking: boolean; isRunning: boolean; direction: Direction },
+  sceneId: SceneId,
 ) {
   const lastFrame = useRef<number | null>(null);
+  const alternate = useRef(false);
 
   useEffect(() => {
     if (!player.isWalking) {
@@ -23,9 +34,12 @@ export function useFootsteps(
     }
     if (lastFrame.current === player.frame) return;
     lastFrame.current = player.frame;
-    const count = player.isRunning ? getRunFrameCount(player.direction) : getWalkFrameCount(player.direction);
-    if (player.frame === 0 || player.frame === Math.floor(count / 2)) {
-      playSound(sound, { rate: player.isRunning ? 1.15 : 1 });
+    const feet = player.isRunning
+      ? [0, Math.floor(getRunFrameCount(player.direction) / 2)]
+      : WALK_FOOTFALLS[player.direction].filter((frame) => frame < getWalkFrameCount(player.direction));
+    if (feet.includes(player.frame)) {
+      alternate.current = !alternate.current;
+      playSound(footstepSoundAt(sceneId, player.x, player.y, alternate.current), { rate: player.isRunning ? 1.15 : 1 });
     }
-  }, [player.frame, player.isWalking, player.isRunning, player.direction, sound]);
+  }, [player.frame, player.isWalking, player.isRunning, player.direction, player.x, player.y, sceneId]);
 }

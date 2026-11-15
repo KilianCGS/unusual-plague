@@ -119,6 +119,8 @@ export function formatSceneExport(
     polygons?: { points: Point[] }[];
     // Violet depth shapes. Only exported when there are some.
     occluders?: { points: Point[]; depthY: number }[];
+    // Orange step-mix zones. Only exported when there are some.
+    stepZones?: { points: Point[] }[];
   },
   prefix: string,
   names: {
@@ -128,11 +130,13 @@ export function formatSceneExport(
     interactions?: string;
     polygons?: string;
     occluders?: string;
+    stepZones?: string;
   },
 ) {
   const interactionRows = data.interactions ?? [];
   const polygonRows = data.polygons ?? [];
   const occluderRows = data.occluders ?? [];
+  const stepZoneRows = data.stepZones ?? [];
   const imports =
     (polygonRows.length > 0
       ? 'import type { LogicalRect, PolygonCollider, SceneCollider } from "../collision";\n'
@@ -217,5 +221,20 @@ export function formatSceneExport(
           ),
         );
 
-  return `${imports}${colliders}${polygons}${occluders}\n${transitions}\n${spawns}${interactions}`;
+  const stepZones =
+    stepZoneRows.length === 0
+      ? ""
+      : "\n// STEP ZONES (orange): ground where stone path and earth mix; the steps alternate there.\n" +
+        "// Register them in src/game/audio/stepZones.ts under this scene id.\n" +
+        formatBlock(
+          `export const ${names.stepZones ?? "stepZones"}: { id: string; points: { x: number; y: number }[] }[]`,
+          stepZoneRows.map(
+            (z, i) =>
+              `  { id: "${prefix}-steps-${i + 1}", points: [${z.points
+                .map((pt) => `{ x: ${pt.x}, y: ${pt.y} }`)
+                .join(", ")}] },`,
+          ),
+        );
+
+  return `${imports}${colliders}${polygons}${occluders}${stepZones}\n${transitions}\n${spawns}${interactions}`;
 }

@@ -152,6 +152,21 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.quarry.backMan",
     zone: { offsetX: -33, offsetY: -95, width: 60, height: 111 },
   },
+  // The rest of the quarry camp (2026-11-15). Zones by analogy with the same sprites elsewhere
+  // (the woman is the tavern street's villager-woman-02, the shovel man stands like the back man, the
+  // seated one like the smithy street's seated villager): adjust in the Decorator if needed.
+  "quarry-villager-woman-02-01": {
+    interactionId: "chapter1.quarry.woman",
+    zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },
+  },
+  "quarry-stonecutter-shovel-01": {
+    interactionId: "chapter1.quarry.stonecutterShovel",
+    zone: { offsetX: -33, offsetY: -95, width: 60, height: 111 },
+  },
+  "quarry-stonecutter-stool-01": {
+    interactionId: "chapter1.quarry.stonecutterStool",
+    zone: { offsetX: -32, offsetY: -79, width: 59, height: 95 },
+  },
   "tavern-street-villager-man-01-01": {
     interactionId: "chapter1.tavernStreet.man",
     zone: { offsetX: -33, offsetY: -95, width: 60, height: 111 },
