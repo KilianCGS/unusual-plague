@@ -121,7 +121,7 @@ import { fastTravelCopy } from "../i18n/fastTravel";
 import { FastTravelButton, TravelCaption } from "../ui/FastTravelButton";
 import { ItemFeedback } from "../ui/ItemFeedback";
 import { DAY1_COMPLETED_ID } from "../patients/day1";
-import { DAY_END_SCENES, DAY_WIND_DOWN_FLAGS, isDayWindingDown, shouldAnnounceDayEnd, shouldCloseDayNow } from "./dayEnd";
+import { BED_INTERACTION_ID, DAY_END_SCENES, DAY_WIND_DOWN_FLAGS, isDayWindingDown, shouldAnnounceDayEnd, shouldCloseDayNow } from "./dayEnd";
 import { dayEndCopy } from "../i18n/dayEnd";
 import { DayEndSign } from "../ui/DayEndSign";
 import { doctorThought } from "../dialogue/doctorThought";
@@ -747,6 +747,29 @@ export function GameWorld({
       source: { instanceId?: string; itemId?: string; quantity?: number },
     ) => {
       if (phaseRef.current !== "playing" || diagnosisRef.current !== null) {
+        return;
+      }
+
+      // The bed: with the day's work done it asks whether to sleep, otherwise he is not sleepy.
+      if (interactionId === BED_INTERACTION_ID) {
+        const ready =
+          getNextChapterId(chapterId) !== null &&
+          claimedRewardsRef.current.has(DAY_WIND_DOWN_FLAGS[chapterId] ?? "") &&
+          isDayWindingDown(chapterId, patientsRef.current, claimedRewardsRef.current);
+        if (ready) {
+          setRestPromptOpen(true);
+        } else {
+          startDialogue(
+            localizeConversation(
+              {
+                id: `${chapterId}.bed.notYet`,
+                lines: [doctorThought(dayEndCopy.es.notYetSleepy, dayEndCopy.en.notYetSleepy)],
+              },
+              language,
+              "doctor",
+            ),
+          );
+        }
         return;
       }
 

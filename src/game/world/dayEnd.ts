@@ -18,6 +18,10 @@ export const DAY_WIND_DOWN_FLAGS: Readonly<Record<string, string>> = {
   "chapter-3": "chapter3.day3.windDown",
 };
 
+// The bed in the Doctor's Room (2026-11-15): an interaction zone Kilian paints in /dev/collisions
+// (scene "doctor-room") with this interactionId. With the day's work done it asks "sleep now?".
+export const BED_INTERACTION_ID = "doctor-room.bed";
+
 // The scenes where the day ends once the Doctor is "home": the Botica and the room above it.
 export const DAY_END_SCENES: readonly SceneId[] = ["apothecary-interior", "doctor-room"];
 
