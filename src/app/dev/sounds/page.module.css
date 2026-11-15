@@ -1,0 +1,67 @@
+.page {
+  min-height: 100vh;
+  padding: 24px;
+  font: 14px/1.4 monospace;
+  color: #f4ead5;
+  background: #1a1510;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.group {
+  margin: 0 0 20px;
+}
+
+.group h2 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #c9b27a;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid #3f3427;
+}
+
+.id {
+  min-width: 190px;
+  font-weight: bold;
+}
+
+.file {
+  min-width: 260px;
+  color: #9a8a6a;
+}
+
+.row button,
+.top button {
+  font: inherit;
+  padding: 4px 10px;
+  color: #f4ead5;
+  background: #3a2c1e;
+  border: 1px solid #6a4e35;
+  cursor: pointer;
+}
+
+.row button:hover,
+.top button:hover {
+  background: #54402b;
+}
+
+.row label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

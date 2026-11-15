@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
+import { VolumeControl } from "../audio/VolumeControl";
 import { controlsCopy } from "../i18n/controls";
 import type { Language } from "../i18n/types";
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
@@ -62,6 +63,8 @@ export function PauseMenu({
               </div>
             </>
           ) : (
+            <>
+            <VolumeControl language={language} />
             <div className={styles.buttons}>
               <button type="button" className={styles.button} data-pause-resume onClick={onResume}>
                 {copy.resume}
@@ -75,6 +78,7 @@ export function PauseMenu({
                 </button>
               ) : null}
             </div>
+            </>
           )}
         </div>
       </section>

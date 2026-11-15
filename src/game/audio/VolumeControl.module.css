@@ -1,0 +1,47 @@
+.root {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-family: var(--ui-font);
+  color: #2b1a14;
+}
+
+.label {
+  font-size: 17px;
+  letter-spacing: 0.04em;
+}
+
+.slider {
+  width: 100%;
+  accent-color: #7c2b20;
+  cursor: pointer;
+}
+
+.slider:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.mute {
+  font: inherit;
+  font-size: 15px;
+  padding: 4px 10px 5px;
+  color: #2b1a14;
+  background: #e0d1a9;
+  border: 2px solid #2b1a14;
+  box-shadow: inset 2px 2px 0 rgba(255, 246, 222, 0.6), inset -2px -3px 0 rgba(74, 50, 28, 0.3);
+  cursor: pointer;
+}
+
+.mute:hover,
+.mute:focus-visible {
+  outline: none;
+  background: #f1e5c2;
+}
+
+.muteOn {
+  color: #f4ead5;
+  background: #7c2b20;
+}

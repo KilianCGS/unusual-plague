@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
+import { VolumeControl } from "../audio/VolumeControl";
 import { controlsCopy } from "../i18n/controls";
 import type { Language } from "../i18n/types";
 import { KeyCap } from "../ui/KeyCap";
@@ -140,6 +141,8 @@ export function ControlsPanel({ language, onClose }: { language: Language; onClo
               </div>
             ))}
           </div>
+
+          <VolumeControl language={language} />
 
           <p className={styles.hint}>{copy.hint}</p>
           <div className={styles.buttons}>
