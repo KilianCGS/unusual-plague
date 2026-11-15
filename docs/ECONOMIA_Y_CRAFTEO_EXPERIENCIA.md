@@ -219,3 +219,64 @@ Lo que se aplicó (solo existencias de tienda): sal 3, azúcar 3, hueso 2, ajo 1
 deja de venderse** hasta que un caso la necesite. Coste total de la tienda: 41, frente a 45 obligatorios.
 Resultado: 3.011 estados comprobados, ninguno sin salida. Si se cambia un precio, un pago o una existencia,
 este test dice al momento si se ha vuelto a abrir un callejón.
+
+
+## 6. Días 3 y 4 por datos (2026-11-15)
+
+Mismo método que el día 1: se leen los datos reales (casos, recetas, recolectables de las composiciones,
+intercambios con NPC, suministros del día 2) y se cuenta qué se necesita y de dónde sale. No es una partida
+jugada. Ojo: el test `economy-no-deadlock` solo vigila **lo que vende el mercader**; asume que el resto
+está "libre en el mundo", y para el día 3 eso **no es cierto todavía**.
+
+### Hallazgo principal: el día 3 no tiene de dónde sacar varios ingredientes
+
+Lo que piden los tres casos del día 3, sin contar lo que vende el mercader:
+
+| Caso | Ingredientes crudos |
+|---|---|
+| Mujer del plumero | agua x2, menta x2, miel x1, ajo x1 (tienda) |
+| Minero del camino | naranja x1, agua x2, azúcar x1 (tienda), hueso x1, sal x1 |
+| Picapedrero | tela x1 (tienda), alcohol x1, hierba medicinal x1, miel x1, harina x1 |
+
+Libro de cuentas de lo que **no** vende el mercader (días 1 a 3, ids de recolectables únicos porque lo
+recogido no vuelve a aparecer):
+
+| Ingrediente | Hace falta | Fuentes reales | Resultado |
+|---|---|---|---|
+| Miel | 1 (d1) + 1 (d2) + **2 (d3)** = 4 | apicultor d1 (1) y apicultor d2 (1, solo si un caso del día 2 la necesita) | **faltan 2** |
+| Harina | 1 (d2) + **1 (d3)** = 2 | saco de la panadera, solo mientras un caso del día 2 la necesita | **falta 1** |
+| Alcohol | 1 (d1) + **1 (d3)** = 2 | camarero, una sola vez (día 1) | **falta 1** |
+| Menta | 1 (d2) + **2 (d3)** = 3 | claro del bosque (1) y cabaña (1) | **falta 1** |
+| Hierba medicinal | 2 (d1) + 2 (d2) + **1 (d3)** = 5 | bosque d1 (1), bosque d2 (2), trueque con la bruja (1) | **falta 1** (ya anotado: segunda fuente de hierba) |
+| Naranja | 1 (d1) + 1 (d2) + 1 (d3) = 3 | una rama de 3 | justo, sin margen |
+| Carbón, resina, grasa | solo días 1-2 | cantera, vecina, leñador | bien |
+
+Por qué fallan miel, harina y alcohol: los proveedores del día 2 (`resolveBeekeeperHoney`, saco de harina,
+`CHAPTER2_SUPPLIES`) buscan lo que falta **solo entre los casos del día 2**. En el día 3 responden "hoy no le
+pido nada". El día 3 tampoco tiene colocaciones propias todavía (`chapter-3.ts` vacío: hereda las del día 2).
+
+Consecuencia hoy: con las mejores decisiones posibles, el jugador **no puede curar** al picapedrero (alcohol,
+harina, miel) ni terminar el balsámico del plumero sin una segunda miel. Es un callejón, aunque el dinero
+sobre. Las partidas de prueba no lo ven porque `createDay3DevStart` regala menta, miel, ajo y naranjas.
+
+### Dinero del día 3
+
+Con las existencias de tienda actuales (sal 3, azúcar 3, hueso 2, ajo 1, tela 4) el día 3 se puede pagar: el
+test lo da por bueno. La naranja, sin embargo, depende de **no haber desperdiciado ninguna**: la receta de
+"jarabe cítrico" está bloqueada por el aviso "no hace falta", así que hoy no se puede gastar una por error.
+
+### Día 4
+
+Sin pacientes, sin pagos, sin recetas nuevas: no hay economía que analizar. Lo único a vigilar es el carácter
+del día (visual) y que el jugador no pierda nada por llegar con monedas de sobra (hoy sobran ~8-12).
+
+### Propuestas (cualquiera cierra el callejón; ninguna está aplicada)
+
+1. **Miel, harina y alcohol**: generalizar los suministros del día 2 para que también atiendan los casos
+   del día 3 (apicultor, saco de la panadera, camarero). No cambia ningún texto de diálogo nuevo salvo las
+   líneas de "esto ya lo tienes".
+2. **Menta y hierba**: dos recolectables más que **colocas tú en el Decorator** (menta y hierba ya existen
+   como recolectables; yo solo te doy los nombres). Cierra también la segunda fuente de hierba.
+3. **Naranja**: una segunda rama de naranjas en el día 3 (o aceptar el "justo").
+4. Añadir a `economy-no-deadlock` el libro de cuentas de ingredientes que **no** vende el mercader, para que
+   este tipo de hueco salte en un test en vez de en una partida.
