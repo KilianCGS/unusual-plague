@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { playSound } from "../audio/audioPlayer";
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
 import { bookCopy } from "../i18n/book";
 import {
@@ -102,6 +103,7 @@ export function BookOverlay({
     }
 
     setSpreadIndex(next);
+    playSound("ui.pageTurn");
     onPageChange?.();
   }
 

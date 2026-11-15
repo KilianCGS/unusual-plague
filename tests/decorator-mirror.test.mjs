@@ -129,10 +129,13 @@ test("mirroring moves neither the anchor nor the scale: the box mirrors around t
   ).outputText;
   const mod = new Module("ds");
   mod.paths = Module._nodeModulePaths(root);
+  // the sprite also plays sounds (audio modules): not under test here, so stubbed
   mod.require = (id) =>
     id.includes("decorAssets") || id.includes("decorTypes")
       ? assets
-      : require(id);
+      : id.includes("audio/")
+        ? { playSound: () => null, DECOR_IMPACT_SOUNDS: {}, impactVolume: () => 0 }
+        : require(id);
   mod._compile(sprite, path.join(root, "ds.cjs"));
   const a = mod.exports.getSpriteBox(npc, make());
   const b = mod.exports.getSpriteBox(npc, make({ flipX: true }));

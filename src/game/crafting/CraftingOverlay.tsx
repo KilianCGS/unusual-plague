@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { playSound } from "../audio/audioPlayer";
+import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 
 import { craftingCopy } from "../i18n/crafting";
@@ -113,6 +114,8 @@ export function CraftingOverlay({
   // once: the interface closes into a "Preparing..." bar, and only then the stock changes.
   const [preparing, setPreparing] = useState<{ inventory: InventoryState; created: Created } | null>(null);
   const modalOpen = created !== null;
+  // The kitchen's sound lasts as long as the wait; cancelling the wait cuts it.
+  const cookingSound = useRef<HTMLAudioElement | null>(null);
   const selectedCount = selection.filter(
     (selected) => selected !== null,
   ).length;
@@ -126,6 +129,10 @@ export function CraftingOverlay({
     return () => onCookingChange?.(false);
   }, [isPreparing, onCookingChange]);
 
+  useEffect(() => {
+    return () => cookingSound.current?.pause();
+  }, []);
+
   // The wait is over: the stock changes and the success modal shows.
   useEffect(() => {
     if (!preparing) return;
@@ -133,6 +140,7 @@ export function CraftingOverlay({
       onInventoryChange(preparing.inventory);
       setCreated(preparing.created);
       setPreparing(null);
+      playSound("craft.recipeCrafted");
     }, CRAFT_DURATION_MS[station] ?? 0);
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -149,6 +157,8 @@ export function CraftingOverlay({
 
         if (preparing) {
           // cancelling the wait gives nothing and consumes nothing
+          cookingSound.current?.pause();
+          cookingSound.current = null;
           setPreparing(null);
         } else if (modalOpen) {
           setCreated(null);
@@ -175,6 +185,7 @@ export function CraftingOverlay({
 
     // an item with no free unit left does nothing (its slot looks spent)
     if (availableUnits(inventory, selection, itemId) > 0) {
+      playSound("ui.itemClickDrop");
       setMessage(null);
       setSelection(selectItem(inventory, selection, itemId));
     }
@@ -182,6 +193,7 @@ export function CraftingOverlay({
 
   function handleSlotClick(slotIndex: number) {
     setMessage(null);
+    playSound("ui.itemClickDrop");
     setSelection((current) => deselectSlot(current, slotIndex));
   }
 
@@ -210,10 +222,15 @@ export function CraftingOverlay({
       setSelection(createEmptySelection(station));
       setMessage(null);
       if (CRAFT_DURATION_MS[station]) {
+        cookingSound.current = playSound("craft.cooking");
         setPreparing({ inventory: result.inventory, created: made });
       } else {
         onInventoryChange(result.inventory);
         setCreated(made);
+        // chopping and grinding have their own sound; the table just finishes the recipe
+        if (station === "chop") playSound("craft.chop");
+        else if (station === "mortar") playSound("craft.mortar");
+        else playSound("craft.recipeCrafted");
       }
     } else {
       // Nothing is consumed and the selection stays so it can be corrected.

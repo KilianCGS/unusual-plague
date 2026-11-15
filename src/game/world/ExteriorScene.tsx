@@ -28,6 +28,8 @@ import { getNpcColliders } from "../npcs/sceneNpc";
 import { getSceneNpcs } from "../npcs/sceneNpcs";
 import { SceneNpcSprite } from "../npcs/SceneNpcSprite";
 import { DOCTOR_SCALE } from "../protagonist/doctorScale";
+import { footstepSoundFor } from "../audio/footstepSurface";
+import { useFootsteps } from "../audio/useFootsteps";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
 import { getMovementBob } from "../protagonist/protagonistRun";
 import { useReportRunning } from "../protagonist/useReportRunning";
@@ -215,6 +217,13 @@ export function ExteriorScene({
     onRunBlocked,
   });
 
+  useFootsteps(player, footstepSoundFor(scene.id));
+  // Where the Doctor is, for the working NPCs' sounds (silent while not playing).
+  const listenerRef = useRef<{ x: number; y: number } | null>(null);
+  useEffect(() => {
+    listenerRef.current = isPlaying ? { x: player.x, y: player.y } : null;
+  }, [isPlaying, player.x, player.y]);
+
   const sceneZones = getSceneInteractionZones(scene.id);
   const interactionZones = useMemo(
     () => [...sceneZones, ...decor.zones],
@@ -367,6 +376,7 @@ export function ExteriorScene({
               key={instance.instanceId}
               asset={asset}
               instance={instance}
+              listener={listenerRef}
             />
           ))}
           {decor.sprites.map(({ asset, instance }) =>

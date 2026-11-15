@@ -14,6 +14,7 @@ import {
 } from "react";
 
 import { ApothecaryScene } from "../apothecary/ApothecaryScene";
+import { playSound } from "../audio/audioPlayer";
 import { BookOverlay } from "../book/BookOverlay";
 import { DiagnosisOverlay } from "../patients/DiagnosisOverlay";
 import { DIAGNOSIS_SYMPTOMS, checkDiagnosis, diagnosisConversation, type DiagnosisSession } from "../patients/diagnosis";
@@ -570,6 +571,7 @@ export function GameWorld({
       let nextPatients = patientsRef.current;
       let nextRewards = claimedRewardsRef.current;
       let nextCoins = coinsRef.current;
+      const coinsBefore = coinsRef.current;
       let earned = 0;
       const obtained: { itemId: string; quantity: number }[] = [];
 
@@ -659,6 +661,10 @@ export function GameWorld({
         showNotice(moneyCopy[language].received(earned));
       }
 
+      // Money changing hands has its own sound; otherwise receiving an item does.
+      if (nextCoins !== coinsBefore) playSound("ui.coins");
+      else if (obtained.length > 0) playSound("ui.itemObtained");
+
       for (const { itemId, quantity } of obtained) {
         showNotice(
           formatObtainedNotice(
@@ -718,6 +724,7 @@ export function GameWorld({
       storageRef.current = nextStorage;
       setInventory(nextInventory);
       setStorage(nextStorage);
+      playSound("ui.itemClickDrop");
       if (!toStorage && rememberRecipes(nextInventory)) {
         showNotice(recipeDiscoveryCopy[language]);
       }
@@ -739,6 +746,7 @@ export function GameWorld({
 
       // The Doctor's Storage chest: open its interface.
       if (interactionId === STORAGE_INTERACTION_ID) {
+        playSound("ui.chestOpen");
         setStorageOpen(true);
         return;
       }
@@ -775,6 +783,7 @@ export function GameWorld({
           inventoryRef.current = next;
           setInventory(next);
           setCollected((current) => markCollected(current, source.instanceId!));
+          playSound("ui.itemObtained");
           showNotice(
             formatObtainedNotice(
               language,

@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, MutableRefObject } from "react";
 
+import { playSound } from "../audio/audioPlayer";
+import { DECOR_IMPACT_SOUNDS, impactVolume } from "../audio/decorImpactSounds";
 import type { DecorAsset, DecorInstance } from "./decorTypes";
 
 // Frame index of an in-place animation (1 frame = static, no timer).
@@ -44,12 +46,26 @@ export function getSpriteBox(asset: DecorAsset, instance: DecorInstance) {
 export function DecorSprite({
   asset,
   instance,
+  listener,
 }: {
   asset: DecorAsset;
   instance: DecorInstance;
+  // Where the Doctor stands (null while the game is not being played). Only needed for
+  // working NPCs that make a sound; without it they stay silent.
+  listener?: MutableRefObject<{ x: number; y: number } | null>;
 }) {
   const { frames, frameWidth, frameHeight, fps, loop } = asset.sprite;
   const frameIndex = useFrameIndex(frames.length, fps, loop);
+  const impact = DECOR_IMPACT_SOUNDS[asset.id];
+
+  useEffect(() => {
+    const at = listener?.current;
+    if (!impact || !at || frameIndex !== impact.frame) return;
+    const volume = impactVolume(Math.hypot(at.x - instance.x, at.y - instance.y), impact.radius);
+    if (volume > 0) playSound(impact.sound, { volume });
+    // the sound belongs to the frame change only
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frameIndex]);
 
   const anchorStyle: CSSProperties = {
     position: "absolute",

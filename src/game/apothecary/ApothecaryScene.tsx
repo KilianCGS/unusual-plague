@@ -21,6 +21,7 @@ import { DOCTOR_SCALE } from "../protagonist/doctorScale";
 
 // Inside the Botica he looked huge next to the furniture: 15% smaller here only.
 const BOTICA_DOCTOR_SCALE = 0.85;
+import { useFootsteps } from "../audio/useFootsteps";
 import { ProtagonistSprite } from "../protagonist/ProtagonistSprite";
 import { getMovementBob } from "../protagonist/protagonistRun";
 import { useReportRunning } from "../protagonist/useReportRunning";
@@ -142,6 +143,8 @@ export function ApothecaryScene({
     runDisabled: true,
     onRunBlocked,
   });
+
+  useFootsteps(player, "steps.interior");
 
   usePlayerMoved(player.x, player.y, onPlayerMoved);
   useReportRunning(player.isRunning, onRunningChange);
