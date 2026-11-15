@@ -262,7 +262,7 @@ test("crafting shapes for the first days: generic 2- and 3-input recipes on both
   assert.equal(out("manual", "water", "cloth"), "cold-cloth");
   assert.equal(out("manual", "cloth", "alcohol"), "disinfected-bandage");
   assert.equal(out("fire", "water", "medicinal-herb"), "medicinal-infusion");
-  assert.equal(out("fire", "water", "mushroom", "salt"), "mushroom-soup");
+  assert.equal(out("fire", "water", "chopped-mushroom", "salt"), "mushroom-soup");
 
   // a future Milk + Honey recipe is just data: no change in the crafting code
   const milkHoney = {

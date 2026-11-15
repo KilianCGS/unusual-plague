@@ -6,6 +6,10 @@ import type { Language } from "../i18n/types";
 // raw resource or a prepared remedy. Add an entry here to add an item; nothing
 // else needs to change.
 export type ItemId =
+  | "chopped-onion"
+  | "chopped-mushroom"
+  | "chopped-pine-mushroom"
+  | "crushed-garlic"
   | "medicinal-herb"
   | "cloth"
   | "alcohol"
@@ -252,6 +256,27 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     id: "crushed-herb",
     name: { es: "Hierba machacada", en: "Crushed herb" },
     icon: `${PREPARED_ICONS}/crushed-herb.png`,
+  },
+  // 2026-11-14: chopped on the kitchen's cutting board, ground in the mortar. NEW names, for review.
+  "chopped-onion": {
+    id: "chopped-onion",
+    name: { es: "Cebolla troceada", en: "Chopped onion" },
+    icon: `${PREPARED_ICONS}/chopped-onion.png`,
+  },
+  "chopped-mushroom": {
+    id: "chopped-mushroom",
+    name: { es: "Hongo troceado", en: "Chopped mushroom" },
+    icon: `${PREPARED_ICONS}/chopped-mushroom.png`,
+  },
+  "chopped-pine-mushroom": {
+    id: "chopped-pine-mushroom",
+    name: { es: "Seta de pino troceada", en: "Chopped pine mushroom" },
+    icon: `${PREPARED_ICONS}/chopped-pine-mushroom.png`,
+  },
+  "crushed-garlic": {
+    id: "crushed-garlic",
+    name: { es: "Ajo machacado", en: "Crushed garlic" },
+    icon: `${PREPARED_ICONS}/crushed-garlic.png`,
   },
   "charcoal-suspension": {
     id: "charcoal-suspension",

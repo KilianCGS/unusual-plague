@@ -263,7 +263,7 @@ test("7-9. the soup keeps its ids but is shown as Sopa ligera / Light soup; Milk
     [
       ["water", 1],
       ["salt", 1],
-      ["mushroom", 1],
+      ["chopped-mushroom", 1],
     ],
   );
   const milk = RECIPES.find((r) => r.id === "fire.milk-with-honey");

@@ -1651,6 +1651,8 @@ export function GameWorld({
           activeTreatments={activeTreatments}
           onOpenMortar={() => setCraftingStation("mortar")}
           onBackToTable={() => setCraftingStation("manual")}
+          onOpenBoard={() => setCraftingStation("chop")}
+          onBackToKitchen={() => setCraftingStation("fire")}
           onCookingChange={setCooking}
           onInventoryChange={(next) => {
             inventoryRef.current = next;

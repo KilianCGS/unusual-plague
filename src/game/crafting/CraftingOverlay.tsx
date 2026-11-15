@@ -37,6 +37,8 @@ type Message =
 
 // The mortar's picture (a fixture of the work table, not an item).
 const MORTAR_ICON = "/game/ui/mortar.png";
+// The kitchen's cutting board (a fixture of the stove, not an item).
+const BOARD_ICON = "/game/ui/cutting-board.png";
 
 // How many raw ingredients the known cases still lack in total.
 function totalMissing(treatments: readonly ItemNeed[], inventory: InventoryState) {
@@ -72,6 +74,8 @@ export function CraftingOverlay({
   activeTreatments,
   onOpenMortar,
   onBackToTable,
+  onOpenBoard,
+  onBackToKitchen,
   onCookingChange,
 }: {
   station: CraftStation;
@@ -91,6 +95,9 @@ export function CraftingOverlay({
   // The mortar button of the work table, and the way back from the mortar.
   onOpenMortar?: () => void;
   onBackToTable?: () => void;
+  // The cutting board button of the kitchen, and the way back from the board.
+  onOpenBoard?: () => void;
+  onBackToKitchen?: () => void;
   // Tells the scene behind that the kitchen is cooking (steam and a livelier fire).
   onCookingChange?: (cooking: boolean) => void;
 }) {
@@ -266,6 +273,31 @@ export function CraftingOverlay({
               <span className={styles.mortarLabel}>{copy.mortar.label}</span>
             </button>
           ) : null}
+          {station === "fire" && onOpenBoard ? (
+            <button
+              type="button"
+              className={styles.mortar}
+              data-crafting-board
+              aria-label={copy.board.label}
+              disabled={modalOpen}
+              onClick={onOpenBoard}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={BOARD_ICON} alt="" width={48} height={48} draggable={false} />
+              <span className={styles.mortarLabel}>{copy.board.label}</span>
+            </button>
+          ) : null}
+          {station === "chop" && onBackToKitchen ? (
+            <button
+              type="button"
+              className={styles.back}
+              data-crafting-back
+              disabled={modalOpen}
+              onClick={onBackToKitchen}
+            >
+              {copy.board.back}
+            </button>
+          ) : null}
           {station === "mortar" && onBackToTable ? (
             <button
               type="button"
@@ -283,7 +315,7 @@ export function CraftingOverlay({
             </button>
           ) : null}
           <p className={styles.counter} data-crafting-counter>
-            {station === "mortar" ? copy.mortar.ingredient : copy.ingredients} {selectedCount}/{selection.length}
+            {station === "mortar" || station === "chop" ? copy.mortar.ingredient : copy.ingredients} {selectedCount}/{selection.length}
           </p>
 
           <div className={styles.selection} data-crafting-selection>

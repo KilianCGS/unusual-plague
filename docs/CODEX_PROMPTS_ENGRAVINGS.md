@@ -87,3 +87,20 @@ Los iconos del inventario son de 48x48 px (arte de píxel); los nuevos ya los ti
 - Al sustituir los ficheros no hace falta tocar código: el Compendio ya los usa por nombre.
 - Los provisionales actuales los generan `art/book-placeholder-ailments.cjs` y
   `art/book-placeholder-illustrations.cjs`; no volver a ejecutarlos tras instalar los definitivos.
+
+## Cuatro preparados más (2026-11-14): troceados y ajo machacado
+
+Con la tabla de cortar de la cocina hay cuatro preparados nuevos que también tienen página en el
+libro. Hoy llevan una **copia provisional** del grabado de la hierba machacada
+(`crushed-herb.png`): hay que sustituirlos. Mismo estilo, tamaño y formato que
+`preparations/mint-infusion.png` (el objeto solo, centrado, con 2-3 ingredientes que lo componen
+dibujados al lado, trazo fino a pluma, sombreado con rayado cruzado, sin color, sin marco, sin
+texto).
+
+- `preparations/chopped-onion.png`: cebolla troceada en dados sobre una tabla; al lado, una cebolla
+  entera y un cuchillo.
+- `preparations/chopped-mushroom.png`: hongo cortado en láminas y trozos; al lado, un hongo entero.
+- `preparations/chopped-pine-mushroom.png`: seta de pino en trozos, con el pie en rodajas; al lado,
+  una seta entera.
+- `preparations/crushed-garlic.png`: ajo machacado en un montoncito casi en polvo; al lado, una
+  cabeza de ajo y un diente.

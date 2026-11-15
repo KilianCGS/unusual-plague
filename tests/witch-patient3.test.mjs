@@ -896,7 +896,10 @@ test("Route C (the collector): both Mushrooms first > one for the soup, one for 
   });
   assert.equal(count(f, "mushroom"), 2);
   // one goes into the soup (Patient 2's recipe), whenever he likes
-  const soup = cr.combine(f.inventory, "fire", ["water", "salt", "mushroom"]);
+  // (the mushroom is chopped on the kitchen's board first)
+  const chopped = cr.combine(f.inventory, "chop", ["mushroom"]);
+  assert.equal(chopped.kind, "success");
+  const soup = cr.combine(chopped.inventory, "fire", ["water", "salt", "chopped-mushroom"]);
   assert.equal(soup.kind, "success");
   f = { ...f, inventory: soup.inventory };
   assert.equal(count(f, "mushroom"), 1);
@@ -925,8 +928,9 @@ test("Route C (the collector): both Mushrooms first > one for the soup, one for 
     ),
   );
   assert.equal(count(g, "mushroom"), 1);
+  const gChopped = cr.combine(g.inventory, "chop", ["mushroom"]);
   assert.equal(
-    cr.combine(g.inventory, "fire", ["water", "salt", "mushroom"]).kind,
+    cr.combine(gChopped.inventory, "fire", ["water", "salt", "chopped-mushroom"]).kind,
     "success",
   );
 });

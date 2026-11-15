@@ -262,7 +262,7 @@ export function ApothecaryScene({
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       key={interactionId}
-                      src="/game/ui/tutorial/wood-arrow.png"
+                      src="/game/ui/tutorial/arrow-yellow.png"
                       alt=""
                       className={styles.pointer}
                       data-tutorial-pointer={interactionId}

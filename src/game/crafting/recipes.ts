@@ -8,14 +8,16 @@ import type { ItemId } from "../items/items";
 // are valid there and how many ingredients can be placed:
 //   manual  the work table: mixing, soaking, wrapping...            (2 inputs)
 //   fire    the hearth: boiling, cooking, infusing, reducing...     (3 inputs)
+//   chop    the cutting board of the kitchen: CHOPPING one ingredient (1 input)
 //   mortar  the mortar on the work table: GRINDING one ingredient   (1 input)
 //           (the mortar is never consumed: it is a fixture of the table)
-export type CraftStation = "manual" | "fire" | "mortar";
+export type CraftStation = "manual" | "fire" | "mortar" | "chop";
 
 export const STATION_MAX_INPUTS: Record<CraftStation, number> = {
   manual: 2,
   fire: 3,
   mortar: 1,
+  chop: 1,
 };
 
 // Inputs carry a quantity (a future recipe may need "herb x2"), so they are a
@@ -69,7 +71,7 @@ export const RECIPES: Recipe[] = [
     inputs: [
       { itemId: "water", quantity: 1 },
       { itemId: "salt", quantity: 1 },
-      { itemId: "mushroom", quantity: 1 },
+      { itemId: "chopped-mushroom", quantity: 1 },
     ],
     output: { itemId: "mushroom-soup", quantity: 1 },
   },
@@ -109,7 +111,7 @@ export const RECIPES: Recipe[] = [
   {
     id: "fire.balsamic-syrup",
     station: "fire",
-    inputs: [{ itemId: "mint-infusion", quantity: 1 }, { itemId: "honey", quantity: 1 }, { itemId: "garlic", quantity: 1 }],
+    inputs: [{ itemId: "mint-infusion", quantity: 1 }, { itemId: "honey", quantity: 1 }, { itemId: "crushed-garlic", quantity: 1 }],
     output: { itemId: "balsamic-syrup", quantity: 1 },
   },
   {
@@ -143,6 +145,31 @@ export const RECIPES: Recipe[] = [
     output: { itemId: "crushed-herb", quantity: 1 },
   },
   {
+    id: "mortar.crushed-garlic",
+    station: "mortar",
+    inputs: [{ itemId: "garlic", quantity: 1 }],
+    output: { itemId: "crushed-garlic", quantity: 1 },
+  },
+  // The cutting board of the kitchen: one ingredient in, its chopped version out (1 for 1).
+  {
+    id: "chop.onion",
+    station: "chop",
+    inputs: [{ itemId: "onion", quantity: 1 }],
+    output: { itemId: "chopped-onion", quantity: 1 },
+  },
+  {
+    id: "chop.mushroom",
+    station: "chop",
+    inputs: [{ itemId: "mushroom", quantity: 1 }],
+    output: { itemId: "chopped-mushroom", quantity: 1 },
+  },
+  {
+    id: "chop.pine-mushroom",
+    station: "chop",
+    inputs: [{ itemId: "pine-mushroom", quantity: 1 }],
+    output: { itemId: "chopped-pine-mushroom", quantity: 1 },
+  },
+  {
     id: "manual.charcoal-suspension",
     station: "manual",
     inputs: [{ itemId: "crushed-coal", quantity: 1 }, { itemId: "water", quantity: 1 }],
@@ -167,13 +194,13 @@ export const RECIPES: Recipe[] = [
   {
     id: "fire.mushroom-cream",
     station: "fire",
-    inputs: [{ itemId: "pine-mushroom", quantity: 1 }, { itemId: "milk", quantity: 1 }, { itemId: "salt", quantity: 1 }],
+    inputs: [{ itemId: "chopped-pine-mushroom", quantity: 1 }, { itemId: "milk", quantity: 1 }, { itemId: "salt", quantity: 1 }],
     output: { itemId: "mushroom-cream", quantity: 1 },
   },
   {
     id: "fire.onion-syrup",
     station: "fire",
-    inputs: [{ itemId: "onion", quantity: 1 }, { itemId: "sugar", quantity: 1 }],
+    inputs: [{ itemId: "chopped-onion", quantity: 1 }, { itemId: "sugar", quantity: 1 }],
     output: { itemId: "onion-syrup", quantity: 1 },
   },
   {
@@ -191,7 +218,7 @@ export const RECIPES: Recipe[] = [
   {
     id: "fire.strong-broth",
     station: "fire",
-    inputs: [{ itemId: "onion", quantity: 1 }, { itemId: "bone", quantity: 1 }, { itemId: "water", quantity: 1 }],
+    inputs: [{ itemId: "chopped-onion", quantity: 1 }, { itemId: "bone", quantity: 1 }, { itemId: "water", quantity: 1 }],
     output: { itemId: "strong-broth", quantity: 1 },
   },
 ];

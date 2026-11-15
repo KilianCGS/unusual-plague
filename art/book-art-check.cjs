@@ -13,7 +13,7 @@ const BOOK = path.resolve(__dirname, "../public/game/ui/book");
 const OUT = process.argv[2] || path.resolve(__dirname, "../book-art-sheet.png");
 
 const AILMENTS = ["burn-v2", "fracture-v2", "insomnia-v2"].map((n) => ({ file: `ailments/${n}.png`, ref: "ailments/fever-v2.png" }));
-const PREPARATIONS = ["bone-broth", "citrus-syrup", "mushroom-cream", "onion-syrup", "rehydration-drink", "strong-broth"].map((n) => ({
+const PREPARATIONS = ["bone-broth", "citrus-syrup", "mushroom-cream", "onion-syrup", "rehydration-drink", "strong-broth", "chopped-onion", "chopped-mushroom", "chopped-pine-mushroom", "crushed-garlic"].map((n) => ({
   file: `preparations/${n}.png`,
   ref: "preparations/mint-infusion.png",
 }));

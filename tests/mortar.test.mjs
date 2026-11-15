@@ -52,12 +52,13 @@ const stock = (pairs) => pairs.reduce((s, [id, q]) => addItem(s, id, q), createE
 const total = (treatments, inventory) =>
   getMissingIngredients(treatments, inventory).reduce((n, need) => n + need.quantity, 0);
 
-test("the mortar grinds ONE ingredient: coal and herb, nothing else, and it is never consumed", () => {
+test("the mortar grinds ONE ingredient: coal, herb and garlic, nothing else, and it is never consumed", () => {
   assert.equal(STATION_MAX_INPUTS.mortar, 1);
   const grinding = RECIPES.filter((r) => r.station === "mortar");
   assert.deepEqual(grinding.map((r) => [r.inputs[0].itemId, r.output.itemId]), [
     ["coal", "crushed-coal"],
     ["medicinal-herb", "crushed-herb"],
+    ["garlic", "crushed-garlic"],
   ]);
   for (const r of grinding) assert.equal(r.inputs.length, 1);
   assert.equal(cr.combine(stock([["mint", 1]]), "mortar", ["mint"]).kind, "no-recipe");

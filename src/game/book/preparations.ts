@@ -63,6 +63,23 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
     es: "Hierba medicinal machacada en el mortero. Base para la pasta.",
     en: "Medicinal herb ground in the mortar. The base for the paste.",
   },
+  // The four below are NEW text (2026-11-14), awaiting Kilian's review.
+  "chopped-onion": {
+    es: "Cebolla cortada en trozos pequeños sobre la tabla. Lista para cocinar.",
+    en: "Onion cut into small pieces on the board. Ready for cooking.",
+  },
+  "chopped-mushroom": {
+    es: "Hongos cortados en láminas y trozos. Lista para el caldo.",
+    en: "Mushrooms cut into slices and pieces. Ready for the broth.",
+  },
+  "chopped-pine-mushroom": {
+    es: "Seta de pino cortada en trozos, con su pie en rodajas. Lista para la crema.",
+    en: "Pine mushroom cut into pieces, with its stem in slices. Ready for the cream.",
+  },
+  "crushed-garlic": {
+    es: "Ajo machacado en el mortero hasta quedar casi en polvo. Base del jarabe.",
+    en: "Garlic ground in the mortar until almost a powder. The base of the syrup.",
+  },
   "charcoal-suspension": {
     es: "Carbón triturado mezclado con agua. Preparado de administración oral.",
     en: "Ground charcoal mixed with water. A preparation taken by mouth.",

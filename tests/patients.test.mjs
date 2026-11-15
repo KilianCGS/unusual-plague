@@ -326,7 +326,7 @@ test("a station's capacity is a MAXIMUM: the stove runs 2-input and 3-input reci
     ["water", 1],
     ["medicinal-herb", 1],
     ["salt", 1],
-    ["mushroom", 1],
+    ["chopped-mushroom", 1],
   ]);
   // two selected units are enough to try, and the 2-input recipe works
   let two = cr.selectItem(
@@ -340,7 +340,7 @@ test("a station's capacity is a MAXIMUM: the stove runs 2-input and 3-input reci
   assert.equal(inv.countItem(infusion.inventory, "medicinal-infusion"), 1);
   // the existing 3-input recipe still works
   assert.equal(
-    cr.combine(state, "fire", ["mushroom", "water", "salt"]).recipe.id,
+    cr.combine(state, "fire", ["chopped-mushroom", "water", "salt"]).recipe.id,
     "fire.mushroom-soup",
   );
   // one unit is not enough to try
@@ -1374,7 +1374,7 @@ test("baker's Salt: Patient 1's treatment is unchanged and no other patient or r
     ch1.INJURED_MINER_ID,
   ]);
   assert.deepEqual(Object.keys(ch1.CHAPTER1_INITIAL_PATIENTS), [HUSBAND]);
-  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 22);
+  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 26);
   // the reward conversations say nothing about patients, soup or recipes
   for (const lang of ["es", "en"]) {
     for (const key of ["bakerReward", "bakerRewardNoRoom"]) {

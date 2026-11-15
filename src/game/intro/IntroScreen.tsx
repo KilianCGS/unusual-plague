@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const FADE_IN_MS = 1000;
-const READ_MS = 4500;
+const READ_MS = 7500; // 4.5 s + 3 s more: the blocks are longer now
 const FADE_OUT_MS = 1000;
 const GAP_MS = 500;
 

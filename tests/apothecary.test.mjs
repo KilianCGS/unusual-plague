@@ -373,7 +373,7 @@ test("the Botica in play is the new one: its background, its 480x293 world, and 
 });
 
 test("18. the original four recipes are untouched (two patient recipes and Milk with honey were added after them)", () => {
-  assert.equal(RECIPES.length, 22); // + crushed herb (mortar) + the 6 cooking recipes of 2026-11-11
+  assert.equal(RECIPES.length, 26); // + crushed herb (mortar) + the 6 cooking recipes of 2026-11-11
   assert.deepEqual(
     RECIPES.slice(0, 4).map((r) => [
       r.id,
@@ -403,7 +403,7 @@ test("18. the original four recipes are untouched (two patient recipes and Milk 
       [
         "fire.mushroom-soup",
         "fire",
-        "waterx1+saltx1+mushroomx1",
+        "waterx1+saltx1+chopped-mushroomx1",
         "mushroom-soup",
       ],
     ],

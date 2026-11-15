@@ -1,6 +1,15 @@
 # Borrador: "Trocear" en la cocina (2026-11-14)
 
-Estado: **propuesta, nada implementado.** Para revisar antes de tocar código.
+Estado: **implementado el 2026-11-14** con las decisiones de abajo (la propuesta original queda como referencia).
+
+## Decisiones tomadas (2026-11-14)
+
+- Dos botones en la misma interfaz de la cocina: Trocear y Cocinar.
+- Rendimiento 1 a 1: una unidad entera da una unidad troceada.
+- Sin paso de tutorial: el botón se descubre al abrir la cocina.
+- Se aplica a todas las recetas afectadas (las 7 de abajo).
+- Pendiente de decidir por Kilian: qué ingredientes se trocean, nombres de los ítems y el aspecto
+  de los iconos (ver las preguntas al final).
 
 ## Idea
 
@@ -60,3 +69,14 @@ Receta de troceado (una por ingrediente): `fire.chop-onion`, `fire.chop-orange`,
    troceados)? Con 2 por 1 el jugador necesita menos ingredientes y la economía se relaja.
 3. ¿El troceado también tiene un pequeño sonido (cuchillo sobre tabla) aunque no haya espera?
 4. ¿Se aplican a todas las recetas de una vez o solo a las del día 1-2 para no romper nada?
+
+
+## Lo que se implementó (resumen)
+
+- Estación `chop` (tabla de cortar) abierta desde un botón en la cocina; vuelve con "← Cocina".
+- Se **cortan** cebolla, hongo y seta de pino; se **machaca** (mortero) el ajo. Hierba y carbón ya
+  se machacaban. La naranja NO se trocea.
+- Recetas cambiadas: sopa de hongos, crema de setas, jarabe de cebolla, caldo fuerte (cebolla
+  troceada) y jarabe balsámico (ajo machacado).
+- Cuatro ítems nuevos con icono propio (PixelLab) y página de libro provisional; los grabados
+  definitivos los pide `docs/CODEX_PROMPTS_ENGRAVINGS.md`.
