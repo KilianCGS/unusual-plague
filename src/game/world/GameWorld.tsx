@@ -784,6 +784,9 @@ export function GameWorld({
       const station = CRAFT_STATION_BY_INTERACTION_ID[interactionId];
 
       if (station) {
+        // Using the table or the stove is what the "two places" note asks for: it counts as read,
+        // so it does not come back every time the interface is closed.
+        if (tutorial.step === "botica") notifyTutorial("continue");
         setCraftingStation(station);
         return;
       }
@@ -895,7 +898,7 @@ export function GameWorld({
         startDialogue(conversation);
       }
     },
-    [language, chapterId, startDialogue, applyStoryEffects, showNotice, rememberRecipes],
+    [language, chapterId, startDialogue, applyStoryEffects, showNotice, rememberRecipes, tutorial.step, notifyTutorial],
   );
 
   // The notice only needs to disappear after a while.

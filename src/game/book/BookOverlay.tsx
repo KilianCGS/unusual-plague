@@ -81,6 +81,11 @@ export function BookOverlay({
   );
   const [spreadIndex, setSpreadIndex] = useState(0);
 
+  // Opening the book sounds like turning a page (the same sound).
+  useEffect(() => {
+    playSound("ui.pageTurn");
+  }, []);
+
   const section = sections[sectionIndex];
   const spread = section.spreads[spreadIndex];
   const hasPrevious = spreadIndex > 0;

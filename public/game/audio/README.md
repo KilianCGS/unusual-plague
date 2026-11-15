@@ -18,3 +18,15 @@ Archivos organizados por nombre; aún no los usa ningún código. Rutas pública
 | ui | coins.mp3 | dineroCompraVenta | Compra y venta |
 | ui | item-obtained.mp3 | ItemObtainingFromNpcorFarming | Objeto recibido de un NPC o recolectado |
 | ui | chest-open.mp3 | OPeningRoomChest | Abrir el cofre de la habitación |
+
+## Sonidos que faltan (lista de Kilian, 2026-11-15)
+
+Conectados con sonido existente:
+- Abrir el libro: usa `ui/page-turn.mp3` (el mismo que pasar página).
+
+Pendientes de recibir (el archivo y el nombre los pone Kilian; aquí van los usos):
+- Abrir el mapa.
+- Cerrar el mapa.
+- Cambiar de pestaña en el libro (Ingredientes, Preparados, Dolencias, Pacientes).
+- `game-intro` (música de la pantalla de inicio, en bucle) y `intro-button-click` (botones de inicio:
+  Empezar, Controles y banderas de idioma).
