@@ -1,0 +1,206 @@
+# Textos nuevos para revisar (ES / EN) — 2026-11-15
+
+Todo lo que ha escrito Claude y no está aprobado todavía. Español = voz canónica; el inglés es adaptación
+natural. Las tablas del tutorial, la intro y la cocina son el texto COMPLETO actual de cada bloque (incluye frases ya aprobadas mezcladas con las nuevas). Cada tabla dice de qué fichero sale; para corregir, dime la clave y el texto nuevo (o cámbialo en
+el fichero). Generado desde el código, así que lo que ves aquí es lo que sale en el juego.
+
+## 1. Tutorial (src/game/i18n/tutorial.ts)
+
+### Pasos del tutorial
+
+| Clave | Español | English |
+|---|---|---|
+| goal.title[0] | Explora la ciudad y trata a los pacientes que lo necesiten. | Explore the town and treat the patients who need it. |
+| goal.body | Esa es tu misión, Doctor. Te enseñaré lo imprescindible por el camino. | That is your mission, Doctor. I will teach you the essentials along the way. |
+| book.title[0] | Pulsa  | Press  |
+| book.title[1].action | book | book |
+| book.title[2] |  para abrir tu libro. |  to open your book. |
+| book.body | El Compendio es tu herramienta más importante: lo consultarás una y otra vez para reconocer dolencias, recordar preparados y repasar a tus pacientes. | The Compendium is your most important tool: you will consult it again and again to recognise ailments, recall preparations and review your patients. |
+| book-cover.title[0] | Haz clic en el libro para abrirlo. | Click the book to open it. |
+| book-cover.body | También puedes pulsar Espacio. | You can also press Space. |
+| book-page.title[0] | Pasa de página con  | Turn the page with  |
+| book-page.title[1].key | ← | ← |
+| book-page.title[2] |   |   |
+| book-page.title[3].key | → | → |
+| book-page.title[4] | . | . |
+| book-page.body | Estás en Ingredientes: todo lo que puedes recoger o comprar y para qué sirve cada cosa.<br>También puedes usar las flechas que hay junto a las páginas. | You are in Ingredients: everything you can gather or buy, and what each thing is for.<br>You can also use the arrows beside the pages. |
+| book-preparations.title[0] | Abre la pestaña Preparados. | Open the Remedies tab. |
+| book-preparations.body | Aquí se apuntan las recetas que vayas aprendiendo: qué mezclar, en qué estación y qué resulta. | Here go the recipes you learn: what to mix, at which station, and what comes out. |
+| book-ailments.title[0] | Ahora, la pestaña Dolencias. | Now, the Ailments tab. |
+| book-ailments.body | Todas las enfermedades que conoces: sus síntomas para reconocerlas y cómo se tratan. Te hará falta para diagnosticar. | Every illness you know: its symptoms, so you can recognise it, and how it is treated. You will need it to diagnose. |
+| book-patients.title[0] | Y por último, Pacientes. | And last, Patients. |
+| book-patients.body | La ficha de cada persona a la que atiendas: qué le pasa, qué necesita y cómo va su tratamiento. | The file of each person you treat: what is wrong, what they need and how the treatment is going. |
+| book-close.title[0] | Pulsa  | Press  |
+| book-close.title[1].action | book | book |
+| book-close.title[2] |  o  |  or  |
+| book-close.title[3].key | Esc | Esc |
+| book-close.title[4] |  para cerrar el libro. |  to close the book. |
+| book-close.body | Podrás volver a abrirlo siempre que lo necesites. | You can open it again whenever you need it. |
+| map.title[0] | Mantén  | Hold  |
+| map.title[1].action | map | map |
+| map.title[2] |  para consultar el mapa. |  to check the map. |
+| map.body | Te mostrará dónde estás y te ayudará a orientarte por la ciudad. | It shows where you are and helps you find your way around town. |
+| move.title[0] | Usa  | Use  |
+| move.title[2] |  o  |  or  |
+| move.title[4] |  para moverte. |  to move. |
+| move.body | Echa un vistazo a tu habitación. | Have a look around your room. |
+| chest-approach.title[0] | Acércate al cofre. | Approach the chest. |
+| chest-approach.body | Es tu almacén personal, en la esquina de la habitación. | It is your personal storage, in the corner of the room. |
+| chest-interact.title[0] | Pulsa  | Press  |
+| chest-interact.title[1].action | interact | interact |
+| chest-interact.title[2] |  para interactuar. |  to interact. |
+| chest-interact.body | Con {interact} hablas con las personas y usas los objetos del mundo.<br>Prueba con el cofre: ábrelo y toma el frasco vacío. | With {interact} you talk to people and use the objects of the world.<br>Try it on the chest: open it and take the empty flask. |
+| take-flask.title[0] | Selecciona el frasco vacío para llevarlo contigo. | Select the empty flask to carry it with you. |
+| take-flask.body | Lo necesitarás para recoger muestras. | You will need it to collect samples. |
+| bar.title[0] | Tu inventario y tu dinero. | Your inventory and your money. |
+| bar.body | La barra de abajo es lo que llevas encima: tiene pocas casillas, así que elige bien.<br>Las monedas, abajo a la derecha, sirven para comprar ingredientes a los comerciantes. | The bar below is what you carry: it has few slots, so choose wisely.<br>The coins, bottom right, are for buying ingredients from the merchants. |
+| eye.title[0] | Ojo abierto, ojo cerrado. | Eye open, eye closed. |
+| eye.body | El ojo de la barra de abajo la esconde cuando te estorba y la vuelve a mostrar. Los objetos siguen contigo aunque no los veas. | The eye on the bar below hides it when it gets in your way and shows it again. Your items stay with you even when you cannot see them. |
+| exit-room.title[0] | Baja a la botica. | Go down to the apothecary. |
+| exit-room.body | Sal de tu habitación por la puerta. | Leave your room through the door. |
+| botica.title[0] | Dos lugares para preparar remedios. | Two places to prepare remedies. |
+| botica.body | La mesa de alquimia (izquierda) sirve para mezclar y preparar a mano; el mortero se abre desde ella.<br>La cocina (arriba a la derecha) sirve para cocer y hervir. Acércate y pulsa {interact}. | The alchemy table (left) is for mixing and preparing by hand; the mortar opens from it.<br>The stove (top right) is for cooking and boiling. Step up and press {interact}. |
+| exit-botica.title[0] | Sal a la calle. | Head out to the street. |
+| exit-botica.body | Hay mucha ciudad por recorrer. | There is a whole town to explore. |
+| run.title[0] | Mantén  | Hold  |
+| run.title[1].action | run | run |
+| run.title[2] |  mientras te mueves para correr. |  while moving to run. |
+| run.body | En interiores, mejor ir despacio. | Indoors, better take it slow. |
+
+### Botón de continuar
+
+| Clave | Español | English |
+|---|---|---|
+| label | Entendido | Got it |
+| key | Enter | Enter |
+
+## 2. Texto de la intro antes de empezar (src/game/i18n/introScreen.ts)
+
+### Bloques de la intro
+
+| Clave | Español | English |
+|---|---|---|
+| blocks[0] | La peste quedó atrás hace ya algunos años.<br><br>Se llevó consigo muchas vidas, pero no logró acabar con nosotros. Todavía quedan sus huellas: cruces borradas en las puertas, campanas que nadie se atreve a tocar y una máscara de pico que sigo llevando por costumbre. | The plague was left behind some years ago.<br><br>It took many lives, but it could not bring an end to us. Its marks remain: faded crosses on the doors, bells nobody dares to ring, and a beaked mask I still wear out of habit. |
+| blocks[1] | Nuestro pequeño pueblo volvió a llenarse de voces, de pan caliente y de mercado los domingos.<br><br>Aprendimos a reír otra vez, casi con prisa, como quien teme que se lo quiten. Poco a poco, la normalidad regresó. | Our small village slowly filled again with voices, warm bread, and market days on Sundays.<br><br>We learned to laugh again, almost in a hurry, like people afraid it might be taken from them. Little by little, normal life returned. |
+| blocks[2] | Yo seguí haciendo lo que siempre había hecho: hierbas, frascos y paciencia.<br><br>Hasta esta mañana. Alguien ha llamado a la botica antes de que saliera el sol, y no era un enfermo cualquiera. Era alguien que sabe lo que pasa cuando algo no encaja. | I carried on doing what I had always done: herbs, jars, and patience.<br><br>Until this morning. Someone knocked at the apothecary before sunrise, and it was no ordinary patient. It was someone who knows what happens when something does not fit. |
+
+## 3. Cocina y tabla de cortar (src/game/i18n/crafting.ts)
+
+### Crafteo (todo el bloque, incluye lo nuevo: Preparando…, tabla, volver)
+
+| Clave | Español | English |
+|---|---|---|
+| title.manual | Preparar | Prepare |
+| title.fire | Cocinar | Cook |
+| title.mortar | Triturar | Grind |
+| title.chop | Trocear | Chop |
+| ingredients | Ingredientes | Ingredients |
+| inventoryHeading | Inventario del Doctor | Doctor's inventory |
+| action.manual | Preparar | Prepare |
+| action.fire | Cocinar | Cook |
+| action.mortar | Triturar | Grind |
+| action.chop | Trocear | Chop |
+| close | Cerrar | Close |
+| noRecipe | Estos ingredientes no parecen combinar bien aquí. | These ingredients don't seem to combine well here. |
+| noSpace | No tengo sitio para llevar esto. | I don't have room to carry this. |
+| notNeeded | (Eso no lo necesito ahora.) | (I don't need that right now.) |
+| neededElsewhere | (Eso me hace falta para otra cosa.) | (I need that for something else.) |
+| mortar.label | Triturar | Grind |
+| mortar.back | Mesa | Table |
+| mortar.ingredient | Ingrediente | Ingredient |
+| board.label | Trocear | Chop |
+| board.back | Cocina | Kitchen |
+| limitReached | Ya no caben más ingredientes. | No more ingredients fit. |
+| preparing | Preparando... | Preparing... |
+| preparingHint | Esc para cancelar | Esc to cancel |
+| created | Has preparado | Prepared |
+| closeModal | Cerrar | Close |
+
+## 4. Fin del día y cama (src/game/i18n/dayEnd.ts)
+
+### Fin de día
+
+| Clave | Español | English |
+|---|---|---|
+| thoughts.chapter-1 | Creo que por hoy he hecho un buen trabajo. Debería descansar. | I think I've done a good day's work. I should get some rest. |
+| thoughts.chapter-2 | Hoy ha dado mucho de sí, y ha salido bien. Será mejor que descanse. | Today gave a lot, and it went well. I'd better rest. |
+| thoughts.chapter-3 | Estoy cansado, pero contento. Mañana será otro día: a descansar. | I'm tired, but glad. Tomorrow is another day: time to rest. |
+| sign | Ve a la botica | Go to the apothecary |
+| notYetSleepy | Aún queda trabajo por hacer. No es hora de dormir. | There is still work to do. It is not time to sleep. |
+| rest.title | Fin del día | End of the day |
+| rest.question | ¿Quieres dormir ya y pasar al día siguiente? | Do you want to sleep now and start the next day? |
+| rest.sleep | Dormir | Sleep |
+| rest.keep | Seguir explorando | Keep exploring |
+
+## 5. Volumen (src/game/i18n/audio.ts)
+
+### Control de sonido
+
+| Clave | Español | English |
+|---|---|---|
+| volume | Sonido | Sound |
+| mute | Silenciar | Mute |
+| unmute | Activar | Unmute |
+
+## 6. Objetos nuevos (src/game/items/items.ts)
+
+| Id | Español | English |
+|---|---|---|
+| candle | Vela | Candle |
+| chopped-onion | Cebolla troceada | Chopped onion |
+| chopped-mushroom | Hongo troceado | Chopped mushroom |
+| chopped-pine-mushroom | Seta de pino troceada | Chopped pine mushroom |
+| crushed-garlic | Ajo machacado | Crushed garlic |
+
+## 7. Diálogos nuevos
+
+### Vela en la estatua de la plaza (statueCandle.ts)
+
+| Quién | Español | English |
+|---|---|---|
+| doctor | Enciendo la vela al pie de la estatua. No sé a quién se la dedico: a todos, supongo. | I light the candle at the foot of the statue. I don't know who it's for: everyone, I suppose. |
+| doctor | La llama se queda quieta, sin prisa. Hoy tampoco la tengo yo. | The flame stays still, in no hurry. Neither am I today. |
+| doctor | Las plagas se llevan nombres. Una vela, al menos, recuerda dónde estaban. | Plagues take names away. A candle, at least, remembers where they were. |
+
+### Bruja del claro, día 3, primera visita: hueso + hierba + menta (las 2 últimas líneas son nuevas) (chapter3WitchDialogues.ts)
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | Mira quién viene. Llegas tarde para las setas y pronto para lo demás, pero siempre eres bienvenido. | Look who's here. You're late for the mushrooms and early for the rest, but you're always welcome. |
+| doctor | ¡Qué alegría verte! ¿Qué es lo demás? | How good to see you! What's the rest? |
+| personaje | Depende de cuánto te guste preguntar. Y a ti te gusta mucho, lo sé. | It depends on how much you like asking. And you like it a lot, I know. |
+| doctor | Veo que estás recogiendo setas. | I see you're picking mushrooms. |
+| personaje | Qué ojo clínico, de verdad. ¿Por eso eres médico? | Such a clinical eye, truly. Is that why you're a doctor? |
+| personaje | Toma, anda. Es para ti. | Here, go on. It's for you. |
+| doctor | ¡Un hueso! Gracias. | A bone! Thank you. |
+| personaje | Para caldo. Alguien va a tener frío y te lo va a pedir. | For broth. Someone is going to be cold and ask you for it. |
+| doctor | ¿Quién? | Who? |
+| personaje | Alguien con frío. | Someone cold. |
+| doctor | Sigues sin responder, y aun así te sonrío. | You still don't answer, and I'm smiling anyway. |
+| personaje | Te he dado un hueso. Es más que una respuesta, y más de lo que le doy a la mayoría. | I gave you a bone. That's more than an answer, and more than I give most people. |
+| personaje | Llévate también menta y una hierba del claro. Unos tosen, otros sangran, y el trabajo te toca a ti. | Take some mint and an herb from the glade too. Some cough, others bleed, and the work falls to you. |
+| doctor | Con eso tengo para un par de remedios. Gracias, de verdad. | That's enough for a couple of remedies. Thank you, truly. |
+
+### Mujer del campamento de la cantera (chapter1Dialogues.ts)
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | Les traigo el almuerzo a estos. Si no, la piedra les sabe a pan, y el pan, a piedra. | I bring these lads their lunch. Otherwise the stone tastes like bread, and the bread like stone. |
+| doctor | ¿Alguno anda con tos o con dolores? | Is anyone coughing or aching? |
+| personaje | Todos, un poco. Pero hoy ninguno se ha quejado, y eso por aquí ya es salud. | All of them, a little. But today nobody has complained, and around here that counts as health. |
+
+### Cantero apoyado en la pala (chapter1Dialogues.ts)
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | Apoyado en la pala se lleva mejor la mañana. La pala no se queja. | Leaning on the shovel the morning goes easier. The shovel doesn't complain. |
+| doctor | ¿Y la espalda? | And your back? |
+| personaje | La espalda sí. Pero a ella no le pregunta nadie. | My back does. But nobody asks it anything. |
+
+### Cantero del taburete (chapter1Dialogues.ts)
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | Me siento un momento y el taburete ya me da la razón. | I sit for a moment and the stool already agrees with me. |
+| doctor | ¿Tanto cansa partir piedra? | Does splitting stone tire you that much? |
+| personaje | Cansa no partirla. Cuando uno para, es cuando se entera de todo. | What tires is not splitting it. It's when you stop that you notice everything. |
