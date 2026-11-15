@@ -2,7 +2,7 @@
 // Nothing here plays by itself: scenes and actions call `playSound(id)` (audioPlayer.ts)
 // once they are connected. `loop` marks sounds meant to be repeated by the caller at a
 // comfortable pace (blacksmith, wood chop); the others are one-shots.
-export type SoundCategory = "steps" | "loops" | "crafting" | "ui";
+export type SoundCategory = "steps" | "loops" | "crafting" | "ui" | "music";
 
 export const SOUND_IDS = [
   "steps.interior",
@@ -19,6 +19,8 @@ export const SOUND_IDS = [
   "ui.coins",
   "ui.itemObtained",
   "ui.chestOpen",
+  "ui.introButton",
+  "music.intro",
 ] as const;
 
 export type SoundId = (typeof SOUND_IDS)[number];
@@ -54,5 +56,7 @@ export const SOUNDS: Record<SoundId, SoundDef> = {
   "ui.itemClickDrop": def("ui.itemClickDrop", "ui/item-click-drop.mp3", "ui"),
   "ui.coins": def("ui.coins", "ui/coins.mp3", "ui"),
   "ui.itemObtained": def("ui.itemObtained", "ui/item-obtained.mp3", "ui"),
+  "ui.introButton": def("ui.introButton", "ui/intro-button-click.mp3", "ui"),
+  "music.intro": def("music.intro", "music/game-intro.mp3", "music", true),
   "ui.chestOpen": def("ui.chestOpen", "ui/chest-open.mp3", "ui"),
 };

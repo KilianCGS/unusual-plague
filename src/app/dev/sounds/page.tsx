@@ -7,7 +7,7 @@ import { setAudioSettings, useAudioSettings } from "../../../game/audio/audioSto
 import { SOUND_IDS, SOUNDS, type SoundCategory, type SoundId } from "../../../game/audio/soundManifest";
 import styles from "./page.module.css";
 
-const CATEGORIES: SoundCategory[] = ["steps", "loops", "crafting", "ui"];
+const CATEGORIES: SoundCategory[] = ["steps", "loops", "crafting", "ui", "music"];
 
 // /dev/sounds: listen to every sound, and try the "loop" ones repeated at a chosen pace
 // (the interval between hits and the playback rate) to find the speed that fits the NPC

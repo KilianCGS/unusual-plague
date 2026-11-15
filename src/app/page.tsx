@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { GameWorld } from "../game/world/GameWorld";
+import { playSound } from "../game/audio/audioPlayer";
+import { useIntroMusic } from "../game/audio/useIntroMusic";
 import { ControlsPanel } from "../game/controls/ControlsPanel";
 import { controlsCopy } from "../game/i18n/controls";
 import { IntroScreen } from "../game/intro/IntroScreen";
@@ -29,6 +31,8 @@ export default function Home() {
     .map((word) => [...(word.charAt(0) + word.slice(1).toLowerCase())]);
   const introCopy = introScreenCopy[language];
   const isInteractionLocked = fadePhase !== "idle";
+  // The title screen has its own music (it fades out when the game begins).
+  useIntroMusic(gamePhase === "title");
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -93,6 +97,7 @@ export default function Home() {
   };
 
   const handleBegin = () => {
+    playSound("ui.introButton");
     transitionToPhase("intro");
   };
 
@@ -149,7 +154,10 @@ export default function Home() {
             type="button"
             aria-label="Español"
             disabled={isInteractionLocked}
-            onClick={() => setLanguage("es")}
+            onClick={() => {
+              playSound("ui.introButton");
+              setLanguage("es");
+            }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -165,7 +173,10 @@ export default function Home() {
             type="button"
             aria-label="English"
             disabled={isInteractionLocked}
-            onClick={() => setLanguage("en")}
+            onClick={() => {
+              playSound("ui.introButton");
+              setLanguage("en");
+            }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -216,7 +227,10 @@ export default function Home() {
           className="begin-button secondary-title-button"
           type="button"
           disabled={isInteractionLocked}
-          onClick={() => setIsAboutPanelOpen(true)}
+          onClick={() => {
+            playSound("ui.introButton");
+            setIsAboutPanelOpen(true);
+          }}
         >
           {copy.aboutButton}
         </button>
@@ -224,7 +238,10 @@ export default function Home() {
           className="begin-button secondary-title-button controls-title-button"
           type="button"
           disabled={isInteractionLocked}
-          onClick={() => setIsControlsOpen(true)}
+          onClick={() => {
+            playSound("ui.introButton");
+            setIsControlsOpen(true);
+          }}
         >
           {controlsCopy[language].openButton}
         </button>

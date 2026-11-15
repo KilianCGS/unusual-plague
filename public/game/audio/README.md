@@ -24,9 +24,10 @@ Archivos organizados por nombre; aún no los usa ningún código. Rutas pública
 Conectados con sonido existente:
 - Abrir el libro: usa `ui/page-turn.mp3` (el mismo que pasar página).
 
+Conectados (2026-11-15): `music/game-intro.mp3` (música de la pantalla de título, en bucle, con fundido al empezar) y
+`ui/intro-button-click.mp3` (Empezar, Sobre el juego, Controles y banderas de idioma del título).
+
 Pendientes de recibir (el archivo y el nombre los pone Kilian; aquí van los usos):
 - Abrir el mapa.
 - Cerrar el mapa.
 - Cambiar de pestaña en el libro (Ingredientes, Preparados, Dolencias, Pacientes).
-- `game-intro` (música de la pantalla de inicio, en bucle) y `intro-button-click` (botones de inicio:
-  Empezar, Controles y banderas de idioma).
