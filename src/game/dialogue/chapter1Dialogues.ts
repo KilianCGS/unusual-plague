@@ -305,6 +305,16 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "What tires is not splitting it. It's when you stop that you notice everything.",
       ),
     ]),
+    // The woman at the left of the Tavern Street (2026-11-15): she says the lines already written for the
+    // retired placement (the Tavern Street woman 02), under an id of her own.
+    conversation("chapter1.tavernStreet.womanLeft", [
+      subject(
+        "Anoche juré que no volvería a entrar en esa taberna.",
+        "Last night I swore I'd never set foot in that tavern again.",
+      ),
+      doctor("¿Y hoy? ¿Cómo lleva la promesa?", "And today? How's the promise holding?"),
+      subject("Hoy todavía es pronto.", "It's still early."),
+    ]),
     conversation("chapter1.tavernStreet.man", [
       subject(
         "Dicen que beber solo trae problemas.",

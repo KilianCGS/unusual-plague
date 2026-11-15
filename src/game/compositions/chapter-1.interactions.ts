@@ -167,6 +167,12 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.quarry.stonecutterStool",
     zone: { offsetX: -32, offsetY: -79, width: 59, height: 95 },
   },
+  // The woman at the left of the Tavern Street was left silent by the new world (2026-11-15): her zone copies the same sprite's zone
+  // elsewhere (the other tavern-street woman); adjust in the Decorator if needed.
+  "tavern-street-villager-woman-01-01": {
+    interactionId: "chapter1.tavernStreet.womanLeft",
+    zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },
+  },
   "tavern-street-villager-man-01-01": {
     interactionId: "chapter1.tavernStreet.man",
     zone: { offsetX: -33, offsetY: -95, width: 60, height: 111 },
