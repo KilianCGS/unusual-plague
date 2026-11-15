@@ -61,15 +61,25 @@ export const bartenderDuring: LocalizedConversation = {
 };
 
 // Examined, and the bartender hands over the jar for the milk (once).
+// 2026-11-15 (Kilian): she has overheard that he needs milk, hands over the jar and points him to
+// her sister on the farm, so the player is not lost. New text, awaiting his review.
 export const bartenderJarReady: LocalizedConversation = {
   id: "chapter1.tavern.bartender.jar",
   lines: [
-    doctor("Necesitaré un poco de leche, si es tan amable.", "I'll need a little milk, if you'd be so kind."),
     subject(
-      "Llévese esta jarra. En la granja podrán llenársela, y la leche allí es de la buena.",
-      "Take this jar. They can fill it at the farm, and the milk there is the good kind.",
+      "He escuchado que necesita leche. Tome, llévese esta jarra y hable con mi hermana, en la granja.",
+      "I heard you need milk. Here, take this jar and talk to my sister at the farm.",
     ),
+    doctor("Se lo agradezco. Iré a verla enseguida.", "Thank you. I'll go and see her right away."),
   ],
+};
+
+// Right after the man's examination she calls him over (once), from behind the bar.
+export const BARTENDER_CALL_ID = "chapter1.tavern.bartender.called";
+export const BARTENDER_INSTANCE_ID = "tavern-interior-bartender-01";
+export const bartenderCall: LocalizedConversation = {
+  id: "chapter1.tavern.bartender.call",
+  lines: [subject("Doctor, venga aquí.", "Doctor, come over here.")],
 };
 
 // The same moment with a full pocket: the jar stays with him until there is room.
@@ -190,17 +200,24 @@ const farmMissing = (
 // The first conversation about the milk (after the sick man was examined): the
 // Doctor asks, she PRESENTS the deal. Told once; what she says about the
 // container depends on whether he already carries the jar.
-const farmIntro = (withJar: boolean): LocalizedConversation => ({
-  id: `chapter1.farm.woman.intro${withJar ? "WithJar" : ""}`,
+// When he ALREADY carries the orange (2026-11-15, Kilian: some players pick it up and ignore her), she
+// smells it on him and offers the deal herself. New text, awaiting his review.
+const farmIntro = (withJar: boolean, withOrange = false): LocalizedConversation => ({
+  id: `chapter1.farm.woman.intro${withJar ? "WithJar" : ""}${withOrange ? "WithOrange" : ""}`,
   lines: [
     doctor(
       "Necesito un poco de leche para un enfermo, si puede ser.",
       "I need a little milk for a sick man, if possible.",
     ),
-    subject(
-      "Puedo darle un poco, claro. Si va hacia los frutales, tráigame una naranja: llevo todo el día soñando con una.",
-      "I can spare a little, of course. If you're heading to the orchards, bring me an orange: I've been dreaming of one all day.",
-    ),
+    withOrange
+      ? subject(
+          "Huele usted a que lleva una naranja encima... Una naranja por la leche, ¿le parece un trato justo?",
+          "You smell as if you're carrying an orange... An orange for the milk, does that sound like a fair deal?",
+        )
+      : subject(
+          "Puedo darle un poco, claro. Si va hacia los frutales, tráigame una naranja: llevo todo el día soñando con una.",
+          "I can spare a little, of course. If you're heading to the orchards, bring me an orange: I've been dreaming of one all day.",
+        ),
     withJar
       ? subject(
           "Esa jarra servirá para llevársela.",
@@ -215,6 +232,8 @@ const farmIntro = (withJar: boolean): LocalizedConversation => ({
 
 export const farmWomanIntro = farmIntro(false);
 export const farmWomanIntroWithJar = farmIntro(true);
+export const farmWomanIntroWithOrange = farmIntro(false, true);
+export const farmWomanIntroWithJarAndOrange = farmIntro(true, true);
 
 export const farmWomanMissing = {
   // After the introduction she does not explain it again, only reminds him.

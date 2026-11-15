@@ -246,10 +246,10 @@ test("every hint step has ES and EN copy with its key (the player's own keys are
 });
 
 test("inventory: capacity is 6 and the initial state is empty", () => {
-  assert.equal(inv.INVENTORY_CAPACITY, 6);
+  assert.equal(inv.INVENTORY_CAPACITY, 8);
   const state = inv.createEmptyInventory();
-  assert.equal(state.capacity, 6);
-  assert.equal(state.slots.length, 6);
+  assert.equal(state.capacity, 8);
+  assert.equal(state.slots.length, 8);
   assert.ok(state.slots.every((slot) => slot === null));
   assert.equal(inv.countOccupiedSlots(state), 0);
   assert.ok(inv.isValidInventory(state));

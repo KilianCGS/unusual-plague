@@ -64,7 +64,7 @@ type Created = { itemId: string; quantity: number };
 // the Doctor knows (see combine). Mount it with key={station} so a different
 // station starts with a clean selection (closing the overlay always does).
 // How long a station takes to make something (the kitchen simmers; the others are instant).
-export const CRAFT_DURATION_MS: Partial<Record<CraftStation, number>> = { fire: 5000 };
+export const CRAFT_DURATION_MS: Partial<Record<CraftStation, number>> = { fire: 3000 };
 
 export function CraftingOverlay({
   station,
@@ -140,6 +140,9 @@ export function CraftingOverlay({
       onInventoryChange(preparing.inventory);
       setCreated(preparing.created);
       setPreparing(null);
+      // the cooking sound is longer than the wait: it ends with it
+      cookingSound.current?.pause();
+      cookingSound.current = null;
       playSound("craft.recipeCrafted");
     }, CRAFT_DURATION_MS[station] ?? 0);
     return () => window.clearTimeout(id);

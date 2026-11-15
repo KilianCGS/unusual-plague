@@ -160,6 +160,8 @@ const crowded = (extra = []) =>
     ["salt", 1],
     ["water", 1],
     ["orange", 1],
+    ["honey", 1],
+    ["milk", 1],
     ...extra,
   ]);
 
@@ -280,7 +282,7 @@ test("Witch 5. atomic: a swap that does not fit changes nothing and is retried l
   // Mushroom x2 plus five other stacks: the herb has no slot and paying one
   // mushroom frees none
   const full = crowded([["mushroom", 2], ["coal", 1]]);
-  assert.equal(inv.countOccupiedSlots(full), 6);
+  assert.equal(inv.countOccupiedSlots(full), 8);
   let f = { ...world(), inventory: full };
   const blocked = talk(WITCH, {
     ...f,

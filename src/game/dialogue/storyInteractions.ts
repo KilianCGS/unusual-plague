@@ -67,6 +67,8 @@ import {
   bartenderWaiting,
   farmWomanIntro,
   farmWomanIntroWithJar,
+  farmWomanIntroWithJarAndOrange,
+  farmWomanIntroWithOrange,
   tavernPatientAfter,
   tavernPatientCure,
   tavernPatientExam,
@@ -577,8 +579,12 @@ function resolveFarmWoman(
   return {
     conversation: localize(
       countItem(facts.inventory, "empty-jar") > 0
-        ? farmWomanIntroWithJar
-        : farmWomanIntro,
+        ? countItem(facts.inventory, "orange") > 0
+          ? farmWomanIntroWithJarAndOrange
+          : farmWomanIntroWithJar
+        : countItem(facts.inventory, "orange") > 0
+          ? farmWomanIntroWithOrange
+          : farmWomanIntro,
       language,
       subjectId,
     ),

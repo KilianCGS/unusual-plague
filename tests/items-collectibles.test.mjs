@@ -58,10 +58,10 @@ const types = (n) => Array.from({ length: n }, (_, i) => `item-${i + 1}`);
 const fill = (ids) =>
   ids.reduce((state, id) => inv.addItem(state, id), inv.createEmptyInventory());
 
-test("1. the inventory starts with 5 empty slots", () => {
+test("1. the inventory starts with 8 empty slots", () => {
   const state = inv.createEmptyInventory();
-  assert.equal(state.slots.length, 6);
-  assert.equal(state.capacity, 6);
+  assert.equal(state.slots.length, 8);
+  assert.equal(state.capacity, 8);
   assert.equal(inv.countOccupiedSlots(state), 0);
 });
 
@@ -89,16 +89,16 @@ test("4. different item types take different slots", () => {
   assert.equal(inv.countOccupiedSlots(state), 3);
 });
 
-test("5. six different types fill the inventory", () => {
-  const state = fill(types(6));
-  assert.equal(inv.countOccupiedSlots(state), 6);
+test("5. eight different types fill the inventory", () => {
+  const state = fill(types(8));
+  assert.equal(inv.countOccupiedSlots(state), 8);
   assert.ok(inv.isValidInventory(state));
 });
 
-test("6. a 7th type cannot be added", () => {
-  const full = fill(types(6));
-  assert.equal(inv.canAddItem(full, "item-7"), false);
-  assert.equal(inv.addItem(full, "item-7"), null);
+test("6. a 9th type cannot be added", () => {
+  const full = fill(types(8));
+  assert.equal(inv.canAddItem(full, "item-9"), false);
+  assert.equal(inv.addItem(full, "item-9"), null);
 });
 
 test("7. a full inventory still accepts more of a type it already holds", () => {

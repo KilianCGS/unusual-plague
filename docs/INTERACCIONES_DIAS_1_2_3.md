@@ -20,8 +20,8 @@ solo piden o dan algo a cambio de algo, (C) dinero y tienda.
 
 | Personaje | Qué pasa |
 |---|---|
-| Granjera (granja) | Da **leche** a cambio de **1 naranja + un tarro vacío** (una vez; hace falta haber examinado al hombre de la taberna) |
-| Tabernero | Da el **tarro vacío** (gratis) y, una vez examinado el minero, **alcohol** (gratis) |
+| Granjera (granja) | Da **leche** a cambio de **1 naranja + un tarro vacío** (una vez; hace falta haber examinado al hombre de la taberna). Si ya lleva la naranja encima, ella lo nota y le ofrece el trato |
+| Tabernero | Nada más examinar al hombre de la taberna **le llama** ("Doctor, venga aquí") y le da el **tarro vacío** pidiéndole que hable con su hermana de la granja; una vez examinado el minero, **alcohol** (gratis) |
 | Apicultor (molino) | Da **miel** gratis, una vez, cuando el hombre de la taberna está examinado |
 | Bruja (taberna) | Cambia **1 hongo** por **hierba medicinal + pluma negra** (la pluma es para el día 4) |
 | Hombre de espaldas (cantera) | Da **carbón** gratis (una vez) |

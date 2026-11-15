@@ -101,7 +101,7 @@ export function StorageOverlay({
             ×
           </button>
           {panel("storage", copy.storageTitle, storage, 5)}
-          {panel("inventory", copy.inventoryTitle, inventory, 6)}
+          {panel("inventory", copy.inventoryTitle, inventory, 4)}
         </div>
       </div>
     </div>

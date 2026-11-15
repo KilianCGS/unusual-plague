@@ -125,10 +125,10 @@ test("the header and the button name the action of the station, and the button s
   assert.equal(craftingCopy.es.action.fire, "Cocinar");
 });
 
-test("the Doctor's inventory: the 6 carried slots in order, with quantities and hover labels", () => {
+test("the Doctor's inventory: the 8 carried slots in order, with quantities and hover labels", () => {
   const markup = render("manual", SAMPLE);
   assert.ok(markup.includes(">Inventario del Doctor</h3>"));
-  assert.equal(count(markup, "data-inventory-slot"), 6);
+  assert.equal(count(markup, "data-inventory-slot"), 8);
   assert.deepEqual(
     [...markup.matchAll(/data-inventory-slot[^>]*data-item-id="([^"]*)"/g)].map(
       (x) => x[1],
@@ -139,9 +139,9 @@ test("the Doctor's inventory: the 6 carried slots in order, with quantities and 
   assert.equal(count(markup, "data-slot-tooltip"), 3);
   assert.ok(markup.includes(`>${getItemName("water", "es")} ×3</span>`));
   assert.equal(count(markup, "title="), 0);
-  // empty inventory slots cannot be clicked: 3 empty + 2 empty ingredient
-  // slots + the action button (nothing selected yet) = 6 disabled buttons
-  assert.equal(count(markup, 'disabled=""'), 6);
+  // empty inventory slots cannot be clicked: 5 empty + 2 empty ingredient
+  // slots + the action button (nothing selected yet) = 8 disabled buttons
+  assert.equal(count(markup, 'disabled=""'), 8);
 });
 
 test("an item without an icon (Medicinal paste) falls back to its readable name", () => {
@@ -165,7 +165,7 @@ test("source: derived quantities, limit feedback, no-space feedback and only the
   // the only wait is the kitchen's "Preparing..." bar (5 s), nothing else is timed
   assert.ok(!/setInterval/.test(source));
   assert.equal((source.match(/setTimeout/g) ?? []).length, 1);
-  assert.ok(source.includes("{ fire: 5000 }"));
+  assert.ok(source.includes("{ fire: 3000 }"));
   // the three feedback lines, picked from the result of combine()
   assert.ok(
     source.includes("copy.noRecipe") && source.includes("copy.noSpace"),
