@@ -104,3 +104,38 @@ texto).
   una seta entera.
 - `preparations/crushed-garlic.png`: ajo machacado en un montoncito casi en polvo; al lado, una
   cabeza de ajo y un diente.
+
+## Prompt final para la 5.ª página de ingredientes (2026-11-15, uno por idioma)
+
+Adjuntar `public/game/ui/book/ingredients/es/ingredients-04.png` y `ingredients-03.png` (y las de `en/`
+para la versión inglesa). Se pide **una imagen por idioma**, con el mismo prompt cambiando el bloque de texto.
+
+> Imagen de un libro antiguo abierto (doble página) sobre pergamino envejecido, exactamente 1678x937 px,
+> idéntica en estilo, marco del libro, papel manchado, grosor de línea (grabado a tinta sepia con sombreado
+> cruzado y toques de color muy suaves) y caligrafía manuscrita a las imágenes de referencia adjuntas.
+> Composición como en las referencias: cuatro ingredientes, dos por página; en cada página el primero arriba
+> y el segundo abajo; cada objeto dibujado solo, centrado en su mitad de página, con una pequeña sombra de
+> rayado bajo él; debajo de cada dibujo, el nombre en caligrafía manuscrita grande y subrayado con un trazo, y
+> debajo una descripción de 2-3 líneas en la misma letra, más pequeña. Sin otros elementos, sin números de
+> página, sin marcos extra.
+>
+> Objetos y texto exacto (no cambiar ni una palabra):
+> - Página izquierda, arriba: un hueso largo limpio de carne, con los extremos redondeados. Nombre: **Hueso**.
+>   Descripción: "Hueso limpio de carne. Con él se cuecen caldos de verdadera sustancia."
+> - Página izquierda, abajo: una seta de pino carnosa, con sombrero redondeado y pie grueso, y una pequeña
+>   aguja de pino al lado. Nombre: **Seta de pino**. Descripción: "Seta carnosa y aromática del pinar. Da
+>   cuerpo a sopas y cremas."
+> - Página derecha, arriba: un cuenco de barro lleno de azúcar en cristales, con unos pocos cristales
+>   sueltos delante (como el cuenco de la sal de la referencia). Nombre: **Azúcar**. Descripción: "Cristales
+>   dulces que endulzan y conservan. Base de jarabes."
+> - Página derecha, abajo: una cebolla entera con sus raíces y una mitad cortada al lado, mostrando las capas.
+>   Nombre: **Cebolla**. Descripción: "Bulbo de sabor fuerte. Cocida con azúcar da un jarabe para la tos."
+
+Versión en inglés: mismo prompt, con estos textos:
+**Bone**: "A bone picked clean. Broths of real substance are cooked with it." ·
+**Pine mushroom**: "A fleshy, fragrant mushroom of the pinewood. It gives body to soups and creams." ·
+**Sugar**: "Sweet crystals that sweeten and preserve. The base of syrups." ·
+**Onion**: "A strong-flavoured bulb. Cooked with sugar it makes a cough syrup."
+
+Entrega: `public/game/ui/book/ingredients/es/ingredients-05.png` y `.../en/ingredients-05.png`.
+Después Claude sube `INGREDIENT_SPREAD_COUNT` a 5 y añade los textos alternativos y los tests.
