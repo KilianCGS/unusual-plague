@@ -71,7 +71,10 @@ test('every treatment order triggers only after its last conversation, then neve
   assert.ok(start>0);assert.ok(trigger.includes('phaseRef.current === "playing"'));
   assert.ok(trigger.includes('afterDialogueRef.current === null'));
   assert.ok(game.includes('chapter-2": DAY2_COMPLETED_ID'));
-  assert.ok(trigger.indexOf('claimFlag(dayCompletedIds[chapterId])')<trigger.indexOf('setClosingActive(true)'));
+  // 2026-11-15: being home only asks "sleep now?"; the closing itself (flag first, then the veil) is closeDayNow
+  assert.ok(trigger.includes('setRestPromptOpen(true)'));
+  const closeNow=game.slice(game.indexOf('const closeDayNow'),game.indexOf('const closeDayNow')+400);
+  assert.ok(closeNow.indexOf('claimFlag(dayCompletedIds[chapterId])')<closeNow.indexOf('setClosingActive(true)'));
 });
 test('epilogue uses the fireplace image, with ES/EN caption and parenthesized Doctor thoughts',()=>{
   assert.ok(fs.existsSync(path.join(root,'public',NARRATIVE_ILLUSTRATIONS['doctor-fireplace'].src)));

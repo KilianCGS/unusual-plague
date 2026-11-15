@@ -222,7 +222,7 @@ test("the closing waits for the whole conversation of the last case: nothing hap
   const source = read("src/game/world/GameWorld.tsx");
   const trigger = source.slice(
     source.indexOf("const closingChapterAvailable"),
-    source.indexOf("const closingChapterAvailable") + 900,
+    source.indexOf("const closingChapterAvailable") + 1800,
   );
   assert.ok(trigger.includes("isPlaying &&"));
   assert.ok(trigger.includes('phaseRef.current === "playing"'));
@@ -254,7 +254,7 @@ test("it fires ONCE: the flag is claimed before the closing starts and Day 2 nev
   const source = read("src/game/world/GameWorld.tsx");
   const trigger = source.slice(
     source.indexOf("const closingChapterAvailable"),
-    source.indexOf("const closingChapterAvailable") + 900,
+    source.indexOf("const closingChapterAvailable") + 1800,
   );
   assert.ok(
     trigger.indexOf("claimFlag(DAY1_COMPLETED_ID)") <

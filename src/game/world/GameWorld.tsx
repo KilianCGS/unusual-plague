@@ -87,6 +87,7 @@ import { noRunLines } from "../i18n/noRun";
 import { runBarkLines } from "../i18n/runBarks";
 import { ControlsPanel } from "../controls/ControlsPanel";
 import { PauseMenu } from "../controls/PauseMenu";
+import { RestPrompt } from "../ui/RestPrompt";
 import { InventoryHud } from "../inventory/InventoryHud";
 import { isInventoryHudVisible } from "../inventory/inventoryHudVisibility";
 import { storageCopy } from "../i18n/storage";
@@ -223,6 +224,9 @@ export function GameWorld({
   const [closingActive, setClosingActive] = useState(false);
   // The pause menu (Esc) and the controls screen opened from it.
   const [pauseOpen, setPauseOpen] = useState(false);
+  // "Sleep now?" (the day ends only when the player says so) and whether he said "not yet".
+  const [restPromptOpen, setRestPromptOpen] = useState(false);
+  const restDeclinedRef = useRef(false);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [closingChapter, setClosingChapter] = useState("chapter-1");
   // The end card after the closing of Day 4 (the last screen of the game).
@@ -370,6 +374,7 @@ export function GameWorld({
     !storageOpen &&
     openShop === null &&
     !pauseOpen &&
+    !restPromptOpen &&
     !inNarrativeScene;
   const mapVisible = mapHeld && canOpenInterface && !bookOpen;
   const pendingRef = useRef<{
@@ -411,6 +416,7 @@ export function GameWorld({
     !storageOpen &&
     openShop === null &&
     !pauseOpen &&
+    !restPromptOpen &&
     !inNarrativeScene;
 
   // Esc opens the pause menu when nothing else is open (Esc closes the other
@@ -1211,20 +1217,30 @@ export function GameWorld({
   };
   const sceneIdForClosing = world.sceneId;
 
+  // Being home with the day's work done only ASKS whether to sleep (2026-11-15): "keep exploring"
+  // lets him go on; leaving the Botica and coming back asks again.
+  const closeDayNow = () => {
+    setRestPromptOpen(false);
+    claimFlag(dayCompletedIds[chapterId]);
+    setClosingChapter(chapterId);
+    chapterAdvancedRef.current = false;
+    setClosingActive(true);
+  };
+  useEffect(() => {
+    if (!DAY_END_SCENES.includes(sceneIdForClosing)) restDeclinedRef.current = false;
+  }, [sceneIdForClosing]);
   useEffect(() => {
     if (
       isPlaying &&
       phaseRef.current === "playing" &&
       afterDialogueRef.current === null &&
       closingChapterAvailable &&
+      !restDeclinedRef.current &&
       shouldCloseDayNow(chapterId, patientsRef.current, claimedRewardsRef.current, sceneIdForClosing)
     ) {
-      claimFlag(dayCompletedIds[chapterId]);
-      setClosingChapter(chapterId);
-      chapterAdvancedRef.current = false;
-      setClosingActive(true);
+      setRestPromptOpen(true);
     }
-  }, [chapterId, isPlaying, patients, claimedRewards, closingChapterAvailable, sceneIdForClosing, claimFlag]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [chapterId, isPlaying, patients, claimedRewards, closingChapterAvailable, sceneIdForClosing]);
 
   // The closing of Day 4 (the end of the game): once the Witch has spoken, when the
   // conversation is over.
@@ -1709,6 +1725,16 @@ export function GameWorld({
           onContinue={ACK_STEPS.includes(tutorialStep) ? handleTutorialContinue : undefined}
           continueLabel={tutorialContinueCopy[language].label}
           language={language}
+        />
+      ) : null}
+      {restPromptOpen ? (
+        <RestPrompt
+          language={language}
+          onSleep={closeDayNow}
+          onKeepExploring={() => {
+            restDeclinedRef.current = true;
+            setRestPromptOpen(false);
+          }}
         />
       ) : null}
       {pauseOpen ? (
