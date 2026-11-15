@@ -23,7 +23,7 @@ type BookCopy = {
   treated: string;
   noRecipes: { title: string; note: string };
   // One short description per INGREDIENTES spread (the image holds the text).
-  ingredientSpreadAlts: [string, string, string, string];
+  ingredientSpreadAlts: string[];
   station: string;
   stations: Record<CraftStation, string>;
 };
@@ -54,6 +54,7 @@ export const bookCopy: Record<Language, BookCopy> = {
       "Ingredientes: alcohol, harina, carbón y tela",
       "Ingredientes: naranja, menta, miel y resina",
       "Ingredientes: grasa animal, ajo, sal y sanguijuela",
+      "Ingredientes: hueso, seta de pino, azúcar y cebolla",
     ],
     station: "Estación",
     stations: { manual: "Mesa", fire: "Cocina", mortar: "Mortero", chop: "Tabla" },

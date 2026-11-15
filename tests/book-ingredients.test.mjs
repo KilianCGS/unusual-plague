@@ -66,15 +66,17 @@ const pngSize = (file) => {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 };
 
+// Spanish has the 5th spread; English is pending (see bookPages.ts) and has 4 for now.
+const COUNTS = { es: 5, en: 4 };
 const PATHS = (language) =>
-  [1, 2, 3, 4].map(
+  Array.from({ length: COUNTS[language] }, (_, i) => i + 1).map(
     (n) => `/game/ui/book/ingredients/${language}/ingredients-0${n}.png`,
   );
 
-test("INGREDIENTES has exactly 4 spreads, one complete image each, in both languages", () => {
+test("INGREDIENTES has its spreads (ES 5, EN 4 until the English 5th arrives), one complete image each", () => {
   for (const language of ["es", "en"]) {
     const section = ingredients(language);
-    assert.equal(section.spreads.length, 4, language);
+    assert.equal(section.spreads.length, COUNTS[language], language);
     section.spreads.forEach((spread, index) => {
       assert.equal(spread.id, `ingredients-${index + 1}`);
       assert.equal(spread.layers.length, 1, "one full-size layer");
@@ -122,7 +124,7 @@ test("changing the language keeps the page: the same spread index resolves to th
   assert.ok(overlay.includes("useState(0)"));
 });
 
-test("the eight images exist, keep the book aspect ratio and are all different", () => {
+test("every installed image exists, keep the book aspect ratio and are all different", () => {
   const seen = new Set();
   for (const language of ["es", "en"]) {
     for (const src of PATHS(language)) {
@@ -139,10 +141,10 @@ test("the eight images exist, keep the book aspect ratio and are all different",
     assert.equal(
       fs.readdirSync(publicFile(`/game/ui/book/ingredients/${language}`))
         .length,
-      4,
+      COUNTS[language],
     );
   }
-  assert.equal(seen.size, 8);
+  assert.equal(seen.size, COUNTS.es + COUNTS.en);
 });
 
 test("the layers are drawn complete and smooth: no cover/crop and no pixel-art scaling for these pictures", () => {
@@ -158,7 +160,7 @@ test("the layers are drawn complete and smooth: no cover/crop and no pixel-art s
 test("accessible names: one short description per spread and language, not the page text", () => {
   for (const language of ["es", "en"]) {
     const alts = bookCopy[language].ingredientSpreadAlts;
-    assert.equal(alts.length, 4);
+    assert.equal(alts.length, COUNTS[language]);
     ingredients(language).spreads.forEach((spread, i) => {
       assert.equal(spread.layers[0].alt, alts[i]);
       assert.ok(alts[i].length < 70, "short");
@@ -196,7 +198,7 @@ test("the old spreads are gone and nothing at runtime points at them", () => {
   }
   assert.equal(
     BOOK_SECTIONS.find((s) => s.id === "ingredients").spreads.length,
-    4,
+    COUNTS.es, // the static export is the Spanish one
   );
 });
 
