@@ -245,6 +245,42 @@ export const chapter2Compositions: DecorComposition[] = [
     ]
   },
   {
+    "sceneId": "forest-glade",
+    "chapterId": "chapter-2",
+    "instances": [
+      {
+        "instanceId": "forest-glade-mint-world-01",
+        "assetId": "mint-world",
+        "x": 548,
+        "y": 522,
+        "scale": 0.75,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-squirrel-01",
+        "assetId": "squirrel",
+        "x": 690,
+        "y": 468,
+        "scale": 0.88,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-pine-mushroom-world-01",
+        "assetId": "pine-mushroom-world",
+        "x": 960,
+        "y": 448,
+        "scale": 0.75,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      }
+    ]
+  },
+  {
     "sceneId": "granary-interior",
     "chapterId": "chapter-2",
     "instances": [
