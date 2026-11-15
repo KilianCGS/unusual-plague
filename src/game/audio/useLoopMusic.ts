@@ -5,13 +5,13 @@ import { useEffect } from "react";
 import { effectiveVolume, getAudioSettings } from "./audioStore";
 import { SOUNDS, type SoundId } from "./soundManifest";
 
-const FADE_OUT_MS = 900;
+const DEFAULT_FADE_OUT_MS = 900;
 
 // A music loop that plays while `active` and fades out when it stops being active (or the
 // component goes away). Browsers do not let sound start before the player has done something, so
 // if the first try is refused it starts at the first click or key press. It follows the player's
 // volume and mute setting live.
-export function useLoopMusic(sound: SoundId, active: boolean) {
+export function useLoopMusic(sound: SoundId, active: boolean, fadeOutMs: number = DEFAULT_FADE_OUT_MS) {
   useEffect(() => {
     if (!active || typeof Audio === "undefined") return;
 
@@ -58,7 +58,7 @@ export function useLoopMusic(sound: SoundId, active: boolean) {
           window.clearInterval(fade);
           audio.pause();
         }
-      }, FADE_OUT_MS / steps);
+      }, fadeOutMs / steps);
     };
-  }, [sound, active]);
+  }, [sound, active, fadeOutMs]);
 }

@@ -37,6 +37,7 @@ function Typed({ text, revealed }: { text: string; revealed: number }) {
 export function TutorialHint({
   copy,
   aboveOverlays = false,
+  placement = "bottom",
   raised = false,
   onContinue,
   continueLabel,
@@ -51,6 +52,8 @@ export function TutorialHint({
   language?: Language;
   // Drawn over the Book (its backdrop sits above the normal hint layer).
   aboveOverlays?: boolean;
+  // Where the note sits: the bottom centre by default, the top (not to cover a door) or the left edge.
+  placement?: "bottom" | "top" | "left";
 }) {
   const bindings = useBindings();
   // "{interact}", "{book}" ... inside a text are the player's own keys.
@@ -124,7 +127,7 @@ export function TutorialHint({
 
   return (
     <div
-      className={`${styles.hint}${aboveOverlays ? ` ${styles.aboveOverlays}` : ""}${raised ? ` ${styles.raised}` : ""}`}
+      className={`${styles.hint}${aboveOverlays ? ` ${styles.aboveOverlays}` : ""}${raised ? ` ${styles.raised}` : ""}${placement === "top" ? ` ${styles.placeTop}` : placement === "left" ? ` ${styles.placeLeft}` : ""}`}
       style={{ ["--ui-font" as string]: PIXEL_FONT_FAMILY } as CSSProperties}
       data-tutorial-hint
       role="status"

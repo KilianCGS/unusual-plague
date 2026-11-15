@@ -2,7 +2,7 @@ import type { Language } from "../i18n/types";
 import { chapter1AmbientDialogues } from "./chapter1Dialogues";
 import { chapter2AmbientDialogues } from "./chapter2AmbientDialogues";
 import { ambientForChapter } from "./chapter34AmbientDialogues";
-import { environmentDialogues } from "./environmentDialogues";
+import { NOTICEBOARD_ID, environmentDialogues, noticeboardNotices } from "./environmentDialogues";
 import { chapter1Intro } from "./chapter1Intro";
 import { DOCTOR_SPEAKER, type Conversation } from "./dialogueTypes";
 import {
@@ -33,12 +33,25 @@ export function resolveChapterIntro(
   return intro ? localizeConversation(intro, language, DOCTOR_SPEAKER) : null;
 }
 
+// The notice board: a random notice, never the same one twice in a row.
+let lastNotice = -1;
+function pickNotice(): LocalizedConversation {
+  let index = Math.floor(Math.random() * noticeboardNotices.length);
+  if (index === lastNotice) index = (index + 1) % noticeboardNotices.length;
+  lastNotice = index;
+  return noticeboardNotices[index];
+}
+
 export function resolveInteractionConversation(
   interactionId: string,
   language: Language,
   subjectId: string,
   chapterId?: string,
 ): Conversation | null {
+  if (interactionId === NOTICEBOARD_ID) {
+    return localizeConversation(pickNotice(), language, subjectId);
+  }
+
   // Days 3 and 4: the people say their own lines instead of the Day 2 ones they inherit.
   const conversation =
     (chapterId ? ambientForChapter(chapterId, interactionId) : undefined) ??

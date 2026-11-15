@@ -208,7 +208,7 @@ test("done is final", () => {
 test("every hint step has ES and EN copy with its key (the player's own keys are named by ACTION)", () => {
   const parts = {
     book: ["action", "book"],
-    "book-page": ["key", "→"],
+    "book-page": ["key", "►"],
     "book-close": ["action", "book"],
     map: ["action", "map"],
     move: ["move", 0],

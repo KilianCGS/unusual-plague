@@ -612,7 +612,7 @@ test("every tutorial hint exists in both languages and only names keys that do s
       tutorialCopy[lang][step].title
         .filter((p) => typeof p === "object")
         .map((p) => p.key);
-    assert.deepEqual(keys("book-page"), ["←", "→"]);
+    assert.deepEqual(keys("book-page"), ["◄", "►"]);
     assert.deepEqual(keys("book-close"), [undefined, "Esc"]); // the book key is the player's own (action)
     assert.deepEqual(keys("chest-interact"), [undefined]); // the player's own interact key (action)
     // no hint advertises drag and drop

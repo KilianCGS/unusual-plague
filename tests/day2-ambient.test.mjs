@@ -79,7 +79,8 @@ test("environment catalog resolves only Doctor observations; no object speaks or
     assert.ok(environmentDialogues[entry.interactionId]);
     for (const language of ["es","en"]) {
       const result=resolveInteractionConversation(entry.interactionId,language,"");
-      assert.ok(result.lines.length>=2);
+      // (the notice board says one random single-line notice each time)
+      assert.ok(result.lines.length>=(entry.interactionId==="world.plaza.noticeboard"?1:2));
       assert.ok(result.lines.every(line=>line.speaker==="doctor" && line.text.length>0));
     }
   }

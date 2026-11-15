@@ -5,6 +5,22 @@ import type { LocalizedConversation } from "./localizedConversation";
 const doctor = (es: string, en: string) => ({ speaker: "doctor", text: { es, en } });
 const observe = (id: string, lines: LocalizedConversation["lines"]): [string, LocalizedConversation] => [id, { id, lines }];
 
+// The plaza notice board says ONE of these each time (never the same twice in a row), for the fun of it
+// (2026-11-15). New text, awaiting Kilian's review.
+export const NOTICEBOARD_ID = "world.plaza.noticeboard";
+const notice = (n: number, es: string, en: string): LocalizedConversation => ({
+  id: `${NOTICEBOARD_ID}.${n}`,
+  lines: [doctor(es, en)],
+});
+export const noticeboardNotices: LocalizedConversation[] = [
+  notice(1, "Se vende cabra. Poca leche, mucho carácter. Preguntar por Hilario, que ya no la aguanta.", "For sale: goat. Little milk, plenty of character. Ask for Hilario, who can no longer put up with her."),
+  notice(2, "Se ruega no atar más gatos a este tablón. Los gatos han firmado en contra.", "Please stop tying cats to this board. The cats have signed a protest."),
+  notice(3, "Ofrezco remiendos a cambio de pan. Pan duro, que no soy exigente.", "Mending offered in exchange for bread. Stale bread, I'm not fussy."),
+  notice(4, "Se perdió un sombrero. El dueño ofrece una recompensa y su eterna gratitud, por ese orden.", "A hat has been lost. The owner offers a reward and his eternal gratitude, in that order."),
+  notice(5, "Mercado el domingo. Se ruega no regatear con el tendero cojo: gana siempre.", "Market on Sunday. Please don't haggle with the lame stallholder: he always wins."),
+  notice(6, "Quien se llevó las gallinas del molino puede devolverlas. Las echamos de menos. A las gallinas, digo.", "Whoever took the mill's hens may bring them back. We miss them. The hens, I mean."),
+];
+
 export const environmentDialogues: Record<string, LocalizedConversation> = Object.fromEntries([
   observe("world.plaza.statue", [
     doctor("Alguien ha dejado flores frescas al pie de la estatua.", "Someone has left fresh flowers at the foot of the statue."),

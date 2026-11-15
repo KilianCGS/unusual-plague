@@ -21,6 +21,7 @@ export const SOUND_IDS = [
   "ui.chestOpen",
   "ui.introButton",
   "ui.bookTab",
+  "ui.mapOpen",
   "ui.dialogueBubble",
   "music.intro",
   "music.day1",
@@ -39,7 +40,7 @@ export type SoundDef = {
 
 const BASE = "/game/audio";
 // The steps are half as loud as the rest (Kilian, 2026-11-15).
-const STEP_GAIN = 0.5;
+const STEP_GAIN = 0.375; // (0.5 at first, 25% lower again on 2026-11-15)
 
 function def(id: SoundId, path: string, category: SoundCategory, loop = false, gain = 1): SoundDef {
   return { id, src: `${BASE}/${path}`, category, loop, gain };
@@ -61,7 +62,8 @@ export const SOUNDS: Record<SoundId, SoundDef> = {
   "ui.itemObtained": def("ui.itemObtained", "ui/item-obtained.mp3", "ui"),
   "ui.introButton": def("ui.introButton", "ui/intro-button-click.mp3", "ui"),
   "ui.bookTab": def("ui.bookTab", "ui/book-tab.mp3", "ui"),
-  "ui.dialogueBubble": def("ui.dialogueBubble", "ui/dialogue-bubble.mp3", "ui"),
+  "ui.mapOpen": def("ui.mapOpen", "ui/map-open.mp3", "ui"),
+  "ui.dialogueBubble": def("ui.dialogueBubble", "ui/dialogue-bubble.mp3", "ui", false, 0.75),
   "music.day1": def("music.day1", "music/day1-ambient.mp3", "music", true, 0.6),
   "music.intro": def("music.intro", "music/game-intro.mp3", "music", true),
   "ui.chestOpen": def("ui.chestOpen", "ui/chest-open.mp3", "ui"),

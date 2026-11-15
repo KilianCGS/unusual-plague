@@ -1035,6 +1035,7 @@ export function GameWorld({
 
   useEffect(() => {
     if (mapVisible) {
+      playSound("ui.mapOpen");
       notifyTutorial("map-opened");
     }
   }, [mapVisible, notifyTutorial]);
@@ -1104,7 +1105,11 @@ export function GameWorld({
     setBookCoverOpen(true);
     notifyTutorial("book-cover-opened");
   }, [notifyTutorial]);
-  const handleTutorialContinue = useCallback(() => notifyTutorial("continue"), [notifyTutorial]);
+  // "Understood" (Enter or the button): it sounds like changing a tab of the book.
+  const handleTutorialContinue = useCallback(() => {
+    playSound("ui.bookTab");
+    notifyTutorial("continue");
+  }, [notifyTutorial]);
 
   // The patient flow of the baker's husband, driven by the end of each
   // conversation: the baker's invitation > fade to the bedroom > examination >
@@ -1758,6 +1763,7 @@ export function GameWorld({
           key={`${hintStep}-${language}`}
           copy={hintCopy}
           aboveOverlays={hintOverBook || hintOverStorage}
+          placement={hintStep === "exit-room" ? "top" : hintOverBook || hintOverStorage ? "left" : "bottom"}
           raised={isTutorialHudUnlocked(tutorialStep)}
           onContinue={ACK_STEPS.includes(tutorialStep) ? handleTutorialContinue : undefined}
           continueLabel={tutorialContinueCopy[language].label}

@@ -70,7 +70,11 @@ export function BookOverlay({
   const scale = useFitScale(BOOK_WIDTH, STAGE_HEIGHT, VIEWPORT_FRACTION);
   const [isOpen, setIsOpenState] = useState(false);
   const setIsOpen = (value: boolean) => {
-    if (value && !isOpen) onOpened?.();
+    if (value && !isOpen) {
+      // opening the cover into the pages sounds like turning a page too
+      playSound("ui.pageTurn");
+      onOpened?.();
+    }
     setIsOpenState(value);
   };
   const [sectionIndex, setSectionIndex] = useState(() =>

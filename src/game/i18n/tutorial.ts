@@ -43,7 +43,7 @@ export const tutorialCopy: Record<
       body: "También puedes pulsar Espacio.",
     },
     "book-page": {
-      title: ["Pasa de página con ", { key: "←" }, " ", { key: "→" }, "."],
+      title: ["Pasa de página con ", { key: "◄" }, " ", { key: "►" }, "."],
       body:
       "Estás en Ingredientes: todo lo que puedes recoger o comprar y para qué sirve cada cosa.\nTambién puedes usar las flechas que hay junto a las páginas.",
     },
@@ -132,7 +132,7 @@ export const tutorialCopy: Record<
       body: "You can also press Space.",
     },
     "book-page": {
-      title: ["Turn the page with ", { key: "←" }, " ", { key: "→" }, "."],
+      title: ["Turn the page with ", { key: "◄" }, " ", { key: "►" }, "."],
       body:
       "You are in Ingredients: everything you can gather or buy, and what each thing is for.\nYou can also use the arrows beside the pages.",
     },

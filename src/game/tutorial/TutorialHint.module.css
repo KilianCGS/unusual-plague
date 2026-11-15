@@ -6,7 +6,7 @@
   /* Narrow and tall, centred (2026-11-15): it covers less of the picture than the wide note. */
   left: 50%;
   z-index: 30;
-  width: min(340px, calc(100vw - 48px));
+  width: min(250px, calc(100vw - 48px));
   transform: translateX(-50%);
   padding: 2px;
   font-family: var(--ui-font);
@@ -109,6 +109,18 @@
 /* Above the inventory bar and the coins. */
 .raised {
   bottom: 132px;
+}
+
+/* At the top (the "go down to the apothecary" note must not cover the door). */
+.placeTop {
+  top: 24px;
+  bottom: auto;
+}
+
+/* At the left edge (over the Book, so it covers less of it). */
+.placeLeft {
+  left: 24px;
+  transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

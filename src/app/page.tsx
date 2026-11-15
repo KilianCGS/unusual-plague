@@ -31,8 +31,8 @@ export default function Home() {
     .map((word) => [...(word.charAt(0) + word.slice(1).toLowerCase())]);
   const introCopy = introScreenCopy[language];
   const isInteractionLocked = fadePhase !== "idle";
-  // The title screen has its own music (it fades out when the game begins).
-  useIntroMusic(gamePhase === "title");
+  // The title music plays on the title and the intro text, and fades out when the game begins.
+  useIntroMusic(gamePhase === "title" || gamePhase === "intro");
 
   useEffect(() => {
     document.documentElement.lang = language;
