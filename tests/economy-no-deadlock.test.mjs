@@ -205,5 +205,21 @@ test("the repeatable suppliers cover the cases of Day 3 too (honey, flour and al
   assert.ok(sources.includes('"chapter2.bakery.flourSack"') && sources.includes("honey"));
 });
 
+test("what the Doctor leaves on the ground on Day 1 is still there on Days 2 and 3, in the same place", () => {
+  let checked = 0;
+  for (const sceneId of Object.keys(WORLD_SCENES)) {
+    for (const instance of getComposition(sceneId, "chapter-1")?.instances ?? []) {
+      if (!getDecorAsset(instance.assetId)?.collectibleItemId) continue;
+      for (const chapter of ["chapter-2", "chapter-3"]) {
+        const later = getComposition(sceneId, chapter)?.instances.find((i) => i.instanceId === instance.instanceId);
+        assert.ok(later, `${instance.instanceId} is missing in ${chapter}`);
+        assert.deepEqual([later.x, later.y, later.assetId], [instance.x, instance.y, instance.assetId]);
+      }
+      checked++;
+    }
+  }
+  assert.ok(checked >= 3, "the Day 1 pick-ups are found");
+});
+
 console.log(`
 ${passed} tests passed`);

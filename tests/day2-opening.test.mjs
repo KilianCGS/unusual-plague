@@ -458,13 +458,15 @@ test("chapter-2 has a slot but no invented population; the placement is the pend
 test("instance ids do not collide across chapters where it matters: a Day 2 pick-up cannot reuse a Day 1 id", () => {
   // The collected set lives all game, so a Day 2 collectible with the id of one
   // taken in Day 1 would never appear. Checked against whatever the export holds.
-  const day1Collectibles = new Set();
+  // (Day 1's pick-ups not taken stay in Day 2 as the very same placement - same asset and
+  // position - so only a DIFFERENT placement using one of those ids is a collision.)
+  const day1Collectibles = new Map();
 
   for (const sceneId of Object.keys(WORLD_SCENES)) {
     for (const instance of getComposition(sceneId, "chapter-1")?.instances ??
       []) {
       if (getDecorAsset(instance.assetId)?.collectibleItemId) {
-        day1Collectibles.add(instance.instanceId);
+        day1Collectibles.set(instance.instanceId, instance);
       }
     }
   }
@@ -472,8 +474,10 @@ test("instance ids do not collide across chapters where it matters: a Day 2 pick
   for (const sceneId of Object.keys(WORLD_SCENES)) {
     for (const instance of getComposition(sceneId, "chapter-2")?.instances ??
       []) {
+      const same = day1Collectibles.get(instance.instanceId);
       assert.ok(
-        !day1Collectibles.has(instance.instanceId),
+        !same ||
+          (same.assetId === instance.assetId && same.x === instance.x && same.y === instance.y),
         `${instance.instanceId} (chapter-2) reuses the id of a Day 1 pick-up`,
       );
     }

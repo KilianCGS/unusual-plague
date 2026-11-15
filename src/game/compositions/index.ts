@@ -1,6 +1,7 @@
 import { NEW_WORLD_SCENE_IDS } from "../new-world-map/worldVariant";
 import { newWorldChapter1Compositions } from "../new-world-map/newWorldCompositions";
 import type { DecorComposition, DecorInteraction } from "../decor/decorTypes";
+import { getDecorAsset } from "../decor/decorAssets";
 import { chapter1Compositions } from "./chapter-1";
 import { chapter2Compositions } from "./chapter-2";
 import { artifactsCompositions } from "./artifacts";
@@ -65,8 +66,19 @@ export function getComposition(
     chapterId === "chapter-3"
       ? BY_SCENE_AND_CHAPTER.get(`${sceneId}::chapter-2`)?.instances ?? []
       : [];
+  // What the Doctor did not pick up on an earlier day stays where it was (Kilian, 2026-11-15):
+  // the collectibles of Day 1 are kept in Days 2 and 3. A picked one is hidden by the collected
+  // set (ids last the whole game), so this only brings back what is still on the ground.
+  const leftover =
+    chapterId === "chapter-2" || chapterId === "chapter-3"
+      ? (BY_SCENE_AND_CHAPTER.get(`${sceneId}::chapter-1`)?.instances ?? []).filter(
+          (i) => !!getDecorAsset(i.assetId)?.collectibleItemId,
+        )
+      : [];
   const ownIds = new Set((composition?.instances ?? []).map((i) => i.instanceId));
+  const knownIds = new Set([...ownIds, ...inherited.map((i) => i.instanceId)]);
   const instances = mergeSharedEnvironmentInstances(sceneId, [
+    ...leftover.filter((i) => !knownIds.has(i.instanceId)),
     ...inherited.filter((i) => !ownIds.has(i.instanceId)),
     ...(composition?.instances ?? []),
   ]);

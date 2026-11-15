@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
+
 const FADE_IN_MS = 1000;
 const READ_MS = 7500; // 4.5 s + 3 s more: the blocks are longer now
 const FADE_OUT_MS = 1000;
@@ -92,6 +94,10 @@ export function IntroScreen({ lines, onComplete }: IntroScreenProps) {
         <p
           style={{
             margin: 0,
+            // the same face as the Doctor's lines over the chapter illustrations
+            fontFamily: PIXEL_FONT_FAMILY,
+            fontWeight: 700,
+            textShadow: "1px 1px 0 #000",
             fontSize: "clamp(1.25rem, 2vw, 1.8rem)",
             lineHeight: 1.6,
             letterSpacing: "0.04em",
