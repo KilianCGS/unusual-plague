@@ -1,8 +1,9 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 
+import { playSound } from "../audio/audioPlayer";
 import { PIXEL_FONT_FAMILY } from "../ui/pixelFont";
 import styles from "./DialogueBubble.module.css";
 
@@ -10,6 +11,8 @@ const EDGE_MARGIN = 8;
 const TAIL_SIZE = 12;
 const TAIL_EDGE_INSET = 14;
 const GAP_PX = 6;
+// Least time between two talking blips (ms).
+const BLIP_GAP_MS = 90;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -48,6 +51,18 @@ export function DialogueBubble({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
+  const lastBlip = useRef(0);
+
+  // A small blip while the text is being written, like the talking sound of other games: not on
+  // spaces and never more often than every BLIP_GAP_MS, with a slightly different pitch each time.
+  useEffect(() => {
+    if (isComplete || visibleText.length === 0) return;
+    if (/\s$/.test(visibleText)) return;
+    const now = performance.now();
+    if (now - lastBlip.current < BLIP_GAP_MS) return;
+    lastBlip.current = now;
+    playSound("ui.dialogueBubble", { rate: 0.92 + Math.random() * 0.2 });
+  }, [visibleText, isComplete]);
 
   useLayoutEffect(() => {
     const element = ref.current;

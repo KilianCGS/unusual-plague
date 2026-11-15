@@ -15,6 +15,7 @@ import {
 
 import { ApothecaryScene } from "../apothecary/ApothecaryScene";
 import { playSound } from "../audio/audioPlayer";
+import { useLoopMusic } from "../audio/useLoopMusic";
 import { BookOverlay } from "../book/BookOverlay";
 import { DiagnosisOverlay } from "../patients/DiagnosisOverlay";
 import { DIAGNOSIS_SYMPTOMS, checkDiagnosis, diagnosisConversation, type DiagnosisSession } from "../patients/diagnosis";
@@ -224,6 +225,8 @@ export function GameWorld({
   const [closingActive, setClosingActive] = useState(false);
   // The pause menu (Esc) and the controls screen opened from it.
   const [pauseOpen, setPauseOpen] = useState(false);
+  // Day 1's ambient music starts when the Doctor first leaves the Botica and loops until the day closes.
+  const [leftBotica, setLeftBotica] = useState(false);
   // "Sleep now?" (the day ends only when the player says so) and whether he said "not yet".
   const [restPromptOpen, setRestPromptOpen] = useState(false);
   const restDeclinedRef = useRef(false);
@@ -1242,6 +1245,8 @@ export function GameWorld({
     "chapter-3": DAY3_COMPLETED_ID,
   };
   const sceneIdForClosing = world.sceneId;
+  if (!leftBotica && !DAY_END_SCENES.includes(world.sceneId)) setLeftBotica(true);
+  useLoopMusic("music.day1", chapterId === "chapter-1" && leftBotica && !closingActive);
 
   // Being home with the day's work done only ASKS whether to sleep (2026-11-15): "keep exploring"
   // lets him go on; leaving the Botica and coming back asks again.

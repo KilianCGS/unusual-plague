@@ -96,6 +96,7 @@ export function BookOverlay({
       onSectionChange?.(sections[index].id);
     }
 
+    if (index !== sectionIndex) playSound("ui.bookTab");
     setSectionIndex(index);
     setSpreadIndex(0);
   }

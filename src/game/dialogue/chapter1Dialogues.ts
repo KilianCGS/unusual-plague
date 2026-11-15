@@ -315,6 +315,21 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
       doctor("¿Y hoy? ¿Cómo lleva la promesa?", "And today? How's the promise holding?"),
       subject("Hoy todavía es pronto.", "It's still early."),
     ]),
+    // The farmer hoeing in the mill farmland (2026-11-15, Kilian): the old farmer's lines, under an id of his own.
+    conversation("chapter1.mill.farmerHoeing", [
+      subject(
+        "Las gallinas comen mejor que yo.",
+        "The chickens eat better than I do.",
+      ),
+      doctor(
+        "¿Y si prueba a quitarles un poquito, con cariño?",
+        "What if you took a little of it away, kindly?",
+      ),
+      subject(
+        "¿Y despertar mañana? Ni hablar.",
+        "And wake up tomorrow? No, thank you.",
+      ),
+    ]),
     conversation("chapter1.tavernStreet.man", [
       subject(
         "Dicen que beber solo trae problemas.",

@@ -220,12 +220,12 @@ test("Mill Farmland: the authored Beekeeper, Farmer (hoeing) and Orange, with no
   pin("mill-farmland-beekeeper-01", "beekeeper", 1190, 555, 1.08, true);
   pin("mill-farmland-farmer-hoeing-01", "farmer-hoeing", 1226, 428, 1.17, true);
   pin("mill-farmland-orange-world-01", "orange-world", 860, 483, 1, false);
-  // the farmer has no interaction (the beekeeper got his for Patient 2), and the
-  // Orange is collected by the generic path only (the asset's
+  // the farmer only chats (2026-11-15: he got the old farmer's lines; the beekeeper has his trade
+  // for Patient 2), and the Orange is collected by the generic path only (the asset's
   // collectibleItemId), three at a time
   assert.equal(
-    chapter1Interactions["mill-farmland-farmer-hoeing-01"],
-    undefined,
+    chapter1Interactions["mill-farmland-farmer-hoeing-01"].interactionId,
+    "chapter1.mill.farmerHoeing",
   );
   assert.equal(getDecorAsset("orange-world").collectibleItemId, "orange");
   assert.equal(getDecorAsset("orange-world").collectibleQuantity, 3);
@@ -482,10 +482,9 @@ test("Patient 2 adds no gather source, no provider and no collectible Honey or M
       `${asset.id} gives no honey/milk`,
     );
   }
-  // the farmer still has no interaction (the seller got hers); the Beekeeper gained
-  // his own for Patient 2 (honey, once, through a trade)
-  for (const [instanceId, entry] of Object.entries(chapter1Interactions)) {
-    assert.ok(!/farmer-hoeing/.test(instanceId), instanceId);
+  // the farmer only chats (2026-11-15); the Beekeeper gained his own for Patient 2 (honey,
+  // once, through a trade)
+  for (const [, entry] of Object.entries(chapter1Interactions)) {
     assert.ok(
       !/honey|milk/i.test(entry.interactionId),
       entry.interactionId,

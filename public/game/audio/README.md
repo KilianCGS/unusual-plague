@@ -27,7 +27,11 @@ Conectados con sonido existente:
 Conectados (2026-11-15): `music/game-intro.mp3` (música de la pantalla de título, en bucle, con fundido al empezar) y
 `ui/intro-button-click.mp3` (Empezar, Sobre el juego, Controles y banderas de idioma del título).
 
+Conectados también (2026-11-15): `ui/book-tab.mp3` (cambiar de pestaña del libro), `ui/dialogue-bubble.mp3` (un
+"blip" mientras se escribe cada diálogo, como en otros juegos: no en espacios y como mucho cada 90 ms, con un tono
+algo distinto cada vez; se ajusta con BLIP_GAP_MS en `DialogueBubble.tsx`) y `music/day1-ambient.mp3` (empieza
+cuando el Doctor sale por primera vez de la botica el día 1 y se repite en bucle hasta que el día se cierra).
+
 Pendientes de recibir (el archivo y el nombre los pone Kilian; aquí van los usos):
 - Abrir el mapa.
 - Cerrar el mapa.
-- Cambiar de pestaña en el libro (Ingredientes, Preparados, Dolencias, Pacientes).

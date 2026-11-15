@@ -20,7 +20,10 @@ export const SOUND_IDS = [
   "ui.itemObtained",
   "ui.chestOpen",
   "ui.introButton",
+  "ui.bookTab",
+  "ui.dialogueBubble",
   "music.intro",
+  "music.day1",
 ] as const;
 
 export type SoundId = (typeof SOUND_IDS)[number];
@@ -57,6 +60,9 @@ export const SOUNDS: Record<SoundId, SoundDef> = {
   "ui.coins": def("ui.coins", "ui/coins.mp3", "ui"),
   "ui.itemObtained": def("ui.itemObtained", "ui/item-obtained.mp3", "ui"),
   "ui.introButton": def("ui.introButton", "ui/intro-button-click.mp3", "ui"),
+  "ui.bookTab": def("ui.bookTab", "ui/book-tab.mp3", "ui"),
+  "ui.dialogueBubble": def("ui.dialogueBubble", "ui/dialogue-bubble.mp3", "ui"),
+  "music.day1": def("music.day1", "music/day1-ambient.mp3", "music", true, 0.6),
   "music.intro": def("music.intro", "music/game-intro.mp3", "music", true),
   "ui.chestOpen": def("ui.chestOpen", "ui/chest-open.mp3", "ui"),
 };

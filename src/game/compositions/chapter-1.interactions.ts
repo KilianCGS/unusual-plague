@@ -173,6 +173,10 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.tavernStreet.womanLeft",
     zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },
   },
+  "mill-farmland-farmer-hoeing-01": {
+    interactionId: "chapter1.mill.farmerHoeing",
+    zone: { offsetX: -33, offsetY: -95, width: 60, height: 111 },
+  },
   "tavern-street-villager-man-01-01": {
     interactionId: "chapter1.tavernStreet.man",
     zone: { offsetX: -33, offsetY: -95, width: 60, height: 111 },
