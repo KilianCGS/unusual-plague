@@ -240,7 +240,7 @@ test("the tutorial Book is untouched: it still opens on INGREDIENTES, which keep
   const book = read("src/game/book/BookOverlay.tsx");
   assert.ok(book.includes("onPageChange") && book.includes("onSectionChange"));
   assert.equal(sections("es").ingredients.spreads.length, 5);
-  assert.equal(sections("en").ingredients.spreads.length, 4);
+  assert.equal(sections("en").ingredients.spreads.length, 5);
 });
 
 test("all twenty-six preparations occupy one localized leaf each, two per opening", () => {

@@ -24,6 +24,7 @@ export type TutorialStep =
   | "exit-room" // go down to the Botica
   | "botica" // the two crafting interfaces (acknowledged)
   | "exit-botica" // go out to the street
+  | "fast-travel" // the fast travel button, top right (acknowledged)
   | "run" // hold Space while moving
   | "done";
 
@@ -72,12 +73,13 @@ const STEP_COMPLETED_BY: Record<
   eye: { event: "continue", next: "exit-room" },
   "exit-room": { event: "botica-entered", next: "botica" },
   botica: { event: "continue", next: "exit-botica" },
-  "exit-botica": { event: "street-entered", next: "run" },
+  "exit-botica": { event: "street-entered", next: "fast-travel" },
+  "fast-travel": { event: "continue", next: "run" },
   run: { event: "run-started", next: "done" },
 };
 
 // The steps that wait for the player to say "understood" (a button and Enter).
-export const ACK_STEPS: readonly TutorialStep[] = ["goal", "bar", "eye", "botica"];
+export const ACK_STEPS: readonly TutorialStep[] = ["goal", "bar", "eye", "botica", "fast-travel"];
 
 // The inventory bar and the coins are shown from the step that explains them.
 const HUD_STEPS: readonly TutorialStep[] = [
@@ -86,6 +88,7 @@ const HUD_STEPS: readonly TutorialStep[] = [
   "exit-room",
   "botica",
   "exit-botica",
+  "fast-travel",
   "run",
   "done",
 ];
@@ -114,7 +117,7 @@ const CHEST_STEPS: TutorialStep[] = [
 // The way out of the Doctor's room stays shut until the tutorial has got him to the
 // "go down to the Botica" step: the player cannot leave without having done it.
 export function isRoomExitBlocked(step: TutorialStep): boolean {
-  return !["exit-room", "botica", "exit-botica", "run", "done"].includes(step);
+  return !["exit-room", "botica", "exit-botica", "fast-travel", "run", "done"].includes(step);
 }
 
 export const INITIAL_TUTORIAL_STEP: TutorialStep = "intro";
@@ -136,7 +139,7 @@ export function advanceTutorial(
   // A late tutorial never traps a player who already did the thing: the botica
   // step is skipped if he is already past it (he reached the street).
   if (event === "street-entered" && (step === "botica" || step === "exit-room")) {
-    return "run";
+    return "fast-travel";
   }
 
   const rule = STEP_COMPLETED_BY[step];

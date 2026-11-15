@@ -90,7 +90,8 @@ const ORDER = [
   ["eye", "continue", "exit-room"],
   ["exit-room", "botica-entered", "botica"],
   ["botica", "continue", "exit-botica"],
-  ["exit-botica", "street-entered", "run"],
+  ["exit-botica", "street-entered", "fast-travel"],
+  ["fast-travel", "continue", "run"],
   ["run", "run-started", "done"],
 ];
 // The only other transitions: walking away from the chest / closing the
@@ -300,7 +301,7 @@ console.log(`\n${passed} tests passed`);
   for (const step of ["intro", "goal", "book", "book-cover", "book-page", "book-preparations", "book-ailments", "book-patients", "book-close", "map", "move", "chest-approach", "chest-interact", "take-flask", "bar"]) {
     assert.equal(flow.isRoomExitBlocked(step), true, step);
   }
-  for (const step of ["exit-room", "botica", "exit-botica", "run", "done"]) {
+  for (const step of ["exit-room", "botica", "exit-botica", "fast-travel", "run", "done"]) {
     assert.equal(flow.isRoomExitBlocked(step), false, step);
   }
   const game = fs.readFileSync(path.resolve(root, "src/game/world/GameWorld.tsx"), "utf8");

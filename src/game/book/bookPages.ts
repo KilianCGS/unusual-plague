@@ -188,9 +188,7 @@ function ailmentSpread(ailment: Ailment, language: Language = "es"): BookSpread 
 //   3 Orange / Mint / Honey / Resin
 //   4 Animal fat / Garlic / Salt / Leech
 //   5 Bone / Pine mushroom / Sugar / Onion (the basic ingredients added later)
-// TEMPORARY (2026-11-15): the 5th spread exists in Spanish only; the English one is pending, so
-// English has 4 pages until `en/ingredients-05.png` is installed (then both are 5).
-const INGREDIENT_SPREAD_COUNTS: Record<Language, number> = { es: 5, en: 4 };
+const INGREDIENT_SPREAD_COUNTS: Record<Language, number> = { es: 5, en: 5 };
 
 function ingredientSpreads(language: Language): BookSpread[] {
   const alts = bookCopy[language].ingredientSpreadAlts;

@@ -81,6 +81,7 @@ export const bookCopy: Record<Language, BookCopy> = {
       "Ingredients: alcohol, flour, charcoal and cloth",
       "Ingredients: orange, mint, honey and resin",
       "Ingredients: animal fat, garlic, salt and leech",
+      "Ingredients: bone, pine mushroom, sugar and onion",
     ],
     station: "Station",
     stations: { manual: "Work table", fire: "Stove", mortar: "Mortar", chop: "Board" },

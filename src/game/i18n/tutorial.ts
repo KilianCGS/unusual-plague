@@ -109,6 +109,10 @@ export const tutorialCopy: Record<
       title: ["Sal a la calle."],
       body: "Hay mucha ciudad por recorrer.",
     },
+    "fast-travel": {
+      title: ["Botón de viaje rápido."],
+      body: "Arriba a la derecha: te lleva de vuelta a la botica al instante.\nDespués tarda dos minutos en recargarse; verás cómo se llena.",
+    },
     run: {
       title: ["Mantén ", { action: "run" }, " mientras te mueves para correr."],
       body: "En interiores, mejor ir despacio.",
@@ -193,6 +197,10 @@ export const tutorialCopy: Record<
     "exit-botica": {
       title: ["Head out to the street."],
       body: "There is a whole town to explore.",
+    },
+    "fast-travel": {
+      title: ["Fast travel button."],
+      body: "Top right: it takes you straight back to the apothecary.\nThen it needs two minutes to recharge; you will see it fill up.",
     },
     run: {
       title: ["Hold ", { action: "run" }, " while moving to run."],

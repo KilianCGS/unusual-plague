@@ -1599,6 +1599,7 @@ export function GameWorld({
     hintStep === "exit-room" ||
     hintStep === "botica" ||
     hintStep === "exit-botica" ||
+    hintStep === "fast-travel" ||
     hintStep === "run" ||
     (hintStep === "chest-interact" &&
       availableInteractionId === STORAGE_INTERACTION_ID) ||

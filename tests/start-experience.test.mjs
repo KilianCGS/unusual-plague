@@ -312,7 +312,8 @@ test("Tutorial V2: open book > page > tab > close > map > move > approach chest 
     ["continue", "exit-room"],
     ["botica-entered", "botica"],
     ["continue", "exit-botica"],
-    ["street-entered", "run"],
+    ["street-entered", "fast-travel"],
+    ["continue", "run"],
     ["run-started", "done"],
   ];
   let step = INITIAL_TUTORIAL_STEP;
@@ -351,6 +352,7 @@ test("running is taught when leaving the apothecary (its own step), not in the r
       "exit-room",
       "botica",
       "exit-botica",
+      "fast-travel",
       "run",
     ]);
   }

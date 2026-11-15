@@ -27,6 +27,7 @@ const STEPS: TutorialHintStep[] = [
   "exit-room",
   "botica",
   "exit-botica",
+  "fast-travel",
   "run",
 ];
 

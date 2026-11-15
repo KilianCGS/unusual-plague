@@ -66,14 +66,13 @@ const pngSize = (file) => {
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
 };
 
-// Spanish has the 5th spread; English is pending (see bookPages.ts) and has 4 for now.
-const COUNTS = { es: 5, en: 4 };
+const COUNTS = { es: 5, en: 5 };
 const PATHS = (language) =>
   Array.from({ length: COUNTS[language] }, (_, i) => i + 1).map(
     (n) => `/game/ui/book/ingredients/${language}/ingredients-0${n}.png`,
   );
 
-test("INGREDIENTES has its spreads (ES 5, EN 4 until the English 5th arrives), one complete image each", () => {
+test("INGREDIENTES has its 5 spreads in both languages, one complete image each", () => {
   for (const language of ["es", "en"]) {
     const section = ingredients(language);
     assert.equal(section.spreads.length, COUNTS[language], language);
