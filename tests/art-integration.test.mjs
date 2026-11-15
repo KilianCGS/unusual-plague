@@ -167,7 +167,7 @@ test("all 30 approved art entries are catalog items with bilingual names", () =>
   for (const [key, item] of Object.entries(ITEMS)) assert.equal(item.id, key);
   // 15 existing items + the 17 promoted ones + the Empty jar of Patient 2 +
   // the crushed herb (mortar) + the 10 items of the cooking family (2026-11-11)
-  assert.equal(Object.keys(ITEMS).length, 49);
+  assert.equal(Object.keys(ITEMS).length, 50);
 });
 
 test("prepared catalog now has recipes, without changing Chapter 1 needs or adding material sources", () => {

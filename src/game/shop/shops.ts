@@ -62,6 +62,8 @@ export const MERCHANT_SHOP: ShopDefinition = {
     // From Day 3: garlic, which the balsamic syrup of the sweeper's cough needs. It has no
     // other source in the world; 2 coins is Kilian's earlier decision (2026-11-09).
     { itemId: "garlic", price: 5, stock: 2, fromChapter: "chapter-3" },
+    // An optional extra for the plaza statue (see dialogue/statueCandle.ts); not needed by any case.
+    { itemId: "candle", price: 1, stock: 1, fromChapter: "chapter-2" },
   ],
 };
 

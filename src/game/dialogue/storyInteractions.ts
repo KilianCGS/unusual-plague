@@ -73,6 +73,7 @@ import {
   tavernPatientWaiting,
 } from "./chapter1TavernDialogues";
 import type { Conversation } from "./dialogueTypes";
+import { resolveStatueCandle } from "./statueCandle";
 import { DOCTOR_SPEAKER } from "./dialogueTypes";
 import {
   localizeConversation,
@@ -581,6 +582,8 @@ export function resolveStoryInteraction(
   language: Language,
   subjectId: string,
 ): StoryOutcome | null {
+  const statueCandle = resolveStatueCandle(interactionId, facts, language, subjectId);
+  if (statueCandle) return statueCandle;
   const granary = resolveGranaryInteraction(interactionId, facts, language, subjectId);
   if (granary) return granary;
   const chapter4 = resolveChapter4(interactionId, facts, language, subjectId);

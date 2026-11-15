@@ -6,6 +6,7 @@ import type { Language } from "../i18n/types";
 // raw resource or a prepared remedy. Add an entry here to add an item; nothing
 // else needs to change.
 export type ItemId =
+  | "candle"
   | "chopped-onion"
   | "chopped-mushroom"
   | "chopped-pine-mushroom"
@@ -258,6 +259,15 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     icon: `${PREPARED_ICONS}/crushed-herb.png`,
   },
   // 2026-11-14: chopped on the kitchen's cutting board, ground in the mortar. NEW names, for review.
+  candle: {
+    id: "candle",
+    name: { es: "Vela", en: "Candle" },
+    icon: `${RESOURCE_ICONS}/candle.png`,
+    sourceHint: {
+      es: "El mercader de la plaza vende velas.",
+      en: "The merchant in the plaza sells candles.",
+    },
+  },
   "chopped-onion": {
     id: "chopped-onion",
     name: { es: "Cebolla troceada", en: "Chopped onion" },

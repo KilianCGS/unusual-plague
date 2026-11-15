@@ -102,5 +102,32 @@ test("the kitchen opens the board and the board returns to the kitchen; Cook sti
   assert.ok(world.includes('setCraftingStation("chop")') && world.includes('setCraftingStation("fire")'));
 });
 
+
+// ---- the candle for the plaza statue (optional use of leftover coins)
+{
+  const { resolveStatueCandle, STATUE_CANDLE_REWARD_ID } = at("src/game/dialogue/statueCandle.ts");
+  const { getShop } = at("src/game/shop/shops.ts");
+  const facts = (pairs, claimed = []) => ({ patients: {}, inventory: stock(pairs), claimedRewards: new Set(claimed) });
+  test("the statue takes a candle only when the Doctor carries one, once, and never by surprise", () => {
+    assert.equal(resolveStatueCandle("world.plaza.statue", facts([]), "es", "x"), null, "no candle: the normal observation");
+    assert.equal(resolveStatueCandle("world.plaza.well", facts([["candle", 1]]), "es", "x"), null, "only the statue");
+    const done = resolveStatueCandle("world.plaza.statue", facts([["candle", 1]]), "es", "x");
+    assert.deepEqual(done.effects, [
+      { type: "take-item", itemId: "candle", quantity: 1 },
+      { type: "claim-reward", rewardId: STATUE_CANDLE_REWARD_ID },
+    ]);
+    assert.ok(done.conversation.lines.length >= 2);
+    assert.equal(resolveStatueCandle("world.plaza.statue", facts([["candle", 1]], [STATUE_CANDLE_REWARD_ID]), "es", "x"), null, "once");
+    const en = resolveStatueCandle("world.plaza.statue", facts([["candle", 1]]), "en", "x");
+    assert.equal(en.conversation.lines.length, done.conversation.lines.length);
+  });
+  test("the merchant sells the candle from Day 2 only, for 1 coin; Day 1 stays exactly as it was", () => {
+    const merchant = getShop("chapter1.plaza.merchant");
+    const candle = merchant.entries.find((e) => e.itemId === "candle");
+    assert.deepEqual([candle.price, candle.stock, candle.fromChapter], [1, 1, "chapter-2"]);
+    assert.ok(fs.existsSync(path.join(root, "public/game/items/inventory-icons/candle.png")));
+  });
+}
+
 console.log(`
 ${passed} tests passed`);

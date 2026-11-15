@@ -493,6 +493,7 @@ test("the merchant SELLS cloth: he never gives it through the story any more", (
     { itemId: "onion", price: 2, stock: 3, fromChapter: "chapter-2" },
     { itemId: "bone", price: 3, stock: 3, fromChapter: "chapter-2" },
     { itemId: "garlic", price: 5, stock: 2, fromChapter: "chapter-3" },
+    { itemId: "candle", price: 1, stock: 1, fromChapter: "chapter-2" }, // optional, for the statue
   ]);
   // on Day 1 only the cloth and the salt are on sale
   assert.deepEqual(
@@ -501,11 +502,11 @@ test("the merchant SELLS cloth: he never gives it through the story any more", (
   );
   assert.deepEqual(
     shops.shopForChapter(shops.getShop(MERCHANT), "chapter-2").entries.map((e) => e.itemId),
-    ["cloth", "salt", "sugar", "onion", "bone"],
+    ["cloth", "salt", "sugar", "onion", "bone", "candle"],
   );
   assert.deepEqual(
     shops.shopForChapter(shops.getShop(MERCHANT), "chapter-3").entries.map((e) => e.itemId),
-    ["cloth", "salt", "sugar", "onion", "bone", "garlic"],
+    ["cloth", "salt", "sugar", "onion", "bone", "garlic", "candle"],
   );
 });
 
