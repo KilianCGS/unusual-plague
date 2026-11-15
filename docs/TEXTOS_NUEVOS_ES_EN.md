@@ -207,7 +207,31 @@ el fichero). Generado desde el código, así que lo que ves aquí es lo que sale
 | doctor | ¿Tanto cansa partir piedra? | Does splitting stone tire you that much? |
 | personaje | Cansa no partirla. Cuando uno para, es cuando se entera de todo. | What tires is not splitting it. It's when you stop that you notice everything. |
 
-## 8. Recados voluntarios del día 2 (chapter2Errands.ts)
+## 8. Recados voluntarios: día 1 (chapter1Errands.ts) y día 2 (chapter2Errands.ts)
+
+**Llevar un paño frío al pescador del río** / Bring a cold cloth to the fisherman by the river (paga 3 monedas)
+
+### Petición (primera vez) — chapter1.errand.fisherman.ask
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | Llevo toda la mañana al sol y ya no distingo si pica el pez o pica la cabeza. | I've been in the sun all morning and I can't tell whether it's the fish or my head that's biting. |
+| doctor | Un paño frío en la nuca le sentará bien: agua fresca y un trapo limpio. | A cold cloth on the back of your neck will do you good: cool water and a clean rag. |
+| personaje | Tráigamelo y le doy tres monedas. Es lo que he pescado hoy, que ya es decir. | Bring me one and I'll give you three coins. It's what I've caught today, which says it all. |
+
+### Recordatorio — chapter1.errand.fisherman.reminder
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | ¿El paño? Sigo aquí, al sol, con la nuca ardiendo y la caña quieta. | The cloth? Still here, in the sun, my neck on fire and the rod still. |
+
+### Entrega — chapter1.errand.fisherman.ready
+
+| Quién | Español | English |
+|---|---|---|
+| doctor | Paño frío, recién mojado. Póngaselo en la nuca. | A cold cloth, freshly wetted. Put it on the back of your neck. |
+| personaje | Qué alivio... Tome, tres monedas. Y no le cuente a los peces que me he sentado. | What a relief... Here, three coins. And don't tell the fish I sat down. |
+| doctor | Su secreto está a salvo conmigo. | Your secret is safe with me. |
 
 **Llevar jarabe de cebolla al anciano del cántaro** / Bring onion syrup to the old man with the jug (paga 9 monedas)
 
