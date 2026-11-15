@@ -201,3 +201,21 @@ Para el plazo (19 de noviembre) y para tu pareja jugando los días 1 y 2:
 3. ¿Quieres que el herrero venda carbón (más adelante) y que eso cambie el precio de los preparados con carbón?
 4. ¿Los recados son un extra o parte del recorrido que da dinero imprescindible?
 5. ¿La tabla de cortar debe usarse también en el tutorial, o se descubre sola?
+
+## 8. Verificación sin callejones (2026-11-15)
+
+Principio de Kilian: el dinero debe **sobrar y faltar a la vez** (hay que hacer misiones para
+conseguirlo), pero el jugador **no debe atascarse por cambiar el orden** de comprar, curar o hacer el
+recado. Lo comprueba `tests/economy-no-deadlock.test.mjs`, que explora todos los órdenes posibles de
+compras, curas y recado en los días 1 a 3 y exige que desde cualquier estado alcanzable se pueda terminar.
+
+Lo que encontró con las existencias anteriores:
+- **La sal:** 1 en tienda + 1 de regalo de la panadera, pero se usa 3 veces (sopa del día 1, caldo del
+  recado, caldo del minero del camino del día 3). Hacer el recado antes dejaba al minero sin sal.
+- **Gastar de más:** el coste total de la tienda (56) superaba lo que se cobra de forma obligatoria (45),
+  así que comprar cosas inútiles podía dejar sin monedas para el ajo del último caso.
+
+Lo que se aplicó (solo existencias de tienda): sal 3, azúcar 3, hueso 2, ajo 1, tela 4, vela 1, y la **cebolla
+deja de venderse** hasta que un caso la necesite. Coste total de la tienda: 41, frente a 45 obligatorios.
+Resultado: 3.011 estados comprobados, ninguno sin salida. Si se cambia un precio, un pago o una existencia,
+este test dice al momento si se ha vuelto a abrir un callejón.

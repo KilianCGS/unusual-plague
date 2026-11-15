@@ -93,10 +93,10 @@ test("the merchant's shop: cloth at two coins, four in stock, sold out after fou
 });
 
 test("Day 1 can never block on money: the six coins buy the cloth and the salt before the first payment and every payment covers the rest", () => {
-  // Day 1's shop: from Day 2 the merchant also sells sugar, onion and bone
+  // Day 1's shop: from Day 2 the merchant also sells sugar and bone (the onion is not on sale)
   const shop = shops.shopForChapter(shops.getShop("chapter1.plaza.merchant"), "chapter-1");
   const spendAll = shop.entries.reduce((n, e) => n + e.price * e.stock, 0);
-  assert.equal(spendAll, 10, "Day 1 sells 4 cloths (8) and the salt (2)");
+  assert.equal(spendAll, 14, "Day 1 sells 4 cloths (8) and 3 salts (6)");
   // the mandatory purchases of Day 1: two cloths and one salt
   const price = (id) => shop.entries.find((e) => e.itemId === id).price;
   assert.ok(STARTING_COINS >= 2 * price("cloth") + price("salt"), "cloth x2 + salt fit in the starting purse");
