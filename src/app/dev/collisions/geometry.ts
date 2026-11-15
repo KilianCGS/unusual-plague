@@ -224,7 +224,7 @@ export function formatSceneExport(
   const stepZones =
     stepZoneRows.length === 0
       ? ""
-      : "\n// STEP ZONES (orange): ground where stone path and earth mix; the steps alternate there.\n" +
+      : "\n// STEP ZONES (orange): the stone path; the steps sound like stone there.\n" +
         "// Register them in src/game/audio/stepZones.ts under this scene id.\n" +
         formatBlock(
           `export const ${names.stepZones ?? "stepZones"}: { id: string; points: { x: number; y: number }[] }[]`,

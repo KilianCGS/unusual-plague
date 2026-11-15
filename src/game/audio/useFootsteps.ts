@@ -25,7 +25,6 @@ export function useFootsteps(
   sceneId: SceneId,
 ) {
   const lastFrame = useRef<number | null>(null);
-  const alternate = useRef(false);
 
   useEffect(() => {
     if (!player.isWalking) {
@@ -38,8 +37,7 @@ export function useFootsteps(
       ? [0, Math.floor(getRunFrameCount(player.direction) / 2)]
       : WALK_FOOTFALLS[player.direction].filter((frame) => frame < getWalkFrameCount(player.direction));
     if (feet.includes(player.frame)) {
-      alternate.current = !alternate.current;
-      playSound(footstepSoundAt(sceneId, player.x, player.y, alternate.current), { rate: player.isRunning ? 1.15 : 1 });
+      playSound(footstepSoundAt(sceneId, player.x, player.y), { rate: player.isRunning ? 1.15 : 1 });
     }
   }, [player.frame, player.isWalking, player.isRunning, player.direction, player.x, player.y, sceneId]);
 }

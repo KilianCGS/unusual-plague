@@ -1786,7 +1786,7 @@ function SceneGeometryEditor({
             : mode === "select"
               ? "Nothing is drawn in this mode: click an item on the map to select it (click the same spot again to cycle through stacked items, click empty floor to deselect), then press Delete or use the delete button. Colliders, free shapes, depth shapes, transitions, interactions and spawns can all be picked."
               : mode === "stepzone"
-              ? "Click points to outline ground where stone path and earth MIX (the river bank before the forest, the mountain path). Inside it the Doctor steps alternate between the stone and the earth sound. Click the first point (or Enter) to close the shape. Export the scene and paste it into src/game/audio/stepZones.ts."
+              ? "Click points to outline the STONE path inside a scene whose floor is earth (the river bank before the forest, the mountain path). Inside it the Doctor's steps sound like stone; everywhere else as usual. Click the first point (or Enter) to close the shape. Export the scene and paste it into src/game/audio/stepZones.ts."
               : mode === "occluder"
               ? "Click points to outline the part of the picture that must cover the Doctor (a treetop, a roof). The dashed line is the depth line: the Doctor is behind the shape while the soles of his feet (the bottom edge of his collision box, where the red colliders stop him) are above it. It starts at the lowest point; drag its square handle or type depthY."
               : `Drag on the map to draw a ${mode}.`}{" "}

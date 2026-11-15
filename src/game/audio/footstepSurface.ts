@@ -18,9 +18,9 @@ export function footstepSoundFor(sceneId: SceneId): SoundId {
   return "steps.cityRock";
 }
 
-// The sound of ONE step. Inside an orange zone (stone and earth mixed) the steps alternate:
-// `alternate` flips on every step taken there.
-export function footstepSoundAt(sceneId: SceneId, x: number, y: number, alternate: boolean): SoundId {
-  if (isInStepMixZone(sceneId, x, y)) return alternate ? "steps.cityRock" : "steps.woodPath";
+// The sound of ONE step. Inside an orange zone (the stone path) it is the stone sound; outside it
+// the scene's usual one.
+export function footstepSoundAt(sceneId: SceneId, x: number, y: number): SoundId {
+  if (isInStepMixZone(sceneId, x, y)) return "steps.cityRock";
   return footstepSoundFor(sceneId);
 }
