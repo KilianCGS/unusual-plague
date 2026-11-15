@@ -56,7 +56,7 @@ export const MERCHANT_SHOP: ShopDefinition = {
     // From Day 2 (prices decided by Kilian, 2026-11-11: sugar 3, bone 1, onion 1).
     // None of these is needed to cure a patient: they feed the cooking recipes and
     // the errands. The stock (3 each) is a proposal, to be balanced.
-    { itemId: "sugar", price: 6, stock: 4, fromChapter: "chapter-2" },
+    { itemId: "sugar", price: 5, stock: 4, fromChapter: "chapter-2" },
     { itemId: "onion", price: 2, stock: 3, fromChapter: "chapter-2" },
     { itemId: "bone", price: 3, stock: 3, fromChapter: "chapter-2" },
     // From Day 3: garlic, which the balsamic syrup of the sweeper's cough needs. It has no

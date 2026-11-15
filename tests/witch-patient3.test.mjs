@@ -698,7 +698,7 @@ test("P3 6. Coal: the quarry man (seen from behind) is only ambient until the ca
     .join(" ");
   assert.ok(
     !/compañero|dentro|herid/i.test(ambient),
-    "he sends nobody anywhere",
+    "he sends nobody anywhere with a quest (the coal hint is small talk)",
   );
   assert.equal(
     chapter1AmbientDialogues[MOUNTAIN].lines[0].text.es,

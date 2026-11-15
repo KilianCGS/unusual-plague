@@ -133,6 +133,15 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "Entonces ha elegido muy bien la ropa.",
         "Then you picked exactly the right clothes.",
       ),
+      // A hint (2026-11-15): where the clean coal is. Said as small talk, nobody is sent anywhere.
+      doctor(
+        "Por casualidad, ¿sabe dónde conseguir un poco de carbón limpio?",
+        "By any chance, do you know where I could get a little clean coal?",
+      ),
+      subject(
+        "Pregunte al de la cantera, el que mira sin trabajar. Siempre guarda un poco para su hoguera.",
+        "Ask the one at the quarry, the man who watches and doesn't work. He always keeps a little for his fire.",
+      ),
     ]),
     // Witch at the bar: her real conversations live in storyInteractions.ts.
     conversation("chapter1.tavern.witch", [

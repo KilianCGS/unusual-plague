@@ -489,7 +489,7 @@ test("the merchant SELLS cloth: he never gives it through the story any more", (
     { itemId: "cloth", price: 2, stock: 4 },
     { itemId: "salt", price: 2, stock: 1 },
     // Day 2 onwards (prices raised on 2026-11-13 so that money is needed)
-    { itemId: "sugar", price: 6, stock: 4, fromChapter: "chapter-2" },
+    { itemId: "sugar", price: 5, stock: 4, fromChapter: "chapter-2" },
     { itemId: "onion", price: 2, stock: 3, fromChapter: "chapter-2" },
     { itemId: "bone", price: 3, stock: 3, fromChapter: "chapter-2" },
     { itemId: "garlic", price: 5, stock: 2, fromChapter: "chapter-3" },

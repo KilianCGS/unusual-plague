@@ -1,6 +1,6 @@
 # Economía y crafteo desde la experiencia del jugador (2026-11-15)
 
-Estado: **análisis y propuestas, nada cambiado.** Todas las cifras salen de los datos del juego
+Estado: **análisis y propuestas.** Aplicado el 2026-11-15: azúcar a 5 monedas y una pista del carbón (B4 y A1); el resto sigue como propuesta. Todas las cifras salen de los datos del juego
 (`money/payments.ts`, `shop/shops.ts`, `crafting/recipes.ts`, `patients/*`, `dialogue/npcTrades.ts`) tal y
 como están hoy, incluidos los cambios de esta semana (cocina con espera de 5 s, tabla de cortar, ajo
 machacado, carbón en la cantera). No es una partida jugada: es aritmética más lectura del recorrido.
@@ -52,19 +52,19 @@ las pistas), reunir los ingredientes, fabricarlos y entregarlos.
 |---|---|---|---|---|
 | Tela | 2 | 4 | día 1 | 8 |
 | Sal | 2 | 1 | día 1 | 2 |
-| Azúcar | 6 | 4 | día 2 | 24 |
+| Azúcar | 5 (6 hasta el 2026-11-15) | 4 | día 2 | 20 |
 | Cebolla | 2 | 3 | día 2 | 6 |
 | Hueso | 3 | 3 | día 2 | 9 |
 | Ajo | 5 | 2 | día 3 | 10 |
-| **Todo** | | | | **59** |
+| **Todo** | | | | **55** |
 
 ### Gasto obligatorio estimado (lo que fuerzan los casos si el jugador no encuentra otra fuente)
 
 | Día | Qué hay que comprar | Monedas |
 |---|---|---|
 | 1 | Tela x2 (paño frío, venda) y sal x1 (sopa) | 6 |
-| 2 | Azúcar x1 (bebida cítrica), tela x1 (compresa) | 8 |
-| 3 | Azúcar x1, ajo x1 (balsámico), hueso x1, sal x1, tela x1 | 18 |
+| 2 | Azúcar x1 (bebida cítrica), tela x1 (compresa) | 7 |
+| 3 | Azúcar x1, ajo x1 (balsámico), hueso x1, sal x1, tela x1 | 17 |
 | **Total** | | **32** |
 
 Conclusión numérica: se cobran **53** y lo obligatorio ronda **32**. Sobran unas **20 monedas** en todo el
