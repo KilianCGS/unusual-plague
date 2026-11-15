@@ -633,14 +633,14 @@ test("P3 4. Cloth: the merchant sells it (two coins each, four in stock), whatev
   let coins = money.STARTING_COINS;
   let inventory = world({ p3: "examined" }).inventory;
   for (let i = 1; i <= 3; i++) {
-    assert.equal(shops.unitsLeft(claimed, shop, cloth), 5 - i);
+    assert.equal(shops.unitsLeft(claimed, shop, cloth), 6 - i);
     const effects = shops.buyEffects(claimed, shop, cloth);
     assert.deepEqual(effects.map((e) => e.type), ["take-coins", "give-item", "claim-reward"]);
     coins = money.spendCoins(coins, cloth.price);
     inventory = inv.addItem(inventory, "cloth", 1);
     claimed = new Set([...claimed, effects[2].rewardId]);
   }
-  assert.equal(shops.unitsLeft(claimed, shop, cloth), 1, "one of the four is left after three");
+  assert.equal(shops.unitsLeft(claimed, shop, cloth), 2, "two of the five are left after three");
   assert.equal(coins, money.STARTING_COINS - 6, "three cloths cost six of the starting coins");
   assert.equal(inv.countItem(inventory, "cloth"), 3, "two now, one left over for Day 2");
   // with nothing left, a purchase that cannot be paid takes nothing

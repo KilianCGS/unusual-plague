@@ -1560,9 +1560,9 @@ export function GameWorld({
     () => [
       ...getActiveTreatments(patients, getPatientDefinitions(claimedRewards)),
       // what the Doctor was asked for in a voluntary errand also counts as needed
-      ...getActiveErrandNeeds(claimedRewards),
+      ...getActiveErrandNeeds(claimedRewards, chapterId),
     ],
-    [patients, claimedRewards],
+    [patients, claimedRewards, chapterId],
   );
   const craftableOutputs = useMemo(
     () => getCraftingTargets(activeTreatments, inventory),

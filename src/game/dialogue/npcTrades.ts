@@ -35,6 +35,7 @@ import {
   quarryMinerDone,
   quarryMinerReady,
 } from "./chapter2QuarryDialogues";
+import { CHAPTER1_ERRAND_TRADES } from "./chapter1Errands";
 import { CHAPTER2_ERRAND_TRADES } from "./chapter2Errands";
 import type { LocalizedConversation } from "./localizedConversation";
 
@@ -63,6 +64,8 @@ export type NpcTrade = {
   ask?: LocalizedConversation;
   // Its line in the errands panel (R).
   objective?: Record<Language, string>;
+  // The chapters in which the errand is alive (its character only exists there); any when absent.
+  chapters?: readonly string[];
   // Conversations; a trade without them (a shelf) answers with a notice.
   ready?: LocalizedConversation;
   noRoom?: LocalizedConversation;
@@ -177,7 +180,8 @@ export const NPC_TRADES: Record<string, NpcTrade> = {
     done: quarryMinerDone,
     missing: { all: quarryMinerAsk },
   },
-  // The voluntary errands of Day 2 (chapter2Errands.ts).
+  // The voluntary errand of Day 1 (chapter1Errands.ts) and those of Day 2 (chapter2Errands.ts).
+  ...CHAPTER1_ERRAND_TRADES,
   ...CHAPTER2_ERRAND_TRADES,
 };
 
@@ -187,8 +191,9 @@ export function errandAskedFlag(trade: NpcTrade): string {
 
 // What the Doctor has been asked for and has not delivered: these preparations count as "needed", so
 // the crafting interface lets him make them (and their ingredients are not spent elsewhere).
-export function getActiveErrandNeeds(claimed: ReadonlySet<string>): ItemNeed[] {
+export function getActiveErrandNeeds(claimed: ReadonlySet<string>, chapterId?: string): ItemNeed[] {
   return Object.values(NPC_TRADES)
     .filter((trade) => trade.ask && claimed.has(errandAskedFlag(trade)) && !claimed.has(trade.rewardId))
+    .filter((trade) => !trade.chapters || !chapterId || trade.chapters.includes(chapterId))
     .flatMap((trade) => trade.consumes);
 }

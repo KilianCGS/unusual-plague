@@ -73,14 +73,14 @@ test("every patient of Days 1 and 2 pays something, and the prices are not round
   assert.equal(getPatientPayment("nobody"), 0);
 });
 
-test("the merchant's shop: cloth at two coins, four in stock, sold out after four, units counted by flags", () => {
+test("the merchant's shop: cloth at two coins, five in stock (one more for the fisherman's errand), sold out after five, units counted by flags", () => {
   const shop = shops.getShop("chapter1.plaza.merchant");
   assert.equal(shop.id, "plaza-merchant");
   const [cloth] = shop.entries;
-  assert.deepEqual(cloth, { itemId: "cloth", price: 2, stock: 4 });
+  assert.deepEqual(cloth, { itemId: "cloth", price: 2, stock: 5 });
   let claimed = new Set();
-  for (let i = 0; i < 4; i++) {
-    assert.equal(shops.unitsLeft(claimed, shop, cloth), 4 - i);
+  for (let i = 0; i < 5; i++) {
+    assert.equal(shops.unitsLeft(claimed, shop, cloth), 5 - i);
     const [pay, give, claim] = shops.buyEffects(claimed, shop, cloth);
     assert.deepEqual([pay, give], [
       { type: "take-coins", amount: 2 },
@@ -96,7 +96,7 @@ test("Day 1 can never block on money: the six coins buy the cloth and the salt b
   // Day 1's shop: from Day 2 the merchant also sells sugar and bone (the onion is not on sale)
   const shop = shops.shopForChapter(shops.getShop("chapter1.plaza.merchant"), "chapter-1");
   const spendAll = shop.entries.reduce((n, e) => n + e.price * e.stock, 0);
-  assert.equal(spendAll, 14, "Day 1 sells 4 cloths (8) and 3 salts (6)");
+  assert.equal(spendAll, 16, "Day 1 sells 5 cloths (10) and 3 salts (6)");
   // the mandatory purchases of Day 1: two cloths and one salt
   const price = (id) => shop.entries.find((e) => e.itemId === id).price;
   assert.ok(STARTING_COINS >= 2 * price("cloth") + price("salt"), "cloth x2 + salt fit in the starting purse");

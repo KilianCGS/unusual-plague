@@ -41,6 +41,7 @@ const inv = at("src/game/inventory/inventory.ts");
 const story = at("src/game/dialogue/storyInteractions.ts");
 const trades = at("src/game/dialogue/npcTrades.ts");
 const errands = at("src/game/dialogue/chapter2Errands.ts");
+const errands1 = at("src/game/dialogue/chapter1Errands.ts");
 const { getCraftingTargets } = at("src/game/crafting/needs.ts");
 const { getObjectives } = at("src/game/objectives/objectives.ts");
 const { RECIPES } = at("src/game/crafting/recipes.ts");
@@ -61,6 +62,7 @@ const facts = (pairs, claimed = []) => ({
 const talk = (id, f) => story.resolveStoryInteraction(id, f, "es", "x");
 
 const CASES = [
+  { id: errands1.FISHERMAN_INTERACTION_ID, flag: errands1.FISHERMAN_CLOTH_REWARD_ID, item: "cold-cloth", coins: 3, grants: [], key: "fisherman", prefix: "chapter1" },
   { id: errands.ELDER_INTERACTION_ID, flag: errands.ELDER_SYRUP_REWARD_ID, item: "onion-syrup", coins: 9, grants: [], key: "elder" },
   { id: errands.BAKERY_NEIGHBOUR_INTERACTION_ID, flag: errands.BAKERY_BROTH_REWARD_ID, item: "strong-broth", coins: 2, grants: [{ itemId: "sugar", quantity: 1 }], key: "bakery" },
   { id: errands.SEATED_MAN_INTERACTION_ID, flag: errands.SEATED_MAN_DRINK_REWARD_ID, item: "rehydration-drink", coins: 9, grants: [], key: "seated" },
@@ -69,7 +71,7 @@ const CASES = [
 test("the first conversation asks for the item and notes the errand; nothing is taken", () => {
   for (const c of CASES) {
     const out = talk(c.id, facts([]));
-    assert.equal(out.conversation.id, `chapter2.errand.${c.key}.ask`, c.id);
+    assert.equal(out.conversation.id, `${c.prefix ?? "chapter2"}.errand.${c.key}.ask`, c.id);
     assert.deepEqual(out.effects, [{ type: "claim-reward", rewardId: `${c.flag}.asked` }], c.id);
   }
 });
@@ -77,10 +79,10 @@ test("the first conversation asks for the item and notes the errand; nothing is 
 test("once asked, a short reminder; with the item it is taken, paid and marked done", () => {
   for (const c of CASES) {
     const reminder = talk(c.id, facts([], [`${c.flag}.asked`]));
-    assert.equal(reminder.conversation.id, `chapter2.errand.${c.key}.reminder`, c.id);
+    assert.equal(reminder.conversation.id, `${c.prefix ?? "chapter2"}.errand.${c.key}.reminder`, c.id);
     assert.deepEqual(reminder.effects, []);
     const ready = talk(c.id, facts([[c.item, 1]], [`${c.flag}.asked`]));
-    assert.equal(ready.conversation.id, `chapter2.errand.${c.key}.ready`, c.id);
+    assert.equal(ready.conversation.id, `${c.prefix ?? "chapter2"}.errand.${c.key}.ready`, c.id);
     assert.deepEqual(ready.effects, [
       { type: "take-item", itemId: c.item, quantity: 1 },
       ...c.grants.map((g) => ({ type: "give-item", ...g })),
@@ -106,6 +108,14 @@ test("only what was asked (and not yet delivered) counts as needed: the crafting
   // the quarry broth is an errand too now: it was impossible to craft before it was asked for
   const quarry = new Set(["chapter2.quarry.miner.broth.asked"]);
   assert.ok(getCraftingTargets(trades.getActiveErrandNeeds(quarry), inv.createEmptyInventory()).has("bone-broth"));
+});
+
+test("the Day 1 fisherman errand lives only in Day 1: it does not linger in the panel or the crafting gate later", () => {
+  const asked = new Set([`${errands1.FISHERMAN_CLOTH_REWARD_ID}.asked`]);
+  assert.deepEqual(trades.getActiveErrandNeeds(asked, "chapter-1"), [{ itemId: "cold-cloth", quantity: 1 }]);
+  assert.deepEqual(trades.getActiveErrandNeeds(asked, "chapter-2"), []);
+  assert.equal(getObjectives({}, "es", { chapterId: "chapter-1", claimed: asked }).length, 1);
+  assert.equal(getObjectives({}, "es", { chapterId: "chapter-2", claimed: asked }).length, 0);
 });
 
 test("the errands panel lists what was asked, ticked when delivered", () => {

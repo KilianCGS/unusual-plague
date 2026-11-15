@@ -6,7 +6,7 @@ solo piden o dan algo a cambio de algo, (C) dinero y tienda.
 
 ## Día 1
 
-**Empieza con 6 monedas.** El mercader de la plaza vende desde el principio: **tela 2 monedas ×4, sal 2 monedas ×3**.
+**Empieza con 6 monedas.** El mercader de la plaza vende desde el principio: **tela 2 monedas ×5, sal 2 monedas ×3**.
 
 ### A. Pacientes (3). Cada uno pide 2 preparados. Pagan al curar.
 
@@ -29,11 +29,11 @@ solo piden o dan algo a cambio de algo, (C) dinero y tienda.
 | Panadera | Al curar a su marido da **1 sal** de agradecimiento |
 | Resto (pescadora, lavandera, niño, herrero, leñador, vecinos...) | Solo conversación ambiental (3 líneas) |
 
-**No hay ningún recado de "entregar un preparado" el día 1.** Todo lo que se craftea es para pacientes.
+**Recado voluntario del día 1 (nuevo):** el **pescador** del río pide un **paño frío** (agua + tela, mesa) y paga **3 monedas**. Cuesta una tela (2 monedas), así que la tienda vende 5 telas en vez de 4.
 
 ### C. Dinero del día 1
 - Gasto obligatorio: **6 monedas** (2 telas + 1 sal), justo lo que tienes al empezar.
-- Ingresos: 3 + 4 + 6 = **13**, que cobras al curar a cada uno.
+- Ingresos: 3 + 4 + 6 = **13**, que cobras al curar a cada uno, más **3** del recado del pescador si lo haces.
 - Los únicos que venden: el mercader de la plaza (tela, sal). Nada más cuesta dinero.
 
 ## Día 2
@@ -92,6 +92,6 @@ colocarlos para poder jugarlo.
 - Ingresos: pacientes 3 + 4 + 6 = **13**.
 
 ## Resumen del dinero de los tres días (si se hace todo)
-- Ingresos: 6 iniciales + 39 de pacientes + recados del día 2 (28) = **73**.
-- Gasto máximo en la tienda: **45** (tela 8, sal 6, azúcar 15, cebolla 4, hueso 6, ajo 5, vela 1).
+- Ingresos: 6 iniciales + 39 de pacientes + recados (3 del día 1 + 28 del día 2) = **76**.
+- Gasto máximo en la tienda: **47** (tela 10, sal 6, azúcar 15, cebolla 4, hueso 6, ajo 5, vela 1).
 - Lo obligatorio cuesta mucho menos de lo que se cobra; el resto es elección del jugador.

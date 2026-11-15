@@ -69,7 +69,8 @@ for (const sceneId of Object.keys(WORLD_SCENES)) {
 }
 // one-time NPC trades: what they give minus what they take
 // (only the Day 1 ones: the quarry errand of Day 2 consumes a broth the Doctor makes later)
-for (const trade of Object.values(NPC_TRADES).filter((t) => t.interactionId.startsWith("chapter1."))) {
+// (the fisherman's cold-cloth errand is optional: it is not part of what Day 1 needs)
+for (const trade of Object.values(NPC_TRADES).filter((t) => t.interactionId.startsWith("chapter1.") && !t.ask)) {
   for (const g of trade.grants) add(balance, g.itemId, g.quantity);
   for (const c of trade.consumes) add(balance, c.itemId, -c.quantity);
 }

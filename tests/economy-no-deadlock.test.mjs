@@ -70,6 +70,8 @@ const need = Object.fromEntries(patientIds.map((id) => {
 // Each one: what it needs from the shop, what it pays in coins, what it hands over besides.
 const ERRANDS = Object.values(NPC_TRADES).filter((t) => t.ask).map((t) => ({
   id: t.rewardId,
+  // the day index an errand starts on: its chapter, or Day 2 (index 1) when it has none
+  fromDay: t.chapters ? CHAPTERS.indexOf(t.chapters[0]) : 1,
   coins: t.payCoins ?? 0,
   grants: t.grants.map((g) => [g.itemId, g.quantity]),
   raw: getRequiredIngredients(t.consumes, createEmptyInventory()).filter((n) => shopIds.has(n.itemId)).map((n) => [n.itemId, n.quantity]),
@@ -87,7 +89,7 @@ test("the model reads the real data: every patient pays, and what each one needs
     "chapter3-path-miner": [["sugar", 1], ["bone", 1], ["salt", 1]],
     "chapter3-stonecutter": [["cloth", 1]],
   });
-  assert.equal(ERRANDS.length, 4, "the quarry broth + the three Day 2 errands");
+  assert.equal(ERRANDS.length, 5, "the Day 1 fisherman + the quarry broth + the three Day 2 errands");
   const quarry = ERRANDS.find((e) => e.id === "chapter2.quarry.miner.broth");
   assert.deepEqual(quarry.raw.sort(), [["bone", 1], ["salt", 1]].sort());
   assert.ok(RECIPES.length > 0);
@@ -143,8 +145,8 @@ function canFinish(s) {
     if (!s.cured.has(id) && need[id].every(([item, qty]) => held[item] >= qty)) moves.push({ ...s, cured: new Set([...s.cured, id]) });
   }
   // the optional errands, from Day 2
-  if (day >= 1) ERRANDS.forEach((e, i) => {
-    if (!(s.errands & (1 << i)) && e.raw.every(([item, qty]) => held[item] >= qty)) moves.push({ ...s, errands: s.errands | (1 << i) });
+  ERRANDS.forEach((e, i) => {
+    if (day >= e.fromDay && !(s.errands & (1 << i)) && e.raw.every(([item, qty]) => held[item] >= qty)) moves.push({ ...s, errands: s.errands | (1 << i) });
   });
   for (const m of moves) { if (canFinish(m)) ok = true; }
   memo.set(k, ok);

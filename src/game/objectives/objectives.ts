@@ -48,6 +48,7 @@ export function getObjectives(
   // The voluntary errands the Doctor has been asked for (2026-11-15), pending or done.
   if (context) {
     for (const trade of Object.values(NPC_TRADES)) {
+      if (trade.chapters && !trade.chapters.includes(context.chapterId)) continue;
       if (trade.objective && context.claimed.has(errandAskedFlag(trade))) {
         errands.push({ id: trade.rewardId, text: trade.objective[language], done: context.claimed.has(trade.rewardId) });
       }

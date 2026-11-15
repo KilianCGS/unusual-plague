@@ -51,7 +51,7 @@ export const MERCHANT_SHOP: ShopDefinition = {
   // tavern man's soup) is sold too, so that case never waits for the baker's
   // thank-you: Day 1 spends 2 + 1 of the 4 starting coins.
   entries: [
-    { itemId: "cloth", price: 2, stock: 4 },
+    { itemId: "cloth", price: 2, stock: 5 },
     { itemId: "salt", price: 2, stock: 3 },
     // From Day 2 (prices decided by Kilian, 2026-11-11: sugar 3, bone 1, onion 1).
     // None of these is needed to cure a patient: they feed the cooking recipes and

@@ -486,7 +486,7 @@ test("the merchant SELLS cloth: he never gives it through the story any more", (
   assert.ok(!(MERCHANT in story.PATIENT_INTERACTION_IDS));
   const shops = at("src/game/shop/shops.ts");
   assert.deepEqual(shops.getShop(MERCHANT).entries, [
-    { itemId: "cloth", price: 2, stock: 4 },
+    { itemId: "cloth", price: 2, stock: 5 },
     { itemId: "salt", price: 2, stock: 3 },
     // Day 2 onwards (prices raised on 2026-11-13 so that money is needed)
     { itemId: "sugar", price: 5, stock: 3, fromChapter: "chapter-2" },

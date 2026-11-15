@@ -19,9 +19,9 @@ el fichero). Generado desde el código, así que lo que ves aquí es lo que sale
 | book-cover.title[0] | Haz clic en el libro para abrirlo. | Click the book to open it. |
 | book-cover.body | También puedes pulsar Espacio. | You can also press Space. |
 | book-page.title[0] | Pasa de página con  | Turn the page with  |
-| book-page.title[1].key | ← | ← |
+| book-page.title[1].key | ◄ | ◄ |
 | book-page.title[2] |   |   |
-| book-page.title[3].key | → | → |
+| book-page.title[3].key | ► | ► |
 | book-page.title[4] | . | . |
 | book-page.body | Estás en Ingredientes: todo lo que puedes recoger o comprar y para qué sirve cada cosa.<br>También puedes usar las flechas que hay junto a las páginas. | You are in Ingredients: everything you can gather or buy, and what each thing is for.<br>You can also use the arrows beside the pages. |
 | book-preparations.title[0] | Abre la pestaña Preparados. | Open the Remedies tab. |
