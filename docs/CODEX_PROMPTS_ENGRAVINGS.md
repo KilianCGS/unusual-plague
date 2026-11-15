@@ -107,35 +107,37 @@ texto).
 
 ## Prompt final para la 5.ª página de ingredientes (2026-11-15, uno por idioma)
 
-Adjuntar `public/game/ui/book/ingredients/es/ingredients-04.png` y `ingredients-03.png` (y las de `en/`
-para la versión inglesa). Se pide **una imagen por idioma**, con el mismo prompt cambiando el bloque de texto.
+Adjuntar una página ya terminada del Compendio (la de Leche / Hongo / Hierba medicinal / Agua) y
+`public/game/ui/book/ingredients/es/ingredients-04.png` (para el inglés, las de `en/`). Una imagen por idioma.
 
-> Imagen de un libro antiguo abierto (doble página) sobre pergamino envejecido, exactamente 1678x937 px,
-> idéntica en estilo, marco del libro, papel manchado, grosor de línea (grabado a tinta sepia con sombreado
-> cruzado y toques de color muy suaves) y caligrafía manuscrita a las imágenes de referencia adjuntas.
-> Composición como en las referencias: cuatro ingredientes, dos por página; en cada página el primero arriba
-> y el segundo abajo; cada objeto dibujado solo, centrado en su mitad de página, con una pequeña sombra de
-> rayado bajo él; debajo de cada dibujo, el nombre en caligrafía manuscrita grande y subrayado con un trazo, y
-> debajo una descripción de 2-3 líneas en la misma letra, más pequeña. Sin otros elementos, sin números de
-> página, sin marcos extra.
+> Continúa este mismo libro. Te adjunto páginas dobles ya terminadas; necesito UNA más, con el mismo marco de
+> libro abierto, el mismo pergamino manchado y envejecido, el mismo dibujo a tinta sepia con sombreado cruzado y
+> toques de color muy suaves, y la misma letra manuscrita. Tamaño exacto 1678x937 px.
 >
-> Objetos y texto exacto (no cambiar ni una palabra):
-> - Página izquierda, arriba: un hueso largo limpio de carne, con los extremos redondeados. Nombre: **Hueso**.
+> Cada ingrediente sigue exactamente la plantilla de las referencias: el dibujo arriba, centrado en su mitad de
+> página y con una pequeña sombra de hierba o rayado bajo él; debajo, el nombre en letra manuscrita grande,
+> alineado a la izquierda y subrayado con un trazo; debajo, la descripción en letra manuscrita más pequeña, en 2 o
+> 3 líneas. Dos ingredientes por página, uno arriba y otro abajo. Nada más en la página: sin números, sin
+> adornos, sin marcos extra.
+>
+> Los cuatro ingredientes y su texto exacto (no cambiar ni una palabra ni una tilde):
+> - Izquierda, arriba: un hueso largo limpio de carne, con los extremos redondeados. Nombre: **Hueso**.
 >   Descripción: "Hueso limpio de carne. Con él se cuecen caldos de verdadera sustancia."
-> - Página izquierda, abajo: una seta de pino carnosa, con sombrero redondeado y pie grueso, y una pequeña
->   aguja de pino al lado. Nombre: **Seta de pino**. Descripción: "Seta carnosa y aromática del pinar. Da
->   cuerpo a sopas y cremas."
-> - Página derecha, arriba: un cuenco de barro lleno de azúcar en cristales, con unos pocos cristales
->   sueltos delante (como el cuenco de la sal de la referencia). Nombre: **Azúcar**. Descripción: "Cristales
->   dulces que endulzan y conservan. Base de jarabes."
-> - Página derecha, abajo: una cebolla entera con sus raíces y una mitad cortada al lado, mostrando las capas.
->   Nombre: **Cebolla**. Descripción: "Bulbo de sabor fuerte. Cocida con azúcar da un jarabe para la tos."
+> - Izquierda, abajo: una seta de pino, con sombrero carnoso y pie grueso (que no se parezca a la del "Hongo" de
+>   las referencias: más ancha y rechoncha), con una ramita de pino al lado. Nombre: **Seta de pino**.
+>   Descripción: "Seta carnosa y aromática del pinar. Da cuerpo a sopas y cremas."
+> - Derecha, arriba: un cuenco de barro con azúcar en cristales y algunos cristales sueltos delante. Nombre:
+>   **Azúcar**. Descripción: "Cristales dulces que endulzan y conservan. Base de jarabes."
+> - Derecha, abajo: una cebolla entera con raíces y, al lado, una mitad cortada mostrando las capas. Nombre:
+>   **Cebolla**. Descripción: "Bulbo de sabor fuerte. Cocida con azúcar da un jarabe para la tos."
 
-Versión en inglés: mismo prompt, con estos textos:
+Versión en inglés: mismo prompt, con las referencias de `en/` y estos textos:
 **Bone**: "A bone picked clean. Broths of real substance are cooked with it." ·
 **Pine mushroom**: "A fleshy, fragrant mushroom of the pinewood. It gives body to soups and creams." ·
 **Sugar**: "Sweet crystals that sweeten and preserve. The base of syrups." ·
 **Onion**: "A strong-flavoured bulb. Cooked with sugar it makes a cough syrup."
 
-Entrega: `public/game/ui/book/ingredients/es/ingredients-05.png` y `.../en/ingredients-05.png`.
-Después Claude sube `INGREDIENT_SPREAD_COUNT` a 5 y añade los textos alternativos y los tests.
+Entrega: `public/game/ui/book/ingredients/es/ingredients-05.png` y `.../en/ingredients-05.png`, **1678x937** (el
+libro espera ese tamaño; si Codex entrega otro, avisar antes de instalar). Después Claude sube
+`INGREDIENT_SPREAD_COUNT` a 5 y añade los textos alternativos y los tests. Revisar que el texto de la imagen
+coincida letra por letra (tildes incluidas).
