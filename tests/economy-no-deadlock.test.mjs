@@ -66,9 +66,14 @@ const need = Object.fromEntries(patientIds.map((id) => {
   const raw = getRequiredIngredients(def.requiredTreatments, createEmptyInventory());
   return [id, raw.filter((n) => shopIds.has(n.itemId)).map((n) => [n.itemId, n.quantity])];
 }));
-// the quarry errand: a bone broth (bone + salt) that pays 8, from Day 2, once
-const errand = NPC_TRADES["chapter2.quarry.miner"];
-const errandRaw = getRequiredIngredients(errand.consumes, createEmptyInventory()).filter((n) => shopIds.has(n.itemId)).map((n) => [n.itemId, n.quantity]);
+// the voluntary errands (from Day 2, once each): the quarry broth and the Day 2 neighbours'.
+// Each one: what it needs from the shop, what it pays in coins, what it hands over besides.
+const ERRANDS = Object.values(NPC_TRADES).filter((t) => t.ask).map((t) => ({
+  id: t.rewardId,
+  coins: t.payCoins ?? 0,
+  grants: t.grants.map((g) => [g.itemId, g.quantity]),
+  raw: getRequiredIngredients(t.consumes, createEmptyInventory()).filter((n) => shopIds.has(n.itemId)).map((n) => [n.itemId, n.quantity]),
+}));
 
 test("the model reads the real data: every patient pays, and what each one needs from the shop", () => {
   for (const id of patientIds) assert.ok(PATIENT_PAYMENTS[id] > 0, id);
@@ -82,12 +87,14 @@ test("the model reads the real data: every patient pays, and what each one needs
     "chapter3-path-miner": [["sugar", 1], ["bone", 1], ["salt", 1]],
     "chapter3-stonecutter": [["cloth", 1]],
   });
-  assert.deepEqual(errandRaw.sort(), [["bone", 1], ["salt", 1]].sort());
+  assert.equal(ERRANDS.length, 4, "the quarry broth + the three Day 2 errands");
+  const quarry = ERRANDS.find((e) => e.id === "chapter2.quarry.miner.broth");
+  assert.deepEqual(quarry.raw.sort(), [["bone", 1], ["salt", 1]].sort());
   assert.ok(RECIPES.length > 0);
 });
 
 const ITEMS = shopItems.map((e) => e.itemId);
-function key(s) { return `${s.bought.join(",")}|${[...s.cured].sort().join(",")}|${s.errand ? 1 : 0}`; }
+function key(s) { return `${s.bought.join(",")}|${[...s.cured].sort().join(",")}|${s.errands}`; }
 function derived(s) {
   // what is held and the coins follow from what was bought and who was cured
   const held = Object.fromEntries(ITEMS.map((id, i) => [id, s.bought[i]]));
@@ -99,7 +106,14 @@ function derived(s) {
     // the baker's thank-you once her husband is cured: Salt x1 (free)
     if (id === "baker-husband") held.salt += 1;
   }
-  if (s.errand) { coins += errand.payCoins; for (const [item, qty] of errandRaw) held[item] -= qty; }
+  // the Witch of the glade gives a bone on Day 3 (free, once): modelled from the moment Day 2 is over
+  if (DAYS[1].every((id) => s.cured.has(id))) held.bone += 1;
+  ERRANDS.forEach((e, i) => {
+    if (!(s.errands & (1 << i))) return;
+    coins += e.coins;
+    for (const [item, qty] of e.raw) held[item] -= qty;
+    for (const [item, qty] of e.grants) if (item in held) held[item] += qty;
+  });
   return { held, coins };
 }
 const dayOf = (cured) => DAYS.findIndex((day) => !day.every((id) => cured.has(id))); // -1 = all done
@@ -128,8 +142,10 @@ function canFinish(s) {
   for (const id of DAYS[day]) {
     if (!s.cured.has(id) && need[id].every(([item, qty]) => held[item] >= qty)) moves.push({ ...s, cured: new Set([...s.cured, id]) });
   }
-  // the optional errand, from Day 2
-  if (day >= 1 && !s.errand && errandRaw.every(([item, qty]) => held[item] >= qty)) moves.push({ ...s, errand: true });
+  // the optional errands, from Day 2
+  if (day >= 1) ERRANDS.forEach((e, i) => {
+    if (!(s.errands & (1 << i)) && e.raw.every(([item, qty]) => held[item] >= qty)) moves.push({ ...s, errands: s.errands | (1 << i) });
+  });
   for (const m of moves) { if (canFinish(m)) ok = true; }
   memo.set(k, ok);
   if (!ok && deadEnds.length < 5) deadEnds.push({ bought: Object.fromEntries(ITEMS.map((id, i) => [id, s.bought[i]])), cured: [...s.cured], coins });
@@ -137,7 +153,7 @@ function canFinish(s) {
 }
 
 test("from the very start, the player can always finish Days 1-3 in any order of buying, curing and the errand", () => {
-  const start = { bought: ITEMS.map(() => 0), cured: new Set(), errand: false };
+  const start = { bought: ITEMS.map(() => 0), cured: new Set(), errands: 0 };
   assert.ok(canFinish(start));
   // every state that can be reached must still be able to finish: no purchase makes it impossible
   const stuck = [...memo.entries()].filter(([, v]) => !v);
@@ -168,7 +184,7 @@ test("Days 1-3: every ingredient the merchant does not sell has enough sources",
   }
   // what the one-time trades take (the farm woman's orange and jar, the Witch's mushroom)
   for (const [key, trade] of Object.entries(NPC_TRADES)) {
-    if (key === "chapter2.quarry.miner") continue; // the errand is paid in preparations, not raw
+    if (NPC_TRADES[key].ask) continue; // errands are paid in preparations, not raw
     for (const c of trade.consumes) add(demand, c.itemId, c.quantity);
   }
   const supply = new Map();

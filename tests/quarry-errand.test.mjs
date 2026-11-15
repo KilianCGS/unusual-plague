@@ -60,7 +60,8 @@ const talk = (f) => story.resolveStoryInteraction(QUARRY, f, "es", "m");
 test("the quarry miner asks for a bone broth while the Doctor has none, and takes nothing", () => {
   const out = talk(facts([["bone", 1]]));
   assert.equal(out.conversation.id, "chapter2.quarry.miner.ask");
-  assert.deepEqual(out.effects, []);
+  // the request is noted (it is an errand from now on) but nothing is taken
+  assert.deepEqual(out.effects, [{ type: "claim-reward", rewardId: `${trades.QUARRY_BROTH_REWARD_ID}.asked` }]);
 });
 
 test("with the bone broth: it is taken, eight coins are paid, and the errand is marked done", () => {

@@ -2,6 +2,7 @@ import type { Language } from "../i18n/types";
 import { BAKER_HUSBAND_ID, INJURED_MINER_ID, TAVERN_PATIENT_ID } from "../patients/chapter1Patients";
 import { BLACKSMITH_DAY2_ID, FARMER_DAY2_ID, WOODCUTTER_DAY2_ID } from "../patients/chapter2Patients";
 import { PATH_MINER_DAY3_ID, STONECUTTER_DAY3_ID, DUSTER_DAY3_ID } from "../patients/chapter3Patients";
+import { errandAskedFlag, NPC_TRADES } from "../dialogue/npcTrades";
 import { getPatientStatus, type PatientCasesState } from "../patients/patientCases";
 
 // THE ERRANDS PANEL: what the Doctor has pending, derived from the cases (never
@@ -43,6 +44,15 @@ export function getObjectives(
       ? []
       : [{ id: patientId, text: text[language], done: status === "treated" }];
   });
+
+  // The voluntary errands the Doctor has been asked for (2026-11-15), pending or done.
+  if (context) {
+    for (const trade of Object.values(NPC_TRADES)) {
+      if (trade.objective && context.claimed.has(errandAskedFlag(trade))) {
+        errands.push({ id: trade.rewardId, text: trade.objective[language], done: context.claimed.has(trade.rewardId) });
+      }
+    }
+  }
 
   if (context?.chapterId === "chapter-4") {
     errands.push({

@@ -35,6 +35,7 @@ import {
   quarryMinerDone,
   quarryMinerReady,
 } from "./chapter2QuarryDialogues";
+import { CHAPTER2_ERRAND_TRADES } from "./chapter2Errands";
 import type { LocalizedConversation } from "./localizedConversation";
 
 // NPC TRADES: "consume X, receive Y", once. One small data shape for what a
@@ -56,6 +57,12 @@ export type NpcTrade = {
   grants: ItemNeed[];
   // Copper coins paid on top of (or instead of) the items: an errand.
   payCoins?: number;
+  // A VOLUNTARY ERRAND (2026-11-15): the first conversation asks for the item and notes the errand
+  // (the flag `<rewardId>.asked`); until then it is not an errand and nothing is crafted for it.
+  // Once it is done the character goes back to his ordinary lines.
+  ask?: LocalizedConversation;
+  // Its line in the errands panel (R).
+  objective?: Record<Language, string>;
   // Conversations; a trade without them (a shelf) answers with a notice.
   ready?: LocalizedConversation;
   noRoom?: LocalizedConversation;
@@ -164,8 +171,24 @@ export const NPC_TRADES: Record<string, NpcTrade> = {
     consumes: [{ itemId: "bone-broth", quantity: 1 }],
     grants: [],
     payCoins: 8,
+    ask: quarryMinerAsk,
+    objective: { es: "Llevar caldo de huesos al cantero del banco", en: "Bring bone broth to the miner on the quarry bench" },
     ready: quarryMinerReady,
     done: quarryMinerDone,
     missing: { all: quarryMinerAsk },
   },
+  // The voluntary errands of Day 2 (chapter2Errands.ts).
+  ...CHAPTER2_ERRAND_TRADES,
 };
+
+export function errandAskedFlag(trade: NpcTrade): string {
+  return `${trade.rewardId}.asked`;
+}
+
+// What the Doctor has been asked for and has not delivered: these preparations count as "needed", so
+// the crafting interface lets him make them (and their ingredients are not spent elsewhere).
+export function getActiveErrandNeeds(claimed: ReadonlySet<string>): ItemNeed[] {
+  return Object.values(NPC_TRADES)
+    .filter((trade) => trade.ask && claimed.has(errandAskedFlag(trade)) && !claimed.has(trade.rewardId))
+    .flatMap((trade) => trade.consumes);
+}

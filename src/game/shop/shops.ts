@@ -57,7 +57,8 @@ export const MERCHANT_SHOP: ShopDefinition = {
     // None of these is needed to cure a patient: they feed the cooking recipes and
     // the errands. The stock (3 each) is a proposal, to be balanced.
     { itemId: "sugar", price: 5, stock: 3, fromChapter: "chapter-2" },
-    // Onion is NOT on sale until a case needs it (2026-11-15: see tests/economy-no-deadlock.test.mjs).
+    // Onion is sold again from Day 2 (2026-11-15): the voluntary errands (onion syrup, strong broth) use it.
+    { itemId: "onion", price: 2, stock: 2, fromChapter: "chapter-2" },
     { itemId: "bone", price: 3, stock: 2, fromChapter: "chapter-2" },
     // From Day 3: garlic, which the balsamic syrup of the sweeper's cough needs. It has no
     // other source in the world; 2 coins is Kilian's earlier decision (2026-11-09).

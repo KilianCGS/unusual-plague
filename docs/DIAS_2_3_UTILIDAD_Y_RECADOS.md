@@ -73,25 +73,28 @@ barato, ya hay vela y estatua).
 - **Día 3:** 3 pacientes + 3 recados. Gasta lo ganado; hay que elegir qué recado hacer con el azúcar (cuestan lo
   mismo y solo hay un cierto número): esa **decisión** es la parte "sobra y falta".
 
-## 4. Lo que habría que ajustar para que cuadre (sin que nadie se atasque)
+## 4. Lo que había que ajustar para que cuadre (verificado con el test de economía)
 
-El modelo de `economy-no-deadlock` hoy asume que la tienda solo vende lo obligatorio. Con los recados hay que
-recalcular, y estos son los cambios que propongo (se comprueban con el test, que hay que ampliar):
+El modelo de `economy-no-deadlock` comprueba que, comprando y curando en **cualquier orden**, el jugador siempre puede
+terminar. Con los recados ampliados (34.021 estados) los números de mi primera propuesta **fallaban**: con azúcar 5,
+cebolla 3 y hueso 3 el jugador podía gastarse todo el dinero en extras y quedarse sin monedas para el último caso
+(el ajo del día 3). Barrí las combinaciones y solo cuadra con **existencias ajustadas**:
 
-| Cambio | Por qué |
-|---|---|
-| Azúcar: de 3 a **5** existencias (5 monedas) | 1 d2 + 1 d3 obligatorios + 3 de recados posibles (no todos a la vez: ahí está la elección) |
-| Cebolla: **volver a venderla** desde el día 2 (2 monedas, 3 existencias) | hoy está fuera de la tienda; sin ella el jarabe de cebolla y el caldo fuerte no existen |
-| Hueso: de 2 a **3** | 1 caldo de huesos (cantero) + 1 del caso del día 3 + 1 caldo fuerte |
-| Sal: de 3 a **5** | sopa, caldo de huesos, errand del cantero, rehidratante, crema |
-| Leche: una vía para el día 3 | hoy solo hay 1 (día 1); la mujer de la granja puede dar 1 al agradecer (y de ahí sale la crema) |
-| Seta de pino: 1 más | solo hay una en el claro y la usa la bruja; hace falta otra para la crema (colocarla en el Decorator, tú) |
-| Naranja | siguen siendo 3 para 3 usos; el jarabe cítrico necesita **una cuarta** (colocarla, tú) o cambiar su receta |
+| Objeto | Antes | Ahora (aplicado) | Por qué |
+|---|---|---|---|
+| Cebolla | no se vendía | **2** a 2 monedas desde el día 2 | jarabe de cebolla y caldo fuerte |
+| Azúcar | 3 | **3** (sin cambio) | los recados se encadenan: el caldo fuerte **da** un azúcar para el jarabe |
+| Hueso | 2 | **2** (sin cambio) | caldo de huesos del cantero + caldo fuerte (el del caso del día 3 es de la bruja) |
+| Sal | 3 | **3** (sin cambio) | |
+| Coste total tienda | 41 | **45** | queda por debajo de lo que se cobra seguro antes del último caso |
 
-Con esos números el coste total de la tienda sube de 41 a ~64 monedas; los ingresos posibles son los 53 de hoy
-(6 iniciales + pacientes + recado del cantero) más ~34 en monedas de los recados (y un azúcar y una leche), unos
-**87**. Se puede comprar casi todo, pero no todo a la vez si se gasta mal: **sobra lo suficiente para que el dinero no
-ahogue y falta lo suficiente para elegir**, que es lo que pediste. (Cifras a verificar con el test ampliado.)
+Conclusión: el dinero **sobra y falta a la vez** sin atascar a nadie, pero el margen es corto. No se puede subir el
+stock de extras sin que el modelo vuelva a encontrar callejones. Si en el día 3 se añaden recados con ingredientes
+de tienda, hay que volver a pasar el test.
+
+**Esta es la parte que más me gusta del diseño:** el recado de la vecina de la panadería (caldo fuerte) devuelve un
+azúcar, que es justo lo que necesita el jarabe del anciano o la bebida del hombre sentado. El jugador encadena
+*recolecta → cocina → cobra → vuelve a cocinar* sin tocar la tienda más de lo previsto.
 
 ## 5. Qué hay que construir (en orden)
 
@@ -102,7 +105,7 @@ ahogue y falta lo suficiente para elegir**, que es lo que pediste. (Cifras a ver
 2. **Texto de cada recado (ES/EN):** la petición (que sugiere el preparado sin nombrarlo), la entrega, la
    respuesta si falta algo y el agradecimiento: **4 conversaciones por recado, unas 4-6 líneas**. Son 6
    recados: unas 24 conversaciones nuevas. Todo **para tu revisión**.
-3. **Ajustar la tienda** (tabla de arriba) y ampliar el test para que prohíba callejones con los recados.
+3. ~~Ajustar la tienda y ampliar el test~~ **Hecho el 2026-11-15** (ver arriba).
 4. **Tus colocaciones:** una seta de pino y una naranja más (y los pacientes del día 3, que son lo primero).
 5. **Recomendado antes de todo:** colocar el día 3, porque hoy no hay nada contra lo que probar nada de esto.
 
@@ -119,3 +122,16 @@ ahogue y falta lo suficiente para elegir**, que es lo que pediste. (Cifras a ver
 |---|---|---|
 | 2 | 3 casos y 1 recado casi invisible | 3 casos + 3 recados; la tabla de cortar y el azúcar importan |
 | 3 | 3 casos sin mundo propio | 3 casos + 3 recados + un gasto narrativo; hay que elegir con el azúcar |
+
+## 8. Estado de la implementación (2026-11-15)
+
+**Hecho (día 2, tres recados):** anciano del cántaro (jarabe de cebolla, 9 monedas), vecina de la panadería
+(caldo fuerte → 1 azúcar + 2 monedas), hombre sentado de la calle de la taberna (bebida rehidratante, 9
+monedas). Mecanismo: el primer diálogo pide y anota el recado, después hay un recordatorio, la entrega paga, y
+el personaje vuelve a sus frases de siempre; lo pedido cuenta como "necesario" para fabricar; el panel R lo lista.
+**Corregido de paso:** el recado del cantero (caldo de huesos, 8 monedas) **no se podía fabricar** porque el
+juego solo dejaba hacer lo que pedía un paciente; ahora funciona igual que los demás. Textos nuevos en
+`docs/TEXTOS_NUEVOS_ES_EN.md`.
+
+**Pendiente (día 3):** los otros tres (mujer de la granja, joven del río, niña de la muñeca) esperan a que
+coloques el día 3, y ampliar el test para sus ingredientes (seta de pino y naranja que colocas tú).

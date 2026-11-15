@@ -462,6 +462,8 @@ export function resolveTrade(
   subjectId: string,
 ): StoryOutcome | null {
   if (facts.claimedRewards?.has(trade.rewardId)) {
+    // an errand without a thank-you line hands the character back to his ordinary lines
+    if (!trade.done && trade.ask) return null;
     return trade.done
       ? { conversation: localize(trade.done, language, subjectId), effects: [] }
       : {
@@ -486,6 +488,14 @@ export function resolveTrade(
     .map(({ itemId }) => itemId);
 
   if (lacking.length > 0) {
+    // the first time, an errand is asked for (and noted); afterwards a short reminder
+    if (trade.ask && !facts.claimedRewards?.has(`${trade.rewardId}.asked`)) {
+      return {
+        conversation: localize(trade.ask, language, subjectId),
+        effects: [{ type: "claim-reward" as const, rewardId: `${trade.rewardId}.asked` }],
+      };
+    }
+
     const missing = trade.missing;
     const conversation = missing
       ? ((lacking.length === 1 ? missing[lacking[0]] : undefined) ??

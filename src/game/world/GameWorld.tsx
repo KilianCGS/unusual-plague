@@ -33,6 +33,7 @@ import { craftingCopy } from "../i18n/crafting";
 import { moneyCopy } from "../i18n/money";
 import { CoinHud, resetCoinHudMemory } from "../money/CoinHud";
 import { getObjectives } from "../objectives/objectives";
+import { getActiveErrandNeeds } from "../dialogue/npcTrades";
 import { ObjectivesPanel } from "../objectives/ObjectivesPanel";
 import { addCoins, canAfford, spendCoins, STARTING_COINS } from "../money/money";
 import { getPatientPayment } from "../money/payments";
@@ -1551,7 +1552,11 @@ export function GameWorld({
   // What the known cases still need to be prepared; any other recipe is refused
   // in the crafting interface ("I don't need that right now").
   const activeTreatments = useMemo(
-    () => getActiveTreatments(patients, getPatientDefinitions(claimedRewards)),
+    () => [
+      ...getActiveTreatments(patients, getPatientDefinitions(claimedRewards)),
+      // what the Doctor was asked for in a voluntary errand also counts as needed
+      ...getActiveErrandNeeds(claimedRewards),
+    ],
     [patients, claimedRewards],
   );
   const craftableOutputs = useMemo(

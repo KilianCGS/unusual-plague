@@ -1,7 +1,7 @@
 # Textos nuevos para revisar (ES / EN) — 2026-11-15
 
 Todo lo que ha escrito Claude y no está aprobado todavía. Español = voz canónica; el inglés es adaptación
-natural. Las tablas del tutorial, la intro y la cocina son el texto COMPLETO actual de cada bloque (incluye frases ya aprobadas mezcladas con las nuevas). Cada tabla dice de qué fichero sale; para corregir, dime la clave y el texto nuevo (o cámbialo en
+natural. Cada tabla dice de qué fichero sale; para corregir, dime la clave y el texto nuevo (o cámbialo en
 el fichero). Generado desde el código, así que lo que ves aquí es lo que sale en el juego.
 
 ## 1. Tutorial (src/game/i18n/tutorial.ts)
@@ -62,6 +62,8 @@ el fichero). Generado desde el código, así que lo que ves aquí es lo que sale
 | botica.body | La mesa de alquimia (izquierda) sirve para mezclar y preparar a mano; el mortero se abre desde ella.<br>La cocina (arriba a la derecha) sirve para cocer y hervir. Acércate y pulsa {interact}. | The alchemy table (left) is for mixing and preparing by hand; the mortar opens from it.<br>The stove (top right) is for cooking and boiling. Step up and press {interact}. |
 | exit-botica.title[0] | Sal a la calle. | Head out to the street. |
 | exit-botica.body | Hay mucha ciudad por recorrer. | There is a whole town to explore. |
+| fast-travel.title[0] | Botón de viaje rápido. | Fast travel button. |
+| fast-travel.body | Arriba a la derecha: te lleva de vuelta a la botica al instante.<br>Después tarda dos minutos en recargarse; verás cómo se llena. | Top right: it takes you straight back to the apothecary.<br>Then it needs two minutes to recharge; you will see it fill up. |
 | run.title[0] | Mantén  | Hold  |
 | run.title[1].action | run | run |
 | run.title[2] |  mientras te mueves para correr. |  while moving to run. |
@@ -204,3 +206,80 @@ el fichero). Generado desde el código, así que lo que ves aquí es lo que sale
 | personaje | Me siento un momento y el taburete ya me da la razón. | I sit for a moment and the stool already agrees with me. |
 | doctor | ¿Tanto cansa partir piedra? | Does splitting stone tire you that much? |
 | personaje | Cansa no partirla. Cuando uno para, es cuando se entera de todo. | What tires is not splitting it. It's when you stop that you notice everything. |
+
+## 8. Recados voluntarios del día 2 (chapter2Errands.ts)
+
+**Llevar jarabe de cebolla al anciano del cántaro** / Bring onion syrup to the old man with the jug (paga 9 monedas)
+
+### Petición (primera vez) — chapter2.errand.elder.ask
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | Esta tos me acompaña desde que cambió el tiempo. Dicen que la cebolla con azúcar la espanta. | This cough has kept me company since the weather turned. They say onion with sugar scares it off. |
+| doctor | Un jarabe de cebolla. Puedo prepararlo, y no le pediré que se lo beba con cara de héroe. | An onion syrup. I can make it, and I won't ask you to drink it with a hero's face. |
+| personaje | Tráigamelo y le pago nueve monedas. Y no prometo ninguna cara. | Bring it to me and I'll pay you nine coins. And I promise no faces at all. |
+
+### Recordatorio — chapter2.errand.elder.reminder
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | ¿Ya tiene el jarabe? La tos no espera, pero yo sí: estoy sentado. | Have you got the syrup yet? The cough won't wait, but I will: I'm sitting down. |
+
+### Entrega — chapter2.errand.elder.ready
+
+| Quién | Español | English |
+|---|---|---|
+| doctor | Aquí tiene el jarabe de cebolla, todavía templado. | Here's the onion syrup, still warm. |
+| personaje | Huele a cocina de abuela. Nueve monedas, como quedamos. | It smells like grandmother's kitchen. Nine coins, as agreed. |
+| doctor | Es un precio generoso para un jarabe. | That's a generous price for a syrup. |
+| personaje | Es un precio justo por dormir esta noche. | It's a fair price for sleeping tonight. |
+
+**Llevar caldo fuerte a la vecina de la panadería** / Bring strong broth to the bakery's neighbour (paga 2 monedas + sugar x1)
+
+### Petición (primera vez) — chapter2.errand.bakery.ask
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | Mi vecina la panadera dice que su marido sigue flojo. Pan no le falta, pero el pan no es sustancia. | My neighbour the baker says her husband is still weak. He has no lack of bread, but bread isn't substance. |
+| doctor | Un caldo fuerte, de cebolla y hueso. Así se le devuelve cuerpo a un convaleciente. | A strong broth, with onion and bone. That puts body back into a convalescent. |
+| personaje | Si lo prepara, le doy un puñado de azúcar y dos monedas. De la panadería, claro: yo solo hago de mensajera. | If you make it, I'll give you a handful of sugar and two coins. From the bakery, of course: I'm only the messenger. |
+
+### Recordatorio — chapter2.errand.bakery.reminder
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | ¿Y el caldo, doctor? Mi vecina pregunta cada mañana y ya no sé qué contestarle. | And the broth, doctor? My neighbour asks every morning and I no longer know what to tell her. |
+
+### Entrega — chapter2.errand.bakery.ready
+
+| Quién | Español | English |
+|---|---|---|
+| doctor | Caldo fuerte, de cebolla y hueso. Que se lo tome bien caliente. | Strong broth, with onion and bone. Have him drink it good and hot. |
+| personaje | Se lo llevo en cuanto lo tenga. Tome: azúcar y dos monedas, como dije. | I'll take it to him as soon as I can. Here: sugar and two coins, as I said. |
+| doctor | Con esto tengo para un jarabe y para ser feliz. | With this I have enough for a syrup and to be happy. |
+| personaje | Lo primero, seguro. Lo segundo, ya veremos. | The first one, for sure. The second, we'll see. |
+
+**Llevar una bebida rehidratante al hombre sentado de la calle de la taberna** / Bring a rehydration drink to the seated man on the tavern street (paga 9 monedas)
+
+### Petición (primera vez) — chapter2.errand.seated.ask
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | Desde aquí veo salir a los de la taberna con la boca seca y la cabeza hecha un tambor. | From here I watch the tavern folk come out with dry mouths and heads like drums. |
+| doctor | Agua con un poco de azúcar y sal repone lo que se pierde. Es un remedio humilde. | Water with a little sugar and salt puts back what's lost. A humble remedy. |
+| personaje | Los humildes son los que funcionan. Tráigame una bebida de esas y le pago nueve monedas. | The humble ones are the ones that work. Bring me one of those drinks and I'll pay nine coins. |
+
+### Recordatorio — chapter2.errand.seated.reminder
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | ¿La bebida? Aquí me tiene, sentado, esperando con paciencia y con sed. | The drink? Here I am, sitting, waiting with patience and with thirst. |
+
+### Entrega — chapter2.errand.seated.ready
+
+| Quién | Español | English |
+|---|---|---|
+| doctor | Bebida rehidratante: agua, azúcar y sal. Sabe a poco y hace mucho. | Rehydration drink: water, sugar and salt. It tastes of little and does a lot. |
+| personaje | Como todo lo bueno de esta calle. Aquí tiene sus nueve monedas. | Like everything good on this street. Here are your nine coins. |
+| doctor | ¿Se la bebe usted? | Will you drink it yourself? |
+| personaje | Yo no. La guardo para el próximo que salga de la taberna arrepentido. | Not me. I'm keeping it for the next one who walks out of the tavern full of regret. |
