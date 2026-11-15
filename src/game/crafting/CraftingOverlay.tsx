@@ -39,6 +39,8 @@ type Message =
 const MORTAR_ICON = "/game/ui/mortar.png";
 // The kitchen's cutting board (a fixture of the stove, not an item).
 const BOARD_ICON = "/game/ui/cutting-board.png";
+// A small pixel arrow for the "back" buttons (the pixel font has no arrow glyph).
+const BACK_ARROW = "/game/ui/arrow-left.png";
 
 // How many raw ingredients the known cases still lack in total.
 function totalMissing(treatments: readonly ItemNeed[], inventory: InventoryState) {
@@ -295,6 +297,7 @@ export function CraftingOverlay({
               disabled={modalOpen}
               onClick={onBackToKitchen}
             >
+              <img src={BACK_ARROW} alt="" width={9} height={9} className={styles.backArrow} draggable={false} />
               {copy.board.back}
             </button>
           ) : null}
@@ -306,6 +309,7 @@ export function CraftingOverlay({
               disabled={modalOpen}
               onClick={onBackToTable}
             >
+              <img src={BACK_ARROW} alt="" width={9} height={9} className={styles.backArrow} draggable={false} />
               {copy.mortar.back}
             </button>
           ) : null}

@@ -141,15 +141,11 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.tavernStreet.woman",
     zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },
   },
-  // Fruit seller behind her stall: the zone is the rectangle he drew (280,299, 119x27), as offsets from the stall (158,334).
+  // The fruit seller: REMOVED from the Tavern Street on 2026-11-15 (Kilian); the entry stays,
+  // unused, like the other retired ones (her rectangle is the one he drew, 280,299 119x27).
   "tavern-street-fruit-vegetable-seller-stall-01": {
     interactionId: "chapter1.tavernStreet.seller",
     zone: { offsetX: 122, offsetY: -35, width: 119, height: 27 },
-  },
-  // The woman standing left of the Tavern in the new Tavern Street (villager-woman-01).
-  "tavern-street-villager-woman-01-01": {
-    interactionId: "chapter1.tavernStreet.neighbour",
-    zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },
   },
   // The man standing with his back to us at the quarry (villager-back-man).
   "quarry-villager-back-man-01": {

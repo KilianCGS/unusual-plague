@@ -17,5 +17,5 @@ export const BOTICA_STATION_RINGS: Readonly<Record<string, { x: number; y: numbe
 
 // While the kitchen cooks: where the steam leaves the cauldron and where the stove fire burns
 // (logical units, read from the painting like the arrows: the cauldron's rim and the oven mouth).
-export const BOTICA_POT_STEAM = { x: 364, y: 68 };
+export const BOTICA_POT_STEAM = { x: 364, y: 77 };
 export const BOTICA_STOVE_FIRE = { x: 362, y: 103 };

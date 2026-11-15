@@ -633,3 +633,10 @@
   background: rgba(0, 0, 0, 0.25);
   pointer-events: auto;
 }
+
+.backArrow {
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: -1px;
+  image-rendering: pixelated;
+}

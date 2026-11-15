@@ -239,6 +239,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
       doctor("¿Y hoy? ¿Cómo lleva la promesa?", "And today? How's the promise holding?"),
       subject("Hoy todavía es pronto.", "It's still early."),
     ]),
+    // (unused since 2026-11-15: the fruit seller was removed from the scene)
     conversation("chapter1.tavernStreet.seller", [
       subject(
         "Fruta fresca, doctor. Hoy la manzana está más tranquila que la gente de la taberna.",
@@ -248,17 +249,6 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
       subject(
         "Una manzana al día. Lo demás, hágaselo mirar a usted.",
         "An apple a day. For the rest, you're the doctor.",
-      ),
-    ]),
-    conversation("chapter1.tavernStreet.neighbour", [
-      subject(
-        "Vivo a dos pasos de la taberna y ya no necesito reloj: sé la hora por los gritos.",
-        "I live two steps from the tavern and I no longer need a clock: I tell the hour by the shouting.",
-      ),
-      doctor("¿Y a esta hora?", "And at this hour?"),
-      subject(
-        "A esta hora todavía cantan. Más tarde, discuten.",
-        "At this hour they still sing. Later on, they argue.",
       ),
     ]),
     conversation("chapter1.quarry.backMan", [

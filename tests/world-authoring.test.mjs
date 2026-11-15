@@ -231,8 +231,7 @@ test("Mill Farmland: the authored Beekeeper, Farmer (hoeing) and Orange, with no
   assert.equal(getDecorAsset("orange-world").collectibleQuantity, 3);
 });
 
-test("the seller's authored rectangle is now her interaction, placed relative to the stall", () => {
-  // the authored rectangle is kept as it was drawn (still not registered on its own)
+test("the fruit seller was removed from the live Tavern Street: her authored rectangle stays unregistered", () => {
   assert.deepEqual(tavernStreetSellerZone, {
     id: "tavern-street-interaction-1",
     x: 280,
@@ -242,14 +241,8 @@ test("the seller's authored rectangle is now her interaction, placed relative to
     interactionId: "",
   });
   assert.deepEqual(getSceneInteractionZones("tavern-street"), []);
-  const entry = chapter1Interactions["tavern-street-fruit-vegetable-seller-stall-01"];
-  assert.equal(entry.interactionId, "chapter1.tavernStreet.seller");
-  // stall at (158,334): the offsets land exactly on the authored rectangle
-  assert.deepEqual(entry.zone, { offsetX: 280 - 158, offsetY: 299 - 334, width: 119, height: 27 });
-  const es = resolveInteractionConversation("chapter1.tavernStreet.seller", "es", "x");
-  const en = resolveInteractionConversation("chapter1.tavernStreet.seller", "en", "x");
-  assert.ok(es.lines.length >= 2 && en.lines.length === es.lines.length);
-  for (const l of [...es.lines, ...en.lines]) assert.ok(l.text.trim());
+  // (retired, not deleted: the entry stays unused like the other removed ones)
+  assert.equal(chapter1Interactions["tavern-street-fruit-vegetable-seller-stall-01"].interactionId, "chapter1.tavernStreet.seller");
   // the registry does not hold any zone with an empty id anywhere
   for (const scene of Object.keys(WORLD_SCENES)) {
     for (const zone of getSceneInteractionZones(scene))

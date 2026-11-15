@@ -95,6 +95,7 @@ const AUTHORED_FLIPS = { "plaza-merchant-table-01": true };
 // Assets Kilian swapped in place (same instance, same position): the draper's table.
 const AUTHORED_ASSETS = { "plaza-merchant-table-01": "merchant-table-draper" };
 const EXPECTED_REMOVED = [
+  "tavern-street-fruit-vegetable-seller-stall-01", // removed on 2026-11-15 (Kilian)
   "tavern-street-villager-woman-02-01",
   "mill-farmland-farmer-old-01",
   "mill-farmland-villager-young-01",
@@ -454,7 +455,7 @@ test("the new world population keeps authored instances and shared ambient decor
   // exact list: a new gap fails, and so does one that gets fixed (update it).
   assert.deepEqual(unreachableZones.sort(), KNOWN_UNREACHABLE_ZONES);
 
-  assert.equal(total, 32 + NEW_IDS.filter(id=>id!=='forest-cottage').reduce((n,id)=>n+
+  assert.equal(total, 31 + NEW_IDS.filter(id=>id!=='forest-cottage').reduce((n,id)=>n+
     newWorld("src/game/compositions/shared-environment.ts").getSharedEnvironmentInstances(id).length,0));
 
   // interactions are keyed by instanceId and untouched: every interactive
@@ -623,7 +624,6 @@ test("the Decorator export is applied literally (x, y, scale, flipX, colliderEna
       "mill-farmland-orange-world-02": [860, 483, 1, false],
     },
     "tavern-street": {
-      "tavern-street-fruit-vegetable-seller-stall-01": [187, 446, 1.49, true],
       "tavern-street-villager-woman-01-01": [462, 403, 1, true],
     },
   };
