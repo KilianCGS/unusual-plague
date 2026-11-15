@@ -210,6 +210,8 @@ test("the Witch of the glade: a bone once, then a bad omen for a pine mushroom o
   assert.equal(first.conversation.id, "chapter3.glade.witch.bone");
   assert.deepEqual(first.effects, [
     { type: "give-item", itemId: "bone", quantity: 1 },
+    { type: "give-item", itemId: "medicinal-herb", quantity: 1 },
+    { type: "give-item", itemId: "mint", quantity: 1 },
     { type: "claim-reward", rewardId: w.WITCH_BONE_REWARD_ID },
   ]);
   // a full bag: told, nothing given and nothing recorded

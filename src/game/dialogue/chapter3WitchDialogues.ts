@@ -10,6 +10,13 @@ import type { StoryFacts, StoryOutcome } from "./storyInteractions";
 export const WITCH_GLADE_INTERACTION_ID = "chapter3.glade.witch";
 export const WITCH_BONE_REWARD_ID = "chapter3.witch.bone";
 export const WITCH_OMEN_REWARD_ID = "chapter3.witch.omen";
+// What she hands over besides the bone (Kilian, 2026-11-15): the mint and the herb Day 3's cases
+// lack. Given on the same first visit, once.
+export const WITCH_GLADE_GIFTS = [
+  { itemId: "bone", quantity: 1 },
+  { itemId: "medicinal-herb", quantity: 1 },
+  { itemId: "mint", quantity: 1 },
+] as const;
 
 // 2026-11-13: warmth pass on the Doctor's lines (his new voice: cheerful, close, serene). New
 // text, awaiting Kilian's review; the conversations keep their ids, items and missions.
@@ -30,6 +37,8 @@ const BONE_LINES: LocalizedLine[] = [
   witch("Alguien con frío.", "Someone cold."),
   doctor("Sigues sin responder, y aun así te sonrío.", "You still don't answer, and I'm smiling anyway."),
   witch("Te he dado un hueso. Es más que una respuesta, y más de lo que le doy a la mayoría.", "I gave you a bone. That's more than an answer, and more than I give most people."),
+  witch("Llévate también menta y una hierba del claro. Unos tosen, otros sangran, y el trabajo te toca a ti.", "Take some mint and an herb from the glade too. Some cough, others bleed, and the work falls to you."),
+  doctor("Con eso tengo para un par de remedios. Gracias, de verdad.", "That's enough for a couple of remedies. Thank you, truly."),
 ];
 
 const NO_ROOM_LINES: LocalizedLine[] = [
@@ -67,13 +76,16 @@ export function resolveChapter3Witch(
   const local = (conversation: LocalizedConversation) => localizeConversation(conversation, language, subjectId);
 
   if (!claimed.has(WITCH_BONE_REWARD_ID)) {
-    if (!addItem(facts.inventory, "bone", 1)) {
+    // all or nothing: she hands over everything on the first visit, or waits for room
+    let carried: typeof facts.inventory | null = facts.inventory;
+    for (const gift of WITCH_GLADE_GIFTS) carried = carried && addItem(carried, gift.itemId, gift.quantity);
+    if (!carried) {
       return { conversation: local(talk("boneNoRoom", NO_ROOM_LINES)), effects: [] };
     }
     return {
       conversation: local(talk("bone", BONE_LINES)),
       effects: [
-        { type: "give-item", itemId: "bone", quantity: 1 },
+        ...WITCH_GLADE_GIFTS.map((gift) => ({ type: "give-item" as const, itemId: gift.itemId, quantity: gift.quantity })),
         { type: "claim-reward", rewardId: WITCH_BONE_REWARD_ID },
       ],
     };

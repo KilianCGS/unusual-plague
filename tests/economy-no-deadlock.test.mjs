@@ -145,5 +145,65 @@ test("from the very start, the player can always finish Days 1-3 in any order of
   console.log(`  (${visited} states checked, no dead end)`);
 });
 
+// ---- the ingredients the merchant does NOT sell (2026-11-15) ----------------------------------
+// The model above only tracks the merchant. This ledger covers everything else for Days 1-3: how
+// much the three days' cases need (and what the NPC trades eat) against what the game can give, so
+// a gap like "Day 3 has no honey" fails here instead of in a played game.
+// Supply = collectible instances (ids persist between days: each is picked once), one-time NPC
+// trades, the Witch's gifts, and the REPEATABLE suppliers (they hand over what a known case lacks).
+const { getComposition } = at("src/game/compositions/index.ts");
+const { getDecorAsset } = at("src/game/decor/decorAssets.ts");
+const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
+const { GATHER_SOURCES } = at("src/game/dialogue/storyInteractions.ts");
+const { CHAPTER2_SUPPLIES, supplyDefinitions } = at("src/game/dialogue/chapter2Supplies.ts");
+const { WITCH_GLADE_GIFTS } = at("src/game/dialogue/chapter3WitchDialogues.ts");
+
+test("Days 1-3: every ingredient the merchant does not sell has enough sources", () => {
+  const demand = new Map();
+  const add = (map, id, n) => map.set(id, (map.get(id) ?? 0) + n);
+  for (const id of patientIds) {
+    for (const n of getRequiredIngredients(definitions[id].requiredTreatments, createEmptyInventory())) {
+      if (!shopIds.has(n.itemId)) add(demand, n.itemId, n.quantity);
+    }
+  }
+  // what the one-time trades take (the farm woman's orange and jar, the Witch's mushroom)
+  for (const [key, trade] of Object.entries(NPC_TRADES)) {
+    if (key === "chapter2.quarry.miner") continue; // the errand is paid in preparations, not raw
+    for (const c of trade.consumes) add(demand, c.itemId, c.quantity);
+  }
+  const supply = new Map();
+  const seen = new Set();
+  for (const chapter of ["chapter-1", "chapter-2", "chapter-3"]) {
+    for (const sceneId of Object.keys(WORLD_SCENES)) {
+      for (const instance of getComposition(sceneId, chapter)?.instances ?? []) {
+        const asset = getDecorAsset(instance.assetId);
+        if (asset?.collectibleItemId && !seen.has(instance.instanceId)) {
+          seen.add(instance.instanceId);
+          add(supply, asset.collectibleItemId, asset.collectibleQuantity ?? 1);
+        }
+      }
+    }
+  }
+  for (const [key, trade] of Object.entries(NPC_TRADES)) if (key !== "chapter2.quarry.miner") for (const g of trade.grants) add(supply, g.itemId, g.quantity);
+  for (const gift of WITCH_GLADE_GIFTS) add(supply, gift.itemId, gift.quantity);
+  // repeatable suppliers: they give what a known Day 2 or Day 3 case lacks (supplyDefinitions covers both)
+  const repeatable = new Set([...Object.values(CHAPTER2_SUPPLIES).flat(), "honey", "flour", "animal-fat"]);
+  const gathered = new Set(Object.values(GATHER_SOURCES).map((g) => g.itemId));
+  const gaps = [];
+  for (const [item, qty] of demand) {
+    if (gathered.has(item) || repeatable.has(item)) continue;
+    if ((supply.get(item) ?? 0) < qty) gaps.push(`${item}: needs ${qty}, the game gives ${supply.get(item) ?? 0}`);
+  }
+  assert.deepEqual(gaps, []);
+});
+
+test("the repeatable suppliers cover the cases of Day 3 too (honey, flour and alcohol)", () => {
+  const covered = Object.keys(supplyDefinitions(new Set()));
+  for (const id of DAYS[2]) assert.ok(covered.includes(id), `${id} is covered by the suppliers`);
+  assert.ok(CHAPTER2_SUPPLIES["chapter2.tavern.bartender"].includes("alcohol"));
+  const sources = fs.readFileSync(path.join(root, "src/game/dialogue/chapter2Supplies.ts"), "utf8");
+  assert.ok(sources.includes('"chapter2.bakery.flourSack"') && sources.includes("honey"));
+});
+
 console.log(`
 ${passed} tests passed`);

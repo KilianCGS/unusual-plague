@@ -280,3 +280,15 @@ del día (visual) y que el jugador no pierda nada por llegar con monedas de sobr
 3. **Naranja**: una segunda rama de naranjas en el día 3 (o aceptar el "justo").
 4. Añadir a `economy-no-deadlock` el libro de cuentas de ingredientes que **no** vende el mercader, para que
    este tipo de hueco salte en un test en vez de en una partida.
+
+### Aplicado el 2026-11-15 (sin commit todavía)
+
+- Los suministros del día 2 (`chapter2Supplies.ts`) ahora atienden también los casos del día 3: apicultor
+  (miel), saco de la panadera (harina) y camarero (alcohol, antes no tenía). Reutilizan la conversación
+  genérica de suministros, así que no hay diálogo nuevo.
+- La bruja del claro da, en la misma primera visita que el hueso, **una hierba medicinal y una menta**
+  (todo o nada, una sola vez). Son dos líneas nuevas (ES/EN) en `chapter3WitchDialogues.ts`, **pendientes de tu
+  revisión**.
+- `economy-no-deadlock` incluye ahora el libro de cuentas de lo que no vende el mercader: hierba 5/5,
+  menta 3/3, naranja 3/3. Si alguien quita un regalo de la bruja el test falla nombrando qué falta.
+- Sigue sin resolver: la naranja queda justa (3 para 3 usos). Cualquier segunda rama la colocas tú.

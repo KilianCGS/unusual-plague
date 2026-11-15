@@ -1,6 +1,7 @@
 import type { Language } from "../i18n/types";
 import { addItem } from "../inventory/inventory";
 import { getItemName } from "../items/items";
+import { CHAPTER3_PATIENTS } from "../patients/chapter3Patients";
 import { getChapter2PatientDefinitions } from "../patients/farmerInvestigation";
 import { getActiveMissingIngredients } from "../patients/patientNeeds";
 import { chapter2AmbientDialogues } from "./chapter2AmbientDialogues";
@@ -22,7 +23,16 @@ export const CHAPTER2_SUPPLIES: Readonly<Record<string, readonly string[]>> = {
   //   animal fat     -> the woodcutter's thank-you gift.
   "chapter2.mill.neighbour": ["resin"],
   "chapter2.mine.recoveringMiner": ["coal"],
+  // Day 3 (2026-11-15): the bartender gives the alcohol the stonecutter's cast needs. Day 3 inherits
+  // Day 2's placements and interactions, so the same suppliers serve its cases (see
+  // supplyDefinitions); there are no new lines: this uses the generic supply conversation.
+  "chapter2.tavern.bartender": ["alcohol"],
 };
+
+// The cases whose missing ingredients these suppliers cover: Day 2's and Day 3's.
+export function supplyDefinitions(claimed?: ReadonlySet<string>) {
+  return { ...getChapter2PatientDefinitions(claimed), ...CHAPTER3_PATIENTS };
+}
 
 export const FLOUR_SACK_INTERACTION_ID = "chapter2.bakery.flourSack";
 export const BEEKEEPER_INTERACTION_ID = "chapter2.mill.beekeeper";
@@ -37,7 +47,7 @@ export function resolveChapter2Supplies(
 ): StoryOutcome | null {
   const provides = CHAPTER2_SUPPLIES[interactionId];
   if (!provides) return null;
-  const needs = getActiveMissingIngredients(facts.patients, getChapter2PatientDefinitions(facts.claimedRewards), facts.inventory)
+  const needs = getActiveMissingIngredients(facts.patients, supplyDefinitions(facts.claimedRewards), facts.inventory)
     .filter(need => provides.includes(need.itemId));
   if (!needs.length) return null;
   let carried = facts.inventory;
@@ -94,7 +104,7 @@ export function resolveFlourSack(
 function missingNeed(
   patients: StoryFacts["patients"], claimed: ReadonlySet<string> | undefined, inventory: StoryFacts["inventory"], itemId: string,
 ) {
-  return getActiveMissingIngredients(patients, getChapter2PatientDefinitions(claimed), inventory)
+  return getActiveMissingIngredients(patients, supplyDefinitions(claimed), inventory)
     .find(n => n.itemId === itemId);
 }
 
