@@ -223,8 +223,11 @@ test("COPY CHAPTER output cannot erase interactions: the table is a separate fil
   );
   assert.equal(getChapterInteractions("chapter-1"), chapter1Interactions);
   assert.ok(getComposition("plaza", "chapter-1"));
-  // Day 2 plaza: Kilian's kite girl and cat, no interactions yet.
-  assert.deepEqual(getComposition("plaza", "chapter-2").instances.map((i) => i.assetId), ["kite-girl", "cat"]);
+  // Day 2 plaza: Kilian's kite girl and cat, plus (2026-11-16) the merchant and the plaza people carried over
+  // from Day 1 so that the Doctor has a shop on Day 2.
+  assert.deepEqual(getComposition("plaza", "chapter-2").instances.map((i) => i.assetId), [
+    "kite-girl", "cat", "villager-sitting", "merchant-cart", "merchant-table-draper", "villager-woman-02", "merchant-humble",
+  ]);
 });
 
 test("blacksmith: the Doctor can interact from just in front of the anvil he works behind", () => {

@@ -17,6 +17,30 @@ import { mergeSharedEnvironmentInstances } from "./shared-environment";
 //
 // To add a chapter: save its export as chapter-N.ts here, import it and add it
 // to the list below.
+
+// WHAT DAY 2 KEEPS FROM DAY 1 (2026-11-16): Day 2's export has no merchant and no quarry camp, which
+// left the Doctor without a shop (sugar and cloth are only sold there) and the camp empty. These Day 1
+// placements (same positions, authored by Kilian) are carried over until he places Day 2's own.
+// The quarry's stool stonecutter becomes the giver of the bone broth errand.
+const CARRIED_TO_CHAPTER_2: Readonly<Record<string, readonly string[]>> = {
+  plaza: [
+    "plaza-villager-sitting-01",
+    "plaza-merchant-cart-01",
+    "plaza-merchant-table-01",
+    "plaza-villager-woman-02-01",
+    "plaza-merchant-humble-01",
+  ],
+  quarry: ["quarry-villager-woman-02-01", "quarry-stonecutter-shovel-01", "quarry-stonecutter-stool-01"],
+};
+const QUARRY_ERRAND_GIVER_INSTANCE_ID = "quarry-stonecutter-stool-01";
+const carriedCompositions: DecorComposition[] = Object.entries(CARRIED_TO_CHAPTER_2).map(([sceneId, ids]) => ({
+  sceneId,
+  chapterId: "chapter-2",
+  instances: newWorldChapter1Compositions
+    .filter((composition) => composition.sceneId === sceneId)
+    .flatMap((composition) => composition.instances)
+    .filter((instance) => ids.includes(instance.instanceId)),
+}));
 // The exterior scenes of the new world take their population from
 // newWorldCompositions (authored in /dev/decorator on the new maps). The old
 // placements of those scenes stay in chapter-1.ts as legacy, unused; its
@@ -29,6 +53,7 @@ const ALL_COMPOSITIONS: DecorComposition[] = [
   ...newWorldChapter1Compositions,
   // Day 2 has no legacy placements to exclude: its export is read as it is.
   ...chapter2Compositions,
+  ...carriedCompositions,
   ...chapter3Compositions,
   // Day 4 (the night) is authored in the Decorator as the chapter "artifacts" and read as
   // "chapter-4": the people absorbed in their artifacts.
@@ -93,9 +118,9 @@ const INTERACTIONS_BY_CHAPTER: Record<
   Record<string, DecorInteraction>
 > = {
   "chapter-1": chapter1Interactions,
-  "chapter-2": chapter2Interactions,
+  "chapter-2": carriedAndChapter2Interactions(),
   // Day 3 inherits Day 2's interactions; its own (the new people) win on a clash.
-  "chapter-3": { ...chapter2Interactions, ...chapter3Interactions },
+  "chapter-3": { ...carriedAndChapter2Interactions(), ...chapter3Interactions },
 };
 
 const NO_INTERACTIONS: Record<string, DecorInteraction> = {};
@@ -104,4 +129,19 @@ export function getChapterInteractions(
   chapterId: string,
 ): Record<string, DecorInteraction> {
   return INTERACTIONS_BY_CHAPTER[chapterId] ?? NO_INTERACTIONS;
+}
+
+// Day 2's interactions plus those of the carried-over Day 1 placements (their Day 1 zones; the stool
+// stonecutter asks for the bone broth instead of chatting).
+function carriedAndChapter2Interactions(): Record<string, DecorInteraction> {
+  const carried: Record<string, DecorInteraction> = {};
+  for (const ids of Object.values(CARRIED_TO_CHAPTER_2)) {
+    for (const id of ids) {
+      if (chapter1Interactions[id]) carried[id] = chapter1Interactions[id];
+    }
+  }
+  if (carried[QUARRY_ERRAND_GIVER_INSTANCE_ID]) {
+    carried[QUARRY_ERRAND_GIVER_INSTANCE_ID] = { ...carried[QUARRY_ERRAND_GIVER_INSTANCE_ID], interactionId: "chapter2.quarry.miner" };
+  }
+  return { ...carried, ...chapter2Interactions };
 }
