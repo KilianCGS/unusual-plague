@@ -37,10 +37,12 @@ export const NEW_WORLD_VISUALS: DevScene[] = [
     id: "apothecary-street",
     label: "Calle Botica (nuevo mundo)",
     backgroundSrc: `${DIR}/apothecary-street-background.png`,
+    // 2026-11-16: repainted with the new road to the east (1120x1404; it was 1120x1405). Same
+    // geometry: the logical world keeps its size.
     assetWidth: 1120,
-    assetHeight: 1405,
+    assetHeight: 1404,
     initialAssetX: 555,
-    initialAssetY: 1260,
+    initialAssetY: 1259,
     logicalUnitsPerAssetPixel: 0.65,
     colliders: apothecaryStreetColliders,
   },
@@ -103,11 +105,14 @@ export const NEW_WORLD_VISUALS: DevScene[] = [
     id: "farm",
     label: "Granja (nuevo mundo)",
     backgroundSrc: `${DIR}/farm-background.png`,
-    assetWidth: 1581,
-    assetHeight: 945,
-    initialAssetX: 90,
-    initialAssetY: 850,
-    logicalUnitsPerAssetPixel: 1.2,
+    // 2026-11-16: repainted with the cobbled road to the west (1624x969; it was 1581x945, 2.7%
+    // smaller). The scale is lowered so the logical HEIGHT stays 1134 (1.2 * 945 / 969; the width
+    // grows 3 units): every collider, transition and decor keeps its place.
+    assetWidth: 1624,
+    assetHeight: 969,
+    initialAssetX: 92,
+    initialAssetY: 873,
+    logicalUnitsPerAssetPixel: 1.1703,
     colliders: farmColliders,
   },
   {

@@ -25,6 +25,18 @@ const conversation = (
 // ---- the injured miner -----------------------------------------------------
 
 // Not examined yet: the conversation IS the examination.
+// Right after the examination the miner asks if the Doctor needs coal and points him to the quarry
+// camp, where the seated stonecutter gives it (2026-11-16, Kilian). New text, awaiting his review.
+export const INJURED_MINER_COAL_CALL_ID = "chapter1.mine.injuredMiner.coalCalled";
+export const INJURED_MINER_INSTANCE_ID = "mine-interior-injured-miner-01";
+export const injuredMinerCoalHint = conversation("mine.injuredMiner.coalHint", [
+  subject(
+    "¿Le hace falta carbón para el ungüento? Vaya al campamento de la cantera; allí se lo darán.",
+    "Do you need coal for the ointment? Go to the quarry camp; they'll give it to you there.",
+  ),
+  doctor("Gracias, iré a verlos.", "Thank you, I'll go and see them."),
+]);
+
 export const injuredMinerExam = conversation("mine.injuredMiner.exam", [
   subject("Ah... despacio. La pierna.", "Ah... easy. My leg."),
   doctor(
@@ -202,8 +214,8 @@ export const mountainMinerCoalReady = conversation("quarry.backMan.coal", [
   subject("¿Otra vez?", "Again?"),
   doctor("¿Otra vez? ¡Vaya!", "Again? Oh dear!"),
   subject(
-    "Le pasa por no saber cuándo parar. Yo, al menos, miro cómo trabajan los demás.",
-    "That's what comes of not knowing when to stop. I, at least, just watch the others work.",
+    "Le pasa por no saber cuándo parar. Yo, al menos, me siento cuando toca.",
+    "That's what comes of not knowing when to stop. I, at least, sit down when it's time.",
   ),
   doctor(
     "Eso ya me lo había parecido. Y por eso mismo necesito tu ayuda.",
@@ -234,8 +246,8 @@ export const mountainMinerCoalDone = conversation(
   "quarry.backMan.coalDone",
   [
     subject(
-      "Cuide de mi amigo. Y dígale que la próxima vez mire dónde pisa. Yo, desde aquí, lo vería venir.",
-      "Look after my friend. And tell him to watch where he steps next time. From here, I'd see it coming.",
+      "Cuide de mi amigo. Y dígale que la próxima vez mire dónde pisa. Yo, desde el suelo, lo vería venir.",
+      "Look after my friend. And tell him to watch where he steps next time. From down here, I'd see it coming.",
     ),
   ],
 );

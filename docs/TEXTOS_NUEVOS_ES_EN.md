@@ -307,3 +307,38 @@ el fichero). Generado desde el código, así que lo que ves aquí es lo que sale
 | personaje | Como todo lo bueno de esta calle. Aquí tiene sus nueve monedas. | Like everything good on this street. Here are your nine coins. |
 | doctor | ¿Se la bebe usted? | Will you drink it yourself? |
 | personaje | Yo no. La guardo para el próximo que salga de la taberna arrepentido. | Not me. I'm keeping it for the next one who walks out of the tavern full of regret. |
+
+## 9. Guía del día 1 (2026-11-15 y 16)
+
+### Minero herido tras el diagnóstico (chapter1Patient3Dialogues.ts)
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | ¿Le hace falta carbón para el ungüento? Vaya al campamento de la cantera; allí se lo darán. | Do you need coal for the ointment? Go to the quarry camp; they'll give it to you there. |
+| personaje | Gracias, iré a verlos. | Thank you, I'll go and see them. |
+
+### Tabernera: llamada y jarra (chapter1TavernDialogues.ts)
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | Doctor, venga aquí. | Doctor, come over here. |
+| personaje | He escuchado que necesita leche. Tome, llévese esta jarra y hable con mi hermana, en la granja. | I heard you need milk. Here, take this jar and talk to my sister at the farm. |
+| personaje | Se lo agradezco. Iré a verla enseguida. | Thank you. I'll go and see her right away. |
+
+### Cantero descansando en el suelo (nuevo, sustituye al de espaldas)
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | Perdone que no me levante, doctor. Hoy la piedra ha ganado. | Forgive me for not getting up, doctor. The stone won today. |
+| doctor | ¿Tan duro ha sido el día? | Has the day been that hard? |
+| personaje | Duro, no. Largo. Por eso me siento, a ver si se acorta. | Not hard: long. That's why I sit down, to see if it gets shorter. |
+
+### Minero del camino (pista del carbón cambiada)
+
+| Quién | Español | English |
+|---|---|---|
+| personaje | Si viene buscando trabajo, ha elegido mal la ropa. | If you're here looking for work, you picked the wrong clothes. |
+| doctor | No vengo buscando trabajo, solo a saludar. | I'm not looking for work, just saying hello. |
+| personaje | Entonces ha elegido muy bien la ropa. | Then you picked exactly the right clothes. |
+| doctor | Por casualidad, ¿sabe dónde conseguir un poco de carbón limpio? | By any chance, do you know where I could get a little clean coal? |
+| personaje | Pregunte en el campamento de la cantera, al que descansa sentado en el suelo. Siempre guarda un poco para su hoguera. | Ask at the quarry camp, the one resting on the ground. He always keeps a little for his fire. |

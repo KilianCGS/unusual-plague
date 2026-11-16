@@ -477,7 +477,9 @@ export const newWorldChapter1Compositions: DecorComposition[] = [
       },
       {
         instanceId: "quarry-villager-back-man-01",
-        assetId: "villager-back-man",
+        // (the id keeps its old name: it is the coal giver. Since 2026-11-16 he is the stonecutter
+        // resting on the ground, no longer the man seen from behind.)
+        assetId: "stonecutter-resting",
         x: 273,
         y: 497,
         scale: 1,

@@ -62,6 +62,8 @@ export const MAP_LOCATIONS: MapLocation[] = [
 // Paths between places (undirected), following the real connections.
 export const MAP_LINKS: [MapLocationId, MapLocationId][] = [
   ["pharmacy", "plaza"],
+  // The new road from the apothecary street to the farm (2026-11-16): a short cut east.
+  ["pharmacy", "farm"],
   ["plaza", "bakery"],
   ["plaza", "smithy"],
   ["smithy", "mountain"],

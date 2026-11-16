@@ -88,4 +88,29 @@ test("cooking waits 3 seconds, and the Doctor carries 8 things", () => {
   assert.equal(inv.createEmptyInventory().slots.length, 8);
 });
 
+test("the miner points to the quarry camp after his examination; the camp's coal giver is the stonecutter resting on the ground", () => {
+  const p3 = at("src/game/dialogue/chapter1Patient3Dialogues.ts");
+  assert.equal(p3.injuredMinerCoalHint.lines.length, 2);
+  assert.ok(p3.injuredMinerCoalHint.lines[0].text.es.includes("campamento de la cantera"));
+  assert.ok(p3.injuredMinerCoalHint.lines[0].text.en.includes("quarry camp"));
+  const world = read("src/game/world/GameWorld.tsx");
+  const end = world.slice(world.indexOf("const finishExamination"), world.indexOf("const beginDiagnosis"));
+  assert.ok(end.includes("INJURED_MINER_COAL_CALL_ID") && end.includes("injuredMinerCoalHint"));
+  // the coal giver keeps his id but is drawn as the resting stonecutter
+  const comp = read("src/game/new-world-map/newWorldCompositions.ts");
+  const at1 = comp.indexOf('instanceId: "quarry-villager-back-man-01"');
+  assert.ok(comp.slice(at1, at1 + 400).includes('assetId: "stonecutter-resting"'));
+  for (let i = 0; i < 5; i++) assert.ok(fs.existsSync(path.join(root, `public/game/npcs/stonecutter-resting/idle/${i}.png`)));
+});
+
+test("the apothecary street and the farm have the new backgrounds with the world kept the same size, and the map links them", () => {
+  const png = (rel) => { const b = fs.readFileSync(path.join(root, "public", rel)); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
+  assert.deepEqual(png("game/new-world-map/apothecary-street-background.png"), [1120, 1404]);
+  assert.deepEqual(png("game/new-world-map/farm-background.png"), [1624, 969]);
+  const visuals = read("src/game/new-world-map/newWorldVisuals.ts");
+  assert.ok(visuals.includes("assetWidth: 1624") && visuals.includes("logicalUnitsPerAssetPixel: 1.1703"));
+  const { MAP_LINKS } = at("src/game/map/mapLocations.ts");
+  assert.ok(MAP_LINKS.some(([a, b]) => a === "pharmacy" && b === "farm"));
+});
+
 console.log(`\n${passed} tests passed`);

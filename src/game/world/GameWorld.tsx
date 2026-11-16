@@ -15,7 +15,8 @@ import {
 
 import { ApothecaryScene } from "../apothecary/ApothecaryScene";
 import { BARTENDER_CALL_ID, BARTENDER_INSTANCE_ID, bartenderCall } from "../dialogue/chapter1TavernDialogues";
-import { TAVERN_PATIENT_ID } from "../patients/chapter1Patients";
+import { INJURED_MINER_ID, TAVERN_PATIENT_ID } from "../patients/chapter1Patients";
+import { INJURED_MINER_COAL_CALL_ID, INJURED_MINER_INSTANCE_ID, injuredMinerCoalHint } from "../dialogue/chapter1Patient3Dialogues";
 import { playSound } from "../audio/audioPlayer";
 import { useLoopMusic } from "../audio/useLoopMusic";
 import { BookOverlay } from "../book/BookOverlay";
@@ -1152,6 +1153,10 @@ export function GameWorld({
       // The bartender calls the Doctor over (she has heard he needs milk); once.
       claimFlag(BARTENDER_CALL_ID);
       startDialogue(localizeConversation(bartenderCall, language, BARTENDER_INSTANCE_ID));
+    } else if (patientId === INJURED_MINER_ID && !claimedRewardsRef.current.has(INJURED_MINER_COAL_CALL_ID)) {
+      // The miner points the Doctor to the quarry camp for coal; once.
+      claimFlag(INJURED_MINER_COAL_CALL_ID);
+      startDialogue(localizeConversation(injuredMinerCoalHint, language, INJURED_MINER_INSTANCE_ID));
     }
   }, [language, startDialogue, startTransition, claimFlag]);
 

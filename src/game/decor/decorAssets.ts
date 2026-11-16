@@ -879,6 +879,25 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultCollider: { offsetX: -15, offsetY: -80, width: 27, height: 67 },
   },
   {
+    id: "stonecutter-resting",
+    label: "Stonecutter resting on the ground",
+    category: "people",
+    sprite: {
+      // 2026-11-16 (PixelLab, from the stool stonecutter): sits on the bare ground resting, eyes closed.
+      // Replaces the man seen from behind at the quarry camp (he gives the coal). Five pictures played
+      // back and forth (0 1 2 3 4 3 2 1): a slow breath, the head lifts a little.
+      frames: [0, 1, 2, 3, 4, 3, 2, 1].map((i) => `/game/npcs/stonecutter-resting/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // Silhouette of frame 0 (x22-73 y22-79 of the 96x96 frame).
+    defaultCollider: { offsetX: -26, offsetY: -74, width: 52, height: 58 },
+  },
+  {
     id: "villager-back-woman",
     label: "Villager woman from behind",
     category: "people",

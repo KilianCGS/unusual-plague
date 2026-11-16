@@ -147,10 +147,11 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.tavernStreet.seller",
     zone: { offsetX: 122, offsetY: -35, width: 119, height: 27 },
   },
-  // The man standing with his back to us at the quarry (villager-back-man).
+  // The stonecutter resting on the ground at the quarry camp (he gives the coal; he used to be the
+  // man seen from behind, hence the id). The zone is the seated man's silhouette grown by 16.
   "quarry-villager-back-man-01": {
     interactionId: "chapter1.quarry.backMan",
-    zone: { offsetX: -33, offsetY: -95, width: 60, height: 111 },
+    zone: { offsetX: -42, offsetY: -90, width: 84, height: 106 },
   },
   // The rest of the quarry camp (2026-11-15). Zones by analogy with the same sprites elsewhere
   // (the woman is the tavern street's villager-woman-02, the shovel man stands like the back man, the

@@ -691,7 +691,7 @@ test("P3 5. Alcohol: the bartender gives it once the miner is examined, first of
   );
 });
 
-test("P3 6. Coal: the quarry man (seen from behind) is only ambient until the case is examined, then gives it once", () => {
+test("P3 6. Coal: the quarry stonecutter (resting on the ground) is only ambient until the case is examined, then gives it once", () => {
   for (const p3 of [undefined, "discovered"]) {
     assert.equal(talk(MOUNTAIN, world({ p3 })), null, "ambient, no quest");
   }
@@ -704,7 +704,7 @@ test("P3 6. Coal: the quarry man (seen from behind) is only ambient until the ca
   );
   assert.equal(
     chapter1AmbientDialogues[MOUNTAIN].lines[0].text.es,
-    "No se vuelva, doctor. Estoy mirando cómo parten la piedra y me da vergüenza que se note.",
+    "Perdone que no me levante, doctor. Hoy la piedra ha ganado.",
   );
   const f = world({ p3: "examined" });
   const coal = talk(MOUNTAIN, f);

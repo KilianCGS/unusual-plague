@@ -139,8 +139,8 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "By any chance, do you know where I could get a little clean coal?",
       ),
       subject(
-        "Pregunte al de la cantera, el que mira sin trabajar. Siempre guarda un poco para su hoguera.",
-        "Ask the one at the quarry, the man who watches and doesn't work. He always keeps a little for his fire.",
+        "Pregunte en el campamento de la cantera, al que descansa sentado en el suelo. Siempre guarda un poco para su hoguera.",
+        "Ask at the quarry camp, the one resting on the ground. He always keeps a little for his fire.",
       ),
     ]),
     // Witch at the bar: her real conversations live in storyInteractions.ts.
@@ -260,15 +260,17 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
         "An apple a day. For the rest, you're the doctor.",
       ),
     ]),
+    // The stonecutter resting on the ground (2026-11-16: he replaced the man seen from behind). New
+    // text, awaiting Kilian's review.
     conversation("chapter1.quarry.backMan", [
       subject(
-        "No se vuelva, doctor. Estoy mirando cómo parten la piedra y me da vergüenza que se note.",
-        "Don't turn me around, doctor. I'm watching them split the stone and I'd hate for it to show.",
+        "Perdone que no me levante, doctor. Hoy la piedra ha ganado.",
+        "Forgive me for not getting up, doctor. The stone won today.",
       ),
-      doctor("¿Mirar trabajar a otros es un oficio?", "Is watching others work a trade?"),
+      doctor("¿Tan duro ha sido el día?", "Has the day been that hard?"),
       subject(
-        "Es el único que llevo bien. Y ellos trabajan más contentos con público.",
-        "It's the only one I'm good at. And they work happier with an audience.",
+        "Duro, no. Largo. Por eso me siento, a ver si se acorta.",
+        "Not hard: long. That's why I sit down, to see if it gets shorter.",
       ),
     ]),
     // The quarry camp (2026-11-15). New text, awaiting Kilian's review.
