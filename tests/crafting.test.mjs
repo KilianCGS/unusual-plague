@@ -314,12 +314,13 @@ test("14. the chained recipes work with no special logic (mortar, then table)", 
   // the whole herb is no longer a step of the paste, and the paste is no step of the ointment
   assert.equal(cr.combine(stock([["medicinal-herb", 1], ["honey", 1]]), "manual", ["medicinal-herb", "honey"]).kind, "no-recipe");
   assert.equal(cr.combine(state, "manual", ["coal", "medicinal-paste"]).kind, "no-recipe");
-  // the ointment is made of the whole herb and GROUND coal
+  // the ointment is made of GROUND herb and GROUND coal (2026-11-16: the herb is ground too)
   const ground = cr.combine(stock([["coal", 1]]), "mortar", ["coal"]);
+  const groundHerb = cr.combine(inv.addItem(ground.inventory, "medicinal-herb", 1), "mortar", ["medicinal-herb"]);
   const direct = cr.combine(
-    inv.addItem(ground.inventory, "medicinal-herb", 1),
+    groundHerb.inventory,
     "manual",
-    ["crushed-coal", "medicinal-herb"], // any order
+    ["crushed-coal", "crushed-herb"], // any order
   );
   assert.equal(direct.kind, "success");
   assert.equal(direct.recipe.output.itemId, "medicinal-ointment");

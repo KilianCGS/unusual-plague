@@ -15,6 +15,7 @@ import type { CollectedInstanceIds } from "../collectibles/collectibles";
 import { getChapterInteractions, getComposition } from "../compositions";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { AttentionMark } from "../ui/AttentionMark";
+import { WorldLabel } from "../ui/WorldLabel";
 import { PickupAura } from "../ui/PickupAura";
 import { environmentGlowsByScene } from "../interactions/environmentGlows";
 import { DecorSprite } from "../decor/DecorSprite";
@@ -118,6 +119,7 @@ export function ExteriorScene({
   hiddenInstanceIds,
   attentionInstanceIds,
   attentionPoints,
+  worldLabels,
 }: {
   scene: ExteriorWorldScene;
   // Selects which versioned composition (src/game/compositions) populates the
@@ -158,6 +160,8 @@ export function ExteriorScene({
   attentionInstanceIds?: ReadonlySet<string>;
   // "!" marks drawn at fixed scene points (bottom-centre), for painted zones.
   attentionPoints?: readonly { id: string; x: number; y: number }[];
+  // Short words floating at fixed scene points (bottom-centre), e.g. "Sleep" over the bed.
+  worldLabels?: readonly { id: string; x: number; y: number; text: string }[];
 }) {
   const zoomMultiplier = scene.visual.zoomMultiplier ?? 1;
   const world = getSceneWorld(scene.visual);
@@ -412,6 +416,9 @@ export function ExteriorScene({
           ))}
           {attentionPoints?.map((point) => (
             <AttentionMark key={point.id} x={point.x} y={point.y} zIndex={Math.round(point.y) + 1000} />
+          ))}
+          {worldLabels?.map((label) => (
+            <WorldLabel key={label.id} x={label.x} y={label.y} zIndex={Math.round(label.y) + 1000} text={label.text} />
           ))}
           {npcs.map((npc) => (
             <SceneNpcSprite key={npc.id} npc={npc} />

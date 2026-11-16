@@ -162,8 +162,8 @@ test("one single base for every language and every section: the React text is wh
       .join(" | ");
   assert.ok(text("es", "patients").includes("Minero herido"));
   assert.ok(text("en", "patients").includes("The injured miner"));
-  assert.ok(text("es", "preparations").includes("Hierba medicinal + Carbón triturado"));
-  assert.ok(text("en", "preparations").includes("Medicinal herb + Crushed coal"));
+  assert.ok(text("es", "preparations").includes("Hierba machacada + Carbón triturado"));
+  assert.ok(text("en", "preparations").includes("Crushed herb + Crushed coal"));
 });
 
 test("the content stays dynamic and grows by itself: pages follow the patients, ailments and recipes", () => {

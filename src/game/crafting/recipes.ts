@@ -59,8 +59,9 @@ export const RECIPES: Recipe[] = [
     // of this one.)
     id: "manual.medicinal-ointment",
     station: "manual",
+    // 2026-11-16 (Kilian): the herb is ground in the mortar too, like the coal.
     inputs: [
-      { itemId: "medicinal-herb", quantity: 1 },
+      { itemId: "crushed-herb", quantity: 1 },
       { itemId: "crushed-coal", quantity: 1 },
     ],
     output: { itemId: "medicinal-ointment", quantity: 1 },

@@ -71,8 +71,9 @@ test('every treatment order triggers only after its last conversation, then neve
   assert.ok(start>0);assert.ok(trigger.includes('phaseRef.current === "playing"'));
   assert.ok(trigger.includes('afterDialogueRef.current === null'));
   assert.ok(game.includes('chapter-2": DAY2_COMPLETED_ID'));
-  // 2026-11-15: being home only asks "sleep now?"; the closing itself (flag first, then the veil) is closeDayNow
-  assert.ok(trigger.includes('setRestPromptOpen(true)'));
+  // 2026-11-16: the day closes when he sleeps (the bed, E) - or, until the bed zone is painted, on arriving in
+  // his room; the closing itself (flag first, then the veil) is closeDayNow
+  assert.ok(trigger.includes('closeDayNow()'));assert.ok(game.includes('setSleepRequested(true)'));assert.ok(!game.includes('RestPrompt'));
   const closeNow=game.slice(game.indexOf('const closeDayNow'),game.indexOf('const closeDayNow')+400);
   assert.ok(closeNow.indexOf('claimFlag(dayCompletedIds[chapterId])')<closeNow.indexOf('setClosingActive(true)'));
 });

@@ -17,6 +17,7 @@ import { ApothecaryScene } from "../apothecary/ApothecaryScene";
 import { BARTENDER_CALL_ID, BARTENDER_INSTANCE_ID, bartenderCall } from "../dialogue/chapter1TavernDialogues";
 import { INJURED_MINER_ID, TAVERN_PATIENT_ID } from "../patients/chapter1Patients";
 import { INJURED_MINER_COAL_CALL_ID, INJURED_MINER_INSTANCE_ID, injuredMinerCoalHint } from "../dialogue/chapter1Patient3Dialogues";
+import { getSceneInteractionZones } from "../interactions/sceneInteractions";
 import { playSound } from "../audio/audioPlayer";
 import { useLoopMusic } from "../audio/useLoopMusic";
 import { BookOverlay } from "../book/BookOverlay";
@@ -92,7 +93,6 @@ import { noRunLines } from "../i18n/noRun";
 import { runBarkLines } from "../i18n/runBarks";
 import { ControlsPanel } from "../controls/ControlsPanel";
 import { PauseMenu } from "../controls/PauseMenu";
-import { RestPrompt } from "../ui/RestPrompt";
 import { InventoryHud } from "../inventory/InventoryHud";
 import { isInventoryHudVisible } from "../inventory/inventoryHudVisibility";
 import { storageCopy } from "../i18n/storage";
@@ -231,9 +231,8 @@ export function GameWorld({
   const [pauseOpen, setPauseOpen] = useState(false);
   // Day 1's ambient music starts when the Doctor first leaves the Botica and loops until the day closes.
   const [leftBotica, setLeftBotica] = useState(false);
-  // "Sleep now?" (the day ends only when the player says so) and whether he said "not yet".
-  const [restPromptOpen, setRestPromptOpen] = useState(false);
-  const restDeclinedRef = useRef(false);
+  // The player used the bed (E) with the day's work done: the day closes.
+  const [sleepRequested, setSleepRequested] = useState(false);
   const [controlsOpen, setControlsOpen] = useState(false);
   const [closingChapter, setClosingChapter] = useState("chapter-1");
   // The end card after the closing of Day 4 (the last screen of the game).
@@ -356,6 +355,7 @@ export function GameWorld({
   // one for now ("Preparar" at the table, "Cocinar" at the stove).
   const promptLabelFor = useCallback(
     (interactionId: string) => {
+      if (interactionId === BED_INTERACTION_ID) return dayEndCopy[language].sleep;
       const station = CRAFT_STATION_BY_INTERACTION_ID[interactionId];
 
       if (!station) return undefined;
@@ -381,7 +381,6 @@ export function GameWorld({
     !storageOpen &&
     openShop === null &&
     !pauseOpen &&
-    !restPromptOpen &&
     !inNarrativeScene;
   const mapVisible = mapHeld && canOpenInterface && !bookOpen;
   const pendingRef = useRef<{
@@ -423,7 +422,6 @@ export function GameWorld({
     !storageOpen &&
     openShop === null &&
     !pauseOpen &&
-    !restPromptOpen &&
     !inNarrativeScene;
 
   // Esc opens the pause menu when nothing else is open (Esc closes the other
@@ -757,14 +755,14 @@ export function GameWorld({
         return;
       }
 
-      // The bed: with the day's work done it asks whether to sleep, otherwise he is not sleepy.
+      // The bed: with the day's work done he goes to sleep (the day closes), otherwise he is not sleepy.
       if (interactionId === BED_INTERACTION_ID) {
         const ready =
           getNextChapterId(chapterId) !== null &&
           claimedRewardsRef.current.has(DAY_WIND_DOWN_FLAGS[chapterId] ?? "") &&
           isDayWindingDown(chapterId, patientsRef.current, claimedRewardsRef.current);
         if (ready) {
-          setRestPromptOpen(true);
+          setSleepRequested(true);
         } else {
           startDialogue(
             localizeConversation(
@@ -1265,30 +1263,29 @@ export function GameWorld({
   if (!leftBotica && !DAY_END_SCENES.includes(world.sceneId)) setLeftBotica(true);
   useLoopMusic("music.day1", chapterId === "chapter-1" && leftBotica && !closingActive);
 
-  // Being home with the day's work done only ASKS whether to sleep (2026-11-15): "keep exploring"
-  // lets him go on; leaving the Botica and coming back asks again.
+  // The day closes when the Doctor sleeps (2026-11-16, Kilian): the sign sends him to his room, a
+  // "Sleep" label floats over the bed and pressing E there closes the day (no modal). Until the bed
+  // zone is painted in /dev/collisions, arriving in his room is enough.
+  const bedZoneExists = getSceneInteractionZones("doctor-room").some((zone) => zone.interactionId === BED_INTERACTION_ID);
   const closeDayNow = () => {
-    setRestPromptOpen(false);
+    setSleepRequested(false);
     claimFlag(dayCompletedIds[chapterId]);
     setClosingChapter(chapterId);
     chapterAdvancedRef.current = false;
     setClosingActive(true);
   };
   useEffect(() => {
-    if (!DAY_END_SCENES.includes(sceneIdForClosing)) restDeclinedRef.current = false;
-  }, [sceneIdForClosing]);
-  useEffect(() => {
     if (
       isPlaying &&
       phaseRef.current === "playing" &&
       afterDialogueRef.current === null &&
       closingChapterAvailable &&
-      !restDeclinedRef.current &&
-      shouldCloseDayNow(chapterId, patientsRef.current, claimedRewardsRef.current, sceneIdForClosing)
+      shouldCloseDayNow(chapterId, patientsRef.current, claimedRewardsRef.current, "doctor-room") &&
+      (sleepRequested || (!bedZoneExists && sceneIdForClosing === "doctor-room"))
     ) {
-      setRestPromptOpen(true);
+      closeDayNow();
     }
-  }, [chapterId, isPlaying, patients, claimedRewards, closingChapterAvailable, sceneIdForClosing]);
+  }, [chapterId, isPlaying, patients, claimedRewards, closingChapterAvailable, sceneIdForClosing, sleepRequested, bedZoneExists]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The closing of Day 4 (the end of the game): once the Witch has spoken, when the
   // conversation is over.
@@ -1591,6 +1588,13 @@ export function GameWorld({
     [world.sceneId, patients, claimedRewards, inventory],
   );
 
+  // "Sleep" over the bed once the day's work is done (only when the bed zone has been painted).
+  const worldLabels = useMemo(() => {
+    if (!dayOver || world.sceneId !== "doctor-room") return [];
+    const bed = getSceneInteractionZones("doctor-room").find((zone) => zone.interactionId === BED_INTERACTION_ID);
+    return bed ? [{ id: "bed-sleep", x: bed.x + bed.width / 2, y: bed.y - 4, text: dayEndCopy[language].sleep }] : [];
+  }, [dayOver, world.sceneId, language]);
+
   // The hint of the current step. The interaction hint only shows while the
   // [E] prompt does; none shows over an open interface or a conversation.
   const tutorialStep = tutorial.step;
@@ -1681,6 +1685,7 @@ export function GameWorld({
           hiddenInstanceIds={narrativeHiddenInstanceIds}
           attentionInstanceIds={attentionInstanceIds}
           attentionPoints={attentionPoints}
+          worldLabels={worldLabels}
           renderOverlay={renderSceneOverlay}
           onPlayerMoved={handlePlayerMoved}
           onRunningChange={setDoctorRunning}
@@ -1781,16 +1786,6 @@ export function GameWorld({
           language={language}
         />
       ) : null}
-      {restPromptOpen ? (
-        <RestPrompt
-          language={language}
-          onSleep={closeDayNow}
-          onKeepExploring={() => {
-            restDeclinedRef.current = true;
-            setRestPromptOpen(false);
-          }}
-        />
-      ) : null}
       {pauseOpen ? (
         <PauseMenu
           language={language}
@@ -1806,7 +1801,7 @@ export function GameWorld({
       {notice ? <ItemFeedback text={notice.text} /> : null}
       <CompendiumNotice context={{ language, patients, inventory, knownRecipeIds, storyFlags: claimedRewards, diagnosisPatientId: diagnosis?.patientId }} />
       {dayOver &&
-      !DAY_END_SCENES.includes(world.sceneId) &&
+      world.sceneId !== "doctor-room" &&
       !interludeActive &&
       phase === "playing" &&
       !inNarrativeScene ? (

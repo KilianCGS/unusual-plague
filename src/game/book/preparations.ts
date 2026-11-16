@@ -16,8 +16,8 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
     en: "Crushed herbs bound with honey. A thick base for further preparations.",
   },
   "medicinal-ointment": {
-    es: "Mezcla de hierba medicinal y carbón para aplicar sobre la zona afectada.",
-    en: "A mixture of medicinal herb and charcoal applied to the affected area.",
+    es: "Mezcla de hierba machacada y carbón triturado para aplicar sobre la zona afectada.",
+    en: "A mixture of crushed herb and ground charcoal applied to the affected area.",
   },
   "mushroom-soup": {
     es: "Caldo suave de hongos, agua y una pizca de sal.",
@@ -60,8 +60,8 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
     en: "Charcoal ground to powder in the mortar. Requires further preparation.",
   },
   "crushed-herb": {
-    es: "Hierba medicinal machacada en el mortero. Base para la pasta.",
-    en: "Medicinal herb ground in the mortar. The base for the paste.",
+    es: "Hierba medicinal machacada en el mortero. Base para la pasta y el ungüento.",
+    en: "Medicinal herb ground in the mortar. The base for the paste and the ointment.",
   },
   // The four below are NEW text (2026-11-14), awaiting Kilian's review.
   "chopped-onion": {

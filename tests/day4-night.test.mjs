@@ -53,7 +53,7 @@ const { getLockedDoorNotice } = at("src/game/world/lockedDoors.ts");
 test("Day 4 draws the eight scenes that have a night painting with it, and the files exist at the day size", () => {
   const sharpSizes = {
     outskirts: [1546, 1017],
-    "apothecary-street": [1120, 1405],
+    "apothecary-street": [1120, 1404],
     "bakery-street": [1168, 1346],
     "tavern-street": [1730, 909],
     "smithy-street": [1619, 971],

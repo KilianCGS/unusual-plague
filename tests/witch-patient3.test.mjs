@@ -555,21 +555,22 @@ test("P3 2. infected-wound, both treatments and their recipes are revealed", () 
   assert.ok(text("es").includes("MINERO HERIDO"));
   assert.ok(text("es").includes("VENDAJE DESINFECTADO"));
   assert.ok(text("es").includes("UNGÜENTO MEDICINAL"));
-  assert.ok(text("es").includes("HIERBA MEDICINAL"));
+  assert.ok(text("es").includes("HIERBA MACHACADA"));
   assert.ok(text("es").includes("CARBÓN"));
-  assert.ok(!text("es").includes("PASTA MEDICINAL"));
+  // (the crushed herb page now names the paste as one of its uses; the paste's OWN page must not show)
+  assert.ok(!text("es").includes("HIERBAS MACHACADAS Y LIGADAS CON MIEL"));
   assert.ok(text("en").includes("INJURED MINER"));
   assert.ok(text("en").includes("DISINFECTED BANDAGE"));
-  assert.ok(text("en").includes("MEDICINAL HERB"));
-  assert.ok(!text("en").includes("MEDICINAL PASTE"));
+  assert.ok(text("en").includes("CRUSHED HERB"));
+  assert.ok(!text("en").includes("CRUSHED HERBS BOUND WITH HONEY"));
 });
 
-test("P3 3. recipes: ointment = Medicinal herb + Crushed coal (manual); bandage = Cloth + Alcohol; the paste stays but no case needs it", () => {
+test("P3 3. recipes: ointment = Crushed herb + Crushed coal (manual); bandage = Cloth + Alcohol; the paste stays but no case needs it", () => {
   const recipe = (id) => RECIPES.find((r) => r.id === id);
   const ointment = recipe("manual.medicinal-ointment");
   assert.equal(ointment.station, "manual");
   assert.deepEqual(ointment.inputs, [
-    { itemId: "medicinal-herb", quantity: 1 },
+    { itemId: "crushed-herb", quantity: 1 },
     { itemId: "crushed-coal", quantity: 1 },
   ]);
   assert.deepEqual(ointment.output, {
@@ -592,11 +593,9 @@ test("P3 3. recipes: ointment = Medicinal herb + Crushed coal (manual); bandage 
   // really craftable
   const ground = cr.combine(stock([["coal", 1]]), "mortar", ["coal"]);
   assert.equal(ground.kind, "success");
-  const made = cr.combine(
-    inv.addItem(ground.inventory, "medicinal-herb", 1),
-    "manual",
-    ["crushed-coal", "medicinal-herb"],
-  );
+  const groundHerb = cr.combine(inv.addItem(ground.inventory, "medicinal-herb", 1), "mortar", ["medicinal-herb"]);
+  assert.equal(groundHerb.kind, "success");
+  const made = cr.combine(groundHerb.inventory, "manual", ["crushed-coal", "crushed-herb"]);
   assert.equal(made.kind, "success");
   assert.equal(made.recipe.output.itemId, "medicinal-ointment");
   const wrapped = cr.combine(
@@ -858,10 +857,8 @@ test("Route A (the suggested order): Witch asks > mine > Mushroom > Witch gives 
     assert.equal(count(f, id), id === "cloth" ? 2 : 1, id); // two scraps: one is Day 2's
   const bandage = cr.combine(f.inventory, "manual", ["cloth", "alcohol"]);
   const ground = cr.combine(bandage.inventory, "mortar", ["coal"]);
-  const ointment = cr.combine(ground.inventory, "manual", [
-    "medicinal-herb",
-    "crushed-coal",
-  ]);
+  const groundHerb = cr.combine(ground.inventory, "mortar", ["medicinal-herb"]);
+  const ointment = cr.combine(groundHerb.inventory, "manual", ["crushed-herb", "crushed-coal"]);
   f = { ...f, inventory: ointment.inventory };
   const { outcome, next } = go(MINER, f);
   assert.equal(outcome.conversation.id, "chapter1.mine.injuredMiner.cure");

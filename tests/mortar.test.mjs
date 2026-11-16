@@ -66,10 +66,10 @@ test("the mortar grinds ONE ingredient: coal, herb and garlic, nothing else, and
   assert.ok(!RECIPES.some((r) => r.inputs.some((i) => i.itemId === "mortar")));
 });
 
-test("the paste is crushed herb + honey and the ointment is herb + crushed coal", () => {
+test("the paste is crushed herb + honey and the ointment is crushed herb + crushed coal", () => {
   const byId = (id) => RECIPES.find((r) => r.id === id);
   assert.deepEqual(byId("manual.medicinal-paste").inputs.map((i) => i.itemId), ["crushed-herb", "honey"]);
-  assert.deepEqual(byId("manual.medicinal-ointment").inputs.map((i) => i.itemId), ["medicinal-herb", "crushed-coal"]);
+  assert.deepEqual(byId("manual.medicinal-ointment").inputs.map((i) => i.itemId), ["crushed-herb", "crushed-coal"]);
 });
 
 test("needs see through the mortar: a cure that needs paste asks for herb and honey, never crushed herb", () => {
@@ -80,10 +80,10 @@ test("needs see through the mortar: a cure that needs paste asks for herb and ho
 });
 
 test("the guard: grinding the herb another cure needs whole leaves the cases shorter, so it is refused", () => {
-  // a poultice (herb ground) AND an ointment (herb whole) both want herbs
+  // a poultice (herb ground) AND an infusion (herb whole) both want herbs
   const treatments = [
     { itemId: "poultice", quantity: 1 },
-    { itemId: "medicinal-ointment", quantity: 1 },
+    { itemId: "medicinal-infusion", quantity: 1 },
   ];
   const two = stock([["medicinal-herb", 2], ["honey", 1], ["flour", 1], ["coal", 1]]);
   const afterOne = cr.combine(two, "mortar", ["medicinal-herb"]);
@@ -93,7 +93,7 @@ test("the guard: grinding the herb another cure needs whole leaves the cases sho
   assert.equal(afterTwo.kind, "success");
   assert.ok(
     total(treatments, afterTwo.inventory) > total(treatments, afterOne.inventory),
-    "the second grind would leave the ointment without its herb",
+    "the second grind would leave the infusion without its herb",
   );
 });
 

@@ -90,7 +90,9 @@ test("the thoughts and the sign exist in both languages, one thought per day", (
     assert.ok(dayEndCopy[lang].sign.trim());
     for (const [chapter] of DAYS) assert.ok(dayEndCopy[lang].thoughts[chapter]?.trim(), `${lang}/${chapter}`);
   }
-  assert.equal(dayEndCopy.es.sign, "Ve a la botica");
+  assert.equal(dayEndCopy.es.sign, "Ve a tu habitación");
+  assert.equal(dayEndCopy.en.sign, "Go to your room");
+  assert.equal(dayEndCopy.es.sleep, "Dormir");
   assert.equal(dayEndCopy.es.thoughts["chapter-1"], "Creo que por hoy he hecho un buen trabajo. Debería descansar.");
 });
 

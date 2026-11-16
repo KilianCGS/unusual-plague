@@ -397,7 +397,7 @@ test("18. the original four recipes are untouched (two patient recipes and Milk 
       [
         "manual.medicinal-ointment",
         "manual",
-        "medicinal-herbx1+crushed-coalx1",
+        "crushed-herbx1+crushed-coalx1",
         "medicinal-ointment",
       ],
       [
