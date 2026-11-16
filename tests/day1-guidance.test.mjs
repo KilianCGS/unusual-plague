@@ -113,4 +113,17 @@ test("the apothecary street and the farm have the new backgrounds with the world
   assert.ok(MAP_LINKS.some(([a, b]) => a === "pharmacy" && b === "farm"));
 });
 
+test("the day closes at the bed: a centred glowing sign sends him to his room, 'Sleep' floats over the bed, no modal; the ointment grinds the herb too", () => {
+  const world = read("src/game/world/GameWorld.tsx");
+  assert.ok(world.includes("setSleepRequested(true)") && world.includes("worldLabels") && world.includes("bedZoneExists"));
+  assert.ok(!world.includes("RestPrompt") && !fs.existsSync(path.join(root, "src/game/ui/RestPrompt.tsx")));
+  const css = read("src/game/ui/DayEndSign.module.css");
+  assert.ok(css.includes("left: 50%") && css.includes("sign-aura"));
+  const { dayEndCopy } = at("src/game/i18n/dayEnd.ts");
+  assert.equal(dayEndCopy.es.sign, "Ve a tu habitación");
+  assert.equal(dayEndCopy.en.sign, "Go to your room");
+  const { RECIPES } = at("src/game/crafting/recipes.ts");
+  assert.deepEqual(RECIPES.find((r) => r.id === "manual.medicinal-ointment").inputs.map((i) => i.itemId), ["crushed-herb", "crushed-coal"]);
+});
+
 console.log(`\n${passed} tests passed`);
