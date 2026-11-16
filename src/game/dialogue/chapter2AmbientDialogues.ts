@@ -7,6 +7,29 @@ const doctor = (es: string, en: string) => ({ speaker: "doctor", text: { es, en 
 const talk = (id: string, lines: LocalizedConversation["lines"]): [string, LocalizedConversation] => [id, { id, lines }];
 
 export const chapter2AmbientDialogues: Record<string, LocalizedConversation> = Object.fromEntries([
+  // 2026-11-16: the three Day 2 people who had no words (the woman and the seamstress of the apothecary
+  // street, the kite girl of the plaza). New text, awaiting Kilian's review.
+  talk("chapter2.apothecaryStreet.woman", [
+    npc("Pasa usted tanto por aquí que ya lo espero con el reloj en la mano.", "You pass by so often that I wait for you with my watch in hand."),
+    doctor("¿Y llego a la hora?", "And am I on time?"),
+    npc("Llega cuando hay alguien enfermo, que no es lo mismo, aunque se parezca.", "You arrive when someone is ill, which isn't the same, though it looks alike."),
+    doctor("Prometo venir un día solo a saludar.", "I promise to come one day just to say hello."),
+    npc("Ese día traeré pastel.", "That day I'll bring cake."),
+  ]),
+  talk("chapter2.apothecaryStreet.seamstress", [
+    npc("Remiendo lo que el pueblo rompe. Hoy es poco; ayer fue un abrigo y una paciencia.", "I mend what the village breaks. Today it's little; yesterday it was a coat and a patience."),
+    doctor("¿Y la suya, la remienda alguien?", "And yours, does anyone mend that?"),
+    npc("La paciencia no se remienda. Se cose con calma, puntada a puntada.", "Patience can't be mended. It's sewn calmly, stitch by stitch."),
+    doctor("Entonces estoy ante una experta.", "Then I'm in front of an expert."),
+    npc("Se agradece el cumplido. Cobro por puntada.", "The compliment is appreciated. I charge by the stitch."),
+  ]),
+  talk("chapter2.plaza.kiteGirl", [
+    npc("No hay viento, pero la cometa no lo sabe.", "There's no wind, but the kite doesn't know."),
+    doctor("¿Y qué hace una cometa sin viento?", "And what does a kite do without wind?"),
+    npc("Esperar. Como usted cuando no hay enfermos.", "Wait. Like you when there are no patients."),
+    doctor("Yo no espero: repaso el libro.", "I don't wait: I go over my book."),
+    npc("Ella también. Se repasa las nubes.", "So does she. She goes over the clouds."),
+  ]),
   talk("chapter2.bakery.baker", [
     npc("Mi marido ha querido bajar a ayudar esta mañana. Ha llegado hasta la escalera y ya se ha puesto a dar órdenes.", "My husband wanted to come down and help this morning. He made it as far as the stairs before he started giving orders."),
     doctor("¿Ha vuelto a acostarse? Me alegra que ya quiera ayudar.", "Has he gone back to bed? I'm glad he already wants to help."),

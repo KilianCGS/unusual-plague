@@ -4,6 +4,10 @@ import { chapter2Compositions } from "./chapter-2";
 import { chapter1Interactions } from "./chapter-1.interactions";
 
 const ids: Record<string, string> = {
+  // 2026-11-16: people who had no words.
+  "apothecary-street-villager-woman-01-01": "chapter2.apothecaryStreet.woman",
+  "apothecary-street-seamstress-sitting-01": "chapter2.apothecaryStreet.seamstress",
+  "plaza-kite-girl-01": "chapter2.plaza.kiteGirl",
   "granary-interior-farmer-hoeing-sick-lying-01": "chapter2.granary.farmer",
   "granary-interior-elderly-woman-with-cane-01": "chapter2.granary.carer",
   "bakery-interior-baker-01": "chapter2.bakery.baker",

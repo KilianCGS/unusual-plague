@@ -56,9 +56,9 @@ const { createEmptyInventory, addItem } = at("src/game/inventory/inventory.ts");
 let passed=0;
 const test=(name,fn)=>{fn(); passed++; console.log(`ok - ${name}`);};
 
-test("all 15 ambient NPC dialogues are bound to actual Day 2 placements with ES/EN parity",()=>{
+test("all 18 ambient NPC dialogues are bound to actual Day 2 placements with ES/EN parity",()=>{
   const wired = Object.values(getChapterInteractions("chapter-2")).map(x=>x.interactionId);
-  assert.equal(Object.keys(chapter2AmbientDialogues).length,15);
+  assert.equal(Object.keys(chapter2AmbientDialogues).length,18);
   for (const [id,source] of Object.entries(chapter2AmbientDialogues)) {
     assert.ok(wired.includes(id),id);
     for (const language of ["es","en"]) {
