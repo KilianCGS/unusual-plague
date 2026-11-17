@@ -15,6 +15,7 @@ export type MapLocationId =
   | "quarry"
   | "forest-deep"
   | "farm"
+  | "market"
   | "mill"
   | "bakery"
   | "smithy"
@@ -41,6 +42,7 @@ const ROW = (index: number) => [52, 135, 218][index];
 
 export const MAP_LOCATIONS: MapLocation[] = [
   { id: "pharmacy", label: "BOTICA", labelEn: "APOTHECARY", x: COLUMN(2), y: ROW(0) },
+  { id: "market", label: "MERCADO", labelEn: "MARKET", x: COLUMN(3), y: ROW(0) },
   { id: "plaza", label: "PLAZA", labelEn: "SQUARE", x: COLUMN(2), y: ROW(1) },
   { id: "bakery", label: "PANADERÍA", labelEn: "BAKERY", x: COLUMN(2), y: ROW(2) },
   { id: "smithy", label: "HERRERÍA", labelEn: "SMITHY", x: COLUMN(1), y: ROW(1) },
@@ -62,8 +64,9 @@ export const MAP_LOCATIONS: MapLocation[] = [
 // Paths between places (undirected), following the real connections.
 export const MAP_LINKS: [MapLocationId, MapLocationId][] = [
   ["pharmacy", "plaza"],
-  // The new road from the apothecary street to the farm (2026-11-16): a short cut east.
-  ["pharmacy", "farm"],
+  // The market is the road between the apothecary and the farm.
+  ["pharmacy", "market"],
+  ["market", "farm"],
   ["plaza", "bakery"],
   ["plaza", "smithy"],
   ["smithy", "mountain"],
@@ -106,6 +109,7 @@ export const SCENE_TO_MAP_LOCATION: Record<SceneId, MapLocationId> = {
   "forest-deep": "forest-deep",
   // Part of the forest, with no place of its own on the map.
   "forest-glade": "forest",
+  "market-street": "market",
   "mine-interior": "mine",
   "mine-natural-cave": "mine",
 };

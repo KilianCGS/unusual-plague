@@ -165,12 +165,6 @@ export const RECIPES: Recipe[] = [
     output: { itemId: "chopped-mushroom", quantity: 1 },
   },
   {
-    id: "chop.pine-mushroom",
-    station: "chop",
-    inputs: [{ itemId: "pine-mushroom", quantity: 1 }],
-    output: { itemId: "chopped-pine-mushroom", quantity: 1 },
-  },
-  {
     id: "manual.charcoal-suspension",
     station: "manual",
     inputs: [{ itemId: "crushed-coal", quantity: 1 }, { itemId: "water", quantity: 1 }],
@@ -193,12 +187,6 @@ export const RECIPES: Recipe[] = [
     output: { itemId: "bone-broth", quantity: 1 },
   },
   {
-    id: "fire.mushroom-cream",
-    station: "fire",
-    inputs: [{ itemId: "chopped-pine-mushroom", quantity: 1 }, { itemId: "milk", quantity: 1 }, { itemId: "salt", quantity: 1 }],
-    output: { itemId: "mushroom-cream", quantity: 1 },
-  },
-  {
     id: "fire.onion-syrup",
     station: "fire",
     inputs: [{ itemId: "chopped-onion", quantity: 1 }, { itemId: "sugar", quantity: 1 }],
@@ -209,12 +197,6 @@ export const RECIPES: Recipe[] = [
     station: "fire",
     inputs: [{ itemId: "water", quantity: 1 }, { itemId: "sugar", quantity: 1 }, { itemId: "salt", quantity: 1 }],
     output: { itemId: "rehydration-drink", quantity: 1 },
-  },
-  {
-    id: "fire.citrus-syrup",
-    station: "fire",
-    inputs: [{ itemId: "orange", quantity: 1 }, { itemId: "sugar", quantity: 1 }],
-    output: { itemId: "citrus-syrup", quantity: 1 },
   },
   {
     id: "fire.strong-broth",

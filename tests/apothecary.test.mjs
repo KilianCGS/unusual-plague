@@ -373,7 +373,7 @@ test("the Botica in play is the new one: its background, its 480x293 world, and 
 });
 
 test("18. the original four recipes are untouched (two patient recipes and Milk with honey were added after them)", () => {
-  assert.equal(RECIPES.length, 26); // + crushed herb (mortar) + the 6 cooking recipes of 2026-11-11
+  assert.equal(RECIPES.length, 23); // + crushed herb (mortar) + the cooking recipes of 2026-11-11, minus the 3 with no use removed on 2026-11-16 (mushroom cream, citrus syrup, chopping the pine mushroom)
   assert.deepEqual(
     RECIPES.slice(0, 4).map((r) => [
       r.id,

@@ -228,6 +228,14 @@ for (const scene of Object.values(WORLD_SCENES)) {
 }
 
 if (REPORT) console.log(lines.join("\n"));
+// 2026-11-16: the farm collider farm-23 (Kilian's repaint for the market street road) closes the sheep pen,
+// so the three sheep cannot be reached. ON PURPOSE (Kilian confirmed it, 2026-11-16): the sheep are scenery
+// inside their pen. An exact list: if one gets reachable again the entry must be removed.
+for (const n of ["01", "02", "03"]) {
+  const known = `chapter-1 farm: decor-interaction "farm-sheep-${n}-zone" cannot be reached from any arrival`;
+  const at = problems.indexOf(known);
+  if (at >= 0) problems.splice(at, 1);
+}
 if (problems.length) {
   console.log(`\n${problems.length} problem(s):\n- ${problems.join("\n- ")}`);
 }

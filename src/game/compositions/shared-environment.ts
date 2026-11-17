@@ -220,6 +220,271 @@ export const sharedEnvironmentCompositions: Pick<DecorComposition, "sceneId" | "
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0
+      },
+      {
+        "instanceId": "forest-bush-round-01",
+        "assetId": "bush-round",
+        "x": 606,
+        "y": 753,
+        "scale": 0.6,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-fern-weed-02",
+        "assetId": "fern-weed",
+        "x": 542,
+        "y": 212,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-bush-tall-01",
+        "assetId": "bush-tall",
+        "x": 1022,
+        "y": 863,
+        "scale": 0.75,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-grass-tuft-05",
+        "assetId": "grass-tuft",
+        "x": 600,
+        "y": 1009,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-grass-tuft-06",
+        "assetId": "grass-tuft",
+        "x": 664,
+        "y": 452,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-grass-tuft-07",
+        "assetId": "grass-tuft",
+        "x": 1073,
+        "y": 708,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-bush-tall-02",
+        "assetId": "bush-tall",
+        "x": 657,
+        "y": 113,
+        "scale": 0.75,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-grass-tuft-08",
+        "assetId": "grass-tuft",
+        "x": 604,
+        "y": 1058,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-grass-tuft-09",
+        "assetId": "grass-tuft",
+        "x": 729,
+        "y": 509,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-fern-weed-03",
+        "assetId": "fern-weed",
+        "x": 130,
+        "y": 631,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-fern-weed-04",
+        "assetId": "fern-weed",
+        "x": 1301,
+        "y": 655,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-bush-round-02",
+        "assetId": "bush-round",
+        "x": 1247,
+        "y": 548,
+        "scale": 0.6,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-bush-round-03",
+        "assetId": "bush-round",
+        "x": 519,
+        "y": 94,
+        "scale": 0.6,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      }
+    ]
+  },
+  {
+    "sceneId": "forest-glade",
+    "instances": [
+      {
+        "instanceId": "forest-glade-bush-tall-02",
+        "assetId": "bush-tall",
+        "x": 995,
+        "y": 433,
+        "scale": 0.75,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-grass-tuft-06",
+        "assetId": "grass-tuft",
+        "x": 759,
+        "y": 666,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-grass-tuft-07",
+        "assetId": "grass-tuft",
+        "x": 356,
+        "y": 567,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-fern-weed-04",
+        "assetId": "fern-weed",
+        "x": 705,
+        "y": 522,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-fern-weed-05",
+        "assetId": "fern-weed",
+        "x": 714,
+        "y": 686,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-bush-round-01",
+        "assetId": "bush-round",
+        "x": 265,
+        "y": 682,
+        "scale": 0.6,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-bush-round-02",
+        "assetId": "bush-round",
+        "x": 987,
+        "y": 820,
+        "scale": 0.6,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-bush-round-03",
+        "assetId": "bush-round",
+        "x": 1112,
+        "y": 503,
+        "scale": 0.6,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-bush-tall-03",
+        "assetId": "bush-tall",
+        "x": 551,
+        "y": 517,
+        "scale": 0.75,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-grass-tuft-08",
+        "assetId": "grass-tuft",
+        "x": 877,
+        "y": 573,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-fern-weed-06",
+        "assetId": "fern-weed",
+        "x": 808,
+        "y": 423,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-fern-weed-07",
+        "assetId": "fern-weed",
+        "x": 780,
+        "y": 756,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-grass-tuft-09",
+        "assetId": "grass-tuft",
+        "x": 901,
+        "y": 451,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
       }
     ]
   },

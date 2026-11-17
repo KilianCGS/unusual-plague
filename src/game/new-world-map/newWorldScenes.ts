@@ -66,6 +66,12 @@ import {
   forestGladeTransitions,
 } from "./geometry/forestGladeGeometry";
 import {
+  marketStreetColliders,
+  marketStreetOccluders,
+  marketStreetSpawns,
+  marketStreetTransitions,
+} from "./geometry/marketStreetGeometry";
+import {
   outskirtsColliders,
   outskirtsOccluders,
   outskirtsSpawns,
@@ -163,7 +169,8 @@ export const NEW_WORLD_SCENES: Record<
   | "mountain-path"
   | "quarry"
   | "forest-deep"
-  | "forest-glade",
+  | "forest-glade"
+  | "market-street",
   ExteriorWorldScene
 > = {
   // New zones: background only. Their colliders, exits and arrivals come from
@@ -186,6 +193,34 @@ export const NEW_WORLD_SCENES: Record<
     ],
     arrivals: {
       "from-mountain-path": spawnAt(quarrySpawns, "quarry-spawn-1"),
+    },
+  },
+  // The market street (2026-11-16): between the apothecary (west) and the farm (east).
+  "market-street": {
+    id: "market-street",
+    kind: "exterior",
+    visual: visual("market-street"),
+    colliders: marketStreetColliders,
+    occluders: marketStreetOccluders,
+    exits: [
+      exit(
+        "to-farm",
+        marketStreetTransitions,
+        "market-street-transition-1",
+        "farm",
+        "from-market-street",
+      ),
+      exit(
+        "to-apothecary-street",
+        marketStreetTransitions,
+        "market-street-transition-2",
+        "apothecary-street",
+        "from-market-street",
+      ),
+    ],
+    arrivals: {
+      "from-farm": spawnAt(marketStreetSpawns, "market-street-spawn-1"),
+      "from-apothecary-street": spawnAt(marketStreetSpawns, "market-street-spawn-2"),
     },
   },
   "forest-deep": {
@@ -298,6 +333,14 @@ export const NEW_WORLD_SCENES: Record<
         "apothecary-interior",
         "from-apothecary-street",
       ),
+      // The new road east, to the market street (2026-11-16).
+      exit(
+        "to-market-street",
+        apothecaryStreetTransitions,
+        "apothecary-street-transition-3",
+        "market-street",
+        "from-apothecary-street",
+      ),
     ],
     arrivals: {
       "from-apothecary-interior": spawnAt(
@@ -307,6 +350,10 @@ export const NEW_WORLD_SCENES: Record<
       "from-plaza": spawnAt(
         apothecaryStreetSpawns,
         "apothecary-street-spawn-2",
+      ),
+      "from-market-street": spawnAt(
+        apothecaryStreetSpawns,
+        "apothecary-street-spawn-3",
       ),
     },
   },
@@ -567,10 +614,19 @@ export const NEW_WORLD_SCENES: Record<
         "outskirts",
         "from-farm",
       ),
+      // The west road, to the market street (2026-11-16).
+      exit(
+        "to-market-street",
+        farmTransitions,
+        "farm-transition-3",
+        "market-street",
+        "from-farm",
+      ),
     ],
     arrivals: {
       "from-mill-farmland": spawnAt(farmSpawns, "farm-spawn-1"),
       "from-outskirts": spawnAt(farmSpawns, "farm-spawn-2"),
+      "from-market-street": spawnAt(farmSpawns, "farm-spawn-3"),
     },
   },
   "mill-farmland": {

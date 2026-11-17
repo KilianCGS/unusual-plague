@@ -1,13 +1,19 @@
-/* The same wooden frame and parchment as the inventory bar. Square, hard-edged. */
+/* The same wooden bar as the inventory (2026-11-16, Kilian: "the same style, parallel"): identical frame,
+   rivets, slot and baseline, holding ONE slot that is as big as an inventory slot. It sits on the right,
+   on the same line as the bar (same bottom edge, same height). */
 .dock {
+  /* A bit smaller than an inventory slot (60 against 78) and centred on the bar's height: the bar is
+     97 px tall with its 4 px margin, this panel 79, so its bottom edge is (97 - 79) / 2 above the bar's. */
+  --slot-size: 60px;
   position: absolute;
   right: 12px;
-  bottom: 12px;
+  bottom: 13px;
   z-index: 15;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 12px 9px;
+  justify-content: center;
+  margin: 0;
+  padding: 6px 8px 7px;
   font-family: var(--ui-font);
   color: #2b1a14;
   background-color: #4a3524;
@@ -30,13 +36,45 @@
   pointer-events: none;
 }
 
-/* The counter sits in a small parchment window set into the wood. */
+.dock::before,
+.dock::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  width: 6px;
+  height: 6px;
+  background: #a7adb3;
+  border: 1px solid #1c110c;
+  box-shadow: inset 1px 1px 0 #e3e6e9;
+}
+
+.dock::before {
+  left: 3px;
+}
+
+.dock::after {
+  right: 3px;
+}
+
+@media (max-height: 760px) {
+  .dock {
+    /* the short-window bar has 52 px slots (71 px tall): 44 here, centred the same way */
+    --slot-size: 44px;
+    bottom: 12px;
+  }
+}
+
+/* The parchment pocket: the number on top, the coins under it. */
 .window {
   position: relative;
+  box-sizing: border-box;
   display: flex;
+  width: var(--slot-size);
+  height: var(--slot-size);
+  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 3px 10px 4px 6px;
+  justify-content: center;
+  gap: 2px;
   background: #e0d1a9;
   border: 2px solid #2b1a14;
   box-shadow:
@@ -46,17 +84,28 @@
 
 /* A static picture of a few stacked coins (no animation). */
 .coin {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   image-rendering: pixelated;
+}
+
+@media (max-height: 760px) {
+  .coin {
+    width: 18px;
+    height: 18px;
+  }
+
+  .count {
+    font-size: 14px;
+  }
 }
 
 .count {
   display: inline-block;
   min-width: 2ch;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
-  text-align: right;
+  text-align: center;
   /* a number that changes bounces once (the element is re-created by its key) */
   animation: count-bump 0.32s steps(4);
 }

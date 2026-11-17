@@ -110,13 +110,13 @@ test("every treatment is a recipe output and each recipe is revealed by the case
 });
 
 test("each treatment can be made from what the world gives (shop, collectibles, trades, water)", () => {
-  const { MERCHANT_SHOP } = at("src/game/shop/shops.ts");
+  const { allEntriesForChapter } = at("src/game/shop/shops.ts");
   const { NPC_TRADES } = at("src/game/dialogue/npcTrades.ts");
   const { DECOR_ASSETS } = at("src/game/decor/decorAssets.ts");
   const { getComposition } = at("src/game/compositions/index.ts");
   const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
   const raw = new Set(["water"]);
-  for (const entry of MERCHANT_SHOP.entries) raw.add(entry.itemId);
+  for (const entry of allEntriesForChapter("chapter-3")) raw.add(entry.itemId);
   for (const trade of Object.values(NPC_TRADES)) for (const g of trade.grants) raw.add(g.itemId);
   for (const chapter of ["chapter-1", "chapter-2", "chapter-3"]) {
     for (const sceneId of Object.keys(WORLD_SCENES)) {

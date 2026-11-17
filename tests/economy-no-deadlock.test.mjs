@@ -42,7 +42,7 @@ const { getRequiredIngredients } = at("src/game/crafting/needs.ts");
 const { createEmptyInventory } = at("src/game/inventory/inventory.ts");
 const { getPatientDefinitions } = at("src/game/patients/patientRegistry.ts");
 const { PATIENT_PAYMENTS } = at("src/game/money/payments.ts");
-const { MERCHANT_SHOP } = at("src/game/shop/shops.ts");
+const { MERCHANT_SHOP, PRODUCE_STALL, DRAPER_STALL, BUTCHER_STALL, stockForChapter } = at("src/game/shop/shops.ts");
 const { STARTING_COINS } = at("src/game/money/money.ts");
 const { FARMER_SAMPLE_ID, FARMER_ANALYSIS_ID } = at("src/game/patients/farmerInvestigation.ts");
 const { NPC_TRADES } = at("src/game/dialogue/npcTrades.ts");
@@ -55,7 +55,13 @@ const DAYS = [
   ["chapter3-duster", "chapter3-path-miner", "chapter3-stonecutter"],
 ];
 const CHAPTERS = ["chapter-1", "chapter-2", "chapter-3"];
-const shopItems = MERCHANT_SHOP.entries.map((e) => ({ ...e, day: e.fromChapter ? CHAPTERS.indexOf(e.fromChapter) : 0 }));
+// The FINAL market (2026-11-16): the plaza merchant sells only sugar and salt; the three stalls of the
+// market street sell the rest. (Until the stalls are placed the plaza still lists cloth, onion, bone,
+// garlic and candle too; the model ignores them so it does not count that stock twice.) Oranges and animal fat are
+// left out: the fat is a free gift of the woodcutter. The oranges (Mill branches removed on 2026-11-16) are BOUGHT.
+const PLAZA_FINAL = MERCHANT_SHOP.entries.filter((e) => ["salt", "sugar"].includes(e.itemId));
+const STALLS = [PRODUCE_STALL, DRAPER_STALL, BUTCHER_STALL].flatMap((s) => s.entries).filter((e) => e.itemId !== "animal-fat");
+const shopItems = [...PLAZA_FINAL, ...STALLS].map((e) => ({ ...e, day: e.fromChapter ? CHAPTERS.indexOf(e.fromChapter) : 0 }));
 const shopIds = new Set(shopItems.map((e) => e.itemId));
 
 // the items of the shop each patient needs (the rest of the ingredients are free in the world)
@@ -66,6 +72,9 @@ const need = Object.fromEntries(patientIds.map((id) => {
   const raw = getRequiredIngredients(def.requiredTreatments, createEmptyInventory());
   return [id, raw.filter((n) => shopIds.has(n.itemId)).map((n) => [n.itemId, n.quantity])];
 }));
+// the tavern case gets its milk from the farm woman for ONE orange (2026-11-16: the Mill oranges are gone,
+// so that orange is bought at the market stall like the others)
+need["tavern-patient"].push(["orange", 1]);
 // the voluntary errands (from Day 2, once each): the quarry broth and the Day 2 neighbours'.
 // Each one: what it needs from the shop, what it pays in coins, what it hands over besides.
 const ERRANDS = Object.values(NPC_TRADES).filter((t) => t.ask).map((t) => ({
@@ -81,12 +90,12 @@ test("the model reads the real data: every patient pays, and what each one needs
   for (const id of patientIds) assert.ok(PATIENT_PAYMENTS[id] > 0, id);
   assert.deepEqual(Object.fromEntries(Object.entries(need).filter(([, v]) => v.length)), {
     "baker-husband": [["cloth", 1]],
-    "tavern-patient": [["salt", 1]],
+    "tavern-patient": [["salt", 1], ["orange", 1]], // + the orange of the farm woman's trade (milk)
     "injured-miner": [["cloth", 1]],
     "chapter2-blacksmith": [["cloth", 1]],
-    "chapter2-woodcutter": [["sugar", 1]],
+    "chapter2-woodcutter": [["orange", 1], ["sugar", 1]],
     "chapter3-duster": [["garlic", 1]],
-    "chapter3-path-miner": [["sugar", 1], ["bone", 1], ["salt", 1]],
+    "chapter3-path-miner": [["orange", 1], ["sugar", 1], ["bone", 1], ["salt", 1]],
     "chapter3-stonecutter": [["cloth", 1]],
   });
   assert.equal(ERRANDS.length, 5, "the Day 1 fisherman + the quarry broth + the three Day 2 errands");
@@ -110,6 +119,9 @@ function derived(s) {
   }
   // the Witch of the glade gives a bone on Day 3 (free, once): modelled from the moment Day 2 is over
   if (DAYS[1].every((id) => s.cured.has(id))) held.bone += 1;
+  // the baker's sugar (2026-11-16): one, on the first Day 2 talk after the flour offer; modelled from the
+  // moment her husband is cured
+  if (s.cured.has("baker-husband")) held.sugar += 1;
   ERRANDS.forEach((e, i) => {
     if (!(s.errands & (1 << i))) return;
     coins += e.coins;
@@ -135,7 +147,8 @@ function canFinish(s) {
   const moves = [];
   // buy something the merchant has by now
   shopItems.forEach((e, i) => {
-    if (e.day <= day && s.bought[i] < e.stock && coins >= e.price) {
+    // (the daily cap: what can have been bought by today, see ShopEntry.capByChapter)
+    if (e.day <= day && s.bought[i] < stockForChapter(e, CHAPTERS[day]) && coins >= e.price) {
       const bought = [...s.bought]; bought[i]++;
       moves.push({ ...s, bought });
     }
@@ -187,7 +200,8 @@ test("Days 1-3: every ingredient the merchant does not sell has enough sources",
   // what the one-time trades take (the farm woman's orange and jar, the Witch's mushroom)
   for (const [key, trade] of Object.entries(NPC_TRADES)) {
     if (NPC_TRADES[key].ask) continue; // errands are paid in preparations, not raw
-    for (const c of trade.consumes) add(demand, c.itemId, c.quantity);
+    // (what a stall sells is covered by the model above: the farm woman's orange is BOUGHT)
+    for (const c of trade.consumes) if (!shopIds.has(c.itemId)) add(demand, c.itemId, c.quantity);
   }
   const supply = new Map();
   const seen = new Set();

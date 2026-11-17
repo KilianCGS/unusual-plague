@@ -75,7 +75,7 @@ const permutations = (list) =>
       );
 
 test("the V1 recipes, the two patient recipes and Milk with honey exist with the right stations and sizes", () => {
-  assert.equal(RECIPES.length, 26);
+  assert.equal(RECIPES.length, 23); // 26 before 2026-11-16 removed 3 recipes nothing consumed
   assert.deepEqual(STATION_MAX_INPUTS, { manual: 2, fire: 3, mortar: 1, chop: 1 });
   assert.equal(recipeById("manual.disinfected-bandage").inputs.length, 2);
   assert.equal(recipeById("fire.mushroom-soup").inputs.length, 3);
@@ -601,10 +601,10 @@ test("22. the Apothecary places them: one stove zone and one table zone (details
   );
 });
 
-// ------------------------------------------------- THE FLASK OF WATER (2 USES)
-// One filling of the flask is water for both of Patient 1's treatments. It is
-// plain "Water x2" in the inventory: the filling used up the empty flask, and
-// the craft that uses the LAST unit gives the empty flask back.
+// ------------------------------------------------- THE FLASKS OF WATER (ONE TO ONE)
+// 2026-11-16 (Kilian): flasks and water are one to one. Each unit of water fills (uses up) one empty flask,
+// so the two flasks of the chest give the "Water x2" Patient 1 needs, and each flask comes back as soon as
+// its water is used.
 const story = at("src/game/dialogue/storyInteractions.ts");
 const { CHAPTER1_PATIENTS, BAKER_HUSBAND_ID } = at(
   "src/game/patients/chapter1Patients.ts",
@@ -623,7 +623,7 @@ const river = (inventory) =>
     "river",
   );
 
-// the river: take the empty flask, give both units (what GameWorld applies)
+// the river: take one empty flask per unit, give the units (what GameWorld applies)
 function fillFlask(state) {
   let next = state;
   for (const effect of river(state).effects) {
@@ -635,13 +635,17 @@ function fillFlask(state) {
   return next;
 }
 
-test("filling the empty flask gives two uses of water and uses the flask up", () => {
-  const filled = fillFlask(stock([["empty-flask", 1]]));
+test("filling the empty flasks gives one water per flask and uses the flasks up", () => {
+  const filled = fillFlask(stock([["empty-flask", 2]]));
   assert.equal(count(filled, "water"), 2);
   assert.equal(count(filled, "empty-flask"), 0);
-  // the river gives nothing more while both uses are carried (no extra water)
+  // with ONE flask he gets ONE water (never more water than flasks)
+  const single = fillFlask(stock([["empty-flask", 1]]));
+  assert.equal(count(single, "water"), 1);
+  assert.equal(count(single, "empty-flask"), 0);
+  // the river gives nothing more while the water he needs is carried (no extra water)
   assert.deepEqual(river(filled).effects, []);
-  // not even with a second flask: it never creates flasks or water out of nothing
+  // not even with another flask: it never creates flasks or water out of nothing
   assert.deepEqual(river(inv.addItem(filled, "empty-flask", 1)).effects, []);
   // without the flask the river does nothing
   assert.deepEqual(river(stock([])).effects, []);
@@ -651,10 +655,10 @@ for (const [name, order] of [
   ["Infusion, then Cold cloth", [INFUSION, COLD_CLOTH]],
   ["Cold cloth, then Infusion", [COLD_CLOTH, INFUSION]],
 ]) {
-  test(`${name}: water remains after the first craft and the empty flask returns with the second`, () => {
+  test(`${name}: each flask comes back as soon as its water is used`, () => {
     let state = fillFlask(
       stock([
-        ["empty-flask", 1],
+        ["empty-flask", 2],
         ["medicinal-herb", 1],
         ["cloth", 1],
       ]),
@@ -664,16 +668,16 @@ for (const [name, order] of [
     const first = make(state, order[0]);
     assert.equal(first.kind, "success");
     state = first.inventory;
-    // one use left, no flask yet
+    // one water left, and the first flask is already back
     assert.equal(count(state, "water"), 1);
-    assert.equal(count(state, "empty-flask"), 0);
+    assert.equal(count(state, "empty-flask"), 1);
 
     const second = make(state, order[1]);
     assert.equal(second.kind, "success");
     state = second.inventory;
-    // both treatments are made, the water is gone and the empty flask is back
+    // both treatments are made, the water is gone and both flasks are back
     assert.equal(count(state, "water"), 0);
-    assert.equal(count(state, "empty-flask"), 1);
+    assert.equal(count(state, "empty-flask"), 2);
     assert.equal(count(state, "medicinal-infusion"), 1);
     assert.equal(count(state, "cold-cloth"), 1);
     assert.ok(inv.isValidInventory(state));
@@ -684,7 +688,7 @@ test("both orders end exactly the same", () => {
   const run = (order) => {
     let state = fillFlask(
       stock([
-        ["empty-flask", 1],
+        ["empty-flask", 2],
         ["medicinal-herb", 1],
         ["cloth", 1],
       ]),
@@ -703,7 +707,7 @@ test("both orders end exactly the same", () => {
 test("only a successful craft uses the water: an invalid recipe, the wrong station or no space change nothing", () => {
   const state = fillFlask(
     stock([
-      ["empty-flask", 1],
+      ["empty-flask", 2],
       ["medicinal-herb", 1],
       ["cloth", 1],
     ]),
@@ -754,14 +758,14 @@ test("only a successful craft uses the water: an invalid recipe, the wrong stati
   assert.equal(count(done.inventory, "empty-flask"), 1);
 });
 
-test("the flask only comes back with the LAST water; nothing else has a vessel", () => {
+test("a flask comes back for each water used; nothing else has a vessel", () => {
   const three = stock([
     ["water", 3],
     ["cloth", 1],
   ]);
   const out = make(three, COLD_CLOTH);
   assert.equal(count(out.inventory, "water"), 2);
-  assert.equal(count(out.inventory, "empty-flask"), 0);
+  assert.equal(count(out.inventory, "empty-flask"), 1);
   // crafting without water never produces a flask
   const bandage = cr.combine(
     stock([
@@ -787,9 +791,9 @@ test("the flask only comes back with the LAST water; nothing else has a vessel",
   );
 });
 
-test("all 26 catalog preparations have unique recipes; every recipe fits its actual station", () => {
-  assert.equal(new Set(RECIPES.map(r => r.output.itemId)).size, 26);
-  assert.equal(new Set(RECIPES.map(r => r.id)).size, 26);
+test("all 23 catalog preparations have unique recipes; every recipe fits its actual station", () => {
+  assert.equal(new Set(RECIPES.map(r => r.output.itemId)).size, 23);
+  assert.equal(new Set(RECIPES.map(r => r.id)).size, 23);
   for (const recipe of RECIPES) {
     assert.ok(recipe.inputs.reduce((sum,input)=>sum+input.quantity,0)<=STATION_MAX_INPUTS[recipe.station]);
     assert.ok(ITEMS[recipe.output.itemId]);
@@ -870,7 +874,7 @@ test("ingredient discovery teaches specific recipes permanently, including their
   assert.ok(!flour.has('fire.balsamic-syrup'));
   for(const ids of Object.values(RECIPE_DISCOVERY_ITEMS)) for(const id of ids)assert.ok(recipeById(id));
   const all=learnRecipesFromItems(empty,Object.keys(RECIPE_DISCOVERY_ITEMS));
-  assert.equal(all.size,26,'existing ingredients can eventually reveal the whole catalog');
+  assert.equal(all.size,23,'existing ingredients can eventually reveal the whole catalog');
 });
 
 test("receiving or crafting a preparation teaches its recipe and prerequisite without a patient gate", () => {

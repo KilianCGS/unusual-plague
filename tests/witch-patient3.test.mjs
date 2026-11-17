@@ -627,7 +627,7 @@ test("P3 4. Cloth: the merchant sells it (two coins each, four in stock), whatev
   }
   const shops = at("src/game/shop/shops.ts");
   const money = at("src/game/money/money.ts");
-  const shop = shops.getShop(MERCHANT);
+  const shop = shops.getShop("chapter1.market.draper"); // the cloth moved to the market street (2026-11-16)
   const cloth = shop.entries[0];
   // buying is all or nothing: the coin goes only with the cloth
   let claimed = new Set();

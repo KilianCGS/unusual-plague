@@ -408,151 +408,41 @@ test("11b. there is NO physical jar: no take.empty-jar anywhere, no tavern inter
 });
 
 // ------------------------------------------------------------ ORANGES
-test("12-15. ONE orange branch gives Orange x3 in one slot; the second branch stays as decoration", () => {
+test("12-15. (2026-11-16) the Mill orange branches are gone: oranges are bought at the market stall; the branch ART stays registered", () => {
+  // the asset still exists (the art is kept) and still gives three, but it is placed nowhere
   const collectible = getDecorAsset("orange-world");
   assert.equal(collectible.collectibleItemId, "orange");
   assert.equal(collectible.collectibleQuantity, 3);
-  const ambient = getDecorAsset("orange-world-ambient");
-  assert.equal(ambient.collectibleItemId, undefined);
-  assert.deepEqual(ambient.sprite, collectible.sprite, "same art");
-  const composition = getComposition("mill-farmland", "chapter-1");
-  const one = composition.instances.find(
-    (i) => i.instanceId === "mill-farmland-orange-world-01",
-  );
-  const two = composition.instances.find(
-    (i) => i.instanceId === "mill-farmland-orange-world-02",
-  );
-  assert.equal(one.assetId, "orange-world");
-  assert.deepEqual([one.x, one.y], [1844, 872], "the collectible branch is the one on the ground by the bee path");
-  assert.equal(two.assetId, "orange-world-ambient");
-  assert.deepEqual([two.x, two.y], [860, 483], "and the decoration is the one by the house");
-  const resolved = resolveDecorInstances(
-    composition.instances,
-    getChapterInteractions("chapter-1"),
-  );
-  // both are still DRAWN, only one can be picked up, and it gives three
-  assert.ok(
-    resolved.sprites.some((s) => s.instance.instanceId === two.instanceId),
-  );
-  const orangeZones = resolved.zones.filter(
-    (z) => z.interactionId === "collect.orange",
-  );
-  assert.equal(orangeZones.length, 1);
-  assert.equal(resolved.zoneInstanceIds.get(orangeZones[0].id), one.instanceId);
-  assert.equal(resolved.zoneItemQuantities.get(orangeZones[0].id), 3);
-  // after the pick-up the group is gone and nothing else gives oranges
-  const collected = resolveDecorInstances(
-    composition.instances,
-    getChapterInteractions("chapter-1"),
-    new Set([one.instanceId]),
-  );
-  assert.equal(
-    collected.zones.filter((z) => z.interactionId === "collect.orange").length,
-    0,
-  );
-  // one slot
+  assert.equal(getDecorAsset("orange-world-ambient").collectibleItemId, undefined);
+  for (const chapter of ["chapter-1", "chapter-2", "chapter-3"]) {
+    const composition = getComposition("mill-farmland", chapter);
+    assert.ok(!composition.instances.some((i) => /orange-world/.test(i.assetId)), `${chapter} has no orange branch`);
+  }
+  // oranges come from the produce stall of the market street, from Day 1
+  const shops = at("src/game/shop/shops.ts");
+  const orange = shops.shopForChapter(shops.getShop("chapter1.market.produce"), "chapter-1").entries.find((e) => e.itemId === "orange");
+  // 1 coin, ONE on Day 1 (daily cap: 1, 2, 3 by the end of each day), three in all
+  assert.deepEqual([orange.price, orange.stock], [1, 1]);
+  assert.equal(shops.getShop("chapter1.market.produce").entries.find((e) => e.itemId === "orange").stock, 3);
+  // a stack of oranges takes one slot
   const got = inv.addItem(inv.createEmptyInventory(), "orange", 3);
   assert.equal(inv.countOccupiedSlots(got), 1);
   assert.equal(inv.countItem(got, "orange"), 3);
-  // the pick-up path uses the quantity and gives the group's remark
+  // the pick-up path still uses the quantity and the group's remark (kept for any future group)
   const game = read("src/game/world/GameWorld.tsx");
   assert.ok(game.includes("source.quantity ?? 1"));
   assert.ok(game.includes("collectBarkCopy"));
-  assert.equal(
-    collectBarkCopy.es.orange,
-    "Tres de una vez. Me ahorro unas palabras con el agricultor.",
-  );
-  assert.equal(
-    collectBarkCopy.en.orange,
-    "Three at once. Saves me a few words with the farmer.",
-  );
   // the other collectibles still give one
   for (const asset of ["mushroom-world", "medicinal-herb-dev"]) {
     assert.equal(getDecorAsset(asset).collectibleQuantity, undefined, asset);
   }
 });
 
-test("12b. the orange group goes through the REAL runtime path: sprite -> collectible zone -> [E] available -> item and quantity -> collected -> gone", () => {
+test("12b. (2026-11-16) the Mill has no orange to pick up: no [E] zone gives oranges in any scene of Day 1", () => {
   const composition = getComposition("mill-farmland", "chapter-1");
-  const interactions = getChapterInteractions("chapter-1");
-  const resolved = resolveDecorInstances(composition.instances, interactions);
-  const scene = WORLD_SCENES["mill-farmland"];
-  const one = "mill-farmland-orange-world-01";
-  const two = "mill-farmland-orange-world-02";
-  // the visible sprites, both, with the authored positions
-  const sprite = (id) =>
-    resolved.sprites.find((s) => s.instance.instanceId === id);
-  assert.deepEqual(
-    [sprite(one).instance.x, sprite(one).instance.y],
-    [1844, 872],
-  );
-  assert.deepEqual(
-    [sprite(two).instance.x, sprite(two).instance.y],
-    [860, 483],
-  );
-  assert.equal(sprite(one).asset.collectibleItemId, "orange");
-  assert.equal(sprite(two).asset.collectibleItemId, undefined);
-  // the scene builds its zones exactly like ExteriorScene: scene zones, then decor
-  const zones = [
-    ...getSceneInteractionZones("mill-farmland"),
-    ...resolved.zones,
-  ];
-  const feet = (x, y) => ({ x: x - 6, y: y - 19, width: 12, height: 12 });
-  const colliders = [...scene.colliders, ...resolved.colliders];
-  const standable = (x, y) =>
-    !colliders.some((c) => rectsIntersect(feet(x, y), c));
-  // the Doctor standing on / around the sprite of the main group gets [E] ...
-  const spots = [
-    [1844, 889],
-    [1831, 890],
-    [1824, 859],
-    [1884, 919],
-  ].filter(([x, y]) => standable(x, y));
-  assert.ok(spots.length >= 3, "he can really stand there");
-  for (const [x, y] of spots) {
-    const zone = findAvailableInteraction(zones, feet(x, y), "south");
-    assert.equal(zone?.interactionId, "collect.orange", `${x},${y}`);
-    assert.equal(resolved.zoneInstanceIds.get(zone.id), one);
-    // what the scene reports to GameWorld on E: the item and the quantity
-    assert.equal(resolved.zoneItemIds.get(zone.id), "orange");
-    assert.equal(resolved.zoneItemQuantities.get(zone.id), 3);
-  }
-  // ... and around the ambient branch he gets nothing
-  for (const [x, y] of [
-    [860, 491],
-    [846, 483],
-    [876, 471],
-  ]) {
-    // (the beekeeper's own zone may reach there: it is not an orange)
-    assert.notEqual(
-      findAvailableInteraction(zones, feet(x, y), "south")?.interactionId,
-      "collect.orange",
-    );
-  }
-  assert.ok(
-    !resolved.zones.some((z) => resolved.zoneInstanceIds.get(z.id) === two),
-  );
-  // one pick-up: it is gone, the ambient branch stays drawn, nothing else gives oranges
-  const afterPick = resolveDecorInstances(
-    composition.instances,
-    interactions,
-    new Set([one]),
-  );
-  assert.ok(!afterPick.sprites.some((s) => s.instance.instanceId === one));
-  assert.ok(afterPick.sprites.some((s) => s.instance.instanceId === two));
-  assert.equal(
-    findAvailableInteraction(
-      [...getSceneInteractionZones("mill-farmland"), ...afterPick.zones],
-      feet(860, 500),
-      "south",
-    ),
-    null,
-  );
-  // GameWorld is what turns the zone report into the pick-up: quantity, one slot, bark
-  const game = read("src/game/world/GameWorld.tsx");
-  assert.ok(game.includes("if (source.itemId && source.instanceId)"));
-  assert.ok(game.includes("source.quantity ?? 1"));
-  assert.ok(game.includes("markCollected(current, source.instanceId!)"));
+  const resolved = resolveDecorInstances(composition.instances, getChapterInteractions("chapter-1"));
+  assert.equal(resolved.zones.filter((z) => z.interactionId === "collect.orange").length, 0);
+  assert.ok(!resolved.sprites.some((s) => /orange/.test(s.instance.assetId)));
 });
 
 const farmFacts = (pairs, claimed = []) =>
@@ -1092,7 +982,7 @@ function reachability(sceneId) {
 test("24. everything Patient 2 needs can be reached on foot, and the circuit has no broken exits", () => {
   const needs = {
     "tavern-interior": [BARTENDER, PATIENT],
-    "mill-farmland": ["collect.orange", BEE],
+    "mill-farmland": [BEE], // (the orange branch was removed on 2026-11-16: oranges are bought)
     farm: [FARM],
     "mine-interior": ["collect.mushroom"],
     outskirts: ["gather.water"],

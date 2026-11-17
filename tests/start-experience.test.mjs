@@ -279,16 +279,17 @@ test("a new game: no Empty flask in the pocket, ONE in the Storage chest", () =>
   assert.equal(chest.capacity, 10);
   assert.equal(inv.countItem(pocket, "empty-flask"), 0);
   assert.equal(inv.countOccupiedSlots(pocket), 0);
-  assert.equal(inv.countItem(chest, "empty-flask"), 1);
+  // 2026-11-16 (Kilian): TWO flasks, one stack (the river gives 2 waters, so he carries 2 flasks)
+  assert.equal(inv.countItem(chest, "empty-flask"), 2);
   assert.equal(inv.countOccupiedSlots(chest), 1);
-  // exactly one between the two
+  // exactly two between the two
   assert.equal(
     inv.countItem(pocket, "empty-flask") + inv.countItem(chest, "empty-flask"),
-    1,
+    2,
   );
   // taking it is the normal transfer, nothing special
   const taken = transferStack(chest, pocket, "empty-flask");
-  assert.equal(inv.countItem(taken.destination, "empty-flask"), 1);
+  assert.equal(inv.countItem(taken.destination, "empty-flask"), 2);
   assert.equal(inv.countItem(taken.source, "empty-flask"), 0);
 });
 

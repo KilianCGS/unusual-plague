@@ -511,7 +511,6 @@ test("dev start: chapter 2, the Doctor's Room, Day 1 finished, tutorial done, th
     "forest-medicinal-herb-dev-01",
     "mine-interior-mushroom-world-01",
     "mine-interior-mushroom-world-02",
-    "mill-farmland-orange-world-01",
   ]) {
     assert.ok(start.collected.has(id), id);
   }

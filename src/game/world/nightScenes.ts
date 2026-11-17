@@ -32,6 +32,7 @@ export const NIGHT_GRADED_OUTDOORS: readonly string[] = [
   "quarry",
   "forest-deep",
   "forest-glade",
+  "market-street",
 ];
 
 // The grade for the scenes that have no painting: dark, cool, a little desaturated.

@@ -154,8 +154,10 @@ test('carried intermediates reduce raw supply requests; flour comes from the sac
   assert.deepEqual(baker.effects,[{type:'claim-reward',rewardId:FLOUR}],'the baker only allows the sack; she gives no honey');
   assert.deepEqual(interact('chapter2.mill.beekeeper',facts).effects,[],'the carried paste already covers the honey');
   assert.deepEqual(interact('chapter2.mill.beekeeper',{...facts,inventory:createEmptyInventory()}).effects,[{type:'give-item',itemId:'honey',quantity:1}]);
+  // 2026-11-16: her NEXT talk gives one sugar (own flag); once that is claimed she has nothing more to give
   const second=interact('chapter2.bakery.baker',{...facts,claimedRewards:new Set([FLOUR])});
-  assert.equal(second,null);
+  assert.deepEqual(second.effects,[{type:'give-item',itemId:'sugar',quantity:1},{type:'claim-reward',rewardId:'chapter2.bakery.baker.sugar'}]);
+  assert.equal(interact('chapter2.bakery.baker',{...facts,claimedRewards:new Set([FLOUR,'chapter2.bakery.baker.sugar'])}),null);
   assert.deepEqual(interact(SACK,{...facts,claimedRewards:new Set([FLOUR])}).effects,[{type:'give-item',itemId:'flour',quantity:1}]);
   assert.deepEqual(interact(SACK,facts).effects,[]);
 });

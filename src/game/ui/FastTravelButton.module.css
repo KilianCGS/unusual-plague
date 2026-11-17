@@ -1,11 +1,18 @@
 /* Fast travel chip: the same paper-and-dark-outline family as the Book tabs,
-   small, top-right, below every interface and the black screen of a scene
-   change. */
-.button {
-  position: fixed;
+   small, top-right of the GAME FRAME (inside the picture, 2026-11-16), below every interface and the
+   black screen of a scene change. */
+.anchor {
+  position: absolute;
   top: 14px;
   right: 14px;
   z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button {
+  position: relative;
   padding: 2px;
   border: 0;
   border-radius: 0;
@@ -73,9 +80,54 @@
   cursor: default;
 }
 
-.button[data-ready="true"]:hover .face,
-.button:focus-visible .face {
-  background: #f4e9c8;
+/* While the tutorial talks about it: the chip BLINKS and a yellow arrow under it bobs, pointing up at it
+   (2026-11-16, Kilian), until the Doctor presses Enter. Stepped animations, like the rest of the pixel UI. */
+.glow {
+  animation: fast-travel-blink 0.9s steps(1) infinite;
+}
+
+.glow .face {
+  background: #f4e0a0;
+}
+
+@keyframes fast-travel-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.arrow {
+  width: 0;
+  height: 0;
+  margin-top: 8px;
+  border-right: 13px solid transparent;
+  border-bottom: 18px solid #ffd34e;
+  border-left: 13px solid transparent;
+  /* a dark pixel outline so it reads on any ground */
+  filter: drop-shadow(2px 0 0 #2b1a14) drop-shadow(-2px 0 0 #2b1a14) drop-shadow(0 2px 0 #2b1a14)
+    drop-shadow(0 -2px 0 #2b1a14);
+  animation: fast-travel-arrow 0.7s steps(4) infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes fast-travel-arrow {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow,
+  .arrow {
+    animation: none;
+  }
 }
 
 /* The line shown on the black screen: above the black veil (z 30). */

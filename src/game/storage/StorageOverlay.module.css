@@ -5,8 +5,11 @@
   inset: 0;
   z-index: 1000;
   display: flex;
-  align-items: center;
+  /* Higher up (2026-11-16, Kilian): near the top of the window, not in the middle, so the note under it
+     and the world stay visible. */
+  align-items: flex-start;
   justify-content: center;
+  padding-top: 5vh;
   background: rgba(0, 0, 0, 0.45);
   font-family: var(--ui-font);
 }

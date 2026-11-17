@@ -83,10 +83,10 @@ export const tutorialCopy: Record<
     },
     "chest-interact": {
       title: ["Pulsa ", { action: "interact" }, " para interactuar."],
-      body: "Con {interact} hablas con las personas y usas los objetos del mundo.\nPrueba con el cofre: ábrelo y toma el frasco vacío.",
+      body: "Con {interact} hablas con las personas y usas los objetos del mundo.\nPrueba con el cofre: ábrelo y toma los frascos vacíos.",
     },
     "take-flask": {
-      title: ["Selecciona el frasco vacío para llevarlo contigo."],
+      title: ["Selecciona los frascos vacíos para llevarlos contigo."],
       body: "Lo necesitarás para recoger muestras.",
     },
     bar: {
@@ -172,10 +172,10 @@ export const tutorialCopy: Record<
     },
     "chest-interact": {
       title: ["Press ", { action: "interact" }, " to interact."],
-      body: "With {interact} you talk to people and use the objects of the world.\nTry it on the chest: open it and take the empty flask.",
+      body: "With {interact} you talk to people and use the objects of the world.\nTry it on the chest: open it and take the empty flasks.",
     },
     "take-flask": {
-      title: ["Select the empty flask to carry it with you."],
+      title: ["Select the empty flasks to carry them with you."],
       body: "You will need it to collect samples.",
     },
     bar: {

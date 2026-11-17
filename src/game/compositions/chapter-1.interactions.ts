@@ -98,6 +98,31 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.plaza.sittingVillager",
     zone: { offsetX: -32, offsetY: -79, width: 59, height: 95 },
   },
+  // THE MARKET STREET (2026-11-16): the three stalls open their shop. The zones are a DEFAULT, kept SMALL
+  // (about 70% of the stall's width and only 12 units below its anchor, Kilian: "less interaction distance
+  // so it does not get in the way of talking to the people in front of the stalls"): adjust them in the
+  // Decorator.
+  "market-street-market-stall-produce-01": {
+    interactionId: "chapter1.market.produce",
+    zone: { offsetX: -34, offsetY: -45, width: 68, height: 57 },
+  },
+  "market-street-market-stall-draper-01": {
+    interactionId: "chapter1.market.draper",
+    zone: { offsetX: -32, offsetY: -42, width: 64, height: 54 },
+  },
+  "market-street-market-stall-butcher-01": {
+    interactionId: "chapter1.market.butcher",
+    zone: { offsetX: -35, offsetY: -46, width: 70, height: 58 },
+  },
+  // The two villagers in front of the stalls (2026-11-16); the zone is the standing villager's, as on the plaza.
+  "market-street-villager-back-man-01": {
+    interactionId: "chapter1.market.customerMan",
+    zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },
+  },
+  "market-street-villager-back-old-01": {
+    interactionId: "chapter1.market.customerOld",
+    zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },
+  },
   "plaza-cat-01": {
     interactionId: "chapter1.plaza.cat",
     zone: { offsetX: -33, offsetY: -64, width: 64, height: 80 },
@@ -147,19 +172,15 @@ export const chapter1Interactions: Record<string, DecorInteraction> = {
     interactionId: "chapter1.tavernStreet.seller",
     zone: { offsetX: 122, offsetY: -35, width: 119, height: 27 },
   },
-  // The stonecutter resting on the ground at the quarry camp (he gives the coal; he used to be the
-  // man seen from behind, hence the id). The zone is the seated man's silhouette grown by 16.
-  "quarry-villager-back-man-01": {
+  // The stonecutter resting on the ground at the quarry camp (he gives the coal). The zone is the seated
+  // man's silhouette grown by 16. (2026-11-16: new id in Kilian's new quarry camp; it was quarry-villager-back-man-01.)
+  "quarry-stonecutter-resting-01": {
     interactionId: "chapter1.quarry.backMan",
     zone: { offsetX: -42, offsetY: -90, width: 84, height: 106 },
   },
   // The rest of the quarry camp (2026-11-15). Zones by analogy with the same sprites elsewhere
   // (the woman is the tavern street's villager-woman-02, the shovel man stands like the back man, the
   // seated one like the smithy street's seated villager): adjust in the Decorator if needed.
-  "quarry-villager-woman-02-01": {
-    interactionId: "chapter1.quarry.woman",
-    zone: { offsetX: -36, offsetY: -95, width: 64, height: 111 },
-  },
   "quarry-stonecutter-shovel-01": {
     interactionId: "chapter1.quarry.stonecutterShovel",
     zone: { offsetX: -33, offsetY: -95, width: 60, height: 111 },

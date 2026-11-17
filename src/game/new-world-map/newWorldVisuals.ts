@@ -10,6 +10,7 @@ import { outskirtsColliders } from "./geometry/outskirtsGeometry";
 import { plazaColliders } from "./geometry/plazaGeometry";
 import { quarryColliders } from "./geometry/quarryGeometry";
 import { forestGladeColliders } from "./geometry/forestGladeGeometry";
+import { marketStreetColliders } from "./geometry/marketStreetGeometry";
 import { smithyStreetColliders } from "./geometry/smithyStreetGeometry";
 import { tavernStreetColliders } from "./geometry/tavernStreetGeometry";
 
@@ -180,6 +181,26 @@ export const NEW_WORLD_VISUALS: DevScene[] = [
     initialAssetY: 590,
     logicalUnitsPerAssetPixel: 1,
     colliders: forestGladeColliders,
+  },
+  // The market street (2026-11-16): between the apothecary and the farm; the three stalls go under its
+  // awnings. A 1835x674 panorama, copied unmodified. 0.48 unit per asset pixel gives a 881x324 world: it
+  // was first set at 1.2 and the Doctor looked the size of a flower pot; 0.4 made him too big, so +20%
+  // (the geometry is rescaled each time to stay on the same pixels). Kilian can tune it.
+  {
+    id: "market-street",
+    label: "Calle del mercado (nuevo mundo)",
+    backgroundSrc: `${DIR}/market-street-background.png`,
+    assetWidth: 1835,
+    assetHeight: 674,
+    initialAssetX: 200,
+    initialAssetY: 520,
+    logicalUnitsPerAssetPixel: 0.48,
+    // 1.7 (2026-11-16, Kilian: "the market fills almost the whole screen, the inventory keeps its size"): the
+    // 881x324 world is small, so with the shared zoom it showed as a small strip in the window and the HUD
+    // (a fixed size) covered it. Zoomed 1.7x the frame fills the window and the street and its people look
+    // bigger, while the inventory and coins keep their size (hudScale 1). Tune all three live in /dev/market-test.
+    zoomMultiplier: 1.7,
+    colliders: marketStreetColliders,
   },
 ];
 

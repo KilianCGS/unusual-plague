@@ -132,7 +132,8 @@ export const BEEKEEPER_INSTANCE_ID = "mill-farmland-beekeeper-01";
 // The injured miner inside the mine, the man at the quarry (seen from behind) who has
 // the coal, and Witch at the bar.
 export const INJURED_MINER_INSTANCE_ID = "mine-interior-injured-miner-01";
-export const COAL_GIVER_INSTANCE_ID = "quarry-villager-back-man-01";
+// (2026-11-16: the stonecutter resting on the ground of the new quarry camp; it used to be the man seen from behind)
+export const COAL_GIVER_INSTANCE_ID = "quarry-stonecutter-resting-01";
 export const WITCH_INSTANCE_ID = "tavern-interior-witch-tavern-sitting-01";
 
 // The placed characters that show the "!". Derived from the cases, the claimed

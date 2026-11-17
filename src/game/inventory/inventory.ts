@@ -29,6 +29,24 @@ export function createEmptyInventory(
   return { capacity, slots: Array.from({ length: capacity }, () => null) };
 }
 
+// The seamstress's backpack (Day 2): the same inventory with `extra` more empty
+// slots at the end, so what is carried keeps its place.
+export function growInventory(
+  inventory: InventoryState,
+  extra: number = 1,
+): InventoryState {
+  // A backpack only ever adds whole slots; anything else leaves the inventory as it is.
+  if (!Number.isInteger(extra) || extra <= 0) {
+    return inventory;
+  }
+
+  return {
+    ...inventory,
+    capacity: inventory.capacity + extra,
+    slots: [...inventory.slots, ...Array.from({ length: extra }, () => null)],
+  };
+}
+
 export function countOccupiedSlots(inventory: InventoryState): number {
   return inventory.slots.filter((slot) => slot !== null).length;
 }

@@ -173,14 +173,14 @@ export function craft(
     next = next ? removeItem(next, itemId, quantity) : null;
   }
 
-  // A vessel comes back when the last unit it held is used up: a flask of
-  // water gives two uses, and the empty flask returns with the second. It is
-  // part of the same transaction, so it needs room like the output does.
-  for (const { itemId } of recipe.inputs) {
+  // A vessel comes back as the unit it held is used up (2026-11-16, Kilian: flasks and water are one to one):
+  // each unit of water used returns its empty flask. It is part of the same transaction, so it needs room
+  // like the output does.
+  for (const { itemId, quantity } of recipe.inputs) {
     const container = getItem(itemId)?.container;
 
-    if (next && container && countItem(next, itemId) === 0) {
-      next = addItem(next, container, 1);
+    if (next && container) {
+      next = addItem(next, container, quantity);
     }
   }
 

@@ -211,6 +211,112 @@ export const chapter1Compositions: DecorComposition[] = [
     ]
   },
   {
+    "sceneId": "market-street",
+    "chapterId": "chapter-1",
+    "instances": [
+      {
+        "instanceId": "market-street-market-stall-produce-01",
+        "assetId": "market-stall-produce",
+        "x": 411,
+        "y": 229,
+        "scale": 0.89,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "market-street-market-stall-draper-01",
+        "assetId": "market-stall-draper",
+        "x": 557,
+        "y": 227,
+        "scale": 0.84,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "market-street-market-stall-butcher-01",
+        "assetId": "market-stall-butcher",
+        "x": 231,
+        "y": 227,
+        "scale": 0.91,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "market-street-villager-back-man-01",
+        "assetId": "villager-back-man",
+        "x": 264,
+        "y": 254,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "market-street-villager-back-old-01",
+        "assetId": "villager-back-old",
+        "x": 375,
+        "y": 254,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "market-street-field-mouse-01",
+        "assetId": "field-mouse",
+        "x": 742,
+        "y": 178,
+        "scale": 0.69,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "market-street-candle-flame-01",
+        "assetId": "candle-flame",
+        "x": 141,
+        "y": 113,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "market-street-candle-flame-02",
+        "assetId": "candle-flame",
+        "x": 302,
+        "y": 131,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "market-street-candle-flame-03",
+        "assetId": "candle-flame",
+        "x": 646,
+        "y": 112,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "market-street-cat-01",
+        "assetId": "cat",
+        "x": 194,
+        "y": 129,
+        "scale": 0.64,
+        "flipX": true,
+        "colliderEnabled": true,
+        "zOffset": 0
+      }
+    ]
+  },
+  {
     "sceneId": "mill-farmland",
     "chapterId": "chapter-1",
     "instances": [

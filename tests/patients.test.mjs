@@ -485,34 +485,27 @@ test("the merchant SELLS cloth: he never gives it through the story any more", (
   assert.deepEqual(story.NPC_PROVIDES, {});
   assert.ok(!(MERCHANT in story.PATIENT_INTERACTION_IDS));
   const shops = at("src/game/shop/shops.ts");
+  // 2026-11-16: the plaza merchant sells ONLY salt and sugar ("hard-to-get spices"); the rest moved to the
+  // market street stalls (cloth, candle: draper; orange, onion, garlic: produce; bone, fat: butcher)
   assert.deepEqual(shops.getShop(MERCHANT).entries, [
-    { itemId: "cloth", price: 2, stock: 5 },
-    { itemId: "salt", price: 2, stock: 3 },
+    { itemId: "salt", price: 2, stock: 4, capByChapter: { "chapter-1": 2, "chapter-2": 4 } }, // one spare; 2 on Day 1
     // Day 2 onwards (prices raised on 2026-11-13 so that money is needed)
-    { itemId: "sugar", price: 5, stock: 3, fromChapter: "chapter-2" },
-    { itemId: "onion", price: 2, stock: 2, fromChapter: "chapter-2" }, // for the voluntary errands
-    { itemId: "bone", price: 3, stock: 2, fromChapter: "chapter-2" },
-    { itemId: "garlic", price: 5, stock: 1, fromChapter: "chapter-3" },
+    { itemId: "sugar", price: 5, stock: 3, fromChapter: "chapter-2", capByChapter: { "chapter-2": 2, "chapter-3": 3 } },
+  ]);
+  assert.deepEqual(shops.getShop("chapter1.market.draper").entries, [
+    { itemId: "cloth", price: 2, stock: 5, capByChapter: { "chapter-1": 3, "chapter-2": 4, "chapter-3": 5 } },
     { itemId: "candle", price: 1, stock: 1, fromChapter: "chapter-2" }, // optional, for the statue
   ]);
-  // on Day 1 only the cloth and the salt are on sale
-  assert.deepEqual(
-    shops.shopForChapter(shops.getShop(MERCHANT), "chapter-1").entries.map((e) => e.itemId),
-    ["cloth", "salt"],
-  );
-  assert.deepEqual(
-    shops.shopForChapter(shops.getShop(MERCHANT), "chapter-2").entries.map((e) => e.itemId),
-    ["cloth", "salt", "sugar", "onion", "bone", "candle"],
-  );
-  assert.deepEqual(
-    shops.shopForChapter(shops.getShop(MERCHANT), "chapter-3").entries.map((e) => e.itemId),
-    ["cloth", "salt", "sugar", "onion", "bone", "garlic", "candle"],
-  );
+  const sold = (chapter) => shops.allEntriesForChapter(chapter).map((e) => e.itemId).sort();
+  // on Day 1 only the cloth, the oranges and the salt are on sale
+  assert.deepEqual(sold("chapter-1"), ["cloth", "orange", "salt"]);
+  assert.deepEqual(sold("chapter-2"), ["animal-fat", "bone", "candle", "cloth", "onion", "orange", "salt", "sugar"]);
+  assert.deepEqual(sold("chapter-3"), ["animal-fat", "bone", "candle", "cloth", "garlic", "onion", "orange", "salt", "sugar"]);
 });
 
 // ------------------------------------------------------------------------ WATER
-test("water: the river fills the flask once (2 units, the flask is used up), only with the flask and while a known need lacks water", () => {
-  const FLASK = [["empty-flask", 1]];
+test("water: the river fills one flask per unit (2 flasks, 2 units, the flasks are used up), only with flasks and while a known need lacks water", () => {
+  const FLASK = [["empty-flask", 2]]; // two flasks since 2026-11-16: flasks and water are one to one
   const decide = (status, pairs) =>
     story.getGatherDecision("gather.water", facts(status, pairs));
   const water = (status, pairs) =>
@@ -552,9 +545,9 @@ test("water: the river fills the flask once (2 units, the flask is used up), onl
   assert.ok(water("examined", []).notice.includes("recipiente"));
   assert.equal(water("examined", []).conversation, null);
 
-  // need Water x2: ONE filling gives both units and uses up the empty flask
+  // need Water x2: the filling gives both units and uses up the two empty flasks (one each)
   const filling = [
-    { type: "take-item", itemId: "empty-flask", quantity: 1 },
+    { type: "take-item", itemId: "empty-flask", quantity: 2 },
     { type: "give-item", itemId: "water", quantity: 2 },
   ];
   const first = story.resolveStoryInteraction(
@@ -566,7 +559,7 @@ test("water: the river fills the flask once (2 units, the flask is used up), onl
   assert.deepEqual(first.effects, filling);
   assert.equal(first.conversation, null);
   // what the game does with those effects
-  let state = inv.removeItem(stock(FLASK), "empty-flask", 1);
+  let state = inv.removeItem(stock(FLASK), "empty-flask", 2);
   state = inv.addItem(state, "water", 2);
   assert.equal(inv.countItem(state, "water"), 2);
   assert.equal(inv.countItem(state, "empty-flask"), 0, "the flask is now full");
@@ -1123,7 +1116,7 @@ test("Bakers Bedroom: exported narrative placements stay exact alongside two sha
   );
 });
 
-test("the Empty flask starts in the Doctor's Storage (once), not in his pocket", () => {
+test("the Empty flasks (two, since 2026-11-16) start in the Doctor's Storage, not in his pocket", () => {
   const initialFile = at("src/game/inventory/initialInventory.ts");
   const initial = initialFile.createChapter1Inventory();
   const chest = initialFile.createChapter1Storage();
@@ -1132,7 +1125,7 @@ test("the Empty flask starts in the Doctor's Storage (once), not in his pocket",
   assert.equal(inv.countOccupiedSlots(initial), 0);
   assert.equal(inv.countItem(initial, "empty-flask"), 0);
   assert.equal(chest.capacity, 10);
-  assert.deepEqual(chest.slots[0], { itemId: "empty-flask", quantity: 1 });
+  assert.deepEqual(chest.slots[0], { itemId: "empty-flask", quantity: 2 });
   assert.equal(inv.countOccupiedSlots(chest), 1);
   assert.ok(inv.isValidInventory(initial) && inv.isValidInventory(chest));
   assert.equal(getItemName("empty-flask", "es"), "Frasco vacío");
@@ -1377,7 +1370,7 @@ test("baker's Salt: Patient 1's treatment is unchanged and no other patient or r
     ch1.INJURED_MINER_ID,
   ]);
   assert.deepEqual(Object.keys(ch1.CHAPTER1_INITIAL_PATIENTS), [HUSBAND]);
-  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 26);
+  assert.equal(at("src/game/crafting/recipes.ts").RECIPES.length, 23);
   // the reward conversations say nothing about patients, soup or recipes
   for (const lang of ["es", "en"]) {
     for (const key of ["bakerReward", "bakerRewardNoRoom"]) {

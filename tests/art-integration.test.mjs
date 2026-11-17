@@ -167,7 +167,8 @@ test("all 30 approved art entries are catalog items with bilingual names", () =>
   for (const [key, item] of Object.entries(ITEMS)) assert.equal(item.id, key);
   // 15 existing items + the 17 promoted ones + the Empty jar of Patient 2 +
   // the crushed herb (mortar) + the 10 items of the cooking family (2026-11-11)
-  assert.equal(Object.keys(ITEMS).length, 50);
+  // 2026-11-16: minus mushroom cream, citrus syrup and chopped pine mushroom (nothing consumed them)
+  assert.equal(Object.keys(ITEMS).length, 47);
 });
 
 test("prepared catalog now has recipes, without changing Chapter 1 needs or adding material sources", () => {
@@ -195,7 +196,7 @@ test("prepared catalog now has recipes, without changing Chapter 1 needs or addi
     }
   }
   // the six earlier recipes plus Milk with honey
-  assert.equal(RECIPES.length, 26);
+  assert.equal(RECIPES.length, 23);
   // the first patient still needs only the two prepared items
   assert.deepEqual(CHAPTER1_PATIENTS[BAKER_HUSBAND_ID].requiredTreatments, [
     { itemId: "medicinal-infusion", quantity: 1 },

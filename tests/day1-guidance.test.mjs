@@ -98,7 +98,7 @@ test("the miner points to the quarry camp after his examination; the camp's coal
   assert.ok(end.includes("INJURED_MINER_COAL_CALL_ID") && end.includes("injuredMinerCoalHint"));
   // the coal giver keeps his id but is drawn as the resting stonecutter
   const comp = read("src/game/new-world-map/newWorldCompositions.ts");
-  const at1 = comp.indexOf('instanceId: "quarry-villager-back-man-01"');
+  const at1 = comp.indexOf('instanceId: "quarry-stonecutter-resting-01"');
   assert.ok(comp.slice(at1, at1 + 400).includes('assetId: "stonecutter-resting"'));
   for (let i = 0; i < 5; i++) assert.ok(fs.existsSync(path.join(root, `public/game/npcs/stonecutter-resting/idle/${i}.png`)));
 });
@@ -110,7 +110,9 @@ test("the apothecary street and the farm have the new backgrounds with the world
   const visuals = read("src/game/new-world-map/newWorldVisuals.ts");
   assert.ok(visuals.includes("assetWidth: 1624") && visuals.includes("logicalUnitsPerAssetPixel: 1.1703"));
   const { MAP_LINKS } = at("src/game/map/mapLocations.ts");
-  assert.ok(MAP_LINKS.some(([a, b]) => a === "pharmacy" && b === "farm"));
+  // the road to the farm goes THROUGH the market street (Codex put it on the map, 2026-11-16)
+  assert.ok(MAP_LINKS.some(([a, b]) => a === "pharmacy" && b === "market"));
+  assert.ok(MAP_LINKS.some(([a, b]) => a === "market" && b === "farm"));
 });
 
 test("the day closes at the bed: a centred glowing sign sends him to his room, 'Sleep' floats over the bed, no modal; the ointment grinds the herb too", () => {

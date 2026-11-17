@@ -35,6 +35,8 @@ import { useRunBark } from "../bark/useRunBark";
 import { CraftingOverlay } from "../crafting/CraftingOverlay";
 import { craftingCopy } from "../i18n/crafting";
 import { moneyCopy } from "../i18n/money";
+import { useMarketTestOverrides } from "../dev/marketTestOverrides";
+import { HudScale } from "../ui/HudScale";
 import { CoinHud, resetCoinHudMemory } from "../money/CoinHud";
 import { getObjectives } from "../objectives/objectives";
 import { getActiveErrandNeeds } from "../dialogue/npcTrades";
@@ -83,6 +85,8 @@ import {
   removeItem,
   canAddItem,
   countItem,
+  createEmptyInventory,
+  growInventory,
   type InventoryState,
 } from "../inventory/inventory";
 import {
@@ -110,7 +114,7 @@ import {
   treatPatient,
   type PatientCasesState,
 } from "../patients/patientCases";
-import { getActiveTreatments, getPatientMissingIngredients } from "../patients/patientNeeds";
+import { getChapterTreatments, getPatientMissingIngredients } from "../patients/patientNeeds";
 import { getCraftingTargets } from "../crafting/needs";
 import { SCENE_TO_MAP_LOCATION } from "../map/mapLocations";
 import { useMapHold } from "../map/useMapHold";
@@ -356,6 +360,8 @@ export function GameWorld({
   const promptLabelFor = useCallback(
     (interactionId: string) => {
       if (interactionId === BED_INTERACTION_ID) return dayEndCopy[language].sleep;
+      // A seller (the market stalls, the plaza merchant): "[E] Comprar" (2026-11-16, Kilian)
+      if (getShop(interactionId)) return moneyCopy[language].shop.buy;
       const station = CRAFT_STATION_BY_INTERACTION_ID[interactionId];
 
       if (!station) return undefined;
@@ -399,10 +405,17 @@ export function GameWorld({
   const arrivalRef = useRef<Arrival | null>(null);
   const [travelCaption, setTravelCaption] = useState<string | null>(null);
   // Day 4 is at night: its scenes are drawn with their night paintings (or a night grade).
-  const scene = useMemo(
-    () => sceneForChapter(WORLD_SCENES[world.sceneId], chapterId),
-    [world.sceneId, chapterId],
-  );
+  const marketTest = useMarketTestOverrides();
+  const scene = useMemo(() => {
+    const base = sceneForChapter(WORLD_SCENES[world.sceneId], chapterId);
+
+    // /dev/market-test: live values for the market street (null in the real game)
+    if (marketTest && base.id === "market-street" && base.kind === "exterior") {
+      return { ...base, visual: { ...base.visual, ...marketTest } };
+    }
+
+    return base;
+  }, [world.sceneId, chapterId, marketTest]);
   const spawn = getMessengerArrivalSpawn(
     chapterId,
     world,
@@ -608,6 +621,8 @@ export function GameWorld({
           }
 
           nextInventory = removed;
+        } else if (effect.type === "grow-inventory") {
+          nextInventory = growInventory(nextInventory, effect.slots);
         } else if (effect.type === "give-coins") {
           nextCoins = addCoins(nextCoins, effect.amount);
           earned += effect.amount;
@@ -1536,14 +1551,32 @@ export function GameWorld({
     () => getObjectives(patients, language, { chapterId, claimed: claimedRewards }),
     [patients, language, chapterId, claimedRewards],
   );
+  // The size of the inventory bar and the coins in this scene (1 unless the scene sets its own).
+  const hudScale = ("visual" in scene ? scene.visual.hudScale : undefined) ?? 1;
   const renderSceneOverlay = (context: SceneOverlayContext) => (
     <>
       {renderDialogue(context)}
       {renderRunBark(context)}
-      {inventoryHudVisible ? (
-        <InventoryHud inventory={inventory} language={language} />
+      {/* The fast travel chip lives INSIDE the game frame, in the picture (2026-11-16, Kilian), and glows
+          while the tutorial is explaining it. */}
+      {fastTravelAvailable ? (
+        <FastTravelButton
+          label={fastTravelCopy[language].label}
+          onTravel={handleFastTravel}
+          fill={fastTravelFill}
+          glow={tutorialStepNow === "fast-travel"}
+        />
       ) : null}
-      {inventoryHudVisible ? <CoinHud coins={coins} language={language} /> : null}
+      {inventoryHudVisible ? (
+        <HudScale scale={hudScale} origin="bottom center">
+          <InventoryHud inventory={inventory} language={language} />
+        </HudScale>
+      ) : null}
+      {inventoryHudVisible ? (
+        <HudScale scale={hudScale} origin="bottom right">
+          <CoinHud coins={coins} language={language} />
+        </HudScale>
+      ) : null}
       {inventoryHudVisible ? (
         <ObjectivesPanel
           objectives={objectives}
@@ -1566,7 +1599,8 @@ export function GameWorld({
   // in the crafting interface ("I don't need that right now").
   const activeTreatments = useMemo(
     () => [
-      ...getActiveTreatments(patients, getPatientDefinitions(claimedRewards)),
+      // (2026-11-16) what the DAY'S cases need, met or not yet: the cold cloth can be made before examining him
+      ...getChapterTreatments(patients, getPatientDefinitions(claimedRewards), chapterId),
       // what the Doctor was asked for in a voluntary errand also counts as needed
       ...getActiveErrandNeeds(claimedRewards, chapterId),
     ],
@@ -1575,6 +1609,12 @@ export function GameWorld({
   const craftableOutputs = useMemo(
     () => getCraftingTargets(activeTreatments, inventory),
     [activeTreatments, inventory],
+  );
+  // Everything the day calls for, as if the Doctor carried nothing: tells "nobody needs that" apart from
+  // "I already have as many as I need" in the crafting interface.
+  const neededOutputs = useMemo(
+    () => getCraftingTargets(activeTreatments, createEmptyInventory()),
+    [activeTreatments],
   );
 
   // "!" over painted zones (not placed instances): today the baker's flour sack
@@ -1731,6 +1771,7 @@ export function GameWorld({
           inventory={inventory}
           language={language}
           craftableOutputs={craftableOutputs}
+          neededOutputs={neededOutputs}
           activeTreatments={activeTreatments}
           onOpenMortar={() => setCraftingStation("mortar")}
           onBackToTable={() => setCraftingStation("manual")}
@@ -1779,7 +1820,9 @@ export function GameWorld({
           key={`${hintStep}-${language}`}
           copy={hintCopy}
           aboveOverlays={hintOverBook || hintOverStorage}
-          placement={hintStep === "exit-room" ? "top" : hintOverBook || hintOverStorage ? "left" : "bottom"}
+          // 2026-11-16 (Kilian): the Book and chest notes are centred (not at the left edge); the notes that point
+          // at a door ("go down", "go out to the street") are at the top so they do not cover it
+          placement={hintStep === "exit-room" || hintStep === "exit-botica" ? "top" : "bottom"}
           raised={isTutorialHudUnlocked(tutorialStep)}
           onContinue={ACK_STEPS.includes(tutorialStep) ? handleTutorialContinue : undefined}
           continueLabel={tutorialContinueCopy[language].label}
@@ -1806,13 +1849,6 @@ export function GameWorld({
       phase === "playing" &&
       !inNarrativeScene ? (
         <DayEndSign text={dayEndCopy[language].sign} />
-      ) : null}
-      {fastTravelAvailable ? (
-        <FastTravelButton
-          label={fastTravelCopy[language].label}
-          onTravel={handleFastTravel}
-          fill={fastTravelFill}
-        />
       ) : null}
       {phase === "holding" && travelCaption ? (
         <TravelCaption text={travelCaption} />

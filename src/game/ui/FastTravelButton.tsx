@@ -10,20 +10,26 @@ export function FastTravelButton({
   label,
   onTravel,
   fill = 1,
+  glow = false,
 }: {
   label: string;
   onTravel: () => void;
   // 0..1: the recharge bar (1 = ready to use).
   fill?: number;
+  // True while the tutorial is explaining the button (until the Doctor presses Enter): it BLINKS and a yellow
+  // arrow under it bobs, pointing at where it is (2026-11-16, Kilian).
+  glow?: boolean;
 }) {
   const ready = fill >= 1;
   return (
+    <div className={styles.anchor}>
     <button
       type="button"
-      className={styles.button}
+      className={`${styles.button}${glow ? ` ${styles.glow}` : ""}`}
       style={{ ["--ui-font" as string]: PIXEL_FONT_FAMILY } as CSSProperties}
       data-fast-travel
       data-ready={ready}
+      data-glow={glow || undefined}
       aria-disabled={!ready}
       onClick={(event) => {
         // Space / Enter belong to the game (run, interact): never keep focus.
@@ -40,6 +46,8 @@ export function FastTravelButton({
         )}
       </span>
     </button>
+      {glow ? <span className={styles.arrow} aria-hidden data-fast-travel-arrow /> : null}
+    </div>
   );
 }
 

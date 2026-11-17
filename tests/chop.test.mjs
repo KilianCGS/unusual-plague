@@ -51,13 +51,12 @@ const test = (name, fn) => {
 };
 const stock = (pairs) => pairs.reduce((s, [id, q]) => addItem(s, id, q), createEmptyInventory());
 
-test("the board chops ONE ingredient, 1 for 1: onion, mushroom and pine mushroom", () => {
+test("the board chops ONE ingredient, 1 for 1: onion and mushroom (the pine mushroom no longer: 2026-11-16)", () => {
   assert.equal(STATION_MAX_INPUTS.chop, 1);
   const chopping = RECIPES.filter((r) => r.station === "chop");
   assert.deepEqual(chopping.map((r) => [r.inputs[0].itemId, r.output.itemId, r.output.quantity]), [
     ["onion", "chopped-onion", 1],
     ["mushroom", "chopped-mushroom", 1],
-    ["pine-mushroom", "chopped-pine-mushroom", 1],
   ]);
   const made = cr.combine(stock([["onion", 1]]), "chop", ["onion"]);
   assert.equal(made.kind, "success");
@@ -68,7 +67,6 @@ test("the board chops ONE ingredient, 1 for 1: onion, mushroom and pine mushroom
 test("the cooking recipes use the chopped / ground versions, so cooking the raw one does nothing", () => {
   const uses = (id) => RECIPES.find((r) => r.id === id).inputs.map((i) => i.itemId);
   assert.ok(uses("fire.mushroom-soup").includes("chopped-mushroom"));
-  assert.ok(uses("fire.mushroom-cream").includes("chopped-pine-mushroom"));
   assert.ok(uses("fire.onion-syrup").includes("chopped-onion"));
   assert.ok(uses("fire.strong-broth").includes("chopped-onion"));
   assert.ok(uses("fire.balsamic-syrup").includes("crushed-garlic"));
@@ -76,7 +74,7 @@ test("the cooking recipes use the chopped / ground versions, so cooking the raw 
 });
 
 test("each new item has names in both languages and an icon file; the board has its picture", () => {
-  for (const id of ["chopped-onion", "chopped-mushroom", "chopped-pine-mushroom", "crushed-garlic"]) {
+  for (const id of ["chopped-onion", "chopped-mushroom", "crushed-garlic"]) {
     assert.ok(ITEMS[id].name.es && ITEMS[id].name.en, id);
     assert.ok(fs.existsSync(path.join(root, "public", ITEMS[id].icon)), id);
     assert.ok(fs.existsSync(path.join(root, `public/game/ui/book/preparations/${id}.png`)), `${id} book page`);
@@ -89,7 +87,7 @@ test("each new item has names in both languages and an icon file; the board has 
 });
 
 test("seeing an ingredient teaches its chopping or grinding recipe", () => {
-  for (const [item, recipe] of [["onion", "chop.onion"], ["mushroom", "chop.mushroom"], ["pine-mushroom", "chop.pine-mushroom"], ["garlic", "mortar.crushed-garlic"]]) {
+  for (const [item, recipe] of [["onion", "chop.onion"], ["mushroom", "chop.mushroom"], ["garlic", "mortar.crushed-garlic"]]) {
     assert.ok(learnRecipesFromItems(new Set(), [item]).has(recipe), recipe);
   }
 });
@@ -121,8 +119,8 @@ test("the kitchen opens the board and the board returns to the kitchen; Cook sti
     const en = resolveStatueCandle("world.plaza.statue", facts([["candle", 1]]), "en", "x");
     assert.equal(en.conversation.lines.length, done.conversation.lines.length);
   });
-  test("the merchant sells the candle from Day 2 only, for 1 coin; Day 1 stays exactly as it was", () => {
-    const merchant = getShop("chapter1.plaza.merchant");
+  test("the draper's stall sells the candle from Day 2 only, for 1 coin; Day 1 stays exactly as it was", () => {
+    const merchant = getShop("chapter1.market.draper");
     const candle = merchant.entries.find((e) => e.itemId === "candle");
     assert.deepEqual([candle.price, candle.stock, candle.fromChapter], [1, 1, "chapter-2"]);
     assert.ok(fs.existsSync(path.join(root, "public/game/items/inventory-icons/candle.png")));

@@ -342,3 +342,22 @@ el fichero). Generado desde el código, así que lo que ves aquí es lo que sale
 | personaje | Entonces ha elegido muy bien la ropa. | Then you picked exactly the right clothes. |
 | doctor | Por casualidad, ¿sabe dónde conseguir un poco de carbón limpio? | By any chance, do you know where I could get a little clean coal? |
 | personaje | Pregunte en el campamento de la cantera, al que descansa sentado en el suelo. Siempre guarda un poco para su hoguera. | Ask at the quarry camp, the one resting on the ground. He always keeps a little for his fire. |
+
+## 2026-11-16 — mercado, mochila, panadera y vecinos mudos (pendiente de tu revisión)
+
+| Dónde | ES | EN |
+|---|---|---|
+| Tienda de frutas y verduras (saludo) | Todo de la huerta de esta mañana. Si algo no le gusta, es que no lo ha probado. | All from this morning's garden. If you don't like something, you haven't tried it. |
+| Tienda de telas (saludo) | Retales, lino y lana. Lo que sobra de una cosa sirve para otra. | Scraps, linen and wool. What's left over from one thing serves for another. |
+| Carnicería (saludo) | Huesos para el caldo y grasa para lo que haga falta. De la carne mejor no hablamos hoy. | Bones for the broth and fat for whatever's needed. Let's not talk about the meat today. |
+| Vendedora de verduras (charla) | Naranjas, cebollas, ajos. Lo que no vendo hoy, lo vendo mañana, que la fruta es paciente. / Las cebollas ya nacen resignadas. | Oranges, onions, garlic. What I don't sell today I'll sell tomorrow; fruit is patient. / Onions are born resigned. |
+| Vendedor de telas (charla) | Telas, retales y cuero. De lo que sobra de un abrigo sale un vendaje. / En mi oficio, tirar es un pecado. | Cloth, scraps and leather. What's left of a coat makes a bandage. / In my trade, throwing away is a sin. |
+| Carnicero (charla) | Huesos para el caldo y grasa para lo que haga falta. De la carne, hoy mejor no hablamos. / Porque se me nota la cara de carnicero. | Bones for the broth and fat for whatever's needed. Let's not talk about the meat today. / Because I look too much like a butcher. |
+| Costurera: mochila (día 2) | Usted es el que ayudó a mi marido en la taberna… Tome, la mochila la cosí con retales de sobra. Le cabe una cosa más. | You're the one who helped my husband at the tavern… Here, I sewed this backpack from leftover scraps. It holds one more thing. |
+| Panadera: azúcar (día 2) | Espere, Doctor. Con lo de ayer le debo algo más que palabras: un puñado de azúcar del obrador. | Wait, Doctor. After yesterday I owe you more than words: a handful of sugar from the bakery. |
+| Mujer de la calle de la botica | Pasa usted tanto por aquí que ya lo espero con el reloj en la mano. (+4 líneas) | You pass by so often that I wait for you with my watch in hand. (+4 lines) |
+| Costurera (charla ambiental) | Remiendo lo que el pueblo rompe. Hoy es poco; ayer fue un abrigo y una paciencia. (+3 líneas) | I mend what the village breaks. Today it's little; yesterday it was a coat and a patience. (+3 lines) |
+| Niña de la cometa (plaza) | No hay viento, pero la cometa no lo sabe. (+4 líneas) | There's no wind, but the kite doesn't know. (+4 lines) |
+| Aldeano de espaldas, mercado (delante de la carnicería) | Llevo media hora mirando ese jamón y el jamón me mira a mí. / El jamón, pero no se lo cuente a nadie. | I've been looking at that ham for half an hour and the ham is looking back at me. / The ham did, but don't tell anyone. |
+| Anciano de espaldas, mercado | Antes aquí solo había una pared. Ahora hay pared y gente, que es mejor. / A mi edad, mirar es la mitad de comprar. | There used to be only a wall here. Now there's a wall and people, which is better. / At my age, looking is half of buying. |
+| Crafteo: ya tengo suficiente | (Ya tengo todos los que necesito.) | (I already have all I need.) |

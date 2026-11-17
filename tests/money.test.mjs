@@ -73,11 +73,12 @@ test("every patient of Days 1 and 2 pays something, and the prices are not round
   assert.equal(getPatientPayment("nobody"), 0);
 });
 
-test("the merchant's shop: cloth at two coins, five in stock (one more for the fisherman's errand), sold out after five, units counted by flags", () => {
-  const shop = shops.getShop("chapter1.plaza.merchant");
-  assert.equal(shop.id, "plaza-merchant");
+test("the draper's stall: cloth at two coins, five in stock (one more for the fisherman's errand), sold out after five, units counted by flags", () => {
+  const shop = shops.getShop("chapter1.market.draper");
+  assert.equal(shop.id, "market-draper");
   const [cloth] = shop.entries;
-  assert.deepEqual(cloth, { itemId: "cloth", price: 2, stock: 5 });
+  // 2026-11-16: five in stock, but at most 3 by the end of Day 1, 4 by Day 2 and 5 by Day 3 (daily cap)
+  assert.deepEqual(cloth, { itemId: "cloth", price: 2, stock: 5, capByChapter: { "chapter-1": 3, "chapter-2": 4, "chapter-3": 5 } });
   let claimed = new Set();
   for (let i = 0; i < 5; i++) {
     assert.equal(shops.unitsLeft(claimed, shop, cloth), 5 - i);
@@ -93,17 +94,18 @@ test("the merchant's shop: cloth at two coins, five in stock (one more for the f
 });
 
 test("Day 1 can never block on money: the six coins buy the cloth and the salt before the first payment and every payment covers the rest", () => {
-  // Day 1's shop: from Day 2 the merchant also sells sugar and bone (the onion is not on sale)
-  const shop = shops.shopForChapter(shops.getShop("chapter1.plaza.merchant"), "chapter-1");
+  // Day 1's shops: the draper's cloth and the plaza merchant's salt (the oranges are also free in the Mill
+  // field, so they are not counted: from Day 2 the shops also sell sugar, bone and the rest)
+  const shop = { entries: [...shops.allEntriesForChapter("chapter-1")].filter((e) => e.itemId !== "orange") };
   const spendAll = shop.entries.reduce((n, e) => n + e.price * e.stock, 0);
-  assert.equal(spendAll, 16, "Day 1 sells 5 cloths (10) and 3 salts (6)");
+  assert.equal(spendAll, 10, "Day 1 sells 3 cloths (6) and 2 salts (4) at most: the daily cap (2026-11-16)");
   // the mandatory purchases of Day 1: two cloths and one salt
   const price = (id) => shop.entries.find((e) => e.itemId === id).price;
   assert.ok(STARTING_COINS >= 2 * price("cloth") + price("salt"), "cloth x2 + salt fit in the starting purse");
   const day1Income = Object.keys(CHAPTER1_PATIENTS).reduce((n, id) => n + getPatientPayment(id), 0);
   assert.ok(STARTING_COINS + day1Income >= spendAll);
   // even the worst order: only the cloth is mandatory before the first payment
-  assert.ok(STARTING_COINS >= shop.entries[0].price);
+  assert.ok(STARTING_COINS >= price("cloth"));
 });
 
 test("ES and EN copy exists, with singular and plural", () => {

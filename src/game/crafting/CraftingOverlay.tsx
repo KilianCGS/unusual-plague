@@ -33,6 +33,7 @@ type Message =
   | "no-space"
   | "limit"
   | "not-needed"
+  | "enough"
   | "needed-elsewhere"
   | null;
 
@@ -74,6 +75,7 @@ export function CraftingOverlay({
   onClose,
   onAnalyzeSample,
   craftableOutputs,
+  neededOutputs,
   activeTreatments,
   onOpenMortar,
   onBackToTable,
@@ -91,6 +93,9 @@ export function CraftingOverlay({
   // When given, any other recipe is refused and consumes nothing; left out
   // (the /dev/crafting page), every valid recipe can be made.
   craftableOutputs?: ReadonlySet<string>;
+  // Everything the day needs (as if nothing were carried): a result in here but not in craftableOutputs
+  // means "I already have all I need" (2026-11-16).
+  neededOutputs?: ReadonlySet<string>;
   // The treatments the known cases still need. When given, a craft that would
   // leave them MORE short than before is refused too (grinding the herb that
   // another cure needs whole), and nothing is consumed.
@@ -209,7 +214,7 @@ export function CraftingOverlay({
       !craftableOutputs.has(result.recipe.output.itemId)
     ) {
       // Nothing is consumed: the selection stays so it can be corrected.
-      setMessage("not-needed");
+      setMessage(neededOutputs?.has(result.recipe.output.itemId) ? "enough" : "not-needed");
     } else if (
       result.kind === "success" &&
       activeTreatments &&
@@ -391,6 +396,8 @@ export function CraftingOverlay({
                 ? copy.noSpace
                 : message === "limit"
                   ? copy.limitReached
+                  : message === "enough"
+                    ? copy.alreadyEnough
                   : message === "not-needed"
                     ? copy.notNeeded
                     : message === "needed-elsewhere"

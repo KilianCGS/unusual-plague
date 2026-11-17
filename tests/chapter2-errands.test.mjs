@@ -45,7 +45,7 @@ const errands1 = at("src/game/dialogue/chapter1Errands.ts");
 const { getCraftingTargets } = at("src/game/crafting/needs.ts");
 const { getObjectives } = at("src/game/objectives/objectives.ts");
 const { RECIPES } = at("src/game/crafting/recipes.ts");
-const { MERCHANT_SHOP } = at("src/game/shop/shops.ts");
+const { allEntriesForChapter } = at("src/game/shop/shops.ts");
 
 let passed = 0;
 const test = (name, fn) => {
@@ -130,7 +130,8 @@ test("the errands panel lists what was asked, ticked when delivered", () => {
 test("every errand preparation has a recipe, the shop sells its ingredients from Day 2, and texts exist in ES and EN", () => {
   const byOut = new Map(RECIPES.map((r) => [r.output.itemId, r]));
   for (const c of CASES) assert.ok(byOut.has(c.item), c.item);
-  const sold = new Set(MERCHANT_SHOP.entries.filter((e) => e.fromChapter === "chapter-2" || !e.fromChapter).map((e) => e.itemId));
+  // sold by the plaza merchant (sugar, salt) or a market stall (onion, bone)
+  const sold = new Set(allEntriesForChapter("chapter-2").map((e) => e.itemId));
   for (const id of ["onion", "sugar", "bone", "salt"]) assert.ok(sold.has(id), `${id} is sold by Day 2`);
   for (const c of CASES) {
     const trade = trades.NPC_TRADES[c.id];

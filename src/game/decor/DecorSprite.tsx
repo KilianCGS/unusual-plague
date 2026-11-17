@@ -6,6 +6,7 @@ import type { CSSProperties, MutableRefObject } from "react";
 import { playSound } from "../audio/audioPlayer";
 import { DECOR_IMPACT_SOUNDS, impactVolume } from "../audio/decorImpactSounds";
 import type { DecorAsset, DecorInstance } from "./decorTypes";
+import styles from "./DecorSprite.module.css";
 
 // Frame index of an in-place animation (1 frame = static, no timer).
 function useFrameIndex(frameCount: number, fps: number, loop: boolean) {
@@ -47,9 +48,12 @@ export function DecorSprite({
   asset,
   instance,
   listener,
+  highlight = false,
 }: {
   asset: DecorAsset;
   instance: DecorInstance;
+  // The Doctor is within reach of this one (a market stall): a pulsing silhouette glow around it.
+  highlight?: boolean;
   // Where the Doctor stands (null while the game is not being played). Only needed for
   // working NPCs that make a sound; without it they stay silent.
   listener?: MutableRefObject<{ x: number; y: number } | null>;
@@ -89,7 +93,12 @@ export function DecorSprite({
   };
 
   return (
-    <div style={anchorStyle} data-instance-id={instance.instanceId}>
+    <div
+      style={anchorStyle}
+      className={highlight ? styles.highlight : undefined}
+      data-instance-id={instance.instanceId}
+      data-highlight={highlight || undefined}
+    >
       {frames.map((src, index) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img

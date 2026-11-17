@@ -15,6 +15,8 @@ type CraftingCopy = {
   noSpace: string;
   // Feedback line: a valid recipe nobody needs right now (nothing is consumed).
   notNeeded: string;
+  // Feedback line: a preparation the day does need, but the Doctor already carries all of them.
+  alreadyEnough: string;
   // Feedback line: the station has no free ingredient slot left.
   limitReached: string;
   // Feedback line: the ingredient is needed for something else (the craft would
@@ -42,6 +44,8 @@ export const craftingCopy: Record<Language, CraftingCopy> = {
     noRecipe: "Estos ingredientes no parecen combinar bien aquí.",
     noSpace: "No tengo sitio para llevar esto.",
     notNeeded: "(Eso no lo necesito ahora.)",
+    // 2026-11-16: new text, awaiting Kilian's review.
+    alreadyEnough: "(Ya tengo todos los que necesito.)",
     neededElsewhere: "(Eso me hace falta para otra cosa.)",
     mortar: { label: "Triturar", back: "Mesa", ingredient: "Ingrediente" },
     board: { label: "Trocear", back: "Cocina" },
@@ -60,6 +64,7 @@ export const craftingCopy: Record<Language, CraftingCopy> = {
     noRecipe: "These ingredients don't seem to combine well here.",
     noSpace: "I don't have room to carry this.",
     notNeeded: "(I don't need that right now.)",
+    alreadyEnough: "(I already have all I need.)",
     neededElsewhere: "(I need that for something else.)",
     mortar: { label: "Grind", back: "Table", ingredient: "Ingredient" },
     board: { label: "Chop", back: "Kitchen" },

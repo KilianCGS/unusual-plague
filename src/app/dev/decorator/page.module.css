@@ -118,8 +118,27 @@
 .assetButton {
   display: flex;
   width: 100%;
-  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
   text-align: left;
+}
+
+/* Thumbnail of an asset's first frame: fixed box, whole sprite visible, crisp pixels. */
+.assetThumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  background: #1a1610;
+  border: 1px solid #3f3427;
+}
+
+.assetText {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .assetActive {

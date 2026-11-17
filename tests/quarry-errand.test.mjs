@@ -89,8 +89,8 @@ test("the broth is made at the fire from a bone, water and salt (and the merchan
   assert.equal(recipe.station, "fire");
   assert.deepEqual(recipe.inputs.map((i) => i.itemId).sort(), ["bone", "salt", "water"]);
   const shops = at("src/game/shop/shops.ts");
-  const day1 = shops.shopForChapter(shops.getShop("chapter1.plaza.merchant"), "chapter-1").entries.map((e) => e.itemId);
-  const day2 = shops.shopForChapter(shops.getShop("chapter1.plaza.merchant"), "chapter-2").entries.map((e) => e.itemId);
+  const day1 = shops.allEntriesForChapter("chapter-1").map((e) => e.itemId);
+  const day2 = shops.allEntriesForChapter("chapter-2").map((e) => e.itemId);
   assert.ok(!day1.includes("bone") && day2.includes("bone"));
 });
 

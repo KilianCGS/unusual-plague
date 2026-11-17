@@ -17,6 +17,7 @@ import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { AttentionMark } from "../ui/AttentionMark";
 import { WorldLabel } from "../ui/WorldLabel";
 import { PickupAura } from "../ui/PickupAura";
+import { getShop } from "../shop/shops";
 import { environmentGlowsByScene } from "../interactions/environmentGlows";
 import { DecorSprite } from "../decor/DecorSprite";
 import { DOCTOR_NARRATIVE_ASSET_ID } from "../decor/decorAssets";
@@ -251,6 +252,11 @@ export function ExteriorScene({
   // Tell the owner which interaction the [E] prompt is for (and clear it when
   // this scene goes away).
   const availableInteractionId = availableInteraction?.interactionId ?? null;
+  // A seller within reach (a market stall) gets a glowing silhouette so it is easy to spot (2026-11-16, Kilian).
+  const highlightedInstanceId =
+    availableInteraction && getShop(availableInteraction.interactionId)
+      ? decor.zoneInstanceIds.get(availableInteraction.id)
+      : undefined;
   const onInteractionAvailableRef = useRef(onInteractionAvailable);
 
   useEffect(() => {
@@ -380,6 +386,7 @@ export function ExteriorScene({
               asset={asset}
               instance={instance}
               listener={listenerRef}
+              highlight={instance.instanceId === highlightedInstanceId}
             />
           ))}
           {decor.sprites.map(({ asset, instance }) =>

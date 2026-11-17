@@ -83,7 +83,6 @@ const NEW_IDS = [...NEW_WORLD_SCENE_IDS];
 const EXPECTED_ADDED = [
   "tavern-street-villager-woman-01-01",
   "forest-resin-world-01",
-  "mill-farmland-orange-world-02",
   "plaza-merchant-humble-01",
   "mountain-path-miner-pick-swing-01",
 ];
@@ -99,9 +98,14 @@ const EXPECTED_REMOVED = [
   "tavern-street-villager-woman-02-01",
   "mill-farmland-farmer-old-01",
   "mill-farmland-villager-young-01",
+  "mill-farmland-orange-world-01", // both orange branches removed on 2026-11-16 (Kilian): oranges are bought at the market
 ];
 // Every interactive thing placed in the new world can be reached on foot.
-const KNOWN_UNREACHABLE_ZONES = [];
+// 2026-11-16: Kilian's farm repaint (the west road to the market street) added the collider farm-23
+// (426,462 39x65), which closes the gap that led into the sheep pen: the three sheep can no longer be
+// reached. ON PURPOSE (Kilian confirmed it, 2026-11-16): the sheep are scenery inside their pen. An exact
+// list on purpose.
+const KNOWN_UNREACHABLE_ZONES = ["farm-sheep-01-zone", "farm-sheep-02-zone", "farm-sheep-03-zone"];
 const size = (scene) => getSceneWorld(scene.visual);
 
 function pngSize(publicPath) {
@@ -154,6 +158,8 @@ test("the topology of the old world is kept, plus Forest <-> Casita del bosque",
     if (id === "forest") expected.push("forest-cottage", "forest-glade");
     if (id === "mountain-path") expected.push("quarry");
     if (id === "mill-farmland") expected.push("granary-interior");
+    // the market street (2026-11-16) sits between the apothecary street and the farm
+    if (id === "apothecary-street" || id === "farm") expected.push("market-street");
 
     assert.deepEqual(targets(WORLD_SCENES, id), expected.sort(), id);
   }
@@ -455,7 +461,8 @@ test("the new world population keeps authored instances and shared ambient decor
   // exact list: a new gap fails, and so does one that gets fixed (update it).
   assert.deepEqual(unreachableZones.sort(), KNOWN_UNREACHABLE_ZONES);
 
-  assert.equal(total, 31 + NEW_IDS.filter(id=>id!=='forest-cottage').reduce((n,id)=>n+
+  // (31 before the two Mill orange branches were removed on 2026-11-16)
+  assert.equal(total, 29 + NEW_IDS.filter(id=>id!=='forest-cottage').reduce((n,id)=>n+
     newWorld("src/game/compositions/shared-environment.ts").getSharedEnvironmentInstances(id).length,0));
 
   // interactions are keyed by instanceId and untouched: every interactive
@@ -620,8 +627,6 @@ test("the Decorator export is applied literally (x, y, scale, flipX, colliderEna
     },
     "mill-farmland": {
       "mill-farmland-beekeeper-01": [1909, 850, 1.08, true],
-      "mill-farmland-orange-world-01": [1844, 872, 1, false],
-      "mill-farmland-orange-world-02": [860, 483, 1, false],
     },
     "tavern-street": {
       "tavern-street-villager-woman-01-01": [462, 403, 1, true],
@@ -646,7 +651,8 @@ test("interactions of instances the export no longer places stay in the table, u
   const { getChapterInteractions } = newWorld("src/game/compositions/index.ts");
   const table = getChapterInteractions("chapter-1");
 
-  for (const instanceId of EXPECTED_REMOVED) {
+  // (the removed Mill orange branch was a collectible, not an interaction)
+  for (const instanceId of EXPECTED_REMOVED.filter((id) => id !== "mill-farmland-orange-world-01")) {
     assert.ok(table[instanceId], `${instanceId} keeps its interaction`);
   }
 });

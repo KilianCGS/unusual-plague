@@ -243,12 +243,12 @@ test("the tutorial Book is untouched: it still opens on INGREDIENTES, which keep
   assert.equal(sections("en").ingredients.spreads.length, 5);
 });
 
-test("all twenty-six preparations occupy one localized leaf each, two per opening", () => {
+test("all twenty-three preparations occupy one localized leaf each, two per opening", () => {
   const { RECIPES } = at("src/game/crafting/recipes.ts");
   const known = RECIPES.map(recipe => recipe.id);
   for (const language of ["es", "en"]) {
     const preparations = buildBookSections(context(language, {}, known))[3];
-    assert.equal(preparations.spreads.length, 13);
+    assert.equal(preparations.spreads.length, 12);
     preparations.spreads.forEach((spread, index) => {
       const recipes = RECIPES.slice(index * 2, index * 2 + 2);
       assert.equal(spread.layers.length, 1 + recipes.length);
@@ -275,8 +275,9 @@ test("all twenty-six preparations occupy one localized leaf each, two per openin
         assert.ok(blocks.some(block => block.id.endsWith("-availability")));
       });
     });
-    assert.ok(preparations.spreads.at(-1).texts.some(block => block.x > 344),
-      "the sixteenth recipe fills the final leaf");
+    // two recipes per opening: with an odd count (23 since 2026-11-16) the final right leaf stays empty
+    assert.equal(preparations.spreads.at(-1).texts.some(block => block.x > 344), RECIPES.length % 2 === 0,
+      "the final leaf is filled only when the recipe count is even");
   }
 });
 

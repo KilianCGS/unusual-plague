@@ -15,10 +15,9 @@ export const RECIPE_DISCOVERY_ITEMS: Readonly<Record<string, readonly string[]>>
   resin: ["fire.ointment-base", "manual.medicinal-compress"],
   "animal-fat": ["fire.ointment-base", "manual.medicinal-compress"],
   flour: ["manual.poultice"],
-  orange: ["fire.citrus-drink", "fire.citrus-syrup"],
+  orange: ["fire.citrus-drink"],
   bone: ["fire.bone-broth", "fire.strong-broth"],
-  "pine-mushroom": ["fire.mushroom-cream", "chop.pine-mushroom"],
-  sugar: ["fire.onion-syrup", "fire.rehydration-drink", "fire.citrus-syrup"],
+  sugar: ["fire.onion-syrup", "fire.rehydration-drink"],
   onion: ["fire.onion-syrup", "fire.strong-broth", "chop.onion"],
 };
 

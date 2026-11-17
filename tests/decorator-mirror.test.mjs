@@ -133,7 +133,9 @@ test("mirroring moves neither the anchor nor the scale: the box mirrors around t
   mod.require = (id) =>
     id.includes("decorAssets") || id.includes("decorTypes")
       ? assets
-      : id.includes("audio/")
+      : id.endsWith(".module.css")
+        ? {} // (the sprite's glow styles: not under test here)
+        : id.includes("audio/")
         ? { playSound: () => null, DECOR_IMPACT_SOUNDS: {}, impactVolume: () => 0 }
         : require(id);
   mod._compile(sprite, path.join(root, "ds.cjs"));

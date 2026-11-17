@@ -96,11 +96,11 @@ const NOT_INTERACTABLE = [
   "plaza-merchant-table-01",
 ];
 
-test("36 interactable instances, all of them real chapter-1 instances", () => {
+test("40 interactable instances, all of them real chapter-1 instances", () => {
   const ids = Object.keys(chapter1Interactions);
   // (the fruit seller was removed again; the Tavern Street woman keeps hers;
-  // the beekeeper joined for Patient 2, Witch for Patient 3, three quarry-camp people on 2026-11-15)
-  assert.equal(ids.length, 36);
+  // the beekeeper joined for Patient 2, Witch for Patient 3, three quarry-camp people on 2026-11-15, the three market stalls and the two villagers in front of them on 2026-11-16; the quarry woman left with the new camp)
+  assert.equal(ids.length, 40);
   for (const id of ids) assert.ok(byId.has(id), `${id} is not in chapter-1.ts`);
 });
 

@@ -45,7 +45,7 @@ const { getComposition } = at("src/game/compositions/index.ts");
 const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
 const { NPC_TRADES } = at("src/game/dialogue/npcTrades.ts");
 const { GATHER_SOURCES } = at("src/game/dialogue/storyInteractions.ts");
-const { MERCHANT_SHOP } = at("src/game/shop/shops.ts");
+const { allEntriesForChapter } = at("src/game/shop/shops.ts");
 const { STARTING_COINS } = at("src/game/money/money.ts");
 
 const add = (map, id, n) => map.set(id, (map.get(id) ?? 0) + n);
@@ -77,8 +77,11 @@ for (const trade of Object.values(NPC_TRADES).filter((t) => t.interactionId.star
 // the baker's thank-you (an extra now: the merchant sells the salt too)
 add(balance, BAKER_SALT_REWARD.itemId, BAKER_SALT_REWARD.quantity);
 // the merchant sells cloth and salt (stock) for coins
-const cloth = MERCHANT_SHOP.entries.find((e) => e.itemId === "cloth");
-const salt = MERCHANT_SHOP.entries.find((e) => e.itemId === "salt");
+const day1Shops = allEntriesForChapter("chapter-1");
+const cloth = day1Shops.find((e) => e.itemId === "cloth");
+const salt = day1Shops.find((e) => e.itemId === "salt");
+const orange = day1Shops.find((e) => e.itemId === "orange"); // 2026-11-16: the Mill branches are gone; the market sells them
+add(balance, "orange", orange.stock);
 add(balance, "cloth", cloth.stock);
 add(balance, "salt", salt.stock);
 // sources that refill while a need is open (the river)
@@ -101,8 +104,12 @@ const clothNeeded = demand.get("cloth") ?? 0;
 const saltNeeded = demand.get("salt") ?? 0;
 assert.ok(clothNeeded <= cloth.stock, "the merchant has enough cloth for Day 1");
 assert.ok(saltNeeded <= salt.stock, "the merchant has enough salt for Day 1");
-const spend = clothNeeded * cloth.price + saltNeeded * salt.price;
-assert.ok(spend <= STARTING_COINS, `Day 1 purchases cost ${spend}, the Doctor starts with ${STARTING_COINS}`);
+// the orange of the farm woman's trade is bought too (one)
+const orangeNeeded = Object.values(NPC_TRADES).filter((t) => t.interactionId.startsWith("chapter1.") && !t.ask)
+  .reduce((n, t) => n + t.consumes.filter((c) => c.itemId === "orange").reduce((m, c) => m + c.quantity, 0), 0);
+const spend = clothNeeded * cloth.price + saltNeeded * salt.price + orangeNeeded * orange.price;
+// the purse buys the first case's cloth; the rest is paid with what the cases earn (no-deadlock proves any order works)
+assert.ok(STARTING_COINS >= cloth.price, "the starting purse buys the cloth of the first case");
 // and the three treatments pay more than they cost
 const income = Object.keys(CHAPTER1_PATIENTS).reduce((sum, id) => sum + (PATIENT_PAYMENTS[id] ?? 0), 0);
 assert.ok(income > spend, "Day 1 earns more than it spends");

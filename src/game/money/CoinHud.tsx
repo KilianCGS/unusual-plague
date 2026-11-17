@@ -60,11 +60,12 @@ export function CoinHud({ coins, language }: { coins: number; language: Language
             {seen.amount}
           </span>
         ) : null}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className={styles.coin} src={COIN_ICON} alt="" width={16} height={16} draggable={false} />
+        {/* The number ABOVE the coins (2026-11-16, Kilian). */}
         <span key={coins} className={styles.count}>
           {coins}
         </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img className={styles.coin} src={COIN_ICON} alt="" width={16} height={16} draggable={false} />
       </div>
     </div>
   );

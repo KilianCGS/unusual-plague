@@ -267,16 +267,6 @@ export const chapter2Compositions: DecorComposition[] = [
         "flipX": false,
         "colliderEnabled": true,
         "zOffset": 0
-      },
-      {
-        "instanceId": "forest-glade-pine-mushroom-world-01",
-        "assetId": "pine-mushroom-world",
-        "x": 960,
-        "y": 448,
-        "scale": 0.75,
-        "flipX": false,
-        "colliderEnabled": false,
-        "zOffset": 0
       }
     ]
   },

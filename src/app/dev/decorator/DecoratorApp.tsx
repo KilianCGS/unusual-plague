@@ -604,11 +604,22 @@ function Workspace({
                     );
                   }}
                 >
-                  <span>{asset.label}</span>
-                  <span className={styles.hint}>
-                    {asset.sprite.frames.length > 1
-                      ? `${asset.sprite.frames.length}f @${asset.sprite.fps}fps`
-                      : "static"}
+                  {/* A thumbnail of the first frame (2026-11-16, Kilian): easier to find NPCs and props by sight. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    className={styles.assetThumb}
+                    src={asset.sprite.frames[0]}
+                    alt=""
+                    loading="lazy"
+                    draggable={false}
+                  />
+                  <span className={styles.assetText}>
+                    <span>{asset.label}</span>
+                    <span className={styles.hint}>
+                      {asset.sprite.frames.length > 1
+                        ? `${asset.sprite.frames.length}f @${asset.sprite.fps}fps`
+                        : "static"}
+                    </span>
                   </span>
                 </button>
               ))}

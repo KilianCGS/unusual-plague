@@ -1,0 +1,24 @@
+/* A silhouette "aura" around a sprite the Doctor can use right now (a market stall in reach, 2026-11-16).
+   It is made with stacked drop-shadows, which follow the pixels of the sprite itself (not a box), and it
+   pulses slowly so it reads as light and not as an outline. */
+.highlight {
+  animation: stall-aura 1.3s ease-in-out infinite;
+}
+
+@keyframes stall-aura {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 1px rgba(255, 236, 160, 0.95)) drop-shadow(0 0 4px rgba(255, 205, 80, 0.7));
+  }
+  50% {
+    filter: drop-shadow(0 0 2px rgba(255, 246, 200, 1)) drop-shadow(0 0 7px rgba(255, 215, 90, 0.95))
+      drop-shadow(0 0 14px rgba(255, 195, 60, 0.6));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlight {
+    animation: none;
+    filter: drop-shadow(0 0 2px rgba(255, 246, 200, 1)) drop-shadow(0 0 8px rgba(255, 210, 80, 0.9));
+  }
+}

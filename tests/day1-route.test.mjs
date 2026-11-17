@@ -39,8 +39,9 @@ const { createEmptyInventory } = at("src/game/inventory/inventory.ts");
 const { CHAPTER1_PATIENTS } = at("src/game/patients/chapter1Patients.ts");
 const { NPC_TRADES } = at("src/game/dialogue/npcTrades.ts");
 const { GATHER_SOURCES } = at("src/game/dialogue/storyInteractions.ts");
-const { MERCHANT_SHOP, shopForChapter } = at("src/game/shop/shops.ts");
+const { allEntriesForChapter } = at("src/game/shop/shops.ts");
 const { STARTING_COINS } = at("src/game/money/money.ts");
+const { getPatientPayment } = at("src/game/money/payments.ts");
 const { getDecorAsset } = at("src/game/decor/decorAssets.ts");
 const { getComposition } = at("src/game/compositions/index.ts");
 const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
@@ -62,7 +63,8 @@ for (const sceneId of Object.keys(WORLD_SCENES)) {
 const gathered = new Set(Object.values(GATHER_SOURCES).map((g) => g.itemId));
 const granted = new Map();
 for (const trade of Object.values(NPC_TRADES)) for (const g of trade.grants) granted.set(g.itemId, (granted.get(g.itemId) ?? 0) + g.quantity);
-const shop = new Map(shopForChapter(MERCHANT_SHOP, "chapter-1").entries.map((e) => [e.itemId, e]));
+// Day 1 shops: the plaza merchant (salt) and the market stalls (cloth, oranges)
+const shop = new Map(allEntriesForChapter("chapter-1").map((e) => [e.itemId, e]));
 
 test("every raw ingredient of the three Day 1 cases has a source in the Day 1 world", () => {
   assert.ok(raw.length > 0);
@@ -80,12 +82,17 @@ test("what has to be bought at the merchant fits the starting coins (never block
     const toBuy = Math.max(0, need.quantity - fromWorld);
     if (toBuy > 0) cost += toBuy * shop.get(need.itemId).price;
   }
-  assert.ok(cost <= STARTING_COINS, `to buy: ${cost} coins, starting coins: ${STARTING_COINS}`);
+  // 2026-11-16: with the Mill oranges gone the orange is bought too, so the day is paid with the starting
+  // purse PLUS what its cases earn (the no-deadlock test proves every order of buying works)
+  const income = Object.keys(CHAPTER1_PATIENTS).reduce((n, id) => n + getPatientPayment(id), 0);
+  assert.ok(cost <= STARTING_COINS + income, `to buy: ${cost} coins, starting coins: ${STARTING_COINS} + earned ${income}`);
   console.log(`  (Day 1 shopping: ${cost} of ${STARTING_COINS} coins)`);
 });
 
 test("nothing the merchant sells on Day 1 is a trap: every item on sale is used by some Day 1 recipe", () => {
   const needed = new Set(raw.map((n) => n.itemId));
+  // the farm woman's trade (milk for an orange) also uses what the market stall sells (2026-11-16)
+  for (const trade of Object.values(NPC_TRADES).filter((t) => t.interactionId.startsWith("chapter1.") && !t.ask)) for (const c of trade.consumes) needed.add(c.itemId);
   for (const id of shop.keys()) assert.ok(needed.has(id), `${id} is on sale on Day 1 but no case needs it`);
 });
 

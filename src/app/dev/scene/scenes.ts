@@ -37,6 +37,8 @@ export type DevScene = {
   logicalUnitsPerAssetPixel?: number;
   // Multiplies the shared zoom (1 = same apparent size as Calle Taberna).
   zoomMultiplier?: number;
+  // Size of the inventory bar and the coins in this scene (1 = the usual size; 2026-11-16, Kilian).
+  hudScale?: number;
   // Purely visual size of the protagonist sprite (default 1). Scales the image
   // around its feet anchor; position, hitbox and physics are unaffected.
   protagonistScale?: number;

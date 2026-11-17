@@ -30,9 +30,14 @@ const CARRIED_TO_CHAPTER_2: Readonly<Record<string, readonly string[]>> = {
     "plaza-villager-woman-02-01",
     "plaza-merchant-humble-01",
   ],
-  quarry: ["quarry-villager-woman-02-01", "quarry-stonecutter-shovel-01", "quarry-stonecutter-stool-01"],
+  // (2026-11-16: Kilian's new camp: no woman any more; the campfire stays lit. The resting stonecutter, the
+  // Day 1 coal giver, is not carried.)
+  quarry: ["quarry-stonecutter-shovel-01", "quarry-stonecutter-stool-01", "quarry-campfire-01"],
 };
 const QUARRY_ERRAND_GIVER_INSTANCE_ID = "quarry-stonecutter-stool-01";
+// THE MARKET STREET (2026-11-16) is authored once, for Day 1, and stays the same on Days 2 and 3 (Day 3
+// inherits Day 2): its whole population and its stall interactions are carried over.
+const MARKET_STREET_SCENE_ID = "market-street";
 const carriedCompositions: DecorComposition[] = Object.entries(CARRIED_TO_CHAPTER_2).map(([sceneId, ids]) => ({
   sceneId,
   chapterId: "chapter-2",
@@ -41,6 +46,10 @@ const carriedCompositions: DecorComposition[] = Object.entries(CARRIED_TO_CHAPTE
     .flatMap((composition) => composition.instances)
     .filter((instance) => ids.includes(instance.instanceId)),
 }));
+const marketStreetDay1 = chapter1Compositions.find((composition) => composition.sceneId === MARKET_STREET_SCENE_ID);
+if (marketStreetDay1) {
+  carriedCompositions.push({ sceneId: MARKET_STREET_SCENE_ID, chapterId: "chapter-2", instances: marketStreetDay1.instances });
+}
 // The exterior scenes of the new world take their population from
 // newWorldCompositions (authored in /dev/decorator on the new maps). The old
 // placements of those scenes stay in chapter-1.ts as legacy, unused; its
@@ -120,7 +129,7 @@ const INTERACTIONS_BY_CHAPTER: Record<
   "chapter-1": chapter1Interactions,
   "chapter-2": carriedAndChapter2Interactions(),
   // Day 3 inherits Day 2's interactions; its own (the new people) win on a clash.
-  "chapter-3": { ...carriedAndChapter2Interactions(), ...chapter3Interactions },
+  "chapter-3": chapter3AllInteractions(),
 };
 
 const NO_INTERACTIONS: Record<string, DecorInteraction> = {};
@@ -131,6 +140,16 @@ export function getChapterInteractions(
   return INTERACTIONS_BY_CHAPTER[chapterId] ?? NO_INTERACTIONS;
 }
 
+// Day 3 (2026-11-16, Kilian): the stonecutter on the quarry bench is the same man, now with the fracture case
+// (Day 2 he asks for the bone broth). Its zone is kept; only WHAT he says changes. The rest of Day 3's people
+// (the woman with the duster, the path miner, the Witch of the glade) wait for Kilian's placements.
+function chapter3AllInteractions(): Record<string, DecorInteraction> {
+  const inherited = { ...carriedAndChapter2Interactions(), ...chapter3Interactions };
+  const bench = inherited[QUARRY_ERRAND_GIVER_INSTANCE_ID];
+  if (bench) inherited[QUARRY_ERRAND_GIVER_INSTANCE_ID] = { ...bench, interactionId: "chapter3.quarry.stonecutter" };
+  return inherited;
+}
+
 // Day 2's interactions plus those of the carried-over Day 1 placements (their Day 1 zones; the stool
 // stonecutter asks for the bone broth instead of chatting).
 function carriedAndChapter2Interactions(): Record<string, DecorInteraction> {
@@ -139,6 +158,9 @@ function carriedAndChapter2Interactions(): Record<string, DecorInteraction> {
     for (const id of ids) {
       if (chapter1Interactions[id]) carried[id] = chapter1Interactions[id];
     }
+  }
+  for (const instance of marketStreetDay1?.instances ?? []) {
+    if (chapter1Interactions[instance.instanceId]) carried[instance.instanceId] = chapter1Interactions[instance.instanceId];
   }
   if (carried[QUARRY_ERRAND_GIVER_INSTANCE_ID]) {
     carried[QUARRY_ERRAND_GIVER_INSTANCE_ID] = { ...carried[QUARRY_ERRAND_GIVER_INSTANCE_ID], interactionId: "chapter2.quarry.miner" };

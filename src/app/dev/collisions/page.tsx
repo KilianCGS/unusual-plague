@@ -181,6 +181,12 @@ import {
   forestGladeTransitions as nwForestGladeTransitions,
 } from "../../../game/new-world-map/geometry/forestGladeGeometry";
 import {
+  marketStreetColliders as nwMarketStreetColliders,
+  marketStreetOccluders as nwMarketStreetOccluders,
+  marketStreetSpawns as nwMarketStreetSpawns,
+  marketStreetTransitions as nwMarketStreetTransitions,
+} from "../../../game/new-world-map/geometry/marketStreetGeometry";
+import {
   NIGHT_DAY_IDS,
   nightIdOf,
 } from "../../../game/new-world-map/newWorldNightVisuals";
@@ -310,6 +316,8 @@ const EDITOR_SCENES: {
     idPrefix: "forest-glade",
     exportPrefix: "forestGlade",
   },
+  // The market street (2026-11-16): starts empty.
+  { sceneId: "market-street", idPrefix: "market-street", exportPrefix: "marketStreet" },
   // Night versions (chapter 3): they open with the DAY geometry copied in, so
   // only the extra obstacles of the night have to be drawn. Export names end in Night.
   ...NIGHT_DAY_IDS.map((dayId) => ({
@@ -556,6 +564,12 @@ const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
     occluders: nwForestGladeOccluders,
     transitions: nwForestGladeTransitions,
     spawns: nwForestGladeSpawns,
+  },
+  "market-street": {
+    colliders: nwMarketStreetColliders,
+    occluders: nwMarketStreetOccluders,
+    transitions: nwMarketStreetTransitions,
+    spawns: nwMarketStreetSpawns,
   },
 };
 

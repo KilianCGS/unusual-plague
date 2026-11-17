@@ -97,7 +97,7 @@ test('the complete farmer path is playable with five slots, Day 1 leftovers in t
   }
   const treatment=interact('chapter2.granary.farmer',f);
   assert.deepEqual(treatment.effects,[{type:'treat',patientId:ID}]);apply(f,treatment);
-  assert.equal(f.patients[ID],'treated');assert.equal(countItem(f.inventory,'empty-flask'),1);
+  assert.equal(f.patients[ID],'treated');assert.equal(countItem(f.inventory,'empty-flask'),2); // (he carries two since 2026-11-16: each comes back with its water)
   assert.equal(countItem(f.inventory,'charcoal-suspension'),0);
   assert.deepEqual(interact('chapter2.granary.farmer',f).effects,[]);
   assert.equal(interact('chapter2.farm.woman',f).conversation.id,'chapter2.farm.woman.farmerTreated');

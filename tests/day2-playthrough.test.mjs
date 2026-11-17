@@ -72,7 +72,7 @@ const state = {
 };
 for (const [id, q] of [["orange", 2], ["cloth", 1]]) state.inventory = inv.addItem(state.inventory, id, q);
 // Day 1 is over: its pickups are gone (the oranges and herb), the rest of the world is as Day 2 finds it
-const DAY1_USED = new Set(["forest-medicinal-herb-dev-01", "mill-farmland-orange-world-01"]);
+const DAY1_USED = new Set(["forest-medicinal-herb-dev-01"]); // (the Mill oranges were removed on 2026-11-16: they are bought)
 for (const id of DAY1_USED) state.picked.add(id);
 
 const facts = () => ({ patients: state.patients, inventory: state.inventory, claimedRewards: state.claimed });
@@ -137,11 +137,13 @@ function pickUp(itemId) {
   return false;
 }
 function buy(itemId) {
-  const shop = shops.shopForChapter(shops.getShop("chapter1.plaza.merchant"), "chapter-2");
+  // 2026-11-16: the plaza merchant sells sugar and salt; the market street stalls the rest
+  const seller = shops.shopSelling(itemId, "chapter-2");
+  assert.ok(seller, `${itemId} is not on sale on Day 2`);
+  const shop = shops.shopForChapter(seller, "chapter-2");
   const entry = shop.entries.find((e) => e.itemId === itemId);
-  assert.ok(entry, `${itemId} is not on sale on Day 2`);
   assert.ok(shops.unitsLeft(state.claimed, shop, entry) > 0, `${itemId} is sold out`);
-  assert.ok(placedInDay2("chapter1.plaza.merchant"), "the merchant is placed in Day 2");
+  assert.ok(placedInDay2(seller.interactionId), `${seller.interactionId} is placed in Day 2`);
   apply(shops.buyEffects(state.claimed, shop, entry), `buy ${itemId}`);
 }
 const SUPPLIERS = {
@@ -162,7 +164,7 @@ function acquire(itemId) {
     }
     assert.fail(`no supplier gave ${itemId}`);
   }
-  if (shops.shopForChapter(shops.getShop("chapter1.plaza.merchant"), "chapter-2").entries.some((e) => e.itemId === itemId)) return buy(itemId);
+  if (shops.shopSelling(itemId, "chapter-2")) return buy(itemId);
   assert.ok(pickUp(itemId), `${itemId} cannot be found anywhere on Day 2`);
 }
 // make an item with the real recipes and stations (ingredients first)

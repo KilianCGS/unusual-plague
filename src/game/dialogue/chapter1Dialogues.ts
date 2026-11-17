@@ -178,6 +178,49 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
       ),
     ]),
     conversation("chapter1.plaza.cat", [subject("Mrrr...", "Mrrr...")]),
+    // 2026-11-16: the three stalls of the market street. New text, awaiting Kilian's review. (The shop
+    // itself opens straight from the interaction; these are the sellers' own words, like the plaza merchant's.)
+    conversation("chapter1.market.produce", [
+      subject(
+        "Naranjas, cebollas, ajos. Lo que no vendo hoy, lo vendo mañana, que la fruta es paciente.",
+        "Oranges, onions, garlic. What I don't sell today I'll sell tomorrow; fruit is patient.",
+      ),
+      doctor("¿Y las cebollas también?", "And the onions too?"),
+      subject("Las cebollas ya nacen resignadas.", "Onions are born resigned."),
+    ]),
+    conversation("chapter1.market.draper", [
+      subject(
+        "Telas, retales y cuero. De lo que sobra de un abrigo sale un vendaje.",
+        "Cloth, scraps and leather. What's left of a coat makes a bandage.",
+      ),
+      doctor("Eso es aprovechar.", "That's making good use of it."),
+      subject("En mi oficio, tirar es un pecado.", "In my trade, throwing away is a sin."),
+    ]),
+    conversation("chapter1.market.customerMan", [
+      // (2026-11-16: he stands in front of the butcher's stall, so he talks about the ham)
+      subject(
+        "Llevo media hora mirando ese jamón y el jamón me mira a mí.",
+        "I've been looking at that ham for half an hour and the ham is looking back at me.",
+      ),
+      doctor("¿Y quién ha pestañeado primero?", "And who blinked first?"),
+      subject("El jamón, pero no se lo cuente a nadie.", "The ham did, but don't tell anyone."),
+    ]),
+    conversation("chapter1.market.customerOld", [
+      subject(
+        "Antes aquí solo había una pared. Ahora hay pared y gente, que es mejor.",
+        "There used to be only a wall here. Now there's a wall and people, which is better.",
+      ),
+      doctor("¿Y compra algo, o solo mira?", "Do you buy anything, or just look?"),
+      subject("A mi edad, mirar es la mitad de comprar.", "At my age, looking is half of buying."),
+    ]),
+    conversation("chapter1.market.butcher", [
+      subject(
+        "Huesos para el caldo y grasa para lo que haga falta. De la carne, hoy mejor no hablamos.",
+        "Bones for the broth and fat for whatever's needed. Let's not talk about the meat today.",
+      ),
+      doctor("¿Por qué no?", "Why not?"),
+      subject("Porque se me nota la cara de carnicero.", "Because I look too much like a butcher."),
+    ]),
     conversation("chapter1.plaza.merchant", [
       subject(
         "Amuletos contra la mala suerte. Garantía de tres días.",
@@ -274,17 +317,7 @@ export const chapter1AmbientDialogues: Record<string, LocalizedConversation> =
       ),
     ]),
     // The quarry camp (2026-11-15). New text, awaiting Kilian's review.
-    conversation("chapter1.quarry.woman", [
-      subject(
-        "Les traigo el almuerzo a estos. Si no, la piedra les sabe a pan, y el pan, a piedra.",
-        "I bring these lads their lunch. Otherwise the stone tastes like bread, and the bread like stone.",
-      ),
-      doctor("¿Alguno anda con tos o con dolores?", "Is anyone coughing or aching?"),
-      subject(
-        "Todos, un poco. Pero hoy ninguno se ha quejado, y eso por aquí ya es salud.",
-        "All of them, a little. But today nobody has complained, and around here that counts as health.",
-      ),
-    ]),
+    // (the quarry woman who brought the lunch left with the new camp on 2026-11-16: her talk was removed)
     conversation("chapter1.quarry.stonecutterShovel", [
       subject(
         "Apoyado en la pala se lleva mejor la mañana. La pala no se queja.",

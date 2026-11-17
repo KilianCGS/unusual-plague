@@ -104,6 +104,8 @@ export type StoryEffect =
   | { type: "give-item"; itemId: string; quantity: number }
   // Takes items out of the carried inventory (all or nothing, with the rest).
   | { type: "take-item"; itemId: string; quantity: number }
+  // A bigger bag: the carried inventory gets `slots` more places (the Day 2 backpack).
+  | { type: "grow-inventory"; slots: number }
   // The Doctor's copper coins (see src/game/money): earning never fails, paying
   // fails (and so does the whole effect list) when the purse is too light.
   | { type: "give-coins"; amount: number }
@@ -761,20 +763,20 @@ export function resolveStoryInteraction(
     if (decision === "gather") {
       const source = GATHER_SOURCES[interactionId];
 
-      // The empty vessel is filled (used up) and gives what is still missing,
-      // at most `quantity` units: one filling serves both treatments.
+      // One flask per unit of water (2026-11-16, Kilian: the flasks and the water are one to one): each empty
+      // flask is filled (used up) and gives one unit, as many as are still missing, at most `quantity`, and
+      // at most the flasks carried. Each flask comes back as its water is used (craft()).
+      const units = Math.min(
+        source.quantity,
+        missingOf(missing, source.itemId),
+        countItem(facts.inventory, source.requires),
+      );
+
       return {
         conversation: null,
         effects: [
-          { type: "take-item", itemId: source.requires, quantity: 1 },
-          {
-            type: "give-item",
-            itemId: source.itemId,
-            quantity: Math.min(
-              source.quantity,
-              missingOf(missing, source.itemId),
-            ),
-          },
+          { type: "take-item", itemId: source.requires, quantity: units },
+          { type: "give-item", itemId: source.itemId, quantity: units },
         ],
       };
     }

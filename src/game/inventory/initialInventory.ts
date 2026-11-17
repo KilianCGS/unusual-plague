@@ -12,10 +12,11 @@ export function createChapter1Inventory(): InventoryState {
   return createEmptyInventory();
 }
 
-// The Doctor's Storage when Chapter 1 begins: his empty flask, ONCE. Together
-// with the carried inventory there is exactly one Empty flask in the game.
+// The Doctor's Storage when Chapter 1 begins: his TWO empty flasks (2026-11-16, Kilian: filling at the river
+// gives 2 waters, so he carries 2 flasks, one for each). Together with the carried inventory there are
+// exactly two Empty flasks in the game; taking them moves the whole stack.
 export function createChapter1Storage(): InventoryState {
   return (
-    addItem(createEmptyStorage(), "empty-flask", 1) ?? createEmptyStorage()
+    addItem(createEmptyStorage(), "empty-flask", 2) ?? createEmptyStorage()
   );
 }

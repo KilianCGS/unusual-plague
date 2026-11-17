@@ -9,7 +9,6 @@ export type ItemId =
   | "candle"
   | "chopped-onion"
   | "chopped-mushroom"
-  | "chopped-pine-mushroom"
   | "crushed-garlic"
   | "medicinal-herb"
   | "cloth"
@@ -51,10 +50,8 @@ export type ItemId =
   | "sugar"
   | "onion"
   | "bone-broth"
-  | "mushroom-cream"
   | "onion-syrup"
   | "rehydration-drink"
-  | "citrus-syrup"
   | "strong-broth"
   // The black feather the Witch gives (Day 1): it is for no recipe; it matters on Day 4.
   | "black-feather";
@@ -278,11 +275,6 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     name: { es: "Hongo troceado", en: "Chopped mushroom" },
     icon: `${PREPARED_ICONS}/chopped-mushroom.png`,
   },
-  "chopped-pine-mushroom": {
-    id: "chopped-pine-mushroom",
-    name: { es: "Seta de pino troceada", en: "Chopped pine mushroom" },
-    icon: `${PREPARED_ICONS}/chopped-pine-mushroom.png`,
-  },
   "crushed-garlic": {
     id: "crushed-garlic",
     name: { es: "Ajo machacado", en: "Crushed garlic" },
@@ -328,11 +320,6 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     name: { es: "Caldo de huesos", en: "Bone broth" },
     icon: `${PREPARED_ICONS}/bone-broth.png`,
   },
-  "mushroom-cream": {
-    id: "mushroom-cream",
-    name: { es: "Crema de setas", en: "Mushroom cream" },
-    icon: `${PREPARED_ICONS}/mushroom-cream.png`,
-  },
   "onion-syrup": {
     id: "onion-syrup",
     name: { es: "Jarabe de cebolla", en: "Onion syrup" },
@@ -342,11 +329,6 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     id: "rehydration-drink",
     name: { es: "Bebida reconstituyente", en: "Rehydration drink" },
     icon: `${PREPARED_ICONS}/rehydration-drink.png`,
-  },
-  "citrus-syrup": {
-    id: "citrus-syrup",
-    name: { es: "Jarabe cítrico", en: "Citrus syrup" },
-    icon: `${PREPARED_ICONS}/citrus-syrup.png`,
   },
   "strong-broth": {
     id: "strong-broth",

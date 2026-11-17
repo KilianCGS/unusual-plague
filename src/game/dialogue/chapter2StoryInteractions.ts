@@ -62,6 +62,30 @@ const flourOffer = [
   npc("Sírvase del saco del rincón, Doctor. Con la cantidad que pueda llevar bastará.", "Help yourself from the sack in the corner, Doctor. Whatever you can carry will do."),
 ];
 
+// 2026-11-16 (Kilian): the seamstress of the apothecary street is the wife of the tavern man the Doctor
+// helped on Day 1. She gives him a backpack just for talking (one more slot, a comfort, not a reward to
+// earn). New text, awaiting Kilian's review.
+export const SEAMSTRESS_INTERACTION_ID = "chapter2.apothecaryStreet.seamstress";
+export const SEAMSTRESS_BACKPACK_ID = "chapter2.seamstress.backpack";
+const backpackGift = talk("chapter2.apothecaryStreet.seamstress.backpack", [
+  npc("¡Doctor! Usted es el que ayudó a mi marido en la taberna. Dice que ya no le duele la barriga, y que el sermón le dolió más.", "Doctor! You're the one who helped my husband at the tavern. He says his stomach doesn't hurt any more, and that the scolding hurt worse."),
+  doctor("Entonces se curó del todo. Con el sermón no pude hacer nada.", "Then he's fully cured. I couldn't do anything about the scolding."),
+  npc("Lleva usted todo en los brazos. Tome, la mochila la cosí con retales de sobra. Le cabe una cosa más.", "You carry everything in your arms. Here, I sewed this backpack from leftover scraps. It holds one more thing."),
+  doctor("Es perfecta. Se lo agradezco de verdad.", "It's perfect. I truly thank you."),
+  npc("Agradézcaselo a mi marido: sin su barriga no habría mochila.", "Thank my husband: without his stomach there'd be no backpack."),
+]);
+
+// 2026-11-16 (Kilian): the baker gives ONE sugar, as a thank-you, in the first conversation of Day 2
+// after the flour offer (it is her own flag, separate from the Day 1 salt). It waits if it does not fit.
+// New text, awaiting Kilian's review.
+export const BAKER_SUGAR_ID = "chapter2.bakery.baker.sugar";
+const BAKER_INTERACTION_ID = "chapter2.bakery.baker";
+const sugarGift = talk("chapter2.bakery.baker.sugar", [
+  npc("Espere, Doctor. Con lo de ayer le debo algo más que palabras: un puñado de azúcar del obrador.", "Wait, Doctor. After yesterday I owe you more than words: a handful of sugar from the bakery."),
+  doctor("No hacía falta. Pero la acepto, que el azúcar nunca estorba.", "You didn't have to. But I'll take it, sugar never gets in the way."),
+  npc("Es poca. Lo bueno, si es poco, se aprovecha mejor.", "It's not much. What's good, when there's little of it, gets better use."),
+]);
+
 export function resolveChapter2StoryInteraction(
   interactionId: string, facts: StoryFacts, language: Language, subjectId: string,
 ): StoryOutcome | null {
@@ -74,6 +98,23 @@ export function resolveChapter2StoryInteraction(
     return {
       conversation: { ...base, id: `${base.id}.flour`, lines: [...base.lines, ...offer] },
       effects: [...(honey?.effects ?? []), { type: "claim-reward", rewardId: FLOUR_OFFERED_ID }],
+    };
+  }
+  if (interactionId === SEAMSTRESS_INTERACTION_ID && !facts.claimedRewards?.has(SEAMSTRESS_BACKPACK_ID)) {
+    return {
+      conversation: localizeConversation(backpackGift, language, subjectId),
+      effects: [{ type: "grow-inventory", slots: 1 }, { type: "claim-reward", rewardId: SEAMSTRESS_BACKPACK_ID }],
+    };
+  }
+  if (
+    interactionId === BAKER_INTERACTION_ID &&
+    facts.claimedRewards?.has(FLOUR_OFFERED_ID) &&
+    !facts.claimedRewards.has(BAKER_SUGAR_ID) &&
+    canAddItem(facts.inventory, "sugar")
+  ) {
+    return {
+      conversation: localizeConversation(sugarGift, language, subjectId),
+      effects: [{ type: "give-item", itemId: "sugar", quantity: 1 }, { type: "claim-reward", rewardId: BAKER_SUGAR_ID }],
     };
   }
   const patient = resolveChapter2Patient(interactionId, facts, language, subjectId);

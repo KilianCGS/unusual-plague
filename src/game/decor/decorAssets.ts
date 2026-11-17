@@ -1169,6 +1169,206 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
   },
   {
+    // 2026-11-16 (Kilian): the Witch sitting with her BACK to us, cross-legged and slightly turned, to be
+    // placed on the log of the mushroom glade (the log is the background's: it is NOT in the sprite). PixelLab
+    // state "Sitting crossed-legs back B" of the same Witch, its north-west rotation; use flipX on the
+    // instance to turn her the other way. Static. Silhouette x21-79 y12-83 of the 96x96 frame.
+    // Authoring asset: no collider and no interaction until she is placed.
+    id: "witch-sitting-back",
+    label: "Witch (sitting on the log, from behind)",
+    category: "people",
+    sprite: {
+      frames: ["/game/characters/witch/sit/back/0.png"],
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 0,
+      loop: false,
+    },
+    anchor: { x: 0.521, y: 0.865 },
+    headHeight: 71,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-16 (Kilian's new people): Seated with no bench, turned slightly toward the right to face the old woman. PixelLab character, idle of 9 frames
+    // (ping-pong). Silhouette x35-77 y16-92 of the 108x108 frame.
+    // Authoring asset: no collider and no interaction until placed.
+    id: "elderly-man-seated",
+    label: "Elderly man (seated, chatting; turned right)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/elderly-man-seated/idle/${i}.png`),
+      frameWidth: 108,
+      frameHeight: 108,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.519, y: 0.852 },
+    headHeight: 76,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-16 (Kilian's new people): Seated with no bench, turned slightly toward the left to face the old man. PixelLab character, idle of 9 frames
+    // (ping-pong). Silhouette x37-74 y17-95 of the 112x112 frame.
+    // Authoring asset: no collider and no interaction until placed.
+    id: "elderly-woman-seated",
+    label: "Elderly woman (seated, chatting; turned left)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/elderly-woman-seated/idle/${i}.png`),
+      frameWidth: 112,
+      frameHeight: 112,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.496, y: 0.848 },
+    headHeight: 78,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-16 (Kilian's new people): Crouching boy, realistic child proportions; the top is on the ground. PixelLab character, idle of 9 frames
+    // (ping-pong). Silhouette x15-63 y16-81 of the 96x96 frame.
+    // Authoring asset: no collider and no interaction until placed.
+    id: "boy-spinning-top",
+    label: "Boy playing with a spinning top",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/boy-spinning-top/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.406, y: 0.844 },
+    headHeight: 65,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-16 (Kilian's new people): Realistic child proportions; the rope swings in a loop. PixelLab character, idle of 9 frames
+    // (plain loop). Silhouette x35-89 y17-107 of the 124x124 frame.
+    // Authoring asset: no collider and no interaction until placed.
+    id: "girl-jump-rope",
+    label: "Girl jumping rope",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `/game/npcs/girl-jump-rope/idle/${i}.png`),
+      frameWidth: 124,
+      frameHeight: 124,
+      fps: 9,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.863 },
+    headHeight: 90,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-16 (Kilian's new people): Young bell-ringer in a linen robe. PixelLab character, idle of 9 frames
+    // (ping-pong). Silhouette x34-75 y22-99 of the 116x116 frame.
+    // Authoring asset: no collider and no interaction until placed.
+    id: "acolyte-bell",
+    label: "Acolyte with a hand bell",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/acolyte-bell/idle/${i}.png`),
+      frameWidth: 116,
+      frameHeight: 116,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.47, y: 0.853 },
+    headHeight: 77,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-16 (Kilian's new people): Kneeling, back view. PixelLab character, idle of 9 frames
+    // (ping-pong). Silhouette x34-70 y17-88 of the 104x104 frame.
+    // Authoring asset: no collider and no interaction until placed.
+    id: "praying-old-woman-back",
+    label: "Old woman kneeling in prayer (from behind)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/praying-old-woman-back/idle/${i}.png`),
+      frameWidth: 104,
+      frameHeight: 104,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.846 },
+    headHeight: 71,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-16 (Kilian's new people): Kneeling, profile facing left. PixelLab character, idle of 9 frames
+    // (ping-pong). Silhouette x31-72 y22-92 of the 108x108 frame.
+    // Authoring asset: no collider and no interaction until placed.
+    id: "praying-man-side",
+    label: "Man kneeling in prayer (side view)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/praying-man-side/idle/${i}.png`),
+      frameWidth: 108,
+      frameHeight: 108,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.477, y: 0.852 },
+    headHeight: 70,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-16 (Kilian's new people): Kneeling, three-quarter view facing left. PixelLab character, idle of 9 frames
+    // (ping-pong). Silhouette x35-69 y20-88 of the 104x104 frame.
+    // Authoring asset: no collider and no interaction until placed.
+    id: "praying-young-woman",
+    label: "Young woman kneeling in prayer (three-quarter)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/praying-young-woman/idle/${i}.png`),
+      frameWidth: 104,
+      frameHeight: 104,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.846 },
+    headHeight: 68,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-16 (Kilian's new people): Standing guard, humble chainmail; a spear planted on the ground (replaces the sword). PixelLab, idle of 9 frames
+    // (ping-pong). Silhouette x43-89 y20-108 of the 136x136 frame.
+    // Authoring asset: no collider and no interaction until placed.
+    id: "knight-spear-shield",
+    label: "Knight (spear and shield, on guard)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/knight-spear-shield/idle/${i}.png`),
+      frameWidth: 136,
+      frameHeight: 136,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.485, y: 0.794 },
+    headHeight: 88,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-16 (Kilian's new people): Carpenter at a workbench sawing a plank (the bench is part of the sprite), front view. PixelLab, idle of 9 frames
+    // (ping-pong). Silhouette x21-106 y7-89 of the 128x96 frame.
+    // Authoring asset: no collider and no interaction until placed.
+    id: "carpenter-workbench",
+    label: "Carpenter sawing at his workbench",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/carpenter-workbench/idle/${i}.png`),
+      frameWidth: 128,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.496, y: 0.927 },
+    headHeight: 82,
+    defaultScale: 1,
+  },
+  {
     // Witch's black cat, sitting. An asset of its own, independent of Witch:
     // it can be placed next to her, alone or elsewhere. Drawn facing screen-
     // right; use flipX on the instance to make it face left (the anchor is the
@@ -1613,6 +1813,33 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     // Same silhouette (x19-71 y9-55) and collider as the table it replaces.
     defaultCollider: { offsetX: -29, offsetY: -55, width: 53, height: 47 },
   },
+  // 2026-11-16: the three stalls of the market street (between the apothecary and the farm). Each is
+  // ONE piece: the seller behind the counter, seen from the front, meant to sit under the awnings of
+  // the street's background. 128x96, with a light breathing idle. No default collider: Kilian paints it in /dev/collisions.
+  ...(
+    [
+      ["market-stall-produce", "Market stall - fruit and vegetables"],
+      ["market-stall-draper", "Market stall - cloth and leather"],
+      ["market-stall-butcher", "Market stall - butcher"],
+    ] as const
+  ).map(([id, label]) => ({
+    id,
+    label,
+    category: "ambient" as const,
+    // 9-frame breathing idle (static.png stays next to it as the still version).
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `/game/npcs/${id}/idle/${i}.png`),
+      frameWidth: 128,
+      frameHeight: 96,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 1 },
+    defaultScale: 1,
+    // The counter (2026-11-16, Kilian: "activate the default collider"): the lower 26 units of the sprite,
+    // 116 wide, so the Doctor cannot walk through it. A default sized from the sprite; adjust it in the Decorator.
+    defaultCollider: { offsetX: -58, offsetY: -26, width: 116, height: 26 },
+  })),
   {
     // Day 2: the forest herb is a small pile; one pick-up gives TWO herbs (the
     // blacksmith's paste and the farmer's infusion). Same art and anchor as

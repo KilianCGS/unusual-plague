@@ -72,10 +72,6 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
     es: "Hongos cortados en láminas y trozos. Lista para el caldo.",
     en: "Mushrooms cut into slices and pieces. Ready for the broth.",
   },
-  "chopped-pine-mushroom": {
-    es: "Seta de pino cortada en trozos, con su pie en rodajas. Lista para la crema.",
-    en: "Pine mushroom cut into pieces, with its stem in slices. Ready for the cream.",
-  },
   "crushed-garlic": {
     es: "Ajo machacado en el mortero hasta quedar casi en polvo. Base del jarabe.",
     en: "Garlic ground in the mortar until almost a powder. The base of the syrup.",
@@ -93,10 +89,6 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
     es: "Hueso hervido despacio con agua y sal. Un caldo que repone.",
     en: "Bone simmered slowly with water and salt. A restoring broth.",
   },
-  "mushroom-cream": {
-    es: "Seta de pino y leche con una pizca de sal, cocidas hasta quedar cremosas.",
-    en: "Pine mushroom and milk with a pinch of salt, cooked until creamy.",
-  },
   "onion-syrup": {
     es: "Cebolla y azúcar cocidas hasta formar un jarabe espeso para la tos.",
     en: "Onion and sugar cooked into a thick syrup for a cough.",
@@ -104,10 +96,6 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
   "rehydration-drink": {
     es: "Agua con azúcar y sal. Devuelve las fuerzas a quien está agotado.",
     en: "Water with sugar and salt. Restores the strength of the exhausted.",
-  },
-  "citrus-syrup": {
-    es: "Naranja y azúcar cocidas hasta obtener un jarabe dulce y ácido.",
-    en: "Orange and sugar cooked into a sweet, tangy syrup.",
   },
   "strong-broth": {
     es: "Cebolla, hueso y agua cocidos largo rato. Un caldo oscuro y fuerte.",
