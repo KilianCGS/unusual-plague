@@ -63,6 +63,19 @@ export const chapter3AmbientDialogues: Record<string, LocalizedConversation> = O
   ]),
 ]);
 
+// THE SPEAR KNIGHT IN FRONT OF THE MINE, DAY 3 (2026-11-17, Kilian: "hay desprendimientos"). NEW TEXT, awaiting
+// Kilian's review. The mine entrance is shut on Day 3 (see world/lockedDoors.ts); he explains why.
+export const CHAPTER3_MINE_GUARD_ID = "chapter3.mountainPath.guard";
+export const chapter3MineGuardDialogue: Record<string, LocalizedConversation> = Object.fromEntries([
+  talk(CHAPTER3_MINE_GUARD_ID, [
+    npc("Alto, Doctor. La mina está cerrada hasta nuevo aviso.", "Halt, Doctor. The mine is closed until further notice."),
+    doctor("¿Ha pasado algo?", "Has something happened?"),
+    npc("Desprendimientos. El techo del primer túnel ha cedido, y nadie sabe qué más está suelto ahí dentro.", "Rockfalls. The roof of the first tunnel has given way, and nobody knows what else is loose in there."),
+    doctor("Quizá pueda echar una mano.", "Perhaps I can lend a hand."),
+    npc("Hoy no. No dejo pasar a nadie, ni siquiera a usted. Fuera de la mina hay trabajo de sobra.", "Not today. I let nobody through, not even you. There's plenty of work outside the mine."),
+  ]),
+]);
+
 export const chapter4AmbientDialogues: Record<string, LocalizedConversation> = Object.fromEntries([
   talk("chapter4.outskirts.fisherman", [
     npc("Con luna así no pican, pero se está bien.", "With a moon like this they don't bite, but it's pleasant."),

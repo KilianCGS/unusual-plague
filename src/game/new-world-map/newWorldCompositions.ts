@@ -442,16 +442,6 @@ export const newWorldChapter1Compositions: DecorComposition[] = [
         zOffset: 0,
       },
       {
-        instanceId: "mountain-path-campfire-01",
-        assetId: "campfire",
-        x: 738,
-        y: 298,
-        scale: 1.21,
-        flipX: false,
-        colliderEnabled: false,
-        zOffset: 0,
-      },
-      {
         instanceId: "mountain-path-miner-pick-swing-01",
         assetId: "miner-pick-swing",
         x: 758,

@@ -8,7 +8,8 @@ import type { WorldScene } from "./worldScenes";
 // adding its painting here.
 export const NIGHT_CHAPTER_ID = "chapter-4";
 
-const NIGHT_DIR = "/game/new-world-map/night";
+// 2026-11-17: every night painting lives in public/game/chapter-4-night/ (Kilian's folder).
+const NIGHT_DIR = "/game/chapter-4-night";
 
 export const NIGHT_BACKGROUNDS: Readonly<Record<string, string>> = {
   outskirts: `${NIGHT_DIR}/outskirts-night-background.png`,
@@ -20,7 +21,7 @@ export const NIGHT_BACKGROUNDS: Readonly<Record<string, string>> = {
   // The Witch's cottage at night (2026-11-12): where the Doctor meets her on Day 4.
   "forest-cottage": `${NIGHT_DIR}/forest-cottage-night-background.png`,
   // The Doctor's Room at night (2026-11-13): where Day 4 begins.
-  "doctor-room": "/game/areas/doctor-room/doctor-room-night-background.png",
+  "doctor-room": `${NIGHT_DIR}/doctor-room-night-background.png`,
 };
 
 // The outdoor scenes that have no night painting yet (they get the grade below).
@@ -38,6 +39,20 @@ export const NIGHT_GRADED_OUTDOORS: readonly string[] = [
 // The grade for the scenes that have no painting: dark, cool, a little desaturated.
 export const NIGHT_GRADE =
   "brightness(0.58) sepia(0.55) hue-rotate(168deg) saturate(1.9) contrast(1.12)";
+
+// The night look of a scene's visual (its painting, or the grade when it has none yet). Used by the
+// Decorator when it edits Day 4 ("artifacts"), so Kilian places things on the night image. The Botica
+// (a scene of its own in the Decorator, "apothecary-main-zone") has its night painting too.
+export function nightVisualFor<V extends { backgroundSrc: string; backgroundFilter?: string }>(
+  sceneId: string,
+  visual: V,
+): V {
+  if (sceneId === "apothecary-main-zone") return { ...visual, backgroundSrc: APOTHECARY_NIGHT_BACKGROUND };
+  const painting = NIGHT_BACKGROUNDS[sceneId];
+  if (painting) return { ...visual, backgroundSrc: painting };
+  if (NIGHT_GRADED_OUTDOORS.includes(sceneId)) return { ...visual, backgroundFilter: NIGHT_GRADE };
+  return visual;
+}
 
 export function sceneForChapter(scene: WorldScene, chapterId: string): WorldScene {
   if (chapterId !== NIGHT_CHAPTER_ID || scene.kind !== "exterior") return scene;
@@ -58,4 +73,4 @@ export function sceneForChapter(scene: WorldScene, chapterId: string): WorldScen
 // The Botica is drawn by its own scene, not by the generic renderer: its night painting
 // (2026-11-13, same 1606x979 size as the day one) is chosen here for Day 4.
 export const APOTHECARY_NIGHT_BACKGROUND =
-  "/game/areas/apothecary/apothecary-main-zone-night-background.png";
+  `${NIGHT_DIR}/apothecary-main-zone-night-background.png`;

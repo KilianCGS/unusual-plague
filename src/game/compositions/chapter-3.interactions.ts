@@ -8,7 +8,12 @@ import { chapter3Compositions } from "./chapter-3";
 //   "apothecary-street-woman-dusting-01":  "chapter3.apothecaryStreet.duster",
 //   "mountain-path-miner-pick-swing-01":   "chapter3.mountainPath.miner",
 //   "quarry-miner-01":                     "chapter3.quarry.stonecutter",
-const ids: Record<string, string> = {};
+const ids: Record<string, string> = {
+  // 2026-11-17 (Kilian's second Day 3 export): the Witch sitting on the glade log is the Witch of the glade
+  // (bone, mint, herb and the omen); the spear knight in front of the mine entrance says the way is shut.
+  "forest-glade-witch-sitting-back-01": "chapter3.glade.witch",
+  "mountain-path-knight-spear-shield-01": "chapter3.mountainPath.guard",
+};
 
 // Reach follows each approved placement's scaled sprite bounds plus 16 units (the same
 // rule as Day 2). Does not change the composition or any manually authored geometry.

@@ -141,7 +141,8 @@ test("the market street is populated from Day 1 and stays the same on Days 2 and
   const stalls = ["produce", "draper", "butcher"].map((n) => `market-street-market-stall-${n}-01`);
   for (const chapter of ["chapter-1", "chapter-2", "chapter-3"]) {
     const comp = idx.getComposition("market-street", chapter);
-    assert.equal(comp.instances.length, 10, chapter);
+    // Days 2 and 3 carry the fixtures (stalls, flames, cat, mouse) but not the two customers in front
+    assert.equal(comp.instances.length, chapter === "chapter-1" ? 10 : 8, chapter);
     for (const id of stalls) assert.ok(comp.instances.some((i) => i.instanceId === id), `${id} in ${chapter}`);
     const interactions = idx.getChapterInteractions(chapter);
     assert.deepEqual(stalls.map((id) => interactions[id]?.interactionId), ["chapter1.market.produce", "chapter1.market.draper", "chapter1.market.butcher"], chapter);
@@ -156,9 +157,14 @@ test("the market street is populated from Day 1 and stays the same on Days 2 and
     assert.equal(instance.colliderEnabled, true, id);
     assert.ok(assets.getDecorAsset(instance.assetId).defaultCollider, `${instance.assetId} has a default collider`);
   }
-  const talk = idx.getChapterInteractions("chapter-3");
+  const talk = idx.getChapterInteractions("chapter-1");
   assert.equal(talk["market-street-villager-back-man-01"].interactionId, "chapter1.market.customerMan");
   assert.equal(talk["market-street-villager-back-old-01"].interactionId, "chapter1.market.customerOld");
+  for (const chapter of ["chapter-2", "chapter-3"]) {
+    for (const id of ["market-street-villager-back-man-01", "market-street-villager-back-old-01"]) {
+      assert.equal(idx.getChapterInteractions(chapter)[id], undefined, `${id} is not carried to ${chapter}`);
+    }
+  }
   for (const key of ["chapter1.market.produce", "chapter1.market.draper", "chapter1.market.butcher"]) assert.ok(shops.getShop(key), key);
 });
 

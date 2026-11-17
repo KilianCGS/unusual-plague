@@ -122,7 +122,7 @@ const OLD_DEV_SCENES: DevScene[] = [
   {
     // The Doctor's Room (Kilian, 2026-11-13, replaces the 1385x1136 one): a 1254x1254 painting,
     // 0.375 unit per asset pixel like the other approved interiors, so the world is 470x470.
-    // Its night version (Day 4) is doctor-room-night-background.png, same size.
+    // Its night version (Day 4) is chapter-4-night/doctor-room-night-background.png, same size.
     id: "doctor-room",
     label: "Habitacion del Doctor",
     backgroundSrc: "/game/areas/doctor-room/doctor-room-v2-background.png",

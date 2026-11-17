@@ -36,8 +36,13 @@ const CARRIED_TO_CHAPTER_2: Readonly<Record<string, readonly string[]>> = {
 };
 const QUARRY_ERRAND_GIVER_INSTANCE_ID = "quarry-stonecutter-stool-01";
 // THE MARKET STREET (2026-11-16) is authored once, for Day 1, and stays the same on Days 2 and 3 (Day 3
-// inherits Day 2): its whole population and its stall interactions are carried over.
+// inherits Day 2): its population and its stall interactions are carried over. 2026-11-17 (Kilian): the
+// STALLS are fixed every day for convenience when buying, but the people standing in front of them are
+// NOT carried: each day he places his own there.
 const MARKET_STREET_SCENE_ID = "market-street";
+const MARKET_STREET_CUSTOMER_IDS: readonly string[] = ["market-street-villager-back-man-01", "market-street-villager-back-old-01"];
+const marketStreetCarried = (instances: DecorComposition["instances"]) =>
+  instances.filter((instance) => !MARKET_STREET_CUSTOMER_IDS.includes(instance.instanceId));
 const carriedCompositions: DecorComposition[] = Object.entries(CARRIED_TO_CHAPTER_2).map(([sceneId, ids]) => ({
   sceneId,
   chapterId: "chapter-2",
@@ -48,7 +53,7 @@ const carriedCompositions: DecorComposition[] = Object.entries(CARRIED_TO_CHAPTE
 }));
 const marketStreetDay1 = chapter1Compositions.find((composition) => composition.sceneId === MARKET_STREET_SCENE_ID);
 if (marketStreetDay1) {
-  carriedCompositions.push({ sceneId: MARKET_STREET_SCENE_ID, chapterId: "chapter-2", instances: marketStreetDay1.instances });
+  carriedCompositions.push({ sceneId: MARKET_STREET_SCENE_ID, chapterId: "chapter-2", instances: marketStreetCarried(marketStreetDay1.instances) });
 }
 // The exterior scenes of the new world take their population from
 // newWorldCompositions (authored in /dev/decorator on the new maps). The old
@@ -159,7 +164,7 @@ function carriedAndChapter2Interactions(): Record<string, DecorInteraction> {
       if (chapter1Interactions[id]) carried[id] = chapter1Interactions[id];
     }
   }
-  for (const instance of marketStreetDay1?.instances ?? []) {
+  for (const instance of marketStreetCarried(marketStreetDay1?.instances ?? [])) {
     if (chapter1Interactions[instance.instanceId]) carried[instance.instanceId] = chapter1Interactions[instance.instanceId];
   }
   if (carried[QUARRY_ERRAND_GIVER_INSTANCE_ID]) {

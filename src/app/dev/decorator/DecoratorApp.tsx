@@ -47,6 +47,7 @@ import {
   withInteractions,
 } from "../../../game/decor/decorRuntime";
 import { getChapterInteractions } from "../../../game/compositions";
+import { nightVisualFor } from "../../../game/world/nightScenes";
 import styles from "./page.module.css";
 import { useEditorDirectionInput } from "./useEditorDirectionInput";
 
@@ -241,6 +242,9 @@ function Workspace({
   onClear,
 }: WorkspaceProps) {
   const world = getSceneWorld(scene.visual);
+  // Day 4 ("artifacts") is authored on the NIGHT image of each scene (2026-11-17, Kilian): its painting, or the
+  // dark grade for the scenes that have none yet. Same size and geometry as the day one.
+  const backdrop = chapterId === "artifacts" ? nightVisualFor(scene.id, scene.visual) : scene.visual;
   // Read-only shared backdrop. Local draft instances remain editable, and
   // their ids suppress the preview so the author never sees two copies.
   const sharedBackdrop = getSharedEnvironmentInstances(scene.id).filter(
@@ -995,7 +999,7 @@ function Workspace({
               data-testid="layer"
               className={`${styles.layer} ${armedAssetId ? styles.placing : ""}`}
               style={{
-                backgroundImage: `url("${scene.visual.backgroundSrc}")`,
+                backgroundImage: backdrop.backgroundFilter ? undefined : `url("${backdrop.backgroundSrc}")`,
               }}
               onPointerDown={handlePointerDown}
               onPointerMove={handlePointerMove}
@@ -1005,6 +1009,19 @@ function Workspace({
               {/* Reference sprites never take clicks: instances under them stay
                   selectable. (Wrapper is not positioned: children still stack
                   in the layer.) */}
+              {backdrop.backgroundFilter ? (
+                <div
+                  data-testid="night-grade"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    pointerEvents: "none",
+                    backgroundImage: `url("${backdrop.backgroundSrc}")`,
+                    backgroundSize: "100% 100%",
+                    filter: backdrop.backgroundFilter,
+                  }}
+                />
+              ) : null}
               <div style={{ pointerEvents: "none" }}>
                 {realNpcs.map((npc) => (
                   <SceneNpcSprite key={npc.id} npc={npc} />

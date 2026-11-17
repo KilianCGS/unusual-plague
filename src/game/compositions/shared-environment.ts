@@ -755,16 +755,6 @@ export const sharedEnvironmentCompositions: Pick<DecorComposition, "sceneId" | "
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0
-      },
-      {
-        "instanceId": "mountain-path-campfire-01",
-        "assetId": "campfire",
-        "x": 650,
-        "y": 568,
-        "scale": 1.21,
-        "flipX": false,
-        "colliderEnabled": false,
-        "zOffset": 0
       }
     ]
   },

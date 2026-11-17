@@ -35,6 +35,8 @@ const test = (name, fn) => { fn(); passed++; console.log("ok -", name); };
 const IDS = [
   "elderly-man-seated", "elderly-woman-seated", "boy-spinning-top", "girl-jump-rope", "carpenter-workbench",
   "knight-spear-shield", "acolyte-bell", "praying-old-woman-back", "praying-man-side", "praying-young-woman",
+  // 2026-11-17: the boy archer and the improved villagers (next to the originals)
+  "child-bow-archer", "villager-man-01-v2", "villager-man-02-v2", "villager-woman-01-v2", "villager-woman-02-v2",
 ];
 
 test("the ten new people are registered once, as people, with every frame on disk and the same size", () => {

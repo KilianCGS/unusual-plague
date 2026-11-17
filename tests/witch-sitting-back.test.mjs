@@ -34,11 +34,11 @@ const assets = at("src/game/decor/decorAssets.ts");
 let passed = 0;
 const test = (name, fn) => { fn(); passed++; console.log("ok -", name); };
 
-test("the sitting-from-behind Witch is a static 96x96 Decorator asset, with no collider and no interaction yet", () => {
+test("the sitting-from-behind Witch is a 96x96 breathing Decorator asset, with no collider and no interaction yet", () => {
   const witch = assets.getDecorAsset("witch-sitting-back");
   assert.ok(witch, "registered");
   assert.equal(witch.category, "people");
-  assert.equal(witch.sprite.frames.length, 1);
+  assert.equal(witch.sprite.frames.length, 6);
   assert.equal(witch.defaultCollider, undefined);
   const file = fs.readFileSync(path.join(root, "public", witch.sprite.frames[0]));
   assert.deepEqual([file.readUInt32BE(16), file.readUInt32BE(20)], [96, 96]);

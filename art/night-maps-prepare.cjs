@@ -1,4 +1,4 @@
-// Copies the six night paintings from the Desktop into public/game/new-world-map/night/,
+// Copies the six night paintings from the Desktop into public/game/chapter-4-night/,
 // lined up on their day background (found by comparing edges, see the shift below).
 // A 1-pixel shift of the painting is invisible, but it makes the day collisions fit exactly.
 //   node art/night-maps-prepare.cjs "<folder with the six PNGs>"
@@ -7,7 +7,7 @@ const sharp = require("sharp");
 
 const SRC = process.argv[2];
 if (!SRC) throw new Error('usage: node art/night-maps-prepare.cjs "<folder with the night PNGs>"');
-const OUT = path.resolve(__dirname, "../public/game/new-world-map/night");
+const OUT = path.resolve(__dirname, "../public/game/chapter-4-night");
 
 // [night id, source file, day width, day height, dx, dy]  (dx, dy = where the night
 // painting is displaced from the day one; 0 0 = already exact)

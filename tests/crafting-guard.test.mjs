@@ -87,8 +87,13 @@ test("the guard is wired: overlay refuses, copy exists in both languages, /dev/c
   assert.ok(!read("src/app/dev/crafting/page.tsx").includes("craftableOutputs"));
 });
 
-test("the Witch's house is shut in every chapter, with an ES/EN notice, and only that door", () => {
-  assert.equal(LOCKED_DOORS.length, 1);
+test("the Witch's house is shut in every chapter, with an ES/EN notice; the mine entrance is shut only on Day 3", () => {
+  assert.equal(LOCKED_DOORS.length, 2);
+  for (const [chapter, shut] of [["chapter-1", false], ["chapter-2", false], ["chapter-3", true], ["chapter-4", false]]) {
+    assert.equal(!!getLockedDoorNotice("mountain-path", "mine-interior", chapter, "es"), shut, chapter);
+    assert.equal(!!getLockedDoorNotice("mountain-path", "mine-interior", chapter, "en"), shut, chapter);
+  }
+  assert.equal(getLockedDoorNotice("mountain-path", "smithy-street", "chapter-3", "es"), null);
   for (const chapter of ["chapter-1", "chapter-2"]) {
     assert.equal(getLockedDoorNotice("forest-cottage", "forest-cottage-interior", chapter, "es"), "No debería colarme aquí sin permiso.");
     assert.equal(getLockedDoorNotice("forest-cottage", "forest-cottage-interior", chapter, "en"), "I shouldn't sneak in here without permission.");

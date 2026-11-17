@@ -12,6 +12,17 @@ export type LockedDoor = {
 
 export const LOCKED_DOORS: readonly LockedDoor[] = [
   {
+    // The mine entrance on Day 3 (2026-11-17, Kilian): rockfalls. A spear knight stands in front of it
+    // (his words: chapter3.mountainPath.guard) and the way in stays shut for that day only.
+    fromScene: "mountain-path",
+    targetScene: "mine-interior",
+    openInChapters: ["chapter-1", "chapter-2", "chapter-4"],
+    notice: {
+      es: "Un desprendimiento ha cortado el paso a la mina.",
+      en: "A rockfall has cut off the way into the mine.",
+    },
+  },
+  {
     // The Witch's house. Kilian's plan: on the last day the Doctor visits her
     // after seeing how strange things have become in the village. Until then
     // the door stays shut.

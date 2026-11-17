@@ -7,7 +7,7 @@ import { FOREST_COTTAGE_VISUAL, NEW_WORLD_VISUALS } from "./newWorldVisuals";
 // now: /dev/collisions opens them with the day's geometry copied in ("calcado"), so
 // Kilian can add the obstacles that close an area at night; they are not in WORLD_SCENES.
 // Keyed by the DEV id of the day scene + "-night".
-const NIGHT_DIR = "/game/new-world-map/night";
+const NIGHT_DIR = "/game/chapter-4-night";
 
 // [dev id of the day scene, night file, label]
 const NIGHTS: [string, string, string][] = [

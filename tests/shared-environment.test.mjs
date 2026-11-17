@@ -45,8 +45,9 @@ const { getSceneWorld, DEV_SCENES } = at("src/app/dev/scene/scenes.ts");
 let passed=0;const test=(name,fn)=>{fn();passed++;console.log(`ok - ${name}`);};
 // 2026-11-16: +13 forest bushes, tufts and ferns (Kilian's forest export, ids renumbered after the existing ones)
 // 2026-11-16: +13 more in the forest glade (bushes, tufts and ferns)
-test('122 approved placements remain identical in every current and future chapter',()=>{
-  assert.equal(shared.reduce((n,c)=>n+c.instances.length,0),122);
+// 2026-11-17: -1, the mountain path campfire (Kilian asked to remove it)
+test('121 approved placements remain identical in every current and future chapter',()=>{
+  assert.equal(shared.reduce((n,c)=>n+c.instances.length,0),121);
   for(const c of shared)for(const chapterId of ['chapter-1','chapter-2','chapter-3','artifacts','final','future-day']){
     const result=getComposition(c.sceneId,chapterId);
     assert.equal(result.chapterId,chapterId);
@@ -70,7 +71,7 @@ test('only animated nonblocking noncollectible vegetation and fire belong to the
     assert.equal(resolved.colliders.length,0);assert.equal(resolved.zones.length,0);
   }
   // (2026-11-16: the forest gained 3 ferns, 5 tufts, 2 tall and 3 round bushes)
-  assert.deepEqual(counts,{'fern-weed':29,'grass-tuft':31,'bush-tall':11,'bush-round':10,'campfire':2,'candle-flame':39});
+  assert.deepEqual(counts,{'fern-weed':29,'grass-tuft':31,'bush-tall':11,'bush-round':10,'campfire':1,'candle-flame':39});
   for(const chapter of ['chapter-1','chapter-2','future-day']) {
     assert.deepEqual(getComposition('apothecary-interior',chapter).instances,
       getComposition('apothecary-main-zone',chapter).instances);

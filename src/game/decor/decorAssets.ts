@@ -587,7 +587,9 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
       fps: 2,
       loop: true,
     },
-    // Union silhouette x12-118 y14-72 of the 128x80 frame.
+    // Silhouette x11-119 y5-73 of the 128x80 frame (2026-11-17: redrawn from a slightly
+    // higher camera, same anchor point). The bed is pixel-identical in the 4 pictures; only
+    // the blanket and the man rise one pixel (breathing).
     anchor: { x: 0.512, y: 0.912 },
     defaultScale: 1,
     // Lying down: his lines hang under the bed instead of over his head.
@@ -803,8 +805,9 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     },
     anchor: { x: 0.5, y: 1 },
     defaultScale: 1,
-    // Silhouette of frame 0 (x24-62 y43-79 of the 96x96 frame).
-    defaultCollider: { offsetX: -24, offsetY: -53, width: 39, height: 37 },
+    // Silhouette of frame 0 (x23-62 y43-91 of the 96x96 frame). 2026-11-17: leaned left,
+    // with the rear trousers and one leg drawn; head and shoulders stay where they were.
+    defaultCollider: { offsetX: -25, offsetY: -53, width: 40, height: 49 },
   },
   {
     id: "stonecutter-shovel",
@@ -1178,11 +1181,13 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     label: "Witch (sitting on the log, from behind)",
     category: "people",
     sprite: {
-      frames: ["/game/characters/witch/sit/back/0.png"],
+      // 2026-11-17: slow breathing, the hood and shoulders rise one pixel (6 pictures, 0 and 5
+      // are the still pose).
+      frames: [0, 1, 2, 3, 4, 5].map((i) => `/game/characters/witch/sit/back-idle/${i}.png`),
       frameWidth: 96,
       frameHeight: 96,
-      fps: 0,
-      loop: false,
+      fps: 2.5,
+      loop: true,
     },
     anchor: { x: 0.521, y: 0.865 },
     headHeight: 71,
@@ -1369,6 +1374,275 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
   },
   {
+    // 2026-11-17 (Kilian's NPC improvements): A boy in the style of child-wooden-sword, now an archer: bow, quiver and an arrow held low; calm idle (he does not shoot). PixelLab, idle of 9 frames
+    // (ping-pong of the calm frames 3-8). Silhouette x25-19 y59-71 of the 84x84 frame.
+    // Authoring asset next to the original: no collider and no interaction until placed.
+    id: "child-bow-archer",
+    label: "Boy with a bow and arrows",
+    category: "people",
+    sprite: {
+      frames: [3, 4, 5, 6, 7, 8, 7, 6, 5, 4].map((i) => `/game/npcs/child-bow-archer/idle/${i}.png`),
+      frameWidth: 84,
+      frameHeight: 84,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.845 },
+    headHeight: 52,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-17 (Kilian's NPC improvements): Villager man 1 with a satchel and a straw hat in his hand, a livelier face and idle. PixelLab, idle of 9 frames
+    // (ping-pong). Silhouette x28-65 y15-85 of the 100x100 frame.
+    // Authoring asset next to the original: no collider and no interaction until placed.
+    id: "villager-man-01-v2",
+    label: "Villager man 1 (improved)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/villager-man-01-v2/idle/${i}.png`),
+      frameWidth: 100,
+      frameHeight: 100,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.465, y: 0.85 },
+    headHeight: 70,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-17 (Kilian's NPC improvements): Villager man 2 with a walking stick and a coin purse, bushier beard, strokes his beard. PixelLab, idle of 9 frames
+    // (ping-pong). Silhouette x28-66 y17-85 of the 100x100 frame.
+    // Authoring asset next to the original: no collider and no interaction until placed.
+    id: "villager-man-02-v2",
+    label: "Villager man 2 (improved)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/villager-man-02-v2/idle/${i}.png`),
+      frameWidth: 100,
+      frameHeight: 100,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.47, y: 0.85 },
+    headHeight: 68,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-17 (Kilian's NPC improvements): Villager woman 1 with a basket of eggs and bread and a flower in her bun. PixelLab, idle of 9 frames
+    // (ping-pong). Silhouette x28-61 y16-82 of the 96x96 frame.
+    // Authoring asset next to the original: no collider and no interaction until placed.
+    id: "villager-woman-01-v2",
+    label: "Villager woman 1 (improved)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/villager-woman-01-v2/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.464, y: 0.854 },
+    headHeight: 66,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-17 (Kilian's NPC improvements): Villager woman 2 with a red shawl and a clay jug on her hip. PixelLab, idle of 9 frames
+    // (ping-pong). Silhouette x25-64 y15-80 of the 96x96 frame.
+    // Authoring asset next to the original: no collider and no interaction until placed.
+    id: "villager-woman-02-v2",
+    label: "Villager woman 2 (improved)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/villager-woman-02-v2/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.464, y: 0.833 },
+    headHeight: 65,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-17 (Kilian): the Witch's cat seen from behind, sitting and turned a little to the
+    // left, to sit beside the Witch on the glade log. PixelLab edit of the sitting cat, then a
+    // hand-made idle of 6 pictures: it breathes (head and shoulders 1 px) and the tail tip lifts.
+    // Silhouette x17-49 y11-49 of the 64x64 frame. Use flipX to turn it the other way.
+    // Authoring asset: no collider and no interaction until placed.
+    id: "witch-cat-sitting-back",
+    label: "Witch's cat (sitting, from behind)",
+    category: "animals",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5].map((i) => `/game/characters/witch-cat/sit-back/${i}.png`),
+      frameWidth: 64,
+      frameHeight: 64,
+      fps: 2,
+      loop: true,
+    },
+    anchor: { x: 0.523, y: 0.781 },
+    headHeight: 39,
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-17 (Kilian, for Day 4 and the glade): Overturned merchant cart on fire with two dead horses in harness. 9-frame fire and smoke loop (ping-pong); the horses are pasted from frame 0 so only the fire moves. PixelLab, silhouette
+    // x6-187 y0-125 of the 192x128 frame. Authoring asset: no interaction and not
+    // placed in any scene until Kilian places it in the Decorator.
+    id: "ch4-burning-cart",
+    label: "Burning cart with horses (Day 4 roadblock)",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/ambient/ch4-burning-cart/${i}.png`),
+      frameWidth: 192,
+      frameHeight: 128,
+      fps: 8,
+      loop: true,
+    },
+    anchor: { x: 0.503, y: 0.977 },
+    defaultScale: 1,
+    defaultCollider: { offsetX: -82, offsetY: -38, width: 163, height: 38 },
+  },
+  {
+    // 2026-11-17 (Kilian, for Day 4 and the glade): Tall stack of cut logs. Static. PixelLab, silhouette
+    // x18-106 y11-85 of the 128x96 frame. Authoring asset: no interaction and not
+    // placed in any scene until Kilian places it in the Decorator.
+    id: "ch4-log-pile",
+    label: "Pile of logs (Day 4 roadblock)",
+    category: "ambient",
+    sprite: {
+      frames: ["/game/ambient/ch4-log-pile/0.png"],
+      frameWidth: 128,
+      frameHeight: 96,
+      fps: 0,
+      loop: false,
+    },
+    anchor: { x: 0.484, y: 0.885 },
+    defaultScale: 1,
+    defaultCollider: { offsetX: -40, offsetY: -22, width: 79, height: 22 },
+  },
+  {
+    // 2026-11-17 (Kilian, for Day 4 and the glade): Huge fallen tree across the path, with its roots. Static. PixelLab, silhouette
+    // x4-156 y2-93 of the 160x96 frame. Authoring asset: no interaction and not
+    // placed in any scene until Kilian places it in the Decorator.
+    id: "ch4-fallen-tree",
+    label: "Fallen tree (Day 4 roadblock)",
+    category: "ambient",
+    sprite: {
+      frames: ["/game/ambient/ch4-fallen-tree/0.png"],
+      frameWidth: 160,
+      frameHeight: 96,
+      fps: 0,
+      loop: false,
+    },
+    anchor: { x: 0.5, y: 0.969 },
+    defaultScale: 1,
+    defaultCollider: { offsetX: -68, offsetY: -27, width: 137, height: 27 },
+  },
+  {
+    // 2026-11-17 (Kilian, for Day 4 and the glade): Heap of rough-cut stone blocks. Static. PixelLab, silhouette
+    // x12-81 y6-59 of the 96x64 frame. Authoring asset: no interaction and not
+    // placed in any scene until Kilian places it in the Decorator.
+    id: "ch4-stone-blocks",
+    label: "Stone blocks (Day 4 roadblock)",
+    category: "ambient",
+    sprite: {
+      frames: ["/game/ambient/ch4-stone-blocks/0.png"],
+      frameWidth: 96,
+      frameHeight: 64,
+      fps: 0,
+      loop: false,
+    },
+    anchor: { x: 0.484, y: 0.922 },
+    defaultScale: 1,
+    defaultCollider: { offsetX: -31, offsetY: -16, width: 62, height: 16 },
+  },
+  {
+    // 2026-11-17 (Kilian, for Day 4 and the glade): Violet translucent barrier of runes stretched left to right. Runes pulse and sparks drift (ping-pong). PixelLab, silhouette
+    // x10-151 y9-53 of the 160x64 frame. Authoring asset: no interaction and not
+    // placed in any scene until Kilian places it in the Decorator.
+    id: "ch4-barrier-horizontal",
+    label: "Magic barrier, horizontal (Day 4)",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/ambient/ch4-barrier-horizontal/${i}.png`),
+      frameWidth: 160,
+      frameHeight: 64,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.503, y: 0.828 },
+    defaultScale: 1,
+    defaultCollider: { offsetX: -70, offsetY: -12, width: 141, height: 12 },
+  },
+  {
+    // 2026-11-17 (Kilian, for Day 4 and the glade): Violet translucent column of runes, upright. Runes pulse and sparks drift (ping-pong). PixelLab, silhouette
+    // x11-52 y8-122 of the 64x128 frame. Authoring asset: no interaction and not
+    // placed in any scene until Kilian places it in the Decorator.
+    id: "ch4-barrier-vertical",
+    label: "Magic barrier, vertical (Day 4)",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/ambient/ch4-barrier-vertical/${i}.png`),
+      frameWidth: 64,
+      frameHeight: 128,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.492, y: 0.953 },
+    defaultScale: 1,
+    defaultCollider: { offsetX: -18, offsetY: -12, width: 37, height: 12 },
+  },
+  {
+    // 2026-11-17 (Kilian, for Day 4 and the glade): Crow with a blue sheen, faces left: stands still, then pecks the ground twice (the loop holds the still pose 6 beats). PixelLab, silhouette
+    // x2-31 y3-29 of the 32x32 frame. Authoring asset: no interaction and not
+    // placed in any scene until Kilian places it in the Decorator.
+    id: "witch-crow-pecking",
+    label: "Crow (pecking the ground)",
+    category: "animals",
+    sprite: {
+      frames: [0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `/game/animals/witch-crow-pecking/${i}.png`),
+      frameWidth: 32,
+      frameHeight: 32,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.516, y: 0.906 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-17 (Kilian, for Day 4 and the glade): Raven with amber eyes, faces right: still, then raises its head, caws with an open beak and ruffles its feathers. PixelLab, silhouette
+    // x4-26 y3-29 of the 32x32 frame. Authoring asset: no interaction and not
+    // placed in any scene until Kilian places it in the Decorator.
+    id: "witch-crow-cawing",
+    label: "Raven (shakes and caws)",
+    category: "animals",
+    sprite: {
+      frames: [0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `/game/animals/witch-crow-cawing/${i}.png`),
+      frameWidth: 32,
+      frameHeight: 32,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.469, y: 0.906 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-17 (Kilian, for Day 4 and the glade): Small ruffled crow seen from the front: still, then tilts its head curiously to each side. PixelLab, silhouette
+    // x7-24 y2-29 of the 32x32 frame. Authoring asset: no interaction and not
+    // placed in any scene until Kilian places it in the Decorator.
+    id: "witch-crow-head-tilt",
+    label: "Young crow (tilts its head)",
+    category: "animals",
+    sprite: {
+      frames: [0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `/game/animals/witch-crow-head-tilt/${i}.png`),
+      frameWidth: 32,
+      frameHeight: 32,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.484, y: 0.906 },
+    defaultScale: 1,
+  },
+  {
     // Witch's black cat, sitting. An asset of its own, independent of Witch:
     // it can be placed next to her, alone or elsewhere. Drawn facing screen-
     // right; use flipX on the instance to make it face left (the anchor is the
@@ -1460,8 +1734,8 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
       fps: 1.5,
       loop: true,
     },
-    // Union silhouette x32-66 y9-118 of the 96x128 frame; the anchor is the
-    // centre of the body.
+    // Union silhouette x32-66 y22-118 of the 96x128 frame (2026-11-17: 14 rows of
+    // leg removed, feet unchanged); the anchor is the centre of the old body.
     anchor: { x: 0.516, y: 0.5 },
     defaultScale: 1,
   },
@@ -1775,7 +2049,8 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
       fps: 3,
       loop: true,
     },
-    // Stool/boots of the 128x96 frame (silhouette x19-90 y11-91).
+    // Stool/boots of the 128x96 frame (silhouette x19-80 y19-91; 2026-11-17 legs and
+    // stool scaled to 0.8 so he matches the other NPCs).
     anchor: { x: 0.4, y: 0.94 },
     defaultScale: 1,
   },
