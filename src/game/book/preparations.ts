@@ -39,9 +39,13 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
     es: "Hojas de menta infusionadas en agua. Bebida de aroma fresco.",
     en: "Mint leaves steeped in water. A fresh, aromatic drink.",
   },
+  syrup: {
+    es: "Agua y azúcar cocidas hasta espesar. Base de otros jarabes.",
+    en: "Water and sugar cooked until thick. The base of other syrups.",
+  },
   "balsamic-syrup": {
-    es: "Infusión de menta cocida con miel y ajo hasta obtener un jarabe.",
-    en: "Mint infusion cooked with honey and garlic to make a syrup.",
+    es: "Jarabe base cocido con miel y ajo machacado para calmar la tos.",
+    en: "Base syrup cooked with honey and crushed garlic to soothe a cough.",
   },
   "ointment-base": {
     es: "Grasa animal ligada con resina. Base para preparar compresas medicinales.",

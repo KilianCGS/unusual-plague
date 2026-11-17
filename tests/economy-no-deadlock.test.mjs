@@ -94,7 +94,7 @@ test("the model reads the real data: every patient pays, and what each one needs
     "injured-miner": [["cloth", 1]],
     "chapter2-blacksmith": [["cloth", 1]],
     "chapter2-woodcutter": [["orange", 1], ["sugar", 1]],
-    "chapter3-duster": [["garlic", 1]],
+    "chapter3-duster": [["sugar", 1], ["garlic", 1]], // 2026-11-17: the base syrup takes a sugar
     "chapter3-path-miner": [["orange", 1], ["sugar", 1], ["bone", 1], ["salt", 1]],
     "chapter3-stonecutter": [["cloth", 1]],
   });

@@ -10,14 +10,14 @@ export const RECIPE_DISCOVERY_ITEMS: Readonly<Record<string, readonly string[]>>
   milk: ["fire.milk-with-honey"],
   honey: ["manual.medicinal-paste", "fire.milk-with-honey"],
   coal: ["mortar.crushed-coal", "manual.charcoal-suspension", "manual.medicinal-ointment"],
-  mint: ["fire.mint-infusion", "fire.balsamic-syrup"],
+  mint: ["fire.mint-infusion"],
   garlic: ["fire.balsamic-syrup", "mortar.crushed-garlic"],
   resin: ["fire.ointment-base", "manual.medicinal-compress"],
   "animal-fat": ["fire.ointment-base", "manual.medicinal-compress"],
   flour: ["manual.poultice"],
   orange: ["fire.citrus-drink"],
   bone: ["fire.bone-broth", "fire.strong-broth"],
-  sugar: ["fire.onion-syrup", "fire.rehydration-drink"],
+  sugar: ["fire.syrup", "fire.onion-syrup", "fire.rehydration-drink"],
   onion: ["fire.onion-syrup", "fire.strong-broth", "chop.onion"],
 };
 

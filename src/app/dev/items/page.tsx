@@ -33,6 +33,7 @@ const GROUPS: { title: string; ids: string[] }[] = [
       "chopped-mushroom",
       "medicinal-paste",
       "ointment-base",
+      "syrup",
     ],
   },
   {

@@ -75,7 +75,7 @@ const permutations = (list) =>
       );
 
 test("the V1 recipes, the two patient recipes and Milk with honey exist with the right stations and sizes", () => {
-  assert.equal(RECIPES.length, 23); // 26 before 2026-11-16 removed 3 recipes nothing consumed
+  assert.equal(RECIPES.length, 24); // 2026-11-17: + the base syrup (water + sugar). 26 before 2026-11-16 removed 3 recipes nothing consumed
   assert.deepEqual(STATION_MAX_INPUTS, { manual: 2, fire: 3, mortar: 1, chop: 1 });
   assert.equal(recipeById("manual.disinfected-bandage").inputs.length, 2);
   assert.equal(recipeById("fire.mushroom-soup").inputs.length, 3);
@@ -791,9 +791,9 @@ test("a flask comes back for each water used; nothing else has a vessel", () => 
   );
 });
 
-test("all 23 catalog preparations have unique recipes; every recipe fits its actual station", () => {
-  assert.equal(new Set(RECIPES.map(r => r.output.itemId)).size, 23);
-  assert.equal(new Set(RECIPES.map(r => r.id)).size, 23);
+test("all 24 catalog preparations have unique recipes; every recipe fits its actual station", () => {
+  assert.equal(new Set(RECIPES.map(r => r.output.itemId)).size, 24);
+  assert.equal(new Set(RECIPES.map(r => r.id)).size, 24);
   for (const recipe of RECIPES) {
     assert.ok(recipe.inputs.reduce((sum,input)=>sum+input.quantity,0)<=STATION_MAX_INPUTS[recipe.station]);
     assert.ok(ITEMS[recipe.output.itemId]);
@@ -816,7 +816,7 @@ test("grinding is a single-ingredient processing at the MORTAR only and crafts a
 
 test("four real two-step chains consume their intermediates and produce the catalog result", () => {
   const chains=[
-    [[['water',1],['mint',1],['honey',1],['crushed-garlic',1]],'fire.mint-infusion','fire.balsamic-syrup'],
+    [[['water',1],['sugar',1],['honey',1],['crushed-garlic',1]],'fire.syrup','fire.balsamic-syrup'],
     [[['crushed-herb',1],['honey',1],['flour',1]],'manual.medicinal-paste','manual.poultice'],
     [[['animal-fat',1],['resin',1],['cloth',1]],'fire.ointment-base','manual.medicinal-compress'],
     [[['coal',1],['water',1]],'mortar.crushed-coal','manual.charcoal-suspension'],
@@ -834,7 +834,7 @@ test("recursive needs use carried intermediates once and aggregate shared batch 
   const {getMissingIngredients}=at("src/game/crafting/needs.ts");
   const needs=[{itemId:'balsamic-syrup',quantity:1},{itemId:'mint-infusion',quantity:1}];
   const missing=getMissingIngredients(needs,stock([['mint-infusion',1],['water',1]]));
-  assert.deepEqual(new Map(missing.map(n=>[n.itemId,n.quantity])),new Map([['mint',1],['honey',1],['garlic',1]]));
+  assert.deepEqual(new Map(missing.map(n=>[n.itemId,n.quantity])),new Map([['sugar',1],['honey',1],['garlic',1]]));
   const recipes=[
     {id:'a',station:'manual',inputs:[{itemId:'middle',quantity:1}],output:{itemId:'a',quantity:1}},
     {id:'b',station:'manual',inputs:[{itemId:'middle',quantity:1}],output:{itemId:'b',quantity:1}},
@@ -874,7 +874,7 @@ test("ingredient discovery teaches specific recipes permanently, including their
   assert.ok(!flour.has('fire.balsamic-syrup'));
   for(const ids of Object.values(RECIPE_DISCOVERY_ITEMS)) for(const id of ids)assert.ok(recipeById(id));
   const all=learnRecipesFromItems(empty,Object.keys(RECIPE_DISCOVERY_ITEMS));
-  assert.equal(all.size,23,'existing ingredients can eventually reveal the whole catalog');
+  assert.equal(all.size,24,'existing ingredients can eventually reveal the whole catalog');
 });
 
 test("receiving or crafting a preparation teaches its recipe and prerequisite without a patient gate", () => {

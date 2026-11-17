@@ -103,3 +103,12 @@ El reparto evita los múltiplos de 5 (regla de los tests). Hay unos 347 000 esta
 - Los tests (`economy-no-deadlock`, `day2-playthrough`, `market-street`) leen los datos reales. Si cambia una cifra, fallan.
 - Este documento es una foto de hoy. Si cambia el stock, un precio o un trato, actualízalo.
 - Antecedente: `docs/ECONOMY_REVIEW_NOV13.md` (más corto, de antes del mercado y de los recados).
+
+## Jarabe base (2026-11-17)
+
+El jarabe balsámico (mujer del plumero, Día 3) ya no se hace con la infusión de menta: lleva **jarabe** (nuevo preparado base:
+agua + azúcar, al fuego) + miel + ajo machacado. Efectos en la economía: el Día 3 necesita **un azúcar más** (5 monedas), así que
+el mercader vende hasta **4 azúcares** (tope 4 el Día 3) y los pagos del Día 2 suben: **herrero 6→9, agricultor 7→9** (+5 en total,
+justo el azúcar extra). El test `economy-no-deadlock` pasa con esos números. El icono y el grabado del libro del jarabe son
+**provisionales** (copia del balsámico) hasta que Codex los dibuje: `public/game/items/prepared-icons/syrup.png` y
+`public/game/ui/book/preparations/syrup.png`.

@@ -110,9 +110,16 @@ export const RECIPES: Recipe[] = [
     output: { itemId: "mint-infusion", quantity: 1 },
   },
   {
+    // 2026-11-17 (Kilian): the base the balsamic syrup is built on (instead of the mint infusion).
+    id: "fire.syrup",
+    station: "fire",
+    inputs: [{ itemId: "water", quantity: 1 }, { itemId: "sugar", quantity: 1 }],
+    output: { itemId: "syrup", quantity: 1 },
+  },
+  {
     id: "fire.balsamic-syrup",
     station: "fire",
-    inputs: [{ itemId: "mint-infusion", quantity: 1 }, { itemId: "honey", quantity: 1 }, { itemId: "crushed-garlic", quantity: 1 }],
+    inputs: [{ itemId: "syrup", quantity: 1 }, { itemId: "honey", quantity: 1 }, { itemId: "crushed-garlic", quantity: 1 }],
     output: { itemId: "balsamic-syrup", quantity: 1 },
   },
   {

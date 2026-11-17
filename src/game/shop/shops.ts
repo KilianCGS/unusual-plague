@@ -79,7 +79,8 @@ export const MERCHANT_SHOP: ShopDefinition = {
     // Day 1: two (the tavern case + one spare); the rest from Day 2 (daily cap, see ShopEntry).
     { itemId: "salt", price: 2, stock: 4, capByChapter: { "chapter-1": 2, "chapter-2": 4 } },
     // From Day 2 (the price was decided by Kilian): it feeds two patients and two voluntary errands.
-    { itemId: "sugar", price: 5, stock: 3, fromChapter: "chapter-2", capByChapter: { "chapter-2": 2, "chapter-3": 3 } },
+    // 2026-11-17: stock 4 (one more on Day 3) because the base syrup of the balsamic syrup also takes a sugar.
+    { itemId: "sugar", price: 5, stock: 4, fromChapter: "chapter-2", capByChapter: { "chapter-2": 2, "chapter-3": 4 } },
   ],
 };
 

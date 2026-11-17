@@ -17,8 +17,10 @@ export const PATIENT_PAYMENTS: Readonly<Record<string, number>> = {
   [TAVERN_PATIENT_ID]: 4,
   [INJURED_MINER_ID]: 7,
   [WOODCUTTER_DAY2_ID]: 4,
-  [BLACKSMITH_DAY2_ID]: 6,
-  [FARMER_DAY2_ID]: 7,
+  // 2026-11-17: +3 and +2 on Day 2 (blacksmith 6 to 9, farmer 7 to 9) because the base syrup (water + sugar) of the balsamic syrup makes Day 3 need a
+  // fourth sugar unit (5 coins); the income has to arrive early (economy-no-deadlock).
+  [BLACKSMITH_DAY2_ID]: 9,
+  [FARMER_DAY2_ID]: 9,
   [DUSTER_DAY3_ID]: 3,
   [PATH_MINER_DAY3_ID]: 4,
   [STONECUTTER_DAY3_ID]: 6,

@@ -168,7 +168,8 @@ test("all 30 approved art entries are catalog items with bilingual names", () =>
   // 15 existing items + the 17 promoted ones + the Empty jar of Patient 2 +
   // the crushed herb (mortar) + the 10 items of the cooking family (2026-11-11)
   // 2026-11-16: minus mushroom cream, citrus syrup and chopped pine mushroom (nothing consumed them)
-  assert.equal(Object.keys(ITEMS).length, 47);
+  // 2026-11-17: + the base syrup
+  assert.equal(Object.keys(ITEMS).length, 48);
 });
 
 test("prepared catalog now has recipes, without changing Chapter 1 needs or adding material sources", () => {
@@ -196,7 +197,7 @@ test("prepared catalog now has recipes, without changing Chapter 1 needs or addi
     }
   }
   // the six earlier recipes plus Milk with honey
-  assert.equal(RECIPES.length, 23);
+  assert.equal(RECIPES.length, 24); // 2026-11-17: + the base syrup
   // the first patient still needs only the two prepared items
   assert.deepEqual(CHAPTER1_PATIENTS[BAKER_HUSBAND_ID].requiredTreatments, [
     { itemId: "medicinal-infusion", quantity: 1 },

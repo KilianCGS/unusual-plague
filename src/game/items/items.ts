@@ -34,6 +34,7 @@ export type ItemId =
   | "leech"
   | "milk-with-honey"
   | "mint-infusion"
+  | "syrup"
   | "balsamic-syrup"
   | "ointment-base"
   | "poultice"
@@ -229,6 +230,13 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     id: "balsamic-syrup",
     name: { es: "Jarabe balsámico", en: "Balsamic syrup" },
     icon: `${PREPARED_ICONS}/balsamic-syrup.png`,
+  },
+  // 2026-11-17 (Kilian): the base syrup (water + sugar) that the balsamic syrup is built on. The icon is a
+  // PLACEHOLDER (a copy of the balsamic syrup's) until Codex draws it.
+  syrup: {
+    id: "syrup",
+    name: { es: "Jarabe", en: "Syrup" },
+    icon: `${PREPARED_ICONS}/syrup.png`,
   },
   "ointment-base": {
     id: "ointment-base",

@@ -169,6 +169,10 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
   });
 }
 
+// 2026-11-17 (Kilian): the names of these two are long (HIERBA MACHACADA, CARBÓN TRITURADO) and wrap, so their
+// description overlapped the title: everything under the title sits a bit lower on their pages (and only theirs).
+const LONG_TITLE_DROP: Readonly<Record<string, number>> = { "crushed-herb": 16, "crushed-coal": 16 };
+
 // One known preparation per physical leaf, two per opening.
 export function buildPreparationSpreads(context: BookContext): BookSpread[] {
   const { language, knownRecipeIds } = context;
@@ -186,6 +190,7 @@ export function buildPreparationSpreads(context: BookContext): BookSpread[] {
     const layers: BookSpread["layers"] = [PLAIN_BASE_LAYER];
     known.slice(start, start + 2).forEach((recipe, side) => {
       const column = side === 0 ? LEFT : RIGHT;
+      const drop = LONG_TITLE_DROP[recipe.output.itemId] ?? 0;
       const ingredients = recipe.inputs.map(({ itemId, quantity }) =>
         `${getItemName(itemId, language)}${quantity > 1 ? ` ?${quantity}` : ""}`
       ).join(" + ");
@@ -208,20 +213,20 @@ export function buildPreparationSpreads(context: BookContext): BookSpread[] {
       texts.push(
         text(`${recipe.id}-name`, "preparationTitle", column, 144,
           getItemName(recipe.output.itemId, language).toUpperCase(), "center"),
-        text(`${recipe.id}-description`, "preparationBody", column, 190,
+        text(`${recipe.id}-description`, "preparationBody", column, 190 + drop,
           PREPARATION_DESCRIPTIONS[recipe.output.itemId]?.[language] ?? ""),
-        text(`${recipe.id}-use`, "preparationBody", column, 228,
+        text(`${recipe.id}-use`, "preparationBody", column, 228 + drop,
           getPreparationUse(recipe.output.itemId, language)),
-        text(`${recipe.id}-inputs`, "preparationNote", column, 266, ingredients),
-        text(`${recipe.id}-station`, "preparationNote", column, 316,
+        text(`${recipe.id}-inputs`, "preparationNote", column, 266 + drop, ingredients),
+        text(`${recipe.id}-station`, "preparationNote", column, 316 + drop,
           `${copy.station}: ${copy.stations[recipe.station]}`),
-        text(`${recipe.id}-availability`, "preparationNote", column, 334,
+        text(`${recipe.id}-availability`, "preparationNote", column, 334 + Math.min(drop, 10),
           ingredientsReady
             ? (language === "es" ? "Ingredientes disponibles en la bolsa." : "Ingredients available in your bag.")
             : (language === "es" ? "Faltan ingredientes en la bolsa." : "Some ingredients are missing from your bag.")),
       );
       if (intermediates.length) {
-        texts.push(text(`${recipe.id}-steps`, "preparationNote", column, 298,
+        texts.push(text(`${recipe.id}-steps`, "preparationNote", column, 298 + drop,
           `${language === "es" ? "Preparar antes" : "Prepare first"}: ${intermediates.map(input => getItemName(input.itemId, language)).join(", ")}.`));
       }
     });
