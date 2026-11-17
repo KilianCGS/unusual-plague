@@ -9,6 +9,7 @@ import { chapter3Compositions } from "./chapter-3";
 import { chapter1Interactions } from "./chapter-1.interactions";
 import { chapter2Interactions } from "./chapter-2.interactions";
 import { chapter3Interactions } from "./chapter-3.interactions";
+import { chapter4Interactions } from "./artifacts.interactions";
 import { mergeSharedEnvironmentInstances } from "./shared-environment";
 
 // VERSIONED scene populations, one file per chapter, each produced by
@@ -135,6 +136,8 @@ const INTERACTIONS_BY_CHAPTER: Record<
   "chapter-2": carriedAndChapter2Interactions(),
   // Day 3 inherits Day 2's interactions; its own (the new people) win on a clash.
   "chapter-3": chapter3AllInteractions(),
+  // Day 4 (2026-11-17): derived from what is placed in the Decorator chapter "artifacts" (see artifacts.interactions.ts).
+  "chapter-4": chapter4Interactions,
 };
 
 const NO_INTERACTIONS: Record<string, DecorInteraction> = {};

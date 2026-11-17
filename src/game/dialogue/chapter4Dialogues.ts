@@ -28,6 +28,45 @@ export const ARTIFACT_THOUGHTS: LocalizedLine[] = [
   doctorThought("Está aquí, pero no está.", "He's here, but he isn't."),
 ];
 
+// 2026-11-17 (Kilian: Day 4 is ambient, people and words only): each pose with an artifact has its OWN two thoughts of
+// the Doctor, built on what that person used to do (the contrast with their routine), never naming the object.
+// NEW text, awaiting Kilian's review. The key is the part after "chapter4.artifact." (see ARTIFACT_SLUGS in
+// compositions/artifacts.interactions.ts); a person without an entry here gets one of the generic thoughts above.
+export const ARTIFACT_PERSON_THOUGHTS: Readonly<Record<string, LocalizedLine[]>> = {
+  sweeper: [
+    doctorThought("La escoba le cuelga de la mano como si se le hubiera olvidado que existe.", "The broom hangs from her hand as if she had forgotten it exists."),
+    doctorThought("Hasta hace poco barría hasta las esquinas. Esta noche el polvo puede descansar en paz.", "Until recently she swept right into the corners. Tonight the dust can rest in peace."),
+  ],
+  fisherman: [
+    doctorThought("El hilo flota solo. No mira el agua: mira algo más pequeño y más quieto.", "The line floats on its own. He isn't watching the water: he's watching something smaller and stiller."),
+    doctorThought("Los peces deben de estar encantados.", "The fish must be delighted."),
+  ],
+  bartender: [
+    doctorThought("La jarra rebosa sobre la barra y nadie lo ha notado. Ni siquiera quien la sirvió.", "The tankard overflows on the bar and nobody has noticed. Not even the one who poured it."),
+    doctorThought("Es la primera vez que oigo callar esta taberna.", "It's the first time I've heard this tavern fall silent."),
+  ],
+  baker: [
+    doctorThought("Tiene harina en las manos y no amasa. Con el pulgar repite siempre el mismo gesto.", "There's flour on her hands and she isn't kneading. Her thumb repeats the same small gesture, over and over."),
+    doctorThought("Cuando se queme el pan, quizá levante la vista.", "When the bread burns, perhaps she'll look up."),
+  ],
+  sitting: [
+    doctorThought("Está sentado donde siempre, pero ya no mira pasar a nadie.", "He's sitting where he always does, but he no longer watches anyone pass."),
+    doctorThought("Antes me habría contado quién salía de la taberna, y en qué estado.", "He would once have told me who came out of the tavern, and in what state."),
+  ],
+  woodcutter: [
+    doctorThought("El hacha descansa clavada en el tocón. Él, apoyado, no descansa: mira.", "The axe rests in the stump. He, leaning, isn't resting: he's watching."),
+    doctorThought("Tan cansado hace unos días, y ahora tan despierto... para otra cosa.", "So tired a few days ago, and now so wide awake... for something else."),
+  ],
+  blacksmith: [
+    doctorThought("La mano se curó del todo. Es el oficio el que se ha quedado parado.", "The hand healed completely. It's the trade that has stopped."),
+    doctorThought("La forja se apaga sola y él no se da cuenta.", "The forge is dying down by itself and he doesn't notice."),
+  ],
+  washer: [
+    doctorThought("La ropa se va con la corriente, prenda tras prenda. Ella ni parpadea.", "The washing drifts away with the current, garment after garment. She doesn't even blink."),
+    doctorThought("Cuando se dé cuenta, el río se habrá quedado con toda la colada.", "By the time she notices, the river will have kept all the washing."),
+  ],
+};
+
 const FINAL_LINES: LocalizedLine[] = [
   witch("Llegas. Con la pluma, espero. Y con cara de haber corrido la noche entera.", "You came. With the feather, I hope. And looking as if you'd run all night."),
   doctor("Aquí está, a salvo. ¿Vas a decirme ya para qué, o seguimos con el misterio?", "Here it is, safe and sound. Are you going to tell me now what it's for, or do we keep the mystery?"),
@@ -83,7 +122,11 @@ export function resolveChapter4(
   }
 
   if (interactionId.startsWith(ARTIFACT_PERSON_PREFIX)) {
-    // A fixed thought per person (the same person always gets the same one).
+    // Their own two thoughts when the pose has them (the same person always gets the same ones).
+    const slug = interactionId.slice(ARTIFACT_PERSON_PREFIX.length);
+    const own = ARTIFACT_PERSON_THOUGHTS[slug];
+    if (own) return { conversation: local(talk(`artifact.${slug}`, own)), effects: [] };
+    // Otherwise a fixed generic thought per person.
     let hash = 0;
     for (const char of interactionId) hash = (hash * 31 + char.charCodeAt(0)) % 997;
     const index = hash % ARTIFACT_THOUGHTS.length;

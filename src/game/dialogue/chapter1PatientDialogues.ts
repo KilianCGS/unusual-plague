@@ -65,7 +65,7 @@ export const bakerDelivery: LocalizedConversation = {
   lines: [
     doctor(
       "¡Aquí está! Una infusión medicinal y un paño frío, recién preparados. El paño, para la frente; la infusión, para dentro.",
-      "Here it is! A medicinal infusion and a cold compress, freshly made. The compress for his forehead; the infusion for the inside.",
+      "Here it is! A medicinal infusion and a cold cloth, freshly made. The cloth for his forehead; the infusion for the inside.",
     ),
     subject(
       "Gracias a Dios. Se lo llevo ahora mismo.",

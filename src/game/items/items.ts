@@ -91,8 +91,8 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     name: { es: "Tela", en: "Cloth" },
     icon: `${RESOURCE_ICONS}/cloth.png`,
     sourceHint: {
-      es: "Necesitaré tela limpia. Quizá el mercader tenga.",
-      en: "I will need clean cloth. Perhaps the merchant has some.",
+      es: "Necesitaré tela limpia. En el mercado hay un puesto de telas.",
+      en: "I will need clean cloth. The market has a cloth stall.",
     },
   },
   alcohol: {
@@ -157,7 +157,7 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
   },
   "cold-cloth": {
     id: "cold-cloth",
-    name: { es: "Paño frío", en: "Cold compress" },
+    name: { es: "Paño frío", en: "Cold cloth" },
     icon: `${PREPARED_ICONS}/cold-cloth.png`,
   },
   // The Doctor's own flask: a normal physical item with no special logic yet.
@@ -261,8 +261,8 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
     name: { es: "Vela", en: "Candle" },
     icon: `${RESOURCE_ICONS}/candle.png`,
     sourceHint: {
-      es: "El mercader de la plaza vende velas.",
-      en: "The merchant in the plaza sells candles.",
+      es: "El puesto de telas del mercado vende velas.",
+      en: "The cloth stall in the market sells candles.",
     },
   },
   "chopped-onion": {

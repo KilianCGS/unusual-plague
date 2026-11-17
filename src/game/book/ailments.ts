@@ -72,7 +72,11 @@ export const AILMENTS: Ailment[] = [
     treatment: [
       "Limpiar y proteger la zona con un ",
       { emphasis: "vendaje desinfectado" },
-      ". Las infecciones más avanzadas pueden requerir ",
+      ". Si está inflamada, una ",
+      { emphasis: "cataplasma" },
+      " y una ",
+      { emphasis: "compresa medicinal" },
+      " bajan la hinchazón. En las infecciones avanzadas, ",
       { emphasis: "ungüento medicinal" },
       " antes de vendar.",
     ],
@@ -102,8 +106,8 @@ export const AILMENTS: Ailment[] = [
     treatment: [
       "Reforzar la alimentación con fruta y alimentos nutritivos. Administrar ",
       { emphasis: "bebida cítrica" },
-      " y acompañarlo con ",
-      "alimentos nutritivos",
+      " y acompañarlo con un ",
+      { emphasis: "caldo de huesos" },
       ".",
     ],
   },
@@ -115,9 +119,11 @@ export const AILMENTS: Ailment[] = [
       "Debilidad profunda, somnolencia, mareos y dificultad para concentrarse. El enfermo puede carecer de fuerzas incluso después de descansar.",
     ],
     treatment: [
-      "Reposo, alimento y observación. Un ",
+      "Reposo, alimento y observación. Una ",
       { emphasis: "bebida cítrica" },
-      " puede devolver fuerzas, aunque conviene investigar la causa cuando el agotamiento persista.",
+      " y una ",
+      { emphasis: "infusión de menta" },
+      " pueden devolver fuerzas, aunque conviene investigar la causa cuando el agotamiento persista.",
     ],
   },
   // 2026-11-12: three more ailments (the Compendium now has ten). NEW text, awaiting

@@ -258,7 +258,7 @@ test("PACIENTES and PREPARADOS exist in English too", () => {
       en.includes("Treatment"),
   );
   assert.ok(
-    en.includes("☐ Medicinal infusion") && en.includes("☐ Cold compress"),
+    en.includes("☐ Medicinal infusion") && en.includes("☐ Cold cloth"),
   );
   assert.ok(patientTexts("treated", [], "en").includes("✓ TREATED"));
 });
@@ -307,7 +307,7 @@ test("Water + Medicinal herb -> Medicinal infusion on the FIRE station, any orde
   ); // wrong station
 });
 
-test("Water + Cloth -> Cold compress on the MANUAL station, any order", () => {
+test("Water + Cloth -> Cold cloth on the MANUAL station, any order", () => {
   const ing = (...ids) => ids.map((itemId) => ({ itemId, quantity: 1 }));
   assert.equal(
     cr.findMatchingRecipe("manual", ing("water", "cloth")).output.itemId,
@@ -449,7 +449,7 @@ test("the Doctor's hints: one natural line per missing ingredient, in ES and EN"
   assert.deepEqual(lines([], "es"), [
     "Debería recoger algo de agua del río.",
     "Hace tiempo que no recojo hierbas medicinales. Encontraré algunas en el bosque.",
-    "Necesitaré tela limpia. Quizá el mercader tenga.",
+    "Necesitaré tela limpia. En el mercado hay un puesto de telas.",
   ]);
   assert.equal(lines([], "en").length, 3);
   assert.deepEqual(lines([["water", 1]], "es").length, 3); // Water x1: still missing

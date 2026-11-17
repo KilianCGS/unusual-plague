@@ -20,7 +20,7 @@ export const AILMENTS_EN: Record<string, Pick<Ailment, "name" | "symptoms" | "tr
   "infected-wound": {
     name: "Infected wound",
     symptoms: ["Persistent pain around a wound, swelling, redness and possible discharge."],
-    treatment: ["Clean and protect the area with a ", { emphasis: "disinfected bandage" }, ". A more advanced infection may need ", { emphasis: "medicinal ointment" }, " before dressing."],
+    treatment: ["Clean and protect the area with a ", { emphasis: "disinfected bandage" }, ". If it is swollen, a ", { emphasis: "poultice" }, " and a ", { emphasis: "medicinal compress" }, " bring the swelling down. An advanced infection may need ", { emphasis: "medicinal ointment" }, " before dressing."],
   },
   "chest-cough": {
     name: "Chest cough",
@@ -30,12 +30,12 @@ export const AILMENTS_EN: Record<string, Pick<Ailment, "name" | "symptoms" | "tr
   scurvy: {
     name: "Scurvy",
     symptoms: ["Tiredness, weakness, sore gums and wounds that heal slowly. It may develop after a long period of poor diet."],
-    treatment: ["Improve the diet with fruit and nourishing food. A citrus drink can accompany regular meals."],
+    treatment: ["Improve the diet with fruit and nourishing food. A ", { emphasis: "citrus drink" }, " and a ", { emphasis: "bone broth" }, " can accompany regular meals."],
   },
   exhaustion: {
     name: "Exhaustion",
     symptoms: ["Profound weakness, sleepiness, dizziness and trouble concentrating. The patient may lack strength even after resting."],
-    treatment: ["Rest, food and observation. A ", { emphasis: "citrus drink" }, " may help restore strength, but persistent exhaustion calls for further investigation."],
+    treatment: ["Rest, food and observation. A ", { emphasis: "citrus drink" }, " and a ", { emphasis: "mint infusion" }, " may help restore strength, but persistent exhaustion calls for further investigation."],
   },
   // 2026-11-12: NEW text, awaiting Kilian's review.
   burn: {
