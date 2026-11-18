@@ -228,11 +228,13 @@ const DAY3_PEOPLE = {
 };
 const WITCH = "chapter3.glade.witch";
 
-test("Day 3 placements: the stonecutter on the quarry bench is placed (Kilian: the same man of the bench); the Witch (glade log) is placed too; the rest are still to place", () => {
-  // the people Day 3 still needs and nobody has placed yet: an exact list, so placing one fails here and this
-  // list gets updated (the test then asks for its place in the walkthrough)
+test("Day 3 placements: all three patients and the Witch are placed (2026-11-18, Kilian's placements)", () => {
+  // the people Day 3 still needs and nobody has placed yet: an exact list (empty now)
   const pending = [...Object.values(DAY3_PEOPLE), WITCH].filter((id) => !placedIn(id, "chapter-3")).sort();
-  assert.deepEqual(pending, ["chapter3.apothecaryStreet.duster", "chapter3.mountainPath.miner"]);
+  assert.deepEqual(pending, []);
+  // the woman with the duster is in the bakery street, the "miner" is the resting man of the quarry
+  assert.equal(placedIn("chapter3.apothecaryStreet.duster", "chapter-3"), "bakery-street");
+  assert.equal(placedIn("chapter3.mountainPath.miner", "chapter-3"), "quarry");
   assert.equal(placedIn("chapter3.quarry.stonecutter", "chapter-3"), "quarry");
   assert.equal(placedIn(WITCH, "chapter-3"), "forest-glade");
   // the spear knight in front of the mine is the guard who says the way is shut

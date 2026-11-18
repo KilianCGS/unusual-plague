@@ -36,6 +36,14 @@ const CARRIED_TO_CHAPTER_2: Readonly<Record<string, readonly string[]>> = {
   quarry: ["quarry-stonecutter-shovel-01", "quarry-stonecutter-stool-01", "quarry-campfire-01"],
 };
 const QUARRY_ERRAND_GIVER_INSTANCE_ID = "quarry-stonecutter-stool-01";
+// WHAT DAY 3 DOES NOT INHERIT FROM DAY 2 (2026-11-18). Day 3 starts from Day 2's population and what Kilian places is
+// added on top, but a placement cannot delete one, so the people who were patients on Day 2 and are cured by Day 3 are
+// listed here: the injured blacksmith (Day 3 has his healthy one, placed by Kilian) and the sick farmer lying in the
+// granary. (The tired woodcutter stays on his stump until Kilian places another pose of him.)
+export const NOT_INHERITED_IN_CHAPTER_3: readonly string[] = [
+  "smithy-interior-blacksmith-day2-hurt-hand-01",
+  "granary-interior-farmer-hoeing-sick-lying-01",
+];
 // THE MARKET STREET (2026-11-16) is authored once, for Day 1, and stays the same on Days 2 and 3 (Day 3
 // inherits Day 2): its population and its stall interactions are carried over. 2026-11-17 (Kilian): the
 // STALLS are fixed every day for convenience when buying, but the people standing in front of them are
@@ -104,7 +112,9 @@ export function getComposition(
   // (the same instance id placed again in Day 3 replaces the Day 2 one).
   const inherited =
     chapterId === "chapter-3"
-      ? BY_SCENE_AND_CHAPTER.get(`${sceneId}::chapter-2`)?.instances ?? []
+      ? (BY_SCENE_AND_CHAPTER.get(`${sceneId}::chapter-2`)?.instances ?? []).filter(
+          (instance) => !NOT_INHERITED_IN_CHAPTER_3.includes(instance.instanceId),
+        )
       : [];
   // What the Doctor did not pick up on an earlier day stays where it was (Kilian, 2026-11-15):
   // the collectibles of Day 1 are kept in Days 2 and 3. A picked one is hidden by the collected
@@ -153,6 +163,7 @@ export function getChapterInteractions(
 // (the woman with the duster, the path miner, the Witch of the glade) wait for Kilian's placements.
 function chapter3AllInteractions(): Record<string, DecorInteraction> {
   const inherited = { ...carriedAndChapter2Interactions(), ...chapter3Interactions };
+  for (const id of NOT_INHERITED_IN_CHAPTER_3) delete inherited[id];
   const bench = inherited[QUARRY_ERRAND_GIVER_INSTANCE_ID];
   if (bench) inherited[QUARRY_ERRAND_GIVER_INSTANCE_ID] = { ...bench, interactionId: "chapter3.quarry.stonecutter" };
   return inherited;

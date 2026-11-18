@@ -41,6 +41,16 @@ export const chapter3Compositions: DecorComposition[] = [
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0
+      },
+      {
+        "instanceId": "bakery-street-woman-dusting-01",
+        "assetId": "woman-dusting",
+        "x": 698,
+        "y": 668,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
       }
     ]
   },
@@ -139,6 +149,36 @@ export const chapter3Compositions: DecorComposition[] = [
         "assetId": "witch-cat-sitting-back",
         "x": 1034,
         "y": 671,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-witch-crow-head-tilt-01",
+        "assetId": "witch-crow-head-tilt",
+        "x": 827,
+        "y": 487,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-witch-crow-cawing-01",
+        "assetId": "witch-crow-cawing",
+        "x": 795,
+        "y": 518,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "forest-glade-witch-crow-pecking-01",
+        "assetId": "witch-crow-pecking",
+        "x": 864,
+        "y": 517,
         "scale": 1,
         "flipX": false,
         "colliderEnabled": false,
@@ -317,9 +357,9 @@ export const chapter3Compositions: DecorComposition[] = [
       {
         "instanceId": "quarry-stonecutter-resting-01",
         "assetId": "stonecutter-resting",
-        "x": 1050,
-        "y": 492,
-        "scale": 1,
+        "x": 1032,
+        "y": 508,
+        "scale": 0.82,
         "flipX": false,
         "colliderEnabled": true,
         "zOffset": 0
@@ -331,6 +371,26 @@ export const chapter3Compositions: DecorComposition[] = [
         "y": 435,
         "scale": 1,
         "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "quarry-stonecutter-stool-01",
+        "assetId": "stonecutter-stool",
+        "x": 689,
+        "y": 506,
+        "scale": 0.88,
+        "flipX": false,
+        "colliderEnabled": true,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "quarry-villager-woman-02-v2-01",
+        "assetId": "villager-woman-02-v2",
+        "x": 1076,
+        "y": 491,
+        "scale": 1,
+        "flipX": true,
         "colliderEnabled": false,
         "zOffset": 0
       }

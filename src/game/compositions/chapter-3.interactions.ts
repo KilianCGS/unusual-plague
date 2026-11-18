@@ -13,6 +13,15 @@ const ids: Record<string, string> = {
   // (bone, mint, herb and the omen); the spear knight in front of the mine entrance says the way is shut.
   "forest-glade-witch-sitting-back-01": "chapter3.glade.witch",
   "mountain-path-knight-spear-shield-01": "chapter3.mountainPath.guard",
+  // The healthy blacksmith (hammer) takes the place of the Day 2 injured one: his Day 3 lines
+  // (chapter3.smithy.blacksmith, via chapter2.smithy.blacksmith) belong to him now.
+  "smithy-interior-blacksmith-hammer-01": "chapter2.smithy.blacksmith",
+  // 2026-11-18 (Kilian's placements): the woman with the duster is in the BAKERY street; the "miner" patient is the
+  // resting man of the quarry (with a woman beside him); the stonecutter on the stool keeps being the quarry
+  // patient, now with the zone of his new place and scale.
+  "bakery-street-woman-dusting-01": "chapter3.apothecaryStreet.duster",
+  "quarry-stonecutter-resting-01": "chapter3.mountainPath.miner",
+  "quarry-stonecutter-stool-01": "chapter3.quarry.stonecutter",
 };
 
 // Reach follows each approved placement's scaled sprite bounds plus 16 units (the same

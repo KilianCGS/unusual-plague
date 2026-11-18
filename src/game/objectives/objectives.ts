@@ -22,7 +22,7 @@ export const PATIENT_OBJECTIVES: Readonly<Record<string, Record<Language, string
   [BLACKSMITH_DAY2_ID]: { es: "Tratar al herrero herido", en: "Treat the injured blacksmith" },
   [FARMER_DAY2_ID]: { es: "Tratar al agricultor del molino", en: "Treat the mill farmer" },
   [DUSTER_DAY3_ID]: { es: "Tratar a la mujer del plumero", en: "Treat the woman with the duster" },
-  [PATH_MINER_DAY3_ID]: { es: "Tratar al minero del camino", en: "Treat the path miner" },
+  [PATH_MINER_DAY3_ID]: { es: "Tratar al minero de la cantera", en: "Treat the quarry miner" },
   [STONECUTTER_DAY3_ID]: { es: "Tratar al picapedrero de la cantera", en: "Treat the quarry stonecutter" },
 };
 

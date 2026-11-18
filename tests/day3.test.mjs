@@ -198,7 +198,17 @@ test("Day 3 inherits the population and the interactions of Day 2", () => {
   assert.equal(day3Composition.instances.length >= day2.instances.length, true);
   const i2 = getChapterInteractions("chapter-2");
   const i3 = getChapterInteractions("chapter-3");
-  for (const key of Object.keys(i2)) assert.ok(i3[key], `${key} is kept in Day 3`);
+  // 2026-11-18: everything but the people already cured on Day 2 (NOT_INHERITED_IN_CHAPTER_3)
+  const { NOT_INHERITED_IN_CHAPTER_3 } = at("src/game/compositions/index.ts");
+  for (const key of Object.keys(i2)) {
+    if (NOT_INHERITED_IN_CHAPTER_3.includes(key)) assert.equal(i3[key], undefined, `${key} is not inherited`);
+    else assert.ok(i3[key], `${key} is kept in Day 3`);
+  }
+  for (const sceneId of ["smithy-interior", "granary-interior"]) {
+    const ids = (getComposition(sceneId, "chapter-3")?.instances ?? []).map((i) => i.instanceId);
+    for (const id of NOT_INHERITED_IN_CHAPTER_3) assert.ok(!ids.includes(id), `${id} is not drawn on Day 3`);
+  }
+  assert.equal(i3["smithy-interior-blacksmith-hammer-01"].interactionId, "chapter2.smithy.blacksmith");
 });
 
 test("the Witch of the glade: a bone once, then a bad omen for a pine mushroom once, then a farewell", () => {
