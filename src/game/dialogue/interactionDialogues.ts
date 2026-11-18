@@ -1,7 +1,7 @@
 import type { Language } from "../i18n/types";
 import { chapter1AmbientDialogues } from "./chapter1Dialogues";
 import { chapter2AmbientDialogues } from "./chapter2AmbientDialogues";
-import { ambientForChapter, chapter3MineGuardDialogue } from "./chapter34AmbientDialogues";
+import { ambientForChapter, chapter3MineGuardDialogue, chapter3PeopleDialogues } from "./chapter34AmbientDialogues";
 import { NOTICEBOARD_ID, environmentDialogues, noticeboardNotices } from "./environmentDialogues";
 import { chapter1Intro } from "./chapter1Intro";
 import { DOCTOR_SPEAKER, type Conversation } from "./dialogueTypes";
@@ -17,6 +17,7 @@ const CONVERSATIONS: Record<string, LocalizedConversation> = {
   ...chapter1AmbientDialogues,
   ...chapter2AmbientDialogues,
   ...chapter3MineGuardDialogue,
+  ...chapter3PeopleDialogues,
   ...environmentDialogues,
 };
 

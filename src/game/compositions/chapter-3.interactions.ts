@@ -22,6 +22,26 @@ const ids: Record<string, string> = {
   "bakery-street-woman-dusting-01": "chapter3.apothecaryStreet.duster",
   "quarry-stonecutter-resting-01": "chapter3.mountainPath.miner",
   "quarry-stonecutter-stool-01": "chapter3.quarry.stonecutter",
+  // 2026-11-18: the people who had no words (see chapter3PeopleDialogues).
+  "plaza-priest-praying-01": "chapter3.plaza.priest",
+  "plaza-praying-man-side-01": "chapter3.plaza.prayingMan",
+  "plaza-praying-young-woman-01": "chapter3.plaza.prayingYoungWoman",
+  "plaza-praying-old-woman-back-01": "chapter3.plaza.prayingOldWoman",
+  "plaza-elderly-man-seated-01": "chapter3.plaza.elderMan",
+  "plaza-elderly-woman-seated-01": "chapter3.plaza.elderWoman",
+  "tavern-street-villager-woman-02-01": "chapter3.tavernStreet.neighbour",
+  "tavern-street-boy-spinning-top-01": "chapter3.tavernStreet.topBoy",
+  "tavern-interior-villager-man-01-v2-01": "chapter3.tavernInterior.drinker",
+  "outskirts-woman-washing-clothes-01": "chapter3.outskirts.washer",
+  "mill-farmland-villager-woman-02-01": "chapter3.mill.woman",
+  "mill-farmland-stonecutter-shovel-01": "chapter3.mill.stonecutter",
+  "bakery-street-villager-woman-01-v2-01": "chapter3.bakeryStreet.basketWoman",
+  "smithy-street-girl-jump-rope-01": "chapter3.smithyStreet.ropeGirl",
+  "smithy-street-carpenter-workbench-01": "chapter3.smithyStreet.carpenter",
+  "mountain-path-child-bow-archer-01": "chapter3.mountainPath.archerBoy",
+  "mountain-path-child-wooden-sword-01": "chapter3.mountainPath.swordBoy",
+  "quarry-villager-man-02-v2-01": "chapter3.quarry.visitor",
+  "quarry-villager-woman-02-v2-01": "chapter3.quarry.minersWife",
 };
 
 // Reach follows each approved placement's scaled sprite bounds plus 16 units (the same

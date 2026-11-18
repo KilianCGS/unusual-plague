@@ -361,3 +361,160 @@ el fichero). Generado desde el código, así que lo que ves aquí es lo que sale
 | Aldeano de espaldas, mercado (delante de la carnicería) | Llevo media hora mirando ese jamón y el jamón me mira a mí. / El jamón, pero no se lo cuente a nadie. | I've been looking at that ham for half an hour and the ham is looking back at me. / The ham did, but don't tell anyone. |
 | Anciano de espaldas, mercado | Antes aquí solo había una pared. Ahora hay pared y gente, que es mejor. / A mi edad, mirar es la mitad de comprar. | There used to be only a wall here. Now there's a wall and people, which is better. / At my age, looking is half of buying. |
 | Crafteo: ya tengo suficiente | (Ya tengo todos los que necesito.) | (I already have all I need.) |
+
+
+## Dia 3: la gente que no tenia voz (18-nov, para revisar)
+
+Una conversacion de 3 lineas por persona colocada, con la rareza sutil del dia (algo pequeno en las manos, respuestas tardias) sin nombrar nunca que es.
+
+**chapter3.plaza.priest** (plaza-priest-praying-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Rezo por todos. Hoy cuesta: la mitad de la plaza mira al suelo y la otra mitad, a su mano. | I pray for everyone. It's hard today: half the plaza looks at the ground and the other half at their hand. |
+| Doctor | ¿A su mano? | At their hand? |
+| Persona | A algo pequeño que llevan. No he conseguido ver qué, y mira que tengo buena vista para lo que no se debe mirar. | At something small they carry. I haven't managed to see what, and I do have a good eye for what one shouldn't look at. |
+
+**chapter3.plaza.prayingMan** (plaza-praying-man-side-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Chis. Estoy a mitad de una oración y a mitad de un pensamiento. | Shh. I'm halfway through a prayer and halfway through a thought. |
+| Doctor | ¿Y cuál va ganando? | Which one is winning? |
+| Persona | El pensamiento. Qué vergüenza. | The thought. How embarrassing. |
+
+**chapter3.plaza.prayingYoungWoman** (plaza-praying-young-woman-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Pido que se me pase la prisa. | I'm asking for my hurry to pass. |
+| Doctor | ¿Prisa por qué? | Hurry for what? |
+| Persona | Por llegar. A todo. Sin saber adónde. | To arrive. Everywhere. Without knowing where. |
+
+**chapter3.plaza.prayingOldWoman** (plaza-praying-old-woman-back-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | No me hable ahora, hijo, que se me va el rezo. | Don't speak to me now, son, I'll lose my place. |
+| Doctor | Perdone, vuelvo luego. | Forgive me, I'll come back later. |
+| Persona | Ya se me ha ido. Dígame, ¿qué quería? | It's gone already. Tell me, what did you want? |
+
+**chapter3.plaza.elderMan** (plaza-elderly-man-seated-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Aquí sentado se ve pasar todo. Antes también se oía. | Sitting here you see everything pass. It used to be heard, too. |
+| Doctor | ¿Qué se oía? | What was there to hear? |
+| Persona | Gente. Ahora pasan en silencio, con la cabeza gacha. Mi mujer y yo apostamos a ver quién levanta la vista primero. | People. Now they walk by in silence, heads down. My wife and I bet on who will look up first. |
+
+**chapter3.plaza.elderWoman** (plaza-elderly-woman-seated-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Mi marido dice que usted levantará la vista al pasar. Yo, que no. | My husband says you'll look up as you pass. I say you won't. |
+| Doctor | Pues ha perdido usted: la estoy mirando. | Then you've lost: I'm looking right at you. |
+| Persona | Ay, qué vergüenza. Dos pasteles, entonces. | Oh, how embarrassing. Two pastries, then. |
+
+**chapter3.tavernStreet.neighbour** (tavern-street-villager-woman-02-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Mi vecino lleva tres días sin darme los buenos días. Hoy le ha dicho "perdón" a la pared. | My neighbour hasn't said good morning in three days. Today he said "sorry" to the wall. |
+| Doctor | ¿A la pared? | To the wall? |
+| Persona | Iba mirando algo que llevaba en la mano y chocó con ella. Qué cosas. | He was looking at something he held and walked into it. Honestly. |
+
+**chapter3.tavernStreet.topBoy** (tavern-street-boy-spinning-top-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | ¡Mire, doctor! ¡Ya aguanta una vuelta entera! | Look, doctor! It can last a whole spin now! |
+| Doctor | ¡Enhorabuena, qué puntería! | Congratulations, what a feat! |
+| Persona | Nadie ha visto la vuelta entera. Todos miraban otra cosa. | Nobody saw the whole spin. Everyone was looking at something else. |
+
+**chapter3.tavernInterior.drinker** (tavern-interior-villager-man-01-v2-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Pedí otra jarra y no sé si me la han servido. Estaba mirando algo. | I ordered another tankard and I don't know whether it was served. I was looking at something. |
+| Doctor | ¿Mirando qué? | Looking at what? |
+| Persona | Pues eso: que no lo recuerdo. | That's the thing: I can't remember. |
+
+**chapter3.outskirts.washer** (outskirts-woman-washing-clothes-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | El río trae hoy menos charla. Antes las lavanderas hablábamos más que el agua. | The river brings less chatter today. We washerwomen used to talk more than the water. |
+| Doctor | ¿Y hoy? | And today? |
+| Persona | Hoy solo se oye el agua. Y un zumbido pequeñito, que viene y va. | Today you only hear the water. And a tiny hum that comes and goes. |
+
+**chapter3.mill.woman** (mill-farmland-villager-woman-02-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Salí a por huevos y volví a casa con la cesta vacía. Me entretuve. | I went out for eggs and came home with an empty basket. I got held up. |
+| Doctor | ¿Con qué? | With what? |
+| Persona | Con nada. Y no me di cuenta de cuánto rato. | With nothing. And I didn't notice how long it took. |
+
+**chapter3.mill.stonecutter** (mill-farmland-stonecutter-shovel-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Me han mandado a cavar una zanja. Llevo la pala más tiempo en la mano que en la tierra. | They sent me to dig a ditch. I've held the shovel longer than I've put it in the ground. |
+| Doctor | ¿Descansando? | Resting? |
+| Persona | Pensando. Creo. Ya no distingo. | Thinking. I believe. I can't tell any more. |
+
+**chapter3.bakeryStreet.basketWoman** (bakery-street-villager-woman-01-v2-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Llevo los huevos de la panadera y el pan de mi casa, y se me ha mezclado todo. | I'm carrying the baker's eggs and the bread for my house, and it's all got mixed up. |
+| Doctor | Bueno, un huevo con pan es una comida. | Well, an egg with bread is a meal. |
+| Persona | Eso mismo ha dicho mi marido, sin levantar la vista. | That's just what my husband said, without looking up. |
+
+**chapter3.smithyStreet.ropeGirl** (smithy-street-girl-jump-rope-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | ¡Treinta y dos sin fallar! | Thirty-two without a miss! |
+| Doctor | ¡Qué barbaridad! ¿Quién lleva la cuenta? | Goodness! Who's counting? |
+| Persona | Yo sola. Antes mi hermano contaba en voz alta. | Me, alone. My brother used to count out loud. |
+
+**chapter3.smithyStreet.carpenter** (smithy-street-carpenter-workbench-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Corto recto, mido dos veces, y esta tabla me ha salido torcida. | I cut straight, I measure twice, and this board still came out crooked. |
+| Doctor | Le pasa a los mejores. | It happens to the best. |
+| Persona | Es que miré un segundo hacia otro lado. Con eso basta. | I looked away for just a second. That's all it takes. |
+
+**chapter3.mountainPath.archerBoy** (mountain-path-child-bow-archer-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Les aviso "¡cuidado, flecha!" y ni se apartan. | I warn them "watch out, arrow!" and they don't even step aside. |
+| Doctor | Qué descuido. ¿Sueles apuntar a alguien? | How careless. Do you ever aim at anyone? |
+| Persona | ¡Qué va! Menos mal: ni me ven. | No way! Lucky for them: they don't even see me. |
+
+**chapter3.mountainPath.swordBoy** (mountain-path-child-wooden-sword-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | ¡Defiendo el camino! Nadie pasa sin mi permiso. | I'm defending the path! Nobody passes without my permission. |
+| Doctor | ¿Puedo pasar yo? | May I pass? |
+| Persona | Usted sí, que es el médico. Los demás ni me ven: van mirando algo. | You may, you're the doctor. The rest don't even see me: they're looking at something. |
+
+**chapter3.quarry.visitor** (quarry-villager-man-02-v2-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Vine a cobrar una deuda y me he quedado mirando las piedras. | I came to collect a debt and ended up looking at the stones. |
+| Doctor | Son muy mirables. | They're very lookable. |
+| Persona | Antes no lo eran. Hoy me parecen más interesantes que mi dinero, y eso es mal síntoma. | They weren't before. Today they seem more interesting than my money, and that's a bad sign. |
+
+**chapter3.quarry.minersWife** (quarry-villager-woman-02-v2-01)
+
+| | ES | EN |
+|---|---|---|
+| Persona | Es mi marido. Se queja de las encías, no de lo que come: pan duro, siempre. | He's my husband. He complains about his gums, not about what he eats: hard bread, always. |
+| Doctor | Eso me dice mucho. Gracias. | That tells me a lot. Thank you. |
+| Persona | Le llevo caldo y ni lo prueba. Está distraído. | I bring him broth and he doesn't even taste it. He's distracted. |
