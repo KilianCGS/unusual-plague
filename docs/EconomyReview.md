@@ -112,3 +112,36 @@ el mercader vende hasta **4 azúcares** (tope 4 el Día 3) y los pagos del Día 
 justo el azúcar extra). El test `economy-no-deadlock` pasa con esos números. El icono y el grabado del libro del jarabe son
 **provisionales** (copia del balsámico) hasta que Codex los dibuje: `public/game/items/prepared-icons/syrup.png` y
 `public/game/ui/book/preparations/syrup.png`.
+
+## Revisión del dinero hasta el final del Día 3 (2026-11-18)
+
+Cálculo directo sobre `payments.ts`, `shops.ts`, `recipes.ts` y los recados (no es una partida jugada).
+
+| | Monedas |
+|---|---|
+| Inicial | 6 |
+| Pacientes: Día 1 / 2 / 3 | 15 / 22 / 13 = **50** |
+| Recados: pescador (Día 1) + 4 del Día 2 | 3 + 28 = **31** |
+| **Entra: sin recados / con todos** | **56 / 87** |
+| Obligatorio (tela ×4, sal ×1, naranja ×3, azúcar ×3, ajo ×1; el hueso lo da la bruja y una sal la panadera) | **33** |
+| Máximo comprable en tienda (sal 8, azúcar 20, naranja 3, cebolla 6, ajo 5, tela 10, vela 1, hueso 9, grasa 3) | **65** |
+| **Sobra al acabar el Día 3** — solo lo obligatorio, sin recados / con todos los recados | **23 / 54** |
+| **Sobra** — comprando todo lo comprable, sin recados / con todos los recados | **-9 (no llega) / 22** |
+
+Lectura: sobra **bastante** (el objetivo de Kilian era ~10). Un jugador que haga los recados y compre solo lo necesario acaba con ~54;
+incluso comprando todo con todos los recados le sobran ~22. El azúcar es el cuello de botella (3 obligatorios + 1 de regalo + los
+recados): los recados nuevos del Día 3 **no deberían usar azúcar** (paño frío, vela...) o el test de bloqueo volverá a fallar.
+
+## Cambios del 18-nov (decisiones de Kilian)
+
+- **Pagos del Día 3 más bajos:** mujer del plumero 3→2, minero 4→2, picapedrero 6→3 (-6 en total). Los del Día 2 no se pueden bajar:
+  el test de bloqueo falla (esas monedas pagan el azúcar y el ajo antes de curar). Rango probado: Día 2 en 4/9/9; Día 3 hasta 2/2/3.
+- **Vela fuera:** se quita del puesto de telas (el objeto y la conversación de la estatua quedan en el código, dormidos).
+- **Almacén:** 10 → 15 casillas (una fila más de 5).
+- **Herramientas del Doctor (gasto narrativo):** al cerrar por primera vez la mesa o el fuego en el Día 3 dice «Mis herramientas están
+  muy melladas…»; el herrero sano las renueva por **15 monedas**, una vez. Solo se ofrece **cuando los tres casos del día están
+  tratados**, así que ese gasto nunca compite con una compra obligatoria (no puede bloquear). Código: `dialogue/toolsRenewal.ts`.
+- **Resultado (cálculo):** entra 6 + 50 de pacientes (15 + 22 + 13 - 6 = 44, +6 inicial = 50) = **50** sin recados / **81** con todos.
+  Obligatorio 33. Sobra al acabar el Día 3: **17 / 48**; tras renovar las herramientas: **2 / 33**.
+  La diferencia entre quien hace los recados y quien no es lo que más pesa: si quieres menos holgura para el que los hace todos,
+  la palanca es el pago de los recados del Día 2 (9/9/8/2 + azúcar).

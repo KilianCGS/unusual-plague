@@ -46,7 +46,7 @@ test("the three stalls sell what Kilian decided, from Day 2, and every item exis
     shops.shopForChapter(shops.getShop(id), day).entries.map((e) => e.itemId).sort();
   assert.deepEqual(sells("chapter1.market.produce"), ["onion", "orange"]);
   assert.deepEqual(sells("chapter1.market.produce", "chapter-3"), ["garlic", "onion", "orange"]);
-  assert.deepEqual(sells("chapter1.market.draper"), ["candle", "cloth"]);
+  assert.deepEqual(sells("chapter1.market.draper"), ["cloth"]); // the candle is out for now (2026-11-18)
   // cloth and oranges are on sale from Day 1; the plaza merchant ends up with sugar and salt only
   assert.deepEqual(sells("chapter1.market.draper", "chapter-1"), ["cloth"]);
   assert.deepEqual(sells("chapter1.market.produce", "chapter-1"), ["orange"]);

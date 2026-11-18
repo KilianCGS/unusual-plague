@@ -33,6 +33,31 @@ function useFrameIndex(frameCount: number, fps: number, loop: boolean) {
 export function getSpriteBox(asset: DecorAsset, instance: DecorInstance) {
   const { frameWidth, frameHeight } = asset.sprite;
   const leftFraction = instance.flipX ? 1 - asset.anchor.x : asset.anchor.x;
+  const rotation = (((instance.rotation ?? 0) % 360) + 360) % 360;
+
+  if (rotation !== 0) {
+    // the box that contains the sprite once it is turned around its anchor
+    const left = -leftFraction * frameWidth * instance.scale;
+    const right = left + frameWidth * instance.scale;
+    const top = -asset.anchor.y * frameHeight * instance.scale;
+    const bottom = top + frameHeight * instance.scale;
+    const radians = (rotation * Math.PI) / 180;
+    const cos = Math.cos(radians);
+    const sin = Math.sin(radians);
+    const xs: number[] = [];
+    const ys: number[] = [];
+    for (const [cx, cy] of [[left, top], [right, top], [right, bottom], [left, bottom]]) {
+      xs.push(cx * cos - cy * sin);
+      ys.push(cx * sin + cy * cos);
+    }
+
+    return {
+      x: instance.x + Math.min(...xs),
+      y: instance.y + Math.min(...ys),
+      width: Math.max(...xs) - Math.min(...xs),
+      height: Math.max(...ys) - Math.min(...ys),
+    };
+  }
 
   return {
     x: instance.x - leftFraction * frameWidth * instance.scale,
@@ -87,7 +112,7 @@ export function DecorSprite({
     height: frameHeight,
     imageRendering: "pixelated",
     transformOrigin: `${asset.anchor.x * 100}% ${asset.anchor.y * 100}%`,
-    transform: `scale(${instance.flipX ? -instance.scale : instance.scale}, ${instance.scale})`,
+    transform: `${instance.rotation ? `rotate(${instance.rotation}deg) ` : ""}scale(${instance.flipX ? -instance.scale : instance.scale}, ${instance.scale})`,
     userSelect: "none",
     // Frames are stacked and toggled, so a frame is never loaded mid-animation.
   };

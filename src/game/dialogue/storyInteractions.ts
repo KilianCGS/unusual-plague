@@ -76,6 +76,7 @@ import {
 } from "./chapter1TavernDialogues";
 import type { Conversation } from "./dialogueTypes";
 import { resolveStatueCandle } from "./statueCandle";
+import { resolveToolsRenewal } from "./toolsRenewal";
 import { DOCTOR_SPEAKER } from "./dialogueTypes";
 import {
   localizeConversation,
@@ -131,6 +132,8 @@ export type StoryFacts = {
   // Narrative flags, separate from the medical status of the cases: the
   // one-time rewards already received (absent = none).
   claimedRewards?: ReadonlySet<string>;
+  // The Doctor's copper coins (only the interactions that charge for something read it).
+  coins?: number;
 };
 
 // interactionId of the interactable that belongs to a patient case.
@@ -602,6 +605,8 @@ export function resolveStoryInteraction(
 ): StoryOutcome | null {
   const statueCandle = resolveStatueCandle(interactionId, facts, language, subjectId);
   if (statueCandle) return statueCandle;
+  const tools = resolveToolsRenewal(interactionId, facts, language, subjectId);
+  if (tools) return tools;
   const granary = resolveGranaryInteraction(interactionId, facts, language, subjectId);
   if (granary) return granary;
   const chapter4 = resolveChapter4(interactionId, facts, language, subjectId);

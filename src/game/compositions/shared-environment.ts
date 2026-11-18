@@ -350,6 +350,16 @@ export const sharedEnvironmentCompositions: Pick<DecorComposition, "sceneId" | "
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0
+      },
+      {
+        "instanceId": "forest-bee-swarm-01",
+        "assetId": "bee-swarm",
+        "x": 1105,
+        "y": 983,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
       }
     ]
   },
@@ -630,6 +640,46 @@ export const sharedEnvironmentCompositions: Pick<DecorComposition, "sceneId" | "
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0
+      },
+      {
+        "instanceId": "mill-farmland-bee-swarm-01",
+        "assetId": "bee-swarm",
+        "x": 1966,
+        "y": 776,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "mill-farmland-bee-swarm-02",
+        "assetId": "bee-swarm",
+        "x": 2115,
+        "y": 777,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "mill-farmland-bee-swarm-03",
+        "assetId": "bee-swarm",
+        "x": 2035,
+        "y": 777,
+        "scale": 1,
+        "flipX": true,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "mill-farmland-bee-swarm-04",
+        "assetId": "bee-swarm",
+        "x": 2188,
+        "y": 791,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
       }
     ]
   },
@@ -838,6 +888,61 @@ export const sharedEnvironmentCompositions: Pick<DecorComposition, "sceneId" | "
         "y": 561,
         "scale": 1,
         "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "outskirts-river-current-01",
+        "assetId": "river-current",
+        "x": 639,
+        "y": 54,
+        "scale": 1,
+        "flipX": false,
+        "rotation": 90,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "outskirts-river-current-02",
+        "assetId": "river-current",
+        "x": 554,
+        "y": 102,
+        "scale": 1,
+        "flipX": false,
+        "rotation": 90,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "outskirts-river-current-03",
+        "assetId": "river-current",
+        "x": 614,
+        "y": 618,
+        "scale": 1,
+        "flipX": false,
+        "rotation": 90,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "outskirts-river-current-04",
+        "assetId": "river-current",
+        "x": 571,
+        "y": 721,
+        "scale": 1,
+        "flipX": false,
+        "rotation": 90,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "outskirts-river-current-05",
+        "assetId": "river-current",
+        "x": 597,
+        "y": 272,
+        "scale": 1,
+        "flipX": false,
+        "rotation": 90,
         "colliderEnabled": false,
         "zOffset": 0
       }

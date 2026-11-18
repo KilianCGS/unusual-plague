@@ -160,7 +160,7 @@ test("exactly TWO initial Empty flasks exist across the carried inventory and th
   const taken = st.transferStack(chest, doctor, "empty-flask");
   assert.equal(total(taken.destination, taken.source), 2);
   assert.equal(chest.capacity, st.STORAGE_CAPACITY);
-  assert.equal(st.STORAGE_CAPACITY, 10);
+  assert.equal(st.STORAGE_CAPACITY, 15);
 });
 
 test("I/J. gather.water needs the flask CARRIED (not stored); filling it uses it up", () => {

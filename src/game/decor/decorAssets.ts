@@ -1643,6 +1643,167 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
   },
   {
+    // 2026-11-18 (Kilian: more life, no new NPCs): Orange butterfly seen from above, slow wing flap (ping-pong). PixelLab. Flaps in place: place it over flowers.
+    // Silhouette x1-23 y3-21 of the 24x24 frame. Authoring asset: no collider, no interaction.
+    id: "butterfly",
+    label: "Butterfly (flapping)",
+    category: "animals",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/animals/butterfly/${i}.png`),
+      frameWidth: 24,
+      frameHeight: 24,
+      fps: 6,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.5 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian: more life, no new NPCs): Bee seen from above, buzzing wings and a small bob. PixelLab. For the mill, the apiary and the flowers.
+    // Silhouette x1-23 y2-22 of the 24x24 frame. Authoring asset: no collider, no interaction.
+    id: "bee",
+    label: "Bee (hovering)",
+    category: "animals",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => `/game/animals/bee/${i}.png`),
+      frameWidth: 24,
+      frameHeight: 24,
+      fps: 12,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.5 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian: more life, no new NPCs): Pigeon facing left with a bobbing head and a peck (ping-pong). PixelLab. flipX turns it. For the plaza and rooftops.
+    // Silhouette x4-28 y2-30 of the 32x32 frame. Authoring asset: no collider, no interaction.
+    id: "pigeon",
+    label: "Pigeon (pecking)",
+    category: "animals",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/animals/pigeon/${i}.png`),
+      frameWidth: 32,
+      frameHeight: 32,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.938 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian: smaller, fluttering around, less detail): a tiny silhouette bat that flaps and circles
+    // inside its 32x32 frame (it moves about 8 px, so place it with room around). Hand-made (art/ambient-life-v2.py
+    // --bat); it replaces the detailed PixelLab one. For the night (Day 4): forest, cottage, streets.
+    id: "bat",
+    label: "Bat (small, fluttering around)",
+    category: "animals",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `/game/animals/bat/${i}.png`),
+      frameWidth: 32,
+      frameHeight: 32,
+      fps: 8,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.5 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian: more life, no new NPCs): Three fireflies that blink out of step and drift a pixel. Hand-made (art/ambient-life-v2.py). For Day 4 and the glade.
+    // Silhouette x6-26 y5-26 of the 32x32 frame. Authoring asset: no collider, no interaction.
+    id: "fireflies",
+    label: "Fireflies (three, blinking)",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `/game/ambient/fireflies/${i}.png`),
+      frameWidth: 32,
+      frameHeight: 32,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.484 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian: more life, no new NPCs): Translucent dark fish silhouette swimming sideways with a tail wiggle. Hand-made. For the river; flipX for the other way.
+    // Silhouette x4-31 y2-14 of the 32x16 frame. Authoring asset: no collider, no interaction.
+    id: "fish-shadow-horizontal",
+    label: "Fish shadow, horizontal",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 2, 3].map((i) => `/game/ambient/fish-shadow-horizontal/${i}.png`),
+      frameWidth: 32,
+      frameHeight: 16,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.547, y: 0.5 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian: more life, no new NPCs): The same fish seen swimming up/down the screen. Hand-made. For the river.
+    // Silhouette x2-14 y1-28 of the 16x32 frame. Authoring asset: no collider, no interaction.
+    id: "fish-shadow-vertical",
+    label: "Fish shadow, vertical",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 2, 3].map((i) => `/game/ambient/fish-shadow-vertical/${i}.png`),
+      frameWidth: 16,
+      frameHeight: 32,
+      fps: 4,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.453 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian: more life, no new NPCs): Light streaks of current and bubbles carried along (left to right, flipX for the other way). Hand-made. For the river.
+    // Silhouette x0-64 y4-28 of the 64x32 frame. Authoring asset: no collider, no interaction.
+    id: "river-current",
+    label: "River current and bubbles",
+    category: "ambient",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `/game/ambient/river-current/${i}.png`),
+      frameWidth: 64,
+      frameHeight: 32,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.5 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian: more life, no new NPCs): Four tiny bees buzzing around each other, like the fireflies. Hand-made (art/ambient-life-v2.py). For the mill, flowers and the apiary.
+    // Silhouette x6-31 y7-26 of the 32x32 frame. Authoring asset: no collider, no interaction.
+    id: "bee-swarm",
+    label: "Small swarm of bees (four)",
+    category: "animals",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `/game/ambient/bee-swarm/${i}.png`),
+      frameWidth: 32,
+      frameHeight: 32,
+      fps: 8,
+      loop: true,
+    },
+    anchor: { x: 0.578, y: 0.516 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian: more life, no new NPCs): A second pigeon, turned three-quarters toward the viewer, tilting its head and pecking (ping-pong). PixelLab. flipX turns it. Use it next to the side-view one.
+    // Silhouette x4-24 y3-29 of the 32x32 frame. Authoring asset: no collider, no interaction.
+    id: "pigeon-turned",
+    label: "Pigeon, turned (three-quarter, head tilting)",
+    category: "animals",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/animals/pigeon-turned/${i}.png`),
+      frameWidth: 32,
+      frameHeight: 32,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.438, y: 0.906 },
+    defaultScale: 1,
+  },
+  {
     // Witch's black cat, sitting. An asset of its own, independent of Witch:
     // it can be placed next to her, alone or elsewhere. Drawn facing screen-
     // right; use flipX on the instance to make it face left (the anchor is the

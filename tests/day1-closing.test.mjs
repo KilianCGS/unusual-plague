@@ -292,7 +292,7 @@ test("the closing is ONE sequence: the existing supper interlude whose first lin
   const source = read("src/game/world/GameWorld.tsx");
   assert.equal((source.match(/<NarrativeInterlude/g) ?? []).length, 2); // opening + closing
   assert.ok(source.includes('NARRATIVE_ILLUSTRATIONS["doctor-eating"]'));
-  assert.match(source, /closingChapter === "chapter-2"\s*\? NARRATIVE_ILLUSTRATIONS\["doctor-fireplace"\]\s*: NARRATIVE_ILLUSTRATIONS\["doctor-eating"\]/);
+  assert.match(source, /closingChapter === "chapter-2"\s*\? NARRATIVE_ILLUSTRATIONS\["doctor-cooking"\]\s*: NARRATIVE_ILLUSTRATIONS\["doctor-eating"\]/);
   assert.ok(source.includes('closingChapter === "chapter-3"'));
   assert.ok(source.includes("onCovered={startNextChapter}"));
   assert.ok(source.includes("onFinished={finishClosing}"));

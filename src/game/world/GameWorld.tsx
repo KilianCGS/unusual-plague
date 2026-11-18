@@ -59,6 +59,7 @@ import {
 import { day1Closing } from "../dialogue/chapter1Day1Dialogues";
 import { day2Closing } from "../dialogue/chapter2ClosingDialogues";
 import { day3Closing } from "../dialogue/chapter3ClosingDialogues";
+import { TOOLS_NOTICED_ID, toolsNoticeCopy } from "../dialogue/toolsRenewal";
 import { APOTHECARY_NIGHT_BACKGROUND, NIGHT_CHAPTER_ID, sceneForChapter } from "./nightScenes";
 import { EndCard } from "../ui/EndCard";
 import { DAY4_COMPLETED_ID, WITCH_FINAL_ID, day4Closing } from "../dialogue/chapter4Dialogues";
@@ -569,6 +570,8 @@ export function GameWorld({
   // Space where running is not allowed (interiors): the Doctor says why, one of
   // several lines, never the same twice running.
   const lastNoRunLineRef = useRef(-1);
+  // Day 3: he has just worked at the table or the stove and has not yet remarked on his worn tools.
+  const toolsNoticePendingRef = useRef(false);
   const handleRunBlocked = useCallback(() => {
     const count = noRunLines[language].length;
     let pick = Math.floor(Math.random() * count);
@@ -807,6 +810,10 @@ export function GameWorld({
         // Using the table or the stove is what the "two places" note asks for: it counts as read,
         // so it does not come back every time the interface is closed.
         if (tutorial.step === "botica") notifyTutorial("continue");
+        // Day 3 (2026-11-18): the first time he works, his worn tools come up (said when he closes the table)
+        if (chapterId === "chapter-3" && !claimedRewardsRef.current.has(TOOLS_NOTICED_ID)) {
+          toolsNoticePendingRef.current = true;
+        }
         setCraftingStation(station);
         return;
       }
@@ -874,6 +881,7 @@ export function GameWorld({
           patients: patientsRef.current,
           inventory: inventoryRef.current,
           claimedRewards: claimedRewardsRef.current,
+          coins: coinsRef.current,
         },
         language,
         source.instanceId ?? "",
@@ -948,6 +956,15 @@ export function GameWorld({
     claimedRewardsRef.current = next;
     setClaimedRewards(next);
   }, []);
+
+  // Day 3 (2026-11-18): when he closes the work table or the stove for the first time, he remarks that his
+  // tools are very worn (the blacksmith renews them once the day's cases are treated, see toolsRenewal.ts).
+  useEffect(() => {
+    if (craftingStation !== null || !toolsNoticePendingRef.current) return;
+    toolsNoticePendingRef.current = false;
+    claimFlag(TOOLS_NOTICED_ID);
+    setPickupBark((current) => ({ id: (current?.id ?? 0) + 1, text: toolsNoticeCopy[language] }));
+  }, [craftingStation, claimFlag, language]);
 
   const handleExit = useCallback(
     (exitName: string) => {
@@ -1870,9 +1887,9 @@ export function GameWorld({
             illustration={closingChapter === "chapter-4"
               ? NARRATIVE_ILLUSTRATIONS["doctor-writing-night"]
               : closingChapter === "chapter-3"
-              ? NARRATIVE_ILLUSTRATIONS["doctor-writing"]
+              ? NARRATIVE_ILLUSTRATIONS["doctor-in-bed"]
               : closingChapter === "chapter-2"
-                ? NARRATIVE_ILLUSTRATIONS["doctor-fireplace"]
+                ? NARRATIVE_ILLUSTRATIONS["doctor-cooking"]
                 : NARRATIVE_ILLUSTRATIONS["doctor-eating"]}
             conversation={closingConversation}
             language={language}

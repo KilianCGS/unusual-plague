@@ -494,13 +494,12 @@ test("the merchant SELLS cloth: he never gives it through the story any more", (
   ]);
   assert.deepEqual(shops.getShop("chapter1.market.draper").entries, [
     { itemId: "cloth", price: 2, stock: 5, capByChapter: { "chapter-1": 3, "chapter-2": 4, "chapter-3": 5 } },
-    { itemId: "candle", price: 1, stock: 1, fromChapter: "chapter-2" }, // optional, for the statue
   ]);
   const sold = (chapter) => shops.allEntriesForChapter(chapter).map((e) => e.itemId).sort();
   // on Day 1 only the cloth, the oranges and the salt are on sale
   assert.deepEqual(sold("chapter-1"), ["cloth", "orange", "salt"]);
-  assert.deepEqual(sold("chapter-2"), ["animal-fat", "bone", "candle", "cloth", "onion", "orange", "salt", "sugar"]);
-  assert.deepEqual(sold("chapter-3"), ["animal-fat", "bone", "candle", "cloth", "garlic", "onion", "orange", "salt", "sugar"]);
+  assert.deepEqual(sold("chapter-2"), ["animal-fat", "bone", "cloth", "onion", "orange", "salt", "sugar"]);
+  assert.deepEqual(sold("chapter-3"), ["animal-fat", "bone", "cloth", "garlic", "onion", "orange", "salt", "sugar"]);
 });
 
 // ------------------------------------------------------------------------ WATER
@@ -1124,7 +1123,7 @@ test("the Empty flasks (two, since 2026-11-16) start in the Doctor's Storage, no
   assert.equal(initial.slots.length, 8);
   assert.equal(inv.countOccupiedSlots(initial), 0);
   assert.equal(inv.countItem(initial, "empty-flask"), 0);
-  assert.equal(chest.capacity, 10);
+  assert.equal(chest.capacity, 15);
   assert.deepEqual(chest.slots[0], { itemId: "empty-flask", quantity: 2 });
   assert.equal(inv.countOccupiedSlots(chest), 1);
   assert.ok(inv.isValidInventory(initial) && inv.isValidInventory(chest));

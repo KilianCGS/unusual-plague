@@ -85,6 +85,11 @@ const EXPECTED_ADDED = [
   "forest-resin-world-01",
   "plaza-merchant-humble-01",
   "mountain-path-miner-pick-swing-01",
+  // 2026-11-18 (Kilian's ambient life for chapter 1): two pigeons in the plaza
+  // (the bees and the river currents are in the shared layer; fish shadows, butterflies, fireflies and bats are in the
+  // Days 1 to 3 layer, see compositions/days-1-3-environment.ts)
+  "plaza-pigeon-turned-01",
+  "plaza-pigeon-01",
 ];
 // Replaced (not dropped): Kilian swapped the luxurious merchant for the humble
 // one; the conversation moved to the new instance, so no old interaction stays.
@@ -332,8 +337,11 @@ test("the new world population keeps authored instances and shared ambient decor
   const { getDecorAsset } = newWorld("src/game/decor/decorAssets.ts");
   const { resolveDecorInstances } = newWorld("src/game/decor/decorRuntime.ts");
   const interactions = getChapterInteractions("chapter-1");
-  const sharedById = new Map(newWorld("src/game/compositions/shared-environment.ts")
-    .sharedEnvironmentCompositions.flatMap(c => c.instances).map(i => [i.instanceId, i]));
+  // the shared layer (every chapter) and the Days 1-3 layer (fish shadows, butterflies, bats) are not chapter data
+  const sharedById = new Map([
+    ...newWorld("src/game/compositions/shared-environment.ts").sharedEnvironmentCompositions,
+    ...newWorld("src/game/compositions/days-1-3-environment.ts").days1To3EnvironmentCompositions,
+  ].flatMap(c => c.instances).map(i => [i.instanceId, i]));
   let total = 0;
   const unreachableZones = [];
 
@@ -462,7 +470,8 @@ test("the new world population keeps authored instances and shared ambient decor
   assert.deepEqual(unreachableZones.sort(), KNOWN_UNREACHABLE_ZONES);
 
   // (31 before the two Mill orange branches were removed on 2026-11-16)
-  assert.equal(total, 29 + NEW_IDS.filter(id=>id!=='forest-cottage').reduce((n,id)=>n+
+  // (+2 on 2026-11-18: the pigeons; +17 of the Days 1-3 layer in these scenes: 2 fish shadows, 3 butterflies, 12 fireflies)
+  assert.equal(total, 29 + 2 + 17 + NEW_IDS.filter(id=>id!=='forest-cottage').reduce((n,id)=>n+
     newWorld("src/game/compositions/shared-environment.ts").getSharedEnvironmentInstances(id).length,0));
 
   // interactions are keyed by instanceId and untouched: every interactive

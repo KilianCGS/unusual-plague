@@ -4,7 +4,7 @@
 // later. Sizes are the real file sizes: the interlude lays the picture out from
 // its aspect ratio and never stretches it.
 export type NarrativeIllustrationId =
-  "doctor-writing" | "doctor-writing-night" | "doctor-eating" | "doctor-fireplace";
+  "doctor-writing" | "doctor-writing-night" | "doctor-eating" | "doctor-fireplace" | "doctor-cooking" | "doctor-in-bed";
 
 export type NarrativeIllustration = {
   src: string;
@@ -36,6 +36,18 @@ export const NARRATIVE_ILLUSTRATIONS: Record<
   "doctor-fireplace": {
     src: "/game/narrative/doctor-fireplace.png",
     width: 1671,
+    height: 941,
+  },
+  // 2026-11-18 (Kilian's new pictures): the Doctor cooking his own supper at night closes Day 2; the Doctor in
+  // bed reading, the moon at the window, closes Day 3. (doctor-fireplace is no longer used by any day.)
+  "doctor-cooking": {
+    src: "/game/narrative/doctor-cooking.png",
+    width: 1672,
+    height: 941,
+  },
+  "doctor-in-bed": {
+    src: "/game/narrative/doctor-in-bed.png",
+    width: 1672,
     height: 941,
   },
 };

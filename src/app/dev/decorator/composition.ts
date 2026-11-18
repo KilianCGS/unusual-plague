@@ -42,6 +42,9 @@ function sanitizeInstances(raw: unknown): DecorInstance[] {
         y: item.y,
         scale: Number.isFinite(item.scale) && item.scale > 0 ? item.scale : 1,
         flipX: item.flipX === true,
+        ...(Number.isFinite(item.rotation) && ((item.rotation as number) % 360) !== 0
+          ? { rotation: (((item.rotation as number) % 360) + 360) % 360 }
+          : null),
         colliderEnabled: item.colliderEnabled !== false,
         zOffset: Number.isFinite(item.zOffset) ? item.zOffset : 0,
         interaction: item.interaction ?? undefined,
@@ -147,6 +150,7 @@ function cleanComposition(composition: DecorComposition) {
       y: round(instance.y),
       scale: round(instance.scale, 2),
       flipX: instance.flipX,
+      ...(instance.rotation ? { rotation: round(instance.rotation) } : null),
       colliderEnabled: instance.colliderEnabled,
       zOffset: round(instance.zOffset),
       ...(instance.interaction

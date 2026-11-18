@@ -73,6 +73,9 @@ export type DecorInstance = {
   y: number;
   scale: number;
   flipX: boolean;
+  // Clockwise degrees around the anchor, applied after the flip (2026-11-18: the Decorator's "Rotate 45" button).
+  // Left out = 0. Only the picture turns: the asset's collider and the interaction zone do not.
+  rotation?: number;
   colliderEnabled: boolean;
   // Added to the depth (anchor Y) for things that are not on the floor.
   zOffset: number;

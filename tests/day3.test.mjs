@@ -183,10 +183,15 @@ test("the chapter chain goes 1 -> 2 -> 3 -> 4, every one starting in the Doctor'
 });
 
 test("the Day 3 closing is a short bilingual reflection with the Doctor's thoughts in brackets", () => {
-  assert.equal(day3Closing.lines.length, 4);
+  // 2026-11-18: five lines (the bed, two thoughts, the strange noise and light, the last thought); the picture is the Doctor in bed
+  assert.equal(day3Closing.lines.length, 5);
   for (const line of day3Closing.lines) {
     assert.ok(line.text.es.length > 10 && line.text.en.length > 10);
   }
+  const { NARRATIVE_ILLUSTRATIONS } = at("src/game/narrative/illustrations.ts");
+  assert.ok(fs.existsSync(path.join(root, "public", NARRATIVE_ILLUSTRATIONS["doctor-in-bed"].src)));
+  assert.match(fs.readFileSync(path.join(root, "src/game/world/GameWorld.tsx"), "utf8"), /closingChapter === "chapter-3"\s*\? NARRATIVE_ILLUSTRATIONS\["doctor-in-bed"\]/);
+
 });
 
 test("Day 3 inherits the population and the interactions of Day 2", () => {

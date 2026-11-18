@@ -115,7 +115,8 @@ export const DRAPER_STALL: ShopDefinition = {
   },
   entries: [
     { itemId: "cloth", price: 2, stock: 5, capByChapter: { "chapter-1": 3, "chapter-2": 4, "chapter-3": 5 } },
-    { itemId: "candle", price: 1, stock: 1, fromChapter: "chapter-2" },
+    // 2026-11-18 (Kilian): the candle is out for now (it was only for the statue); the item and the statue
+    // conversation stay in the code, dormant.
   ],
 };
 

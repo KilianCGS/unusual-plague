@@ -42,6 +42,7 @@ import {
 import type { DecorInstance } from "../../../game/decor/decorTypes";
 import { DecorSprite, getSpriteBox } from "../../../game/decor/DecorSprite";
 import { getSharedEnvironmentInstances } from "../../../game/compositions/shared-environment";
+import { getDays1To3EnvironmentInstances } from "../../../game/compositions/days-1-3-environment";
 import {
   getInstanceInteractionZone,
   withInteractions,
@@ -247,7 +248,11 @@ function Workspace({
   const backdrop = chapterId === "artifacts" ? nightVisualFor(scene.id, scene.visual) : scene.visual;
   // Read-only shared backdrop. Local draft instances remain editable, and
   // their ids suppress the preview so the author never sees two copies.
-  const sharedBackdrop = getSharedEnvironmentInstances(scene.id).filter(
+  const sharedBackdrop = [
+    ...getSharedEnvironmentInstances(scene.id),
+    // fish shadows, butterflies and bats: Days 1 to 3 only ("artifacts" is Day 4)
+    ...getDays1To3EnvironmentInstances(scene.id, chapterId),
+  ].filter(
     shared => !instances.some(instance => instance.instanceId === shared.instanceId),
   );
   const layerRef = useRef<HTMLDivElement>(null);
@@ -752,6 +757,29 @@ function Workspace({
                   })
                 }
               />
+            </label>
+            <label className={styles.field}>
+              Rotation: {selected.rotation ?? 0}°
+              <span>
+                <button
+                  type="button"
+                  data-testid="rotate-45"
+                  onClick={() =>
+                    updateInstance(selected.instanceId, {
+                      rotation: (((selected.rotation ?? 0) + 45) % 360) || undefined,
+                    })
+                  }
+                >
+                  Rotate 45°
+                </button>
+                <button
+                  type="button"
+                  disabled={!selected.rotation}
+                  onClick={() => updateInstance(selected.instanceId, { rotation: undefined })}
+                >
+                  0°
+                </button>
+              </span>
             </label>
             <label className={styles.field}>
               collider {selectedAsset.defaultCollider ? "" : "(asset has none)"}

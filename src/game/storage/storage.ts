@@ -13,7 +13,8 @@ import {
 // InventoryState (same stack model, same operations), so it can be serialized
 // next to the carried inventory later. Crafting never reads it: the Doctor has
 // to take things out first.
-export const STORAGE_CAPACITY = 10;
+// 2026-11-18 (Kilian): one more row of the chest (5 columns): 10 -> 15 slots, to ease the bag of 8.
+export const STORAGE_CAPACITY = 15;
 
 // What the chest's interaction zone reports to the owner of the game state.
 export const STORAGE_INTERACTION_ID = "storage.doctor-room";

@@ -21,9 +21,9 @@ export const PATIENT_PAYMENTS: Readonly<Record<string, number>> = {
   // fourth sugar unit (5 coins); the income has to arrive early (economy-no-deadlock).
   [BLACKSMITH_DAY2_ID]: 9,
   [FARMER_DAY2_ID]: 9,
-  [DUSTER_DAY3_ID]: 3,
-  [PATH_MINER_DAY3_ID]: 4,
-  [STONECUTTER_DAY3_ID]: 6,
+  [DUSTER_DAY3_ID]: 2,
+  [PATH_MINER_DAY3_ID]: 2,
+  [STONECUTTER_DAY3_ID]: 3,
 };
 
 export function getPatientPayment(patientId: string): number {

@@ -11,6 +11,7 @@ import { chapter2Interactions } from "./chapter-2.interactions";
 import { chapter3Interactions } from "./chapter-3.interactions";
 import { chapter4Interactions } from "./artifacts.interactions";
 import { mergeSharedEnvironmentInstances } from "./shared-environment";
+import { getDays1To3EnvironmentInstances } from "./days-1-3-environment";
 
 // VERSIONED scene populations, one file per chapter, each produced by
 // "COPY CHAPTER" in /dev/decorator. The runtime reads only these files; the
@@ -127,9 +128,12 @@ export function getComposition(
       : [];
   const ownIds = new Set((composition?.instances ?? []).map((i) => i.instanceId));
   const knownIds = new Set([...ownIds, ...inherited.map((i) => i.instanceId)]);
+  // The ambient life that is the same on Days 1 to 3 (and not on Day 4): fish shadows, butterflies, bats.
+  const ambientLife = getDays1To3EnvironmentInstances(sceneId, chapterId).filter((i) => !ownIds.has(i.instanceId));
   const instances = mergeSharedEnvironmentInstances(sceneId, [
     ...leftover.filter((i) => !knownIds.has(i.instanceId)),
     ...inherited.filter((i) => !ownIds.has(i.instanceId)),
+    ...ambientLife,
     ...(composition?.instances ?? []),
   ]);
   if (!composition && instances.length === 0) return undefined;

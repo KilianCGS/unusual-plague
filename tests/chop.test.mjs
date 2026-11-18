@@ -119,10 +119,9 @@ test("the kitchen opens the board and the board returns to the kitchen; Cook sti
     const en = resolveStatueCandle("world.plaza.statue", facts([["candle", 1]]), "en", "x");
     assert.equal(en.conversation.lines.length, done.conversation.lines.length);
   });
-  test("the draper's stall sells the candle from Day 2 only, for 1 coin; Day 1 stays exactly as it was", () => {
+  test("the draper's stall no longer sells the candle (2026-11-18, out for now); the item and its icon stay", () => {
     const merchant = getShop("chapter1.market.draper");
-    const candle = merchant.entries.find((e) => e.itemId === "candle");
-    assert.deepEqual([candle.price, candle.stock, candle.fromChapter], [1, 1, "chapter-2"]);
+    assert.equal(merchant.entries.find((e) => e.itemId === "candle"), undefined);
     assert.ok(fs.existsSync(path.join(root, "public/game/items/inventory-icons/candle.png")));
   });
 }

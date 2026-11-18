@@ -77,8 +77,8 @@ test('every treatment order triggers only after its last conversation, then neve
   const closeNow=game.slice(game.indexOf('const closeDayNow'),game.indexOf('const closeDayNow')+400);
   assert.ok(closeNow.indexOf('claimFlag(dayCompletedIds[chapterId])')<closeNow.indexOf('setClosingActive(true)'));
 });
-test('epilogue uses the fireplace image, with ES/EN caption and parenthesized Doctor thoughts',()=>{
-  assert.ok(fs.existsSync(path.join(root,'public',NARRATIVE_ILLUSTRATIONS['doctor-fireplace'].src)));
+test('epilogue uses the cooking image (2026-11-18), with ES/EN caption and parenthesized Doctor thoughts',()=>{
+  assert.ok(fs.existsSync(path.join(root,'public',NARRATIVE_ILLUSTRATIONS['doctor-cooking'].src)));
   for(const language of ['es','en']){
     const conversation=localizeConversation(day2Closing,language,'doctor');
     assert.equal(conversation.lines.length,4);
