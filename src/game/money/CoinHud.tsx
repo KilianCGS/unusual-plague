@@ -51,7 +51,7 @@ export function CoinHud({ coins, language }: { coins: number; language: Language
       <div className={styles.window}>
         {seen.amount !== 0 ? (
           <span
-            key={seen.id}
+            key={`delta-${seen.id}`}
             aria-hidden
             data-coin-delta={seen.amount}
             className={`${styles.delta} ${seen.amount > 0 ? styles.deltaGain : styles.deltaSpend}`}
@@ -61,7 +61,7 @@ export function CoinHud({ coins, language }: { coins: number; language: Language
           </span>
         ) : null}
         {/* The number ABOVE the coins (2026-11-16, Kilian). */}
-        <span key={coins} className={styles.count}>
+        <span key={`count-${coins}`} className={styles.count}>
           {coins}
         </span>
         {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -59,7 +59,8 @@ export const SOUNDS: Record<SoundId, SoundDef> = {
   "ui.pageTurn": def("ui.pageTurn", "ui/page-turn.mp3", "ui"),
   "ui.itemClickDrop": def("ui.itemClickDrop", "ui/item-click-drop.mp3", "ui"),
   "ui.coins": def("ui.coins", "ui/coins.mp3", "ui"),
-  "ui.itemObtained": def("ui.itemObtained", "ui/item-obtained.mp3", "ui"),
+  // 2026-11-17 (Kilian): picking things up was too loud: -50%.
+  "ui.itemObtained": def("ui.itemObtained", "ui/item-obtained.mp3", "ui", false, 0.5),
   "ui.introButton": def("ui.introButton", "ui/intro-button-click.mp3", "ui"),
   "ui.bookTab": def("ui.bookTab", "ui/book-tab.mp3", "ui"),
   "ui.mapOpen": def("ui.mapOpen", "ui/map-open.mp3", "ui"),

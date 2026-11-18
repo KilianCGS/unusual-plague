@@ -8,14 +8,19 @@ import type { SceneId } from "../world/worldScenes";
 import { playSound } from "./audioPlayer";
 import { footstepSoundAt } from "./footstepSurface";
 
-// The frames of the walk where a foot is planted on the ground (picked by eye from the sprites;
-// tune here). The 4-frame walks (north, south) plant a foot on frames 0 and 2; the 8-frame side
-// walks (east, west) on 2 and 6. Running plants one foot per half cycle.
+// The frames of the walk where a foot is planted on the ground. 2026-11-17 (Kilian: the walking steps were off, the
+// running ones perfect): measured on the sprites (public/game/characters/protagonist/walk) instead of by eye.
+//  * north / south (4 frames): frames 0 and 2 are the passing poses (both feet level); the feet are planted on
+//    frames 1 and 3 (the lower foot alternates there), so the steps were half a beat early.
+//  * east (8 frames): the widest strides, with the body at its lowest, are frames 2 and 7 (it was 2 and 6).
+//  * west (8 frames, its own drawing): the widest stride and the lowest body are frames 3 and 4, and the other
+//    foot lands at 7 (it was 2 and 6).
+// Running plants one foot per half cycle (frames 0 and count / 2).
 const WALK_FOOTFALLS: Record<Direction, readonly number[]> = {
-  north: [0, 2],
-  south: [0, 2],
-  east: [2, 6],
-  west: [2, 6],
+  north: [1, 3],
+  south: [1, 3],
+  east: [2, 7],
+  west: [3, 7],
 };
 
 // One step sound per footfall, only on the frames where the Doctor's foot lands. Nothing plays
