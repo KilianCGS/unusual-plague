@@ -2,10 +2,11 @@
 
 import { useEffect } from "react";
 
-import { effectiveVolume, getAudioSettings } from "./audioStore";
+import { effectiveVolume } from "./audioStore";
 import { SOUNDS, type SoundId } from "./soundManifest";
 
 const DEFAULT_FADE_OUT_MS = 900;
+const FADE_IN_MS = 2500;
 
 // A music loop that plays while `active` and fades out when it stops being active (or the
 // component goes away). Browsers do not let sound start before the player has done something, so
@@ -18,7 +19,9 @@ export function useLoopMusic(sound: SoundId, active: boolean, fadeOutMs: number 
     const def = SOUNDS[sound];
     const audio = new Audio(def.src);
     audio.loop = true;
-    audio.volume = effectiveVolume(def.gain);
+    // fade in (2026-11-18): the loop rises from silence over FADE_IN_MS instead of starting at full volume
+    let rise = 0;
+    audio.volume = 0;
 
     let stopped = false;
     const removeGestureListeners = () => {
@@ -33,15 +36,12 @@ export function useLoopMusic(sound: SoundId, active: boolean, fadeOutMs: number 
     window.addEventListener("keydown", start);
     start();
 
-    // follow the volume / mute setting while it plays
-    let last = getAudioSettings();
+    // follow the volume / mute setting while it plays (and rise while fading in)
+    const TICK_MS = 100;
     const sync = window.setInterval(() => {
-      const now = getAudioSettings();
-      if (now !== last) {
-        last = now;
-        audio.volume = effectiveVolume(def.gain);
-      }
-    }, 150);
+      rise = Math.min(1, rise + TICK_MS / FADE_IN_MS);
+      audio.volume = effectiveVolume(def.gain) * rise;
+    }, TICK_MS);
 
     return () => {
       stopped = true;

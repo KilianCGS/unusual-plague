@@ -27,6 +27,8 @@ export const CHAPTER2_SUPPLIES: Readonly<Record<string, readonly string[]>> = {
   // Day 2's placements and interactions, so the same suppliers serve its cases (see
   // supplyDefinitions); there are no new lines: this uses the generic supply conversation.
   "chapter2.tavern.bartender": ["alcohol"],
+  // 2026-11-18: the farm woman gives milk again for the old man who cannot sleep (milk with honey), free.
+  "chapter2.farm.woman": ["milk"],
 };
 
 // The cases whose missing ingredients these suppliers cover: Day 2's and Day 3's.

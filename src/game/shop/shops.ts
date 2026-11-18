@@ -77,7 +77,7 @@ export const MERCHANT_SHOP: ShopDefinition = {
     // thanks to the baker's gift. The Day 1-2 payments were raised by 5 in total (money/payments.ts)
     // and the no-deadlock test checks that buying every spare still leaves every case curable.
     // Day 1: two (the tavern case + one spare); the rest from Day 2 (daily cap, see ShopEntry).
-    { itemId: "salt", price: 2, stock: 4, capByChapter: { "chapter-1": 2, "chapter-2": 4 } },
+    { itemId: "salt", price: 2, stock: 5, capByChapter: { "chapter-1": 2, "chapter-2": 4 } },
     // From Day 2 (the price was decided by Kilian): it feeds two patients and two voluntary errands.
     // 2026-11-17: stock 4 (one more on Day 3) because the base syrup of the balsamic syrup also takes a sugar.
     { itemId: "sugar", price: 5, stock: 4, fromChapter: "chapter-2", capByChapter: { "chapter-2": 2, "chapter-3": 4 } },
@@ -114,7 +114,7 @@ export const DRAPER_STALL: ShopDefinition = {
     en: "Scraps, linen and wool. What's left over from one thing serves for another.",
   },
   entries: [
-    { itemId: "cloth", price: 2, stock: 5, capByChapter: { "chapter-1": 3, "chapter-2": 4, "chapter-3": 5 } },
+    { itemId: "cloth", price: 2, stock: 6, capByChapter: { "chapter-1": 3, "chapter-2": 4, "chapter-3": 6 } },
     // 2026-11-18 (Kilian): the candle is out for now (it was only for the statue); the item and the statue
     // conversation stay in the code, dormant.
   ],

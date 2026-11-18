@@ -73,15 +73,15 @@ test("every patient of Days 1 and 2 pays something, and the prices are not round
   assert.equal(getPatientPayment("nobody"), 0);
 });
 
-test("the draper's stall: cloth at two coins, five in stock (one more for the fisherman's errand), sold out after five, units counted by flags", () => {
+test("the draper's stall: cloth at two coins, six in stock (one more for the fisherman and the carpenter), sold out after six, units counted by flags", () => {
   const shop = shops.getShop("chapter1.market.draper");
   assert.equal(shop.id, "market-draper");
   const [cloth] = shop.entries;
   // 2026-11-16: five in stock, but at most 3 by the end of Day 1, 4 by Day 2 and 5 by Day 3 (daily cap)
-  assert.deepEqual(cloth, { itemId: "cloth", price: 2, stock: 5, capByChapter: { "chapter-1": 3, "chapter-2": 4, "chapter-3": 5 } });
+  assert.deepEqual(cloth, { itemId: "cloth", price: 2, stock: 6, capByChapter: { "chapter-1": 3, "chapter-2": 4, "chapter-3": 6 } });
   let claimed = new Set();
-  for (let i = 0; i < 5; i++) {
-    assert.equal(shops.unitsLeft(claimed, shop, cloth), 5 - i);
+  for (let i = 0; i < 6; i++) {
+    assert.equal(shops.unitsLeft(claimed, shop, cloth), 6 - i);
     const [pay, give, claim] = shops.buyEffects(claimed, shop, cloth);
     assert.deepEqual([pay, give], [
       { type: "take-coins", amount: 2 },

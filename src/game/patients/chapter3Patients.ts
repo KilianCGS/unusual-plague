@@ -8,6 +8,8 @@ import type { PatientCaseDefinition } from "./patientCases";
 export const DUSTER_DAY3_ID = "chapter3-duster";
 export const PATH_MINER_DAY3_ID = "chapter3-path-miner";
 export const STONECUTTER_DAY3_ID = "chapter3-stonecutter";
+// 2026-11-18 (Kilian chose it): the old man with the jug of the tavern street cannot sleep; the fourth case of Day 3.
+export const INSOMNIAC_DAY3_ID = "chapter3-insomniac";
 
 export const CHAPTER3_PATIENTS: Record<string, PatientCaseDefinition> = {
   [DUSTER_DAY3_ID]: {
@@ -38,6 +40,16 @@ export const CHAPTER3_PATIENTS: Record<string, PatientCaseDefinition> = {
     observation: { es: "Brazo hinchado y desviado tras el golpe de un bloque. Duele al girarlo y al apoyarlo. Hay que inmovilizarlo.", en: "A swollen, crooked arm after a falling block. It hurts to turn or lean on it. It must be immobilized." },
     requiredTreatments: [{ itemId: "disinfected-bandage", quantity: 1 }, { itemId: "poultice", quantity: 1 }],
     revealsRecipeIds: ["manual.disinfected-bandage", "manual.poultice"],
+    examination: "in-place",
+  },
+  [INSOMNIAC_DAY3_ID]: {
+    id: INSOMNIAC_DAY3_ID,
+    name: { es: "Anciano del cántaro", en: "The old man with the jug" },
+    ailmentId: "insomnia",
+    discovered: { es: "El anciano del cántaro cabecea sentado en la calle de la taberna, con ojeras de varias noches.", en: "The old man with the jug nods off sitting on the tavern street, with the shadows of many nights under his eyes." },
+    observation: { es: "Ojeras, irritabilidad y un cansancio que el descanso no cura. Lleva noches sin pegar ojo.", en: "Dark circles, irritability and a tiredness that rest does not cure. He has gone nights without a wink of sleep." },
+    requiredTreatments: [{ itemId: "mint-infusion", quantity: 1 }, { itemId: "milk-with-honey", quantity: 1 }],
+    revealsRecipeIds: ["fire.mint-infusion", "fire.milk-with-honey"],
     examination: "in-place",
   },
 };

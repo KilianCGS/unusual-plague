@@ -52,7 +52,7 @@ const definitions = getPatientDefinitions(new Set([FARMER_SAMPLE_ID, FARMER_ANAL
 const DAYS = [
   ["baker-husband", "tavern-patient", "injured-miner"],
   ["chapter2-woodcutter", "chapter2-blacksmith", "chapter2-farmer"],
-  ["chapter3-duster", "chapter3-path-miner", "chapter3-stonecutter"],
+  ["chapter3-duster", "chapter3-path-miner", "chapter3-stonecutter", "chapter3-insomniac"],
 ];
 const CHAPTERS = ["chapter-1", "chapter-2", "chapter-3"];
 // The FINAL market (2026-11-16): the plaza merchant sells only sugar and salt; the three stalls of the
@@ -98,7 +98,7 @@ test("the model reads the real data: every patient pays, and what each one needs
     "chapter3-path-miner": [["orange", 1], ["sugar", 1], ["bone", 1], ["salt", 1]],
     "chapter3-stonecutter": [["cloth", 1]],
   });
-  assert.equal(ERRANDS.length, 5, "the Day 1 fisherman + the quarry broth + the three Day 2 errands");
+  assert.equal(ERRANDS.length, 7, "the Day 1 fisherman + the quarry broth + the three Day 2 errands + the two Day 3 ones");
   const quarry = ERRANDS.find((e) => e.id === "chapter2.quarry.miner.broth");
   assert.deepEqual(quarry.raw.sort(), [["bone", 1], ["salt", 1]].sort());
   assert.ok(RECIPES.length > 0);

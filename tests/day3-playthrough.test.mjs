@@ -66,7 +66,7 @@ const test = (name, fn) => {
 // ---- the state, moved by the real effects ---------------------------------------------------------
 let CH = "chapter-2"; // the day being played
 const WOODCUTTER = ch2p.WOODCUTTER_DAY2_ID, BLACKSMITH = ch2p.BLACKSMITH_DAY2_ID, FARMER = ch2p.FARMER_DAY2_ID;
-const DUSTER = ch3p.DUSTER_DAY3_ID, PATH_MINER = ch3p.PATH_MINER_DAY3_ID, STONECUTTER = ch3p.STONECUTTER_DAY3_ID;
+const DUSTER = ch3p.DUSTER_DAY3_ID, PATH_MINER = ch3p.PATH_MINER_DAY3_ID, STONECUTTER = ch3p.STONECUTTER_DAY3_ID, INSOMNIAC = ch3p.INSOMNIAC_DAY3_ID;
 const state = { inventory: inv.createEmptyInventory(), coins: 12, claimed: new Set(), patients: {}, picked: new Set(), log: [] };
 // what Day 1 leaves (as in the Day 2 script): two oranges and a scrap of cloth; its pick-ups are gone
 for (const [id, q] of [["empty-flask", 2], ["orange", 2], ["cloth", 1]]) state.inventory = inv.addItem(state.inventory, id, q); // (two flasks since 2026-11-16)
@@ -148,6 +148,7 @@ const SUPPLIERS = {
   resin: ["chapter2.mill.neighbour"],
   coal: ["chapter2.mine.recoveringMiner"],
   alcohol: ["chapter2.tavern.bartender"],
+  milk: ["chapter2.farm.woman"],
   flour: ["chapter2.bakery.baker", "chapter2.bakery.flourSack"],
 };
 // ONE more unit of an item: a gathered / bought / given one, or a crafted one (its ingredients first)
@@ -225,10 +226,11 @@ const DAY3_PEOPLE = {
   [DUSTER]: "chapter3.apothecaryStreet.duster",
   [PATH_MINER]: "chapter3.mountainPath.miner",
   [STONECUTTER]: "chapter3.quarry.stonecutter",
+  [INSOMNIAC]: "chapter3.tavernStreet.elder",
 };
 const WITCH = "chapter3.glade.witch";
 
-test("Day 3 placements: all three patients and the Witch are placed (2026-11-18, Kilian's placements)", () => {
+test("Day 3 placements: all four patients and the Witch are placed (2026-11-18, Kilian's placements)", () => {
   // the people Day 3 still needs and nobody has placed yet: an exact list (empty now)
   const pending = [...Object.values(DAY3_PEOPLE), WITCH].filter((id) => !placedIn(id, "chapter-3")).sort();
   assert.deepEqual(pending, []);
@@ -262,9 +264,10 @@ test("Day 3: the woman with the duster (mint infusion + balsamic syrup), the pat
   cure(DUSTER, DAY3_PEOPLE[DUSTER]);
   cure(PATH_MINER, DAY3_PEOPLE[PATH_MINER]);
   cure(STONECUTTER, DAY3_PEOPLE[STONECUTTER]);
+  cure(INSOMNIAC, DAY3_PEOPLE[INSOMNIAC]); // mint infusion + milk with honey (the farm woman's milk, the beekeeper's honey)
 });
 
-test("Day 3 can be closed: all three cases treated, nobody stuck, the purse never went negative", () => {
+test("Day 3 can be closed: all four cases treated, nobody stuck, the purse never went negative", () => {
   assert.ok(shouldCloseDay3(state.patients, state.claimed));
   assert.ok(state.coins >= 0);
   console.log(`  (Day 3 finished with ${state.coins} coins; bag: ${state.inventory.slots.filter(Boolean).map((s) => `${s.itemId}x${s.quantity}`).join(" ") || "empty"})`);

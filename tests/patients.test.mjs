@@ -488,12 +488,12 @@ test("the merchant SELLS cloth: he never gives it through the story any more", (
   // 2026-11-16: the plaza merchant sells ONLY salt and sugar ("hard-to-get spices"); the rest moved to the
   // market street stalls (cloth, candle: draper; orange, onion, garlic: produce; bone, fat: butcher)
   assert.deepEqual(shops.getShop(MERCHANT).entries, [
-    { itemId: "salt", price: 2, stock: 4, capByChapter: { "chapter-1": 2, "chapter-2": 4 } }, // one spare; 2 on Day 1
+    { itemId: "salt", price: 2, stock: 5, capByChapter: { "chapter-1": 2, "chapter-2": 4 } }, // one spare; 2 on Day 1
     // Day 2 onwards (prices raised on 2026-11-13 so that money is needed)
     { itemId: "sugar", price: 5, stock: 4, fromChapter: "chapter-2", capByChapter: { "chapter-2": 2, "chapter-3": 4 } },
   ]);
   assert.deepEqual(shops.getShop("chapter1.market.draper").entries, [
-    { itemId: "cloth", price: 2, stock: 5, capByChapter: { "chapter-1": 3, "chapter-2": 4, "chapter-3": 5 } },
+    { itemId: "cloth", price: 2, stock: 6, capByChapter: { "chapter-1": 3, "chapter-2": 4, "chapter-3": 6 } },
   ]);
   const sold = (chapter) => shops.allEntriesForChapter(chapter).map((e) => e.itemId).sort();
   // on Day 1 only the cloth, the oranges and the salt are on sale

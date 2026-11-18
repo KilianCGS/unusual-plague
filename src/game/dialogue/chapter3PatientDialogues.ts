@@ -5,6 +5,7 @@ import {
   PATH_MINER_DAY3_ID,
   STONECUTTER_DAY3_ID,
   DUSTER_DAY3_ID,
+  INSOMNIAC_DAY3_ID,
 } from "../patients/chapter3Patients";
 import { getPatientStatus, isTreatable } from "../patients/patientCases";
 import { localizeConversation, type LocalizedConversation } from "./localizedConversation";
@@ -17,6 +18,7 @@ export const CHAPTER3_PATIENT_INTERACTIONS: Readonly<Record<string, string>> = {
   "chapter3.apothecaryStreet.duster": DUSTER_DAY3_ID,
   "chapter3.mountainPath.miner": PATH_MINER_DAY3_ID,
   "chapter3.quarry.stonecutter": STONECUTTER_DAY3_ID,
+  "chapter3.tavernStreet.elder": INSOMNIAC_DAY3_ID,
 };
 
 // 2026-11-13: warmth pass on the Doctor's lines (his new voice: cheerful, close, serene). New
@@ -101,6 +103,28 @@ const SCRIPTS: Record<string, PatientScript> = {
     ],
     waiting: [
       npc("Tengo el brazo quieto. El resto de mí protesta.", "My arm is still. The rest of me objects."),
+    ],
+  },
+  // 2026-11-18 (Kilian chose this case): the old man with the jug, who does not sleep. NEW text, awaiting review.
+  [INSOMNIAC_DAY3_ID]: {
+    slug: "insomniac",
+    exam: [
+      npc("Buenas, doctor. Perdone si bostezo en su cara: llevo cuatro noches mirando el techo.", "Good day, doctor. Forgive me if I yawn in your face: four nights now I've been staring at the ceiling."),
+      doctor("¿Y de día? ¿Se queda dormido en cualquier sitio?", "And by day? Do you fall asleep anywhere?"),
+      npc("Peor: de día estoy despierto y de mal humor. Ayer le grité a una gallina.", "Worse: by day I'm awake and in a bad mood. Yesterday I shouted at a hen."),
+      doctor("Ojeras, irritabilidad, cansancio que no se quita... Voy a anotarlo para contrastarlo con el Compendio.", "Dark circles, irritability, a tiredness that won't go... I'll note it to compare with the Compendium."),
+      npc("Antes me dormía en la silla. Ahora hasta el jarro me parece ruidoso.", "I used to doze off in my chair. Now even the jug seems noisy."),
+    ],
+    cure: [
+      doctor("Infusión de menta y leche con miel, tibias, antes de acostarse. Y nada de contar gallinas.", "Mint infusion and milk with honey, warm, before bed. And no counting hens."),
+      npc("¿Contar ovejas no vale?", "Doesn't counting sheep count?"),
+      doctor("Las ovejas sí. Las gallinas despiertan.", "Sheep do. Hens wake you up."),
+    ],
+    after: [
+      npc("Anoche dormí de un tirón. Hasta soñé con la gallina, y me disculpé.", "Last night I slept straight through. I even dreamed of the hen, and apologised."),
+    ],
+    waiting: [
+      npc("Sigo sin pegar ojo, doctor. El techo y yo ya nos conocemos demasiado.", "Still not a wink, doctor. The ceiling and I know each other far too well by now."),
     ],
   },
 };

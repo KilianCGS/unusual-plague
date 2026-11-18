@@ -70,8 +70,8 @@ const facts = (patients, pairs = [], claimed = []) => ({
 });
 const IDS = Object.keys(p3.CHAPTER3_PATIENTS);
 
-test("three patients with a known ailment each, a registry entry, symptoms, objective and payment", () => {
-  assert.equal(IDS.length, 3);
+test("four patients with a known ailment each, a registry entry, symptoms, objective and payment", () => {
+  assert.equal(IDS.length, 4);
   const definitions = getPatientDefinitions();
   for (const id of IDS) {
     const definition = p3.CHAPTER3_PATIENTS[id];
@@ -89,7 +89,7 @@ test("three patients with a known ailment each, a registry entry, symptoms, obje
   }
   assert.deepEqual(
     IDS.map((id) => p3.CHAPTER3_PATIENTS[id].ailmentId).sort(),
-    ["chest-cough", "fracture", "scurvy"],
+    ["chest-cough", "fracture", "insomnia", "scurvy"],
   );
 });
 
@@ -143,7 +143,7 @@ test("each treatment can be made from what the world gives (shop, collectibles, 
 
 test("each person: examined in place, then treated when the preparations are carried, then small talk", () => {
   const people = Object.entries(dialogues.CHAPTER3_PATIENT_INTERACTIONS);
-  assert.equal(people.length, 3);
+  assert.equal(people.length, 4);
   for (const [interactionId, id] of people) {
     const definition = p3.CHAPTER3_PATIENTS[id];
     const exam = story.resolveStoryInteraction(interactionId, facts({}), "es", "x");

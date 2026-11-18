@@ -37,6 +37,7 @@ import {
 } from "./chapter2QuarryDialogues";
 import { CHAPTER1_ERRAND_TRADES } from "./chapter1Errands";
 import { CHAPTER2_ERRAND_TRADES } from "./chapter2Errands";
+import { CHAPTER3_ERRAND_TRADES } from "./chapter3Errands";
 import type { LocalizedConversation } from "./localizedConversation";
 
 // NPC TRADES: "consume X, receive Y", once. One small data shape for what a
@@ -183,6 +184,7 @@ export const NPC_TRADES: Record<string, NpcTrade> = {
   // The voluntary errand of Day 1 (chapter1Errands.ts) and those of Day 2 (chapter2Errands.ts).
   ...CHAPTER1_ERRAND_TRADES,
   ...CHAPTER2_ERRAND_TRADES,
+  ...CHAPTER3_ERRAND_TRADES,
 };
 
 export function errandAskedFlag(trade: NpcTrade): string {

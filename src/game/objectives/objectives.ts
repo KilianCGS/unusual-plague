@@ -1,7 +1,7 @@
 import type { Language } from "../i18n/types";
 import { BAKER_HUSBAND_ID, INJURED_MINER_ID, TAVERN_PATIENT_ID } from "../patients/chapter1Patients";
 import { BLACKSMITH_DAY2_ID, FARMER_DAY2_ID, WOODCUTTER_DAY2_ID } from "../patients/chapter2Patients";
-import { PATH_MINER_DAY3_ID, STONECUTTER_DAY3_ID, DUSTER_DAY3_ID } from "../patients/chapter3Patients";
+import { PATH_MINER_DAY3_ID, STONECUTTER_DAY3_ID, DUSTER_DAY3_ID, INSOMNIAC_DAY3_ID } from "../patients/chapter3Patients";
 import { errandAskedFlag, NPC_TRADES } from "../dialogue/npcTrades";
 import { getPatientStatus, type PatientCasesState } from "../patients/patientCases";
 
@@ -24,6 +24,7 @@ export const PATIENT_OBJECTIVES: Readonly<Record<string, Record<Language, string
   [DUSTER_DAY3_ID]: { es: "Tratar a la mujer del plumero", en: "Treat the woman with the duster" },
   [PATH_MINER_DAY3_ID]: { es: "Tratar al minero de la cantera", en: "Treat the quarry miner" },
   [STONECUTTER_DAY3_ID]: { es: "Tratar al picapedrero de la cantera", en: "Treat the quarry stonecutter" },
+  [INSOMNIAC_DAY3_ID]: { es: "Tratar al anciano del cántaro", en: "Treat the old man with the jug" },
 };
 
 export const objectivesCopy: Record<Language, { title: string; toggleHint: string }> = {

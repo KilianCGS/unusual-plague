@@ -170,6 +170,9 @@ function chapter3AllInteractions(): Record<string, DecorInteraction> {
   for (const id of NOT_INHERITED_IN_CHAPTER_3) delete inherited[id];
   const bench = inherited[QUARRY_ERRAND_GIVER_INSTANCE_ID];
   if (bench) inherited[QUARRY_ERRAND_GIVER_INSTANCE_ID] = { ...bench, interactionId: "chapter3.quarry.stonecutter" };
+  // 2026-11-18: the old man with the jug has the insomnia case on Day 3 (his Day 2 errand was the onion syrup).
+  const elder = inherited["tavern-street-elderly-man-with-jug-01"];
+  if (elder) inherited["tavern-street-elderly-man-with-jug-01"] = { ...elder, interactionId: "chapter3.tavernStreet.elder" };
   return inherited;
 }
 

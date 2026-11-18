@@ -41,6 +41,10 @@ export const DIAGNOSIS_SYMPTOMS: Record<string, Record<Language, string>> = {
     es: "Brazo hinchado y desviado tras el golpe de un bloque. Mucho dolor al girarlo o apoyarlo.",
     en: "A swollen, crooked arm after the blow of a block. Sharp pain on turning or leaning on it.",
   },
+  "chapter3-insomniac": {
+    es: "Ojeras, irritabilidad y dolor de cabeza. Lleva varias noches sin dormir y el cansancio no se le quita con el descanso.",
+    en: "Dark circles, irritability and a headache. He has not slept for several nights and rest does not shake the tiredness.",
+  },
   "chapter2-farmer": {
     es: "Debilidad repentina, sudor frío, náuseas y falta de apetito. Hace poco trabajaba con normalidad.",
     en: "Sudden weakness, cold sweats, nausea and loss of appetite. Until recently he was working normally.",
