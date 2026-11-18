@@ -18,14 +18,14 @@ export const CARPENTER_CLOTH_REWARD_ID = "chapter3.errand.carpenterCloth";
 const carpenterAsk = talk("carpenter.ask", [
   npc("Corto recto, mido dos veces, y esta tabla me ha salido torcida. Y ahora, además, me martillea la cabeza.", "I cut straight, I measure twice, and this board still came out crooked. And now my head is hammering too."),
   doctor("Un paño frío en la frente le vendrá bien: agua fresca y un trapo limpio.", "A cold cloth on your forehead will do you good: cool water and a clean rag."),
-  npc("Tráigamelo y le doy tres monedas. Pagaría más, pero la tabla torcida no se vende.", "Bring me one and I'll give you three coins. I'd pay more, but a crooked board won't sell."),
+  npc("Tráigamelo y le doy cuatro monedas. Pagaría más, pero la tabla torcida no se vende.", "Bring me one and I'll give you four coins. I'd pay more, but a crooked board won't sell."),
 ]);
 const carpenterReminder = talk("carpenter.reminder", [
   npc("¿El paño, doctor? Sigo aquí, con la cabeza dando golpes como mi mazo.", "The cloth, doctor? Still here, my head knocking like my mallet."),
 ]);
 const carpenterReady = talk("carpenter.ready", [
   doctor("Paño frío, recién mojado. Sobre la frente y unos minutos con los ojos cerrados.", "A cold cloth, freshly wetted. On your forehead, and a few minutes with your eyes closed."),
-  npc("Ahhh... Esto sí que es una buena herramienta. Tome sus tres monedas.", "Ahhh... Now that is a good tool. Here are your three coins."),
+  npc("Ahhh... Esto sí que es una buena herramienta. Tome sus cuatro monedas.", "Ahhh... Now that is a good tool. Here are your four coins."),
   doctor("Y mida con la cabeza fresca, que la tabla se lo agradecerá.", "And measure with a cool head; the board will thank you."),
 ]);
 
@@ -36,14 +36,14 @@ export const ELDERLY_COUPLE_DRINK_REWARD_ID = "chapter3.errand.elderlyDrink";
 const coupleAsk = talk("couple.ask", [
   npc("Con tanto rezar y tanto sol, mi mujer y yo salimos de misa secos como una pasa.", "With so much praying and so much sun, my wife and I come out of Mass dry as raisins."),
   doctor("Agua con un poco de azúcar y sal repone lo que se pierde. Es un remedio humilde.", "Water with a little sugar and salt puts back what's lost. A humble remedy."),
-  npc("Prepárenos una bebida de esas y le damos cuatro monedas. Lo que sobre lo pagamos en pasteles.", "Make us one of those drinks and we'll give you four coins. Whatever's left over, we'll pay in pastries."),
+  npc("Prepárenos una bebida de esas y le damos seis monedas. Lo que sobre lo pagamos en pasteles.", "Make us one of those drinks and we'll give you six coins. Whatever's left over, we'll pay in pastries."),
 ]);
 const coupleReminder = talk("couple.reminder", [
   npc("¿La bebida, doctor? Seguimos aquí sentados, con paciencia y con sed.", "The drink, doctor? We're still sitting here, with patience and with thirst."),
 ]);
 const coupleReady = talk("couple.ready", [
   doctor("Bebida rehidratante: agua, azúcar y sal. Sabe a poco y hace mucho.", "Rehydration drink: water, sugar and salt. It tastes of little and does a lot."),
-  npc("Los dos a medias, como siempre. Aquí tiene sus cuatro monedas.", "Half each, as always. Here are your four coins."),
+  npc("Los dos a medias, como siempre. Aquí tiene sus seis monedas.", "Half each, as always. Here are your six coins."),
   doctor("Beban despacio, a sorbitos.", "Drink slowly, in little sips."),
 ]);
 

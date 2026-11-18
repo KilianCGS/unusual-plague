@@ -518,3 +518,42 @@ Una conversacion de 3 lineas por persona colocada, con la rareza sutil del dia (
 | Persona | Es mi marido. Se queja de las encías, no de lo que come: pan duro, siempre. | He's my husband. He complains about his gums, not about what he eats: hard bread, always. |
 | Doctor | Eso me dice mucho. Gracias. | That tells me a lot. Thank you. |
 | Persona | Le llevo caldo y ni lo prueba. Está distraído. | I bring him broth and he doesn't even taste it. He's distracted. |
+
+---
+
+## 18 nov: profundidad del Día 3, recados, anciano y guardado (todo NUEVO, pendiente de revisión)
+
+Marca lo que cambiar. Origen entre corchetes.
+
+### Pensamiento de apertura del Día 3 [dialogue/toolsRenewal.ts]
+- ES: Cada día el pueblo parece un poco más cansado. Empezaré por preguntar a quien me mire.
+- EN: Each day the village looks a little more tired. I'll start by asking whoever looks back at me.
+
+### Rumores del panel R, antes de conocer al paciente [objectives/objectives.ts]
+- Mujer del plumero: «Alguien tose sin parar en la calle de la panadería» / "Someone is coughing nonstop on the bakery street"
+- Minero: «Un hombre descansa en la cantera, cansado y sin sonreír» / "A man rests at the quarry, tired and not smiling"
+- Picapedrero: «Un picapedrero se sostiene el brazo en la cantera» / "A stonecutter is holding his arm at the quarry"
+- Anciano del cántaro: «El anciano del cántaro lleva noches sin dormir» / "The old man with the jug has gone nights without sleep"
+
+### Síntomas del diagnóstico, Día 3 (menos evidentes) [patients/diagnosis.ts]
+- Plumero: «Un silbido al respirar y una tos seca que no cede, peor al caer la tarde. Se cansa al subir escaleras y dice que viene de un trabajo polvoriento.»
+- Minero: «Está agotado y le duele la boca al masticar. Un arañazo viejo sigue abierto y su plato es siempre el mismo.»
+- Picapedrero: «No puede girar el antebrazo y el codo está hinchado, de otro color, con la forma cambiada. Lo sostiene con la otra mano.»
+- Anciano: «Ojeras, mal humor por cualquier cosa y dolor de cabeza. Cabecea de día, pero asegura que de noche no logra dormir.»
+(EN en el mismo archivo, `DIAGNOSIS_SYMPTOMS`.)
+
+### Anciano del cántaro, insomnio (cuarto caso) [dialogue/chapter3PatientDialogues.ts]
+- Examen: «Buenas, doctor. Perdone si bostezo en su cara: llevo cuatro noches mirando el techo.» / «Peor: de día estoy despierto y de mal humor. Ayer le grité a una gallina.» / «Antes me dormía en la silla. Ahora hasta el jarro me parece ruidoso.»
+- Cura: Doctor: «Infusión de menta y leche con miel, tibias, antes de acostarse. Y nada de contar gallinas.» / «¿Contar ovejas no vale?» / «Las ovejas sí. Las gallinas despiertan.»
+- Después: «Anoche dormí de un tirón. Hasta soñé con la gallina, y me disculpé.»
+- Esperando: «Sigo sin pegar ojo, doctor. El techo y yo ya nos conocemos demasiado.»
+(La conversación completa y el EN están en el archivo.)
+
+### Recados del Día 3 [dialogue/chapter3Errands.ts]
+- Carpintero (paño frío, 4 monedas): «Corto recto, mido dos veces, y esta tabla me ha salido torcida. Y ahora, además, me martillea la cabeza.» Doctor: «Un paño frío en la frente le vendrá bien.» Paga: «Tome sus cuatro monedas.» Cierre del Doctor: «Y mida con la cabeza fresca, que la tabla se lo agradecerá.»
+- Ancianos de la plaza (bebida rehidratante, 6 monedas): «Con tanto rezar y tanto sol, mi mujer y yo salimos de misa secos como una pasa.» Pago: «Los dos a medias, como siempre. Aquí tiene sus seis monedas.»
+(Texto completo y EN en el archivo; ya coinciden los números con el pago real.)
+
+### Pantalla de título, partida guardada [i18n/saveCopy.ts]
+- Botones: «Continuar», «Partida». Panel: «Partida guardada», «Copiar partida», «Cargar texto pegado», «Cerrar».
+- Mensajes: «Partida copiada. Pégala donde quieras guardarla.» / «Partida cargada. Pulsa «Continuar».» / «Ese texto no es una partida válida.» / «Aún no hay partida guardada: se guarda al empezar el día 2.»
