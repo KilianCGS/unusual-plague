@@ -95,7 +95,10 @@ export const NEW_WORLD_VISUALS: DevScene[] = [
     id: "forest-v1",
     label: "Bosque (nuevo mundo)",
     backgroundSrc: `${DIR}/forest-background.png`,
-    assetWidth: 1426,
+    // 2026-11-18: Kilian repainted the forest day and night images at 1362x1103 (it was 1426x1103); the logical
+    // world follows the real image size (nothing stretched). Colliders, exits and spawns keep their logical
+    // coordinates: Kilian checks them in /dev/collisions.
+    assetWidth: 1362,
     assetHeight: 1103,
     initialAssetX: 110,
     initialAssetY: 550,

@@ -25,6 +25,9 @@ export const SOUND_IDS = [
   "ui.dialogueBubble",
   "music.intro",
   "music.day1",
+  "music.day2",
+  "music.day3",
+  "music.day4",
 ] as const;
 
 export type SoundId = (typeof SOUND_IDS)[number];
@@ -66,6 +69,11 @@ export const SOUNDS: Record<SoundId, SoundDef> = {
   "ui.mapOpen": def("ui.mapOpen", "ui/map-open.mp3", "ui"),
   "ui.dialogueBubble": def("ui.dialogueBubble", "ui/dialogue-bubble.mp3", "ui", false, 0.75),
   "music.day1": def("music.day1", "music/day1-ambient.mp3", "music", true, 0.6),
+  // 2026-11-18: Kilian is generating the ambient music of Days 2, 3 and 4: drop the files with these names in
+  // public/game/audio/music/ (until they exist the day is simply silent: a missing file only fails to play).
+  "music.day2": def("music.day2", "music/day2-ambient.mp3", "music", true, 0.6),
+  "music.day3": def("music.day3", "music/day3-ambient.mp3", "music", true, 0.6),
+  "music.day4": def("music.day4", "music/day4-ambient.mp3", "music", true, 0.6),
   "music.intro": def("music.intro", "music/game-intro.mp3", "music", true),
   "ui.chestOpen": def("ui.chestOpen", "ui/chest-open.mp3", "ui"),
 };

@@ -50,14 +50,16 @@ const { sceneForChapter, NIGHT_BACKGROUNDS, NIGHT_GRADE, NIGHT_CHAPTER_ID } = at
 const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
 const { getLockedDoorNotice } = at("src/game/world/lockedDoors.ts");
 
-test("Day 4 draws the eight scenes that have a night painting with it, and the files exist at the day size", () => {
+test("Day 4 draws the nine scenes that have a night painting with it, and the files exist at the day size", () => {
   const sharpSizes = {
     outskirts: [1546, 1017],
     "apothecary-street": [1120, 1404],
     "bakery-street": [1168, 1346],
     "tavern-street": [1730, 909],
     "smithy-street": [1619, 971],
-    forest: [1426, 1103],
+    // 2026-11-18: Kilian repainted the forest day and night (1362x1103); the night file measures the same as the day one
+    forest: [1362, 1103],
+    plaza: [1536, 1024],
     "forest-cottage": [1426, 1103],
     "doctor-room": [1254, 1254],
   };
@@ -79,11 +81,12 @@ test("Day 4 draws the eight scenes that have a night painting with it, and the f
 });
 
 test("a scene without a painting gets the night grade; other chapters and interiors are untouched", () => {
-  const plaza = sceneForChapter(WORLD_SCENES.plaza, NIGHT_CHAPTER_ID);
-  assert.equal(plaza.visual.backgroundSrc, WORLD_SCENES.plaza.visual.backgroundSrc);
+  // (the plaza has its own painting since 2026-11-18; the farm is one of the scenes that still get the grade)
+  const plaza = sceneForChapter(WORLD_SCENES.farm, NIGHT_CHAPTER_ID);
+  assert.equal(plaza.visual.backgroundSrc, WORLD_SCENES.farm.visual.backgroundSrc);
   assert.equal(plaza.visual.backgroundFilter, NIGHT_GRADE);
   for (const chapter of ["chapter-1", "chapter-2", "chapter-3"]) {
-    assert.equal(sceneForChapter(WORLD_SCENES.plaza, chapter), WORLD_SCENES.plaza);
+    assert.equal(sceneForChapter(WORLD_SCENES.farm, chapter), WORLD_SCENES.farm);
     assert.equal(sceneForChapter(WORLD_SCENES.outskirts, chapter), WORLD_SCENES.outskirts);
   }
   const interior = WORLD_SCENES["tavern-interior"];

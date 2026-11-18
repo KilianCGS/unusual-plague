@@ -23,6 +23,16 @@ export const ARTIFACT_SLUGS: Readonly<Record<string, string>> = {
   woodcutter: "woodcutter",
   blacksmith: "blacksmith",
   "woman-washing-clothes": "washer",
+  // 2026-11-18: the new poses of Day 4
+  "child-sitting": "child",
+  "child-sitting-legs": "child",
+  "fainted-man": "fainted",
+  "fainted-woman": "fainted",
+  "old-man-stool": "oldMan",
+  "old-man-bench": "oldMan",
+  // someone with a phone in one hand and a tankard / jug in the other, waist up from the front
+  "man-tankard-bust": "patron",
+  "woman-jug-bust": "patron",
 };
 
 // [scene|asset] -> the Day 2 interaction that has a Day 4 version.

@@ -17,6 +17,7 @@ const NIGHTS: [string, string, string][] = [
   ["calle-taberna", "tavern-street-night-background.png", "Calle Taberna"],
   ["smithy-street", "smithy-street-night-background.png", "Calle Herrería"],
   ["forest-v1", "forest-night-background.png", "Bosque"],
+  ["plaza", "plaza-night-background.png", "Plaza"],
   ["forest-cottage", "forest-cottage-night-background.png", "Casita del bosque"],
 ];
 

@@ -205,6 +205,7 @@ const NIGHT_EXPORT_PREFIX: Record<string, string> = {
   "calle-taberna": "tavernStreet",
   "smithy-street": "smithyStreet",
   "forest-v1": "forest",
+  plaza: "plaza",
   "forest-cottage": "forestCottage",
 };
 

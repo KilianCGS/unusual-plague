@@ -38,8 +38,8 @@ const BLOCKERS = [
   ["ch4-log-pile", [128, 96], false],
   ["ch4-fallen-tree", [160, 96], false],
   ["ch4-stone-blocks", [96, 64], false],
-  ["ch4-barrier-horizontal", [160, 64], true],
-  ["ch4-barrier-vertical", [64, 128], true],
+  ["ch4-barrier-horizontal", [160, 96], true], // 2026-11-18: now an oval magic circle
+  ["ch4-barrier-vertical", [96, 160], true], // the same circle turned a quarter
 ];
 const CROWS = ["witch-crow-pecking", "witch-crow-cawing", "witch-crow-head-tilt"];
 

@@ -69,7 +69,7 @@ test("every pose with an artifact has its own two Doctor thoughts, in both langu
     assert.equal(a.conversation.id, `chapter4.artifact.${slug}`);
     assert.equal(a.conversation.lines.length, 2);
   }
-  assert.equal(new Set(Object.values(c4.ARTIFACT_PERSON_THOUGHTS).map((l) => l[0].text.es)).size, 8, "eight different people, eight different thoughts");
+  assert.equal(new Set(Object.values(c4.ARTIFACT_PERSON_THOUGHTS).map((l) => l[0].text.es)).size, 12, "twelve different kinds of person, twelve different thoughts");
   // an unknown pose still gets a generic thought
   assert.equal(resolveStoryInteraction("chapter4.artifact.somebodyNew", facts(), "en", "p").conversation.lines.length, 1);
 });

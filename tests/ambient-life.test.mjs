@@ -51,4 +51,22 @@ test("the ten ambient life sprites are registered, animated, with real frames of
   }
 });
 
+const art = at("src/game/compositions/artifacts.interactions.ts");
+const c4 = at("src/game/dialogue/chapter4Dialogues.ts");
+const NEW_DAY4 = ["child-sitting", "child-sitting-legs", "fainted-man", "fainted-woman", "old-man-stool", "old-man-bench", "man-tankard-bust", "woman-jug-bust"];
+
+test("the new Day 4 smartphone poses (child, fainted, old man, someone with a tankard) are registered, animated and have thoughts of the Doctor", () => {
+  for (const base of NEW_DAY4) {
+    const a = assets.getDecorAsset(`${base}-smartphone`);
+    assert.ok(a, base);
+    assert.equal(a.category, "people");
+    assert.deepEqual([a.sprite.frameWidth, a.sprite.frameHeight], [96, 96]);
+    assert.equal(new Set(a.sprite.frames).size, 9, base);
+    for (const f of new Set(a.sprite.frames)) assert.deepEqual(png(f), [96, 96], `${base} ${f}`);
+    assert.equal(a.defaultCollider, undefined, base);
+    const slug = art.ARTIFACT_SLUGS[base];
+    assert.ok(slug && c4.ARTIFACT_PERSON_THOUGHTS[slug]?.length === 2, `${base} has its thoughts`);
+  }
+});
+
 console.log(`\n${passed} tests passed`);

@@ -61,6 +61,23 @@ export const ARTIFACT_PERSON_THOUGHTS: Readonly<Record<string, LocalizedLine[]>>
     doctorThought("La mano se curó del todo. Es el oficio el que se ha quedado parado.", "The hand healed completely. It's the trade that has stopped."),
     doctorThought("La forja se apaga sola y él no se da cuenta.", "The forge is dying down by itself and he doesn't notice."),
   ],
+  // 2026-11-18: the new poses of Day 4 (a child on the ground, someone fainted, an old man facing left)
+  child: [
+    doctorThought("Un niño sentado en el suelo, y ni corre ni pregunta. Es lo que más me inquieta.", "A child sitting on the ground, not running, not asking questions. That's what unsettles me most."),
+    doctorThought("Los niños siempre me preguntan qué llevo en la bolsa. Este ni me ha mirado.", "Children always ask me what I carry in my bag. This one hasn't even looked at me."),
+  ],
+  fainted: [
+    doctorThought("Respira y el pulso es firme. Se habrá chocado con algo sin levantar la vista a tiempo.", "Breathing, steady pulse. They must have walked into something without looking up in time."),
+    doctorThought("La luz sigue encendida a su lado, como esperando a que despierte.", "The light is still on beside them, as if waiting for them to wake."),
+  ],
+  patron: [
+    doctorThought("Una mano para la jarra y otra para la luz. Y la jarra va ganando poco.", "One hand for the tankard and the other for the light. And the tankard is hardly winning."),
+    doctorThought("Se le inclina la bebida y no lo nota: está donde esté la luz.", "The drink is tipping over and they don't notice: they are wherever the light is."),
+  ],
+  oldMan: [
+    doctorThought("Ya no mira pasar el pueblo: mira lo que sostiene en las manos.", "He no longer watches the village go by: he watches what he holds in his hands."),
+    doctorThought("Con cuánto cuidado la sujeta, con lo que le tiemblan los dedos.", "How carefully he holds it, with how much his fingers shake."),
+  ],
   washer: [
     doctorThought("La ropa se va con la corriente, prenda tras prenda. Ella ni parpadea.", "The washing drifts away with the current, garment after garment. She doesn't even blink."),
     doctorThought("Cuando se dé cuenta, el río se habrá quedado con toda la colada.", "By the time she notices, the river will have kept all the washing."),

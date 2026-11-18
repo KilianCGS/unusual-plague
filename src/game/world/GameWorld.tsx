@@ -1294,6 +1294,10 @@ export function GameWorld({
   const sceneIdForClosing = world.sceneId;
   if (!leftBotica && !DAY_END_SCENES.includes(world.sceneId)) setLeftBotica(true);
   useLoopMusic("music.day1", chapterId === "chapter-1" && leftBotica && !closingActive);
+  // Days 2, 3 and 4 have their own ambient track (files by Kilian, see soundManifest.ts)
+  useLoopMusic("music.day2", chapterId === "chapter-2" && leftBotica && !closingActive);
+  useLoopMusic("music.day3", chapterId === "chapter-3" && leftBotica && !closingActive);
+  useLoopMusic("music.day4", chapterId === "chapter-4" && leftBotica && !closingActive);
 
   // The day closes when the Doctor sleeps (2026-11-16, Kilian): the sign sends him to his room, a
   // "Sleep" label floats over the bed and pressing E there closes the day (no modal). Until the bed

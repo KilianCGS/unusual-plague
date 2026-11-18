@@ -1484,11 +1484,11 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
   },
   {
-    // 2026-11-17 (Kilian, for Day 4 and the glade): Overturned merchant cart on fire with two dead horses in harness. 9-frame fire and smoke loop (ping-pong); the horses are pasted from frame 0 so only the fire moves. PixelLab, silhouette
-    // x6-187 y0-125 of the 192x128 frame. Authoring asset: no interaction and not
-    // placed in any scene until Kilian places it in the Decorator.
+    // 2026-11-17 (Kilian, for Day 4): a wooden cart loaded with burning straw, thick smoke rising. 2026-11-18: the two
+    // horses are gone (PixelLab edit of the first picture, then animated: 9 frames of fire and smoke, ping-pong).
+    // Silhouette x19-171 y0-121 of the 192x128 frame. Authoring asset: no interaction until placed.
     id: "ch4-burning-cart",
-    label: "Burning cart with horses (Day 4 roadblock)",
+    label: "Cart with burning straw (Day 4 roadblock)",
     category: "ambient",
     sprite: {
       frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/ambient/ch4-burning-cart/${i}.png`),
@@ -1497,9 +1497,9 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
       fps: 8,
       loop: true,
     },
-    anchor: { x: 0.503, y: 0.977 },
+    anchor: { x: 0.495, y: 0.945 },
     defaultScale: 1,
-    defaultCollider: { offsetX: -82, offsetY: -38, width: 163, height: 38 },
+    defaultCollider: { offsetX: -68, offsetY: -36, width: 137, height: 36 },
   },
   {
     // 2026-11-17 (Kilian, for Day 4 and the glade): Tall stack of cut logs. Static. PixelLab, silhouette
@@ -1556,40 +1556,40 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultCollider: { offsetX: -31, offsetY: -16, width: 62, height: 16 },
   },
   {
-    // 2026-11-17 (Kilian, for Day 4 and the glade): Violet translucent barrier of runes stretched left to right. Runes pulse and sparks drift (ping-pong). PixelLab, silhouette
-    // x10-151 y9-53 of the 160x64 frame. Authoring asset: no interaction and not
-    // placed in any scene until Kilian places it in the Decorator.
+    // 2026-11-17 (Kilian, for Day 4): the violet magic barrier. 2026-11-18: now an OVAL MAGIC CIRCLE on the ground, with runes
+    // and symbols all around the ring, same violet colours (PixelLab, animated: the runes pulse; ping-pong).
+    // Silhouette x9-151 y8-80 of the 160x96 frame. Its collider covers the ring.
     id: "ch4-barrier-horizontal",
-    label: "Magic barrier, horizontal (Day 4)",
+    label: "Magic circle, wide oval (Day 4 barrier)",
     category: "ambient",
     sprite: {
       frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/ambient/ch4-barrier-horizontal/${i}.png`),
       frameWidth: 160,
-      frameHeight: 64,
+      frameHeight: 96,
       fps: 6,
       loop: true,
     },
-    anchor: { x: 0.503, y: 0.828 },
+    anchor: { x: 0.5, y: 0.458 },
     defaultScale: 1,
-    defaultCollider: { offsetX: -70, offsetY: -12, width: 141, height: 12 },
+    defaultCollider: { offsetX: -64, offsetY: -22, width: 128, height: 43 },
   },
   {
-    // 2026-11-17 (Kilian, for Day 4 and the glade): Violet translucent column of runes, upright. Runes pulse and sparks drift (ping-pong). PixelLab, silhouette
-    // x11-52 y8-122 of the 64x128 frame. Authoring asset: no interaction and not
-    // placed in any scene until Kilian places it in the Decorator.
+    // 2026-11-17 (Kilian, for Day 4): the violet magic barrier. 2026-11-18: the same OVAL MAGIC CIRCLE as the horizontal
+    // one turned a quarter, so it stands tall (the oval is seen from above, so turning it is exact).
+    // Silhouette x8-80 y9-151 of the 96x160 frame. Its collider covers the ring.
     id: "ch4-barrier-vertical",
-    label: "Magic barrier, vertical (Day 4)",
+    label: "Magic circle, tall oval (Day 4 barrier)",
     category: "ambient",
     sprite: {
       frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/ambient/ch4-barrier-vertical/${i}.png`),
-      frameWidth: 64,
-      frameHeight: 128,
+      frameWidth: 96,
+      frameHeight: 160,
       fps: 6,
       loop: true,
     },
-    anchor: { x: 0.492, y: 0.953 },
+    anchor: { x: 0.458, y: 0.5 },
     defaultScale: 1,
-    defaultCollider: { offsetX: -18, offsetY: -12, width: 37, height: 12 },
+    defaultCollider: { offsetX: -22, offsetY: -64, width: 43, height: 128 },
   },
   {
     // 2026-11-17 (Kilian, for Day 4 and the glade): Crow with a blue sheen, faces left: stands still, then pecks the ground twice (the loop holds the still pose 6 beats). PixelLab, silhouette
@@ -1801,6 +1801,142 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
       loop: true,
     },
     anchor: { x: 0.438, y: 0.906 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian, Day 4): Child sitting cross-legged, thumbs tapping slowly, face lit by the device. PixelLab (style anchored on villager-sitting-smartphone),
+    // idle of 9 frames (ping-pong, very slow). Silhouette x33-62 y34-77 of the 96x96 frame.
+    // Authoring asset: no collider; Day 4 gives it a thought of the Doctor by itself (artifacts.interactions.ts).
+    id: "child-sitting-smartphone",
+    label: "Child sitting on the ground with a smartphone (crossed legs)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/child-sitting-smartphone/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.495, y: 0.802 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian, Day 4): A second child, legs stretched forward, ragged clothes, thumbs tapping. PixelLab (style anchored on villager-sitting-smartphone),
+    // idle of 9 frames (ping-pong, very slow). Silhouette x26-60 y32-80 of the 96x96 frame.
+    // Authoring asset: no collider; Day 4 gives it a thought of the Doctor by itself (artifacts.interactions.ts).
+    id: "child-sitting-legs-smartphone",
+    label: "Child sitting on the ground with a smartphone (legs forward)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/child-sitting-legs-smartphone/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.448, y: 0.833 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian, Day 4): man fainted ON HIS BACK with his arms open like a cross, as if he had fallen backwards
+    // after walking into something; breathing slowly, the phone beside his hand flickers blue. PixelLab (9 frames, ping-pong).
+    // Silhouette x8-90 y19-79 of the 96x96 frame. Authoring asset: no collider.
+    id: "fainted-man-smartphone",
+    label: "Man fainted on his back, smartphone beside his hand",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/fainted-man-smartphone/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.51, y: 0.823 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian, Day 4): Woman lying unconscious on her back, breathing slowly; the phone on the ground flickers blue. PixelLab (style anchored on villager-sitting-smartphone),
+    // idle of 9 frames (ping-pong, very slow). Silhouette x21-72 y24-76 of the 96x96 frame.
+    // Authoring asset: no collider; Day 4 gives it a thought of the Doctor by itself (artifacts.interactions.ts).
+    id: "fainted-woman-smartphone",
+    label: "Woman fainted on the ground, smartphone beside her hand",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/fainted-woman-smartphone/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.484, y: 0.792 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian, Day 4): Old man seated on a low stool in profile facing LEFT, cane against his knee, thumb tapping. PixelLab (style anchored on villager-sitting-smartphone),
+    // idle of 9 frames (ping-pong, very slow). Silhouette x28-62 y26-79 of the 96x96 frame.
+    // Authoring asset: no collider; Day 4 gives it a thought of the Doctor by itself (artifacts.interactions.ts).
+    id: "old-man-stool-smartphone",
+    label: "Old man on a stool with a smartphone, facing left",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/old-man-stool-smartphone/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.469, y: 0.823 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian, Day 4): Old man seated as if on a bench (no bench drawn: long legs, boots flat on the ground), in profile facing LEFT, stick against his knee, thumb tapping. PixelLab (style anchored on villager-sitting-smartphone),
+    // idle of 9 frames (ping-pong, very slow). Silhouette x20-65 y16-82 of the 96x96 frame.
+    // Authoring asset: no collider; Day 4 gives it a thought of the Doctor by itself (artifacts.interactions.ts).
+    id: "old-man-bench-smartphone",
+    label: "Old man seated as on a bench with a smartphone, facing left",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/old-man-bench-smartphone/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.443, y: 0.854 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian, Day 4): Man seen from the front, waist up, a smartphone in one hand and a wooden tankard in the other. PixelLab (style anchored on villager-sitting-smartphone),
+    // idle of 9 frames (ping-pong, very slow). Silhouette x24-67 y29-79 of the 96x96 frame.
+    // Authoring asset: no collider; Day 4 gives it a thought of the Doctor by itself (artifacts.interactions.ts).
+    id: "man-tankard-bust-smartphone",
+    label: "Man, waist up from the front, smartphone in one hand and a tankard in the other",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/man-tankard-bust-smartphone/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.474, y: 0.823 },
+    defaultScale: 1,
+  },
+  {
+    // 2026-11-18 (Kilian, Day 4): Woman seen from the front, waist up, a smartphone in one hand and a clay jug in the other. PixelLab (style anchored on villager-sitting-smartphone),
+    // idle of 9 frames (ping-pong, very slow). Silhouette x26-68 y23-79 of the 96x96 frame.
+    // Authoring asset: no collider; Day 4 gives it a thought of the Doctor by itself (artifacts.interactions.ts).
+    id: "woman-jug-bust-smartphone",
+    label: "Woman, waist up from the front, smartphone in one hand and a jug in the other",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2, 1].map((i) => `/game/npcs/woman-jug-bust-smartphone/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 3,
+      loop: true,
+    },
+    anchor: { x: 0.49, y: 0.823 },
     defaultScale: 1,
   },
   {
