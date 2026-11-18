@@ -523,7 +523,7 @@ test("the real game starts as always: only the dev page hands GameWorld a start"
   const home = read("src/app/page.tsx");
 
   assert.ok(home.includes("<GameWorld language={language}"));
-  assert.ok(!home.includes("devStart"));
+  assert.ok(!home.includes("devStart="), "the real game never hands a dev start (it may only resume a saved game, 2026-11-18)");
   const game = read("src/game/world/GameWorld.tsx");
 
   for (const fallback of [

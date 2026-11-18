@@ -11,6 +11,9 @@ import { introScreenCopy } from "../game/i18n/introScreen";
 import { GothicText } from "../game/ui/GothicText";
 import { titleScreenCopy } from "../game/i18n/titleScreen";
 import type { Language } from "../game/i18n/types";
+import { saveCopy } from "../game/i18n/saveCopy";
+import type { GameDevStart } from "../game/world/devStart";
+import { readSave, saveFromText, saveToText, toDevStart, writeSave, type SaveGame } from "../game/save/saveGame";
 
 const FADE_DURATION_MS = 1000;
 
@@ -25,6 +28,17 @@ export default function Home() {
   const [fadePhase, setFadePhase] = useState<FadePhase>("idle");
   const [queuedPhase, setQueuedPhase] = useState<GamePhase | null>(null);
   const copy = titleScreenCopy[language];
+  const saves = saveCopy[language];
+  // The saved game (autosaved at every dawn): read after mount, since it lives in the browser.
+  const [savedGame, setSavedGame] = useState<SaveGame | null>(null);
+  const [loadedStart, setLoadedStart] = useState<GameDevStart | undefined>(undefined);
+  const [isSavePanelOpen, setIsSavePanelOpen] = useState(false);
+  const [pasteText, setPasteText] = useState("");
+  const [saveMessage, setSaveMessage] = useState<string | null>(null);
+  useEffect(() => {
+    const id = window.setTimeout(() => setSavedGame(readSave()), 0);
+    return () => window.clearTimeout(id);
+  }, [gamePhase]);
   // "UNUSUAL PLAGUE" -> ["Unusual", "Plague"] as letters, in title case
   const titleWords = copy.title
     .split(" ")
@@ -98,7 +112,39 @@ export default function Home() {
 
   const handleBegin = () => {
     playSound("ui.introButton");
+    setLoadedStart(undefined);
     transitionToPhase("intro");
+  };
+
+  const handleContinue = () => {
+    if (!savedGame) return;
+    playSound("ui.introButton");
+    setLoadedStart(toDevStart(savedGame));
+    transitionToPhase("apothecary");
+  };
+
+  const handleCopySave = async () => {
+    if (!savedGame) return;
+    const text = saveToText(savedGame);
+    setPasteText(text);
+    try {
+      await navigator.clipboard.writeText(text);
+      setSaveMessage(saves.copied);
+    } catch {
+      // the clipboard can be refused: the text stays in the box to copy by hand
+      setSaveMessage(saves.copied);
+    }
+  };
+
+  const handleLoadSave = () => {
+    const parsed = saveFromText(pasteText);
+    if (!parsed) {
+      setSaveMessage(saves.invalid);
+      return;
+    }
+    writeSave(parsed);
+    setSavedGame(parsed);
+    setSaveMessage(saves.loaded);
   };
 
   const handleAboutBackdropClick = () => {
@@ -127,7 +173,7 @@ export default function Home() {
   if (gamePhase === "apothecary") {
     return (
       <>
-        <GameWorld language={language} onQuit={() => transitionToPhase("title")} />
+        <GameWorld language={language} resume={loadedStart} autosave onQuit={() => transitionToPhase("title")} />
         <div
           className="title-screen-fade"
           style={{
@@ -221,6 +267,28 @@ export default function Home() {
             >
               {copy.beginButton}
             </button>
+            {savedGame ? (
+              <button
+                className="begin-button title-save-button"
+                type="button"
+                disabled={isInteractionLocked}
+                onClick={handleContinue}
+              >
+                {saves.continueButton}
+              </button>
+            ) : null}
+            <button
+              className="begin-button title-save-button"
+              type="button"
+              disabled={isInteractionLocked}
+              onClick={() => {
+                playSound("ui.introButton");
+                setSaveMessage(savedGame ? null : saves.empty);
+                setIsSavePanelOpen(true);
+              }}
+            >
+              {saves.saveButton}
+            </button>
           </div>
         </div>
         <button
@@ -249,6 +317,36 @@ export default function Home() {
 
       {isControlsOpen ? (
         <ControlsPanel language={language} onClose={() => setIsControlsOpen(false)} />
+      ) : null}
+
+      {isSavePanelOpen ? (
+        <div className="about-panel-backdrop" onClick={() => setIsSavePanelOpen(false)}>
+          <section className="about-panel" aria-modal="true" role="dialog" onClick={(event) => event.stopPropagation()}>
+            <h2 className="about-panel-title">{saves.title}</h2>
+            <p>{saves.intro}</p>
+            <textarea
+              className="save-text"
+              value={pasteText}
+              placeholder={saves.placeholder}
+              onChange={(event) => setPasteText(event.target.value)}
+              rows={4}
+            />
+            {saveMessage ? <p className="save-message">{saveMessage}</p> : null}
+            <div className="save-actions">
+              {savedGame ? (
+                <button className="begin-button" type="button" onClick={handleCopySave}>
+                  {saves.copy}
+                </button>
+              ) : null}
+              <button className="begin-button" type="button" onClick={handleLoadSave} disabled={!pasteText.trim()}>
+                {saves.load}
+              </button>
+              <button className="begin-button" type="button" onClick={() => setIsSavePanelOpen(false)}>
+                {saves.close}
+              </button>
+            </div>
+          </section>
+        </div>
       ) : null}
 
       {isAboutPanelOpen ? (

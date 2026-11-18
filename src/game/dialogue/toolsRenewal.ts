@@ -63,6 +63,13 @@ export function resolveToolsRenewal(
 }
 
 // What the Doctor says, once, after using the work table or the stove on Day 3.
+// DAY 3 OPENING THOUGHT (2026-11-18): said once, as a thought over the Doctor, the first time he is out of the
+// Botica on Day 3. NEW TEXT, awaiting Kilian's review.
+export const day3OpeningCopy: Record<Language, string> = {
+  es: "Cada día el pueblo parece un poco más cansado. Empezaré por preguntar a quien me mire.",
+  en: "Each day the village looks a little more tired. I'll start by asking whoever looks back at me.",
+};
+
 export const toolsNoticeCopy: Record<Language, string> = {
   es: "Mis herramientas están muy melladas... El herrero sabrá afilarlas cuando acabe la jornada.",
   en: "My tools are very worn... The blacksmith will know how to sharpen them once the day's work is done.",

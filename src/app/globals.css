@@ -398,3 +398,38 @@ main.title-screen.is-black .title-screen-fade {
   left: auto;
   right: clamp(18px, 2vw, 34px);
 }
+
+/* The saved-game buttons sit under the start button, smaller (2026-11-18). */
+.title-start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.title-save-button {
+  font-size: 0.8em;
+  opacity: 0.9;
+}
+
+.save-text {
+  width: 100%;
+  margin: 0.4rem 0 0.6rem;
+  padding: 0.5rem;
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #2b1a14;
+  background: #f3e8c8;
+  border: 2px solid #4a3524;
+  resize: vertical;
+}
+
+.save-message {
+  font-style: italic;
+}
+
+.save-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}

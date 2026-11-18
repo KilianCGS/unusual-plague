@@ -59,7 +59,8 @@ import {
 import { day1Closing } from "../dialogue/chapter1Day1Dialogues";
 import { day2Closing } from "../dialogue/chapter2ClosingDialogues";
 import { day3Closing } from "../dialogue/chapter3ClosingDialogues";
-import { TOOLS_NOTICED_ID, toolsNoticeCopy } from "../dialogue/toolsRenewal";
+import { createSave, writeSave } from "../save/saveGame";
+import { TOOLS_NOTICED_ID, day3OpeningCopy, toolsNoticeCopy } from "../dialogue/toolsRenewal";
 import { APOTHECARY_NIGHT_BACKGROUND, NIGHT_CHAPTER_ID, sceneForChapter } from "./nightScenes";
 import { EndCard } from "../ui/EndCard";
 import { DAY4_COMPLETED_ID, WITCH_FINAL_ID, day4Closing } from "../dialogue/chapter4Dialogues";
@@ -185,7 +186,9 @@ type WorldState = { sceneId: SceneId; spawnName: string; arrival: number };
 // scene change and keep walking once the fade ends.
 export function GameWorld({
   language,
-  devStart,
+  devStart: devStartProp,
+  resume,
+  autosave = false,
   onQuit,
 }: {
   language: Language;
@@ -193,7 +196,12 @@ export function GameWorld({
   onQuit?: () => void;
   // A development start (see /dev/day2). The real game never passes it.
   devStart?: GameDevStart;
+  // A saved game to continue (the title screen's Continue): it starts like a development start, from the Doctor's room.
+  resume?: GameDevStart;
+  // Write a save when each new day begins (the real game only; the dev pages never overwrite the player's save).
+  autosave?: boolean;
 }) {
+  const devStart = devStartProp ?? resume;
   const input = useDirectionInput();
   const [world, setWorld] = useState<WorldState>(() => {
     const start = devStart
@@ -965,6 +973,39 @@ export function GameWorld({
     claimFlag(TOOLS_NOTICED_ID);
     setPickupBark((current) => ({ id: (current?.id ?? 0) + 1, text: toolsNoticeCopy[language] }));
   }, [craftingStation, claimFlag, language]);
+
+  // Day 3 (2026-11-18): the opening thought, once, the first time he is out of the Botica.
+  const day3OpeningShownRef = useRef(false);
+  useEffect(() => {
+    if (chapterId !== "chapter-3" || day3OpeningShownRef.current || !leftBotica) return;
+    if (DAY_END_SCENES.includes(world.sceneId) || !isPlaying) return;
+    const id = window.setTimeout(() => {
+      day3OpeningShownRef.current = true;
+      setPickupBark((current) => ({ id: (current?.id ?? 0) + 1, text: day3OpeningCopy[language] }));
+    }, 600);
+    return () => window.clearTimeout(id);
+  }, [chapterId, leftBotica, world.sceneId, isPlaying, language]);
+
+  // AUTOSAVE (2026-11-18): when a new day begins (the chapter changes), the state is written once. Read through the
+  // refs/state at that moment: the closing has already finished, so nothing is in the middle of a scene.
+  const savedChapterRef = useRef(chapterId);
+  useEffect(() => {
+    if (savedChapterRef.current === chapterId) return;
+    savedChapterRef.current = chapterId;
+    if (!autosave) return;
+    writeSave(
+      createSave({
+        chapterId,
+        patients: patientsRef.current,
+        claimedRewards: claimedRewardsRef.current,
+        knownRecipeIds: knownRecipeIds,
+        inventory: inventoryRef.current,
+        storage: storageRef.current,
+        collected,
+        coins: coinsRef.current,
+      }),
+    );
+  }, [chapterId, autosave, knownRecipeIds, collected]);
 
   const handleExit = useCallback(
     (exitName: string) => {

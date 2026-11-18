@@ -135,7 +135,7 @@ test("the errands panel shows 'see the Witch' on Day 4 and ticks it when she has
   const { getObjectives } = at("src/game/objectives/objectives.ts");
   const c4 = at("src/game/dialogue/chapter4Dialogues.ts");
   assert.equal(getObjectives({}, "es").length, 0);
-  assert.equal(getObjectives({}, "es", { chapterId: "chapter-3", claimed: new Set() }).length, 0);
+  assert.equal(getObjectives({}, "es", { chapterId: "chapter-3", claimed: new Set() }).length, 4, "Day 3 starts with four rumours (2026-11-18)");
   const pending = getObjectives({}, "es", { chapterId: "chapter-4", claimed: new Set() });
   assert.deepEqual(pending.map((o) => [o.text, o.done]), [["Ir a ver a la bruja", false]]);
   const done = getObjectives({}, "en", { chapterId: "chapter-4", claimed: new Set([c4.WITCH_FINAL_ID]) });

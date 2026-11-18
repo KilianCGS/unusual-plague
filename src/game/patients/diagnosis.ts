@@ -30,20 +30,20 @@ export const DIAGNOSIS_SYMPTOMS: Record<string, Record<Language, string>> = {
   },
   // Day 3 (2026-11-12): NEW text, awaiting Kilian's review.
   "chapter3-duster": {
-    es: "Tos persistente, respiración silbante y opresión en el pecho desde que limpió el polvo de un piso cerrado. Empeora por la noche.",
-    en: "A persistent cough, wheezing and tightness in the chest since she dusted a long-closed floor. It is worse at night.",
+    es: "Un silbido al respirar y una tos seca que no cede, peor al caer la tarde. Se cansa al subir escaleras y dice que viene de un trabajo polvoriento.",
+    en: "A whistle when she breathes and a dry cough that will not ease, worse as evening falls. She tires on the stairs and says it comes from dusty work.",
   },
   "chapter3-path-miner": {
-    es: "Cansancio, encías doloridas que sangran y un rasguño que no cierra. Lleva semanas comiendo pan duro y cecina.",
-    en: "Tiredness, sore gums that bleed and a scratch that will not close. He has eaten hard bread and jerky for weeks.",
+    es: "Está agotado y le duele la boca al masticar. Un arañazo viejo sigue abierto y su plato es siempre el mismo.",
+    en: "He is worn out and his mouth hurts when he chews. An old scratch is still open and his plate is always the same.",
   },
   "chapter3-stonecutter": {
-    es: "Brazo hinchado y desviado tras el golpe de un bloque. Mucho dolor al girarlo o apoyarlo.",
-    en: "A swollen, crooked arm after the blow of a block. Sharp pain on turning or leaning on it.",
+    es: "No puede girar el antebrazo y el codo está hinchado, de otro color, con la forma cambiada. Lo sostiene con la otra mano.",
+    en: "He cannot turn his forearm and the elbow is swollen, discoloured and the wrong shape. He holds it with his other hand.",
   },
   "chapter3-insomniac": {
-    es: "Ojeras, irritabilidad y dolor de cabeza. Lleva varias noches sin dormir y el cansancio no se le quita con el descanso.",
-    en: "Dark circles, irritability and a headache. He has not slept for several nights and rest does not shake the tiredness.",
+    es: "Ojeras, mal humor por cualquier cosa y dolor de cabeza. Cabecea de día, pero asegura que de noche no logra dormir.",
+    en: "Dark circles, a short temper over nothing and a headache. He nods off by day, yet swears he cannot sleep at night.",
   },
   "chapter2-farmer": {
     es: "Debilidad repentina, sudor frío, náuseas y falta de apetito. Hace poco trabajaba con normalidad.",
