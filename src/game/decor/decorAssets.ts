@@ -1940,6 +1940,26 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
   },
   {
+    // 2026-11-19 (Kilian: no more PixelLab, "we make do with what we have"): the Witch FACING US, conjuring. It is her
+    // existing standing front pose (characters/witch/idle/south.png) with a scripted violet orb of light floating between
+    // her hands, four sparks orbiting it and three runes rising (the Day 4 violet of the magic circle), and a one-pixel
+    // breath. 8 frames, loop. Silhouette x28-68 y11-87 of the 96x96 frame. Authoring asset: no collider; placed in
+    // her cottage on Day 4 she becomes chapter4.cottage.witch (artifacts.interactions.ts: any "witch..." asset there).
+    id: "witch-conjuring-front",
+    label: "Witch facing us, conjuring a light (Day 4)",
+    category: "people",
+    sprite: {
+      frames: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => `/game/npcs/witch-conjuring-front/idle/${i}.png`),
+      frameWidth: 96,
+      frameHeight: 96,
+      fps: 5,
+      loop: true,
+    },
+    anchor: { x: 0.5, y: 0.906 },
+    headHeight: 75,
+    defaultScale: 1,
+  },
+  {
     // Witch's black cat, sitting. An asset of its own, independent of Witch:
     // it can be placed next to her, alone or elsewhere. Drawn facing screen-
     // right; use flipX on the instance to make it face left (the anchor is the

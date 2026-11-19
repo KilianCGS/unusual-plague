@@ -86,7 +86,7 @@ export const forestOccluders: OcclusionShape[] = [
 // TRANSITIONS (yellow): activation zones. No destination yet.
 export const forestTransitions: (LogicalRect & { id: string })[] = [
   { id: "forest-transition-1", x: 1391, y: 588, width: 35, height: 115 },
-  { id: "forest-transition-2", x: 648, y: 1060, width: 201, height: 45 },
+  { id: "forest-transition-2", x: 648, y: 1058, width: 201, height: 45 },
   { id: "forest-transition-3", x: 1314, y: 512, width: 48, height: 141 },
   { id: "forest-transition-4", x: 0, y: 465, width: 48, height: 111 },
 ];
