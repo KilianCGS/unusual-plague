@@ -557,3 +557,35 @@ Marca lo que cambiar. Origen entre corchetes.
 ### Pantalla de título, partida guardada [i18n/saveCopy.ts]
 - Botones: «Continuar», «Partida». Panel: «Partida guardada», «Copiar partida», «Cargar texto pegado», «Cerrar».
 - Mensajes: «Partida copiada. Pégala donde quieras guardarla.» / «Partida cargada. Pulsa «Continuar».» / «Ese texto no es una partida válida.» / «Aún no hay partida guardada: se guarda al empezar el día 2.»
+
+---
+
+## 19 nov: final del día 4 (todo NUEVO, pendiente de revisión)
+
+Origen: `src/game/dialogue/chapter4Dialogues.ts` y `src/game/ui/EndCard.tsx` (EN en los mismos archivos).
+
+### Puerta cerrada hasta hablar con la Bruja de fuera (si pisa la puerta)
+- Bruja: «Aquí, Doctor. Primero tú y yo; la puerta no se abre sola.» / "Here, Doctor. You and I first; the door won't open by itself."
+
+### Bruja fuera de la casita (de frente, conjurando), con la pluma
+1. Bruja: «Has llegado. ¿Llevas la pluma? Bien. Toda la noche te ha rozado y no te ha prendido.»
+2. Doctor: «Todo el pueblo mirando una luz, y yo aquí, mirándote a ti. No entiendo por qué a mí no me llama.»
+3. Bruja: «La pluma es de cuervo y mi hechizo la acompaña: mientras las lleves encima, esa luz no sabrá hablarte. Entra en casa, que fuera la noche escucha.»
+4. Bruja: «Te espero dentro.»
+Sin la pluma: pensamiento del Doctor, «Me pidió que trajera la pluma. No la llevo encima.» (ya existía).
+
+### Conversación final, dentro (líneas añadidas hoy)
+- Doctor: «Los artefactos... los he visto por todas partes. Y a mí no me han atrapado.»
+- Bruja: «Te cubren la pluma y el hechizo. Pero no estás hecho de otra pasta, Doctor: ellos tampoco querían caer.»
+(El resto de la conversación es la anterior, sin cambios.)
+
+### Epílogo, tras el cierre y el negro
+1. «Esta peste no da fiebre ni deja marcas. No se huele, no se contagia por el aire: se contagia por los ojos.»
+2. «Se llevó primero las conversaciones, luego los oficios, y al final las miradas. Nadie la sufre como un mal.»
+3. «Y por eso es la más difícil de tratar: nadie quiere curarse de lo que cree que le hace compañía.»
+4. «El remedio no se bebe ni se unta. Se ofrece, de persona a persona, y cada cual decide si levanta la cabeza.»
+Después: «FIN» / «Gracias por jugar.»
+
+### Decisiones abiertas que dejé yo (cámbialas si no te gustan)
+- La pluma y el hechizo protegen al Doctor: la explicación es mínima a propósito («ya inventaremos algo»).
+- La puerta de la casita se abre en cuanto ella ha hablado fuera; si entra sin hablarle, la de dentro habla igual.
