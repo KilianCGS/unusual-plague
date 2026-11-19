@@ -511,7 +511,7 @@ export const NEW_WORLD_SCENES: Record<
       exit(
         "to-outskirts",
         forestTransitions,
-        "forest-transition-3",
+        "forest-transition-4",
         "outskirts",
         "from-forest",
       ),
@@ -527,7 +527,7 @@ export const NEW_WORLD_SCENES: Record<
       exit(
         "to-forest-glade",
         forestTransitions,
-        "forest-transition-1",
+        "forest-transition-3",
         "forest-glade",
         "from-forest",
       ),
@@ -535,9 +535,9 @@ export const NEW_WORLD_SCENES: Record<
     arrivals: {
       // The spawns keep Kilian's exact positions; the arrival faces INTO the
       // forest (his spawns were exported facing south).
-      "from-outskirts": { ...spawnAt(forestSpawns, "forest-spawn-1"), direction: "east" },
+      "from-outskirts": { ...spawnAt(forestSpawns, "forest-spawn-2"), direction: "east" },
       // The east spawn is ready for the glade's return trip.
-      "from-forest-glade": { ...spawnAt(forestSpawns, "forest-spawn-2"), direction: "west" },
+      "from-forest-glade": { ...spawnAt(forestSpawns, "forest-spawn-1"), direction: "west" },
       "from-forest-cottage": { ...spawnAt(forestSpawns, "forest-spawn-3"), direction: "north" },
     },
   },

@@ -21,6 +21,7 @@ import type {
 } from "../../../game/collision";
 import type { OcclusionShape } from "../../../game/occlusion";
 import { getSceneInteractionZones } from "../../../game/interactions/sceneInteractions";
+import { SHAPE_KINDS, transformScene, type ShapeKind } from "./transform";
 import { ENVIRONMENT_INTERACTIONS, STORY_ZONE_INTERACTIONS } from "../../../game/interactions/environmentCatalog";
 import {
   doctorRoomRedesignColliders,
@@ -750,6 +751,8 @@ function SceneGeometryEditor({
   const [shape, setShape] = useState<Shape>("rect");
   const [draftPoints, setDraftPoints] = useState<Point[]>([]);
   // index -1 on a depth shape is its depth line.
+  // Dragging the BODY of the selected shape (select mode): where the pointer last was (2026-11-18).
+  const [bodyDrag, setBodyDrag] = useState<Point | null>(null);
   const [vertexDrag, setVertexDrag] = useState<{
     kind: "polygon" | "occluder" | "stepzone";
     editorId: string;
@@ -759,6 +762,35 @@ function SceneGeometryEditor({
   const [history, setHistory] = useState<Selection[]>([]);
   const [cursor, setCursor] = useState<Point | null>(null);
   const [copyStatus, setCopyStatus] = useState("");
+  // MOVE SHAPES (2026-11-18): shift / scale everything drawn in this scene (optionally inside a box).
+  const [moveForm, setMoveForm] = useState({ dx: "0", dy: "0", sx: "1", sy: "1", x1: "", y1: "", x2: "", y2: "" });
+  const [moveKinds, setMoveKinds] = useState<ReadonlySet<ShapeKind>>(new Set(SHAPE_KINDS));
+  const [moveUndo, setMoveUndo] = useState<{ sceneId: string; data: SceneData }[]>([]);
+  const [moveStatus, setMoveStatus] = useState("");
+  const moveRegion = (() => {
+    const [x1, y1, x2, y2] = [moveForm.x1, moveForm.y1, moveForm.x2, moveForm.y2].map((v) => Number(v));
+    const filled = [moveForm.x1, moveForm.y1, moveForm.x2, moveForm.y2].every((v) => v.trim() !== "");
+    return filled && [x1, y1, x2, y2].every(Number.isFinite) && x2 > x1 && y2 > y1 ? { x1, y1, x2, y2 } : null;
+  })();
+  const applyMove = () => {
+    const num = (v: string, fallback: number) => (v.trim() !== "" && Number.isFinite(Number(v)) ? Number(v) : fallback);
+    const options = {
+      dx: num(moveForm.dx, 0), dy: num(moveForm.dy, 0), sx: num(moveForm.sx, 1), sy: num(moveForm.sy, 1),
+      kinds: moveKinds, region: moveRegion,
+    };
+    if (options.sx <= 0 || options.sy <= 0) { setMoveStatus("Scale must be above 0."); return; }
+    setMoveUndo((previous) => [...previous, { sceneId: scene.id, data }]);
+    onDataChange((previous) => transformScene(previous, options));
+    setMoveStatus(`Moved (${options.dx}, ${options.dy}) ×(${options.sx}, ${options.sy})${moveRegion ? " inside the box" : ""}.`);
+  };
+  const undoMove = () => {
+    const last = moveUndo[moveUndo.length - 1];
+    // a move is only undone on the scene it was made on
+    if (!last || last.sceneId !== scene.id) return;
+    setMoveUndo((previous) => previous.slice(0, -1));
+    onDataChange(() => last.data);
+    setMoveStatus("Move undone.");
+  };
   const { colliders, transitions, spawns, interactions, polygons, occluders, stepZones } =
     data;
 
@@ -964,6 +996,23 @@ function SceneGeometryEditor({
     removeItem,
   ]);
 
+  // Arrow keys nudge the selected shape by 1 unit (10 with Shift). Re-bound every render so it always sees the
+  // latest data.
+  useEffect(() => {
+    function handleArrows(event: KeyboardEvent) {
+      const step = event.shiftKey ? 10 : 1;
+      const delta: Record<string, [number, number]> = {
+        ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step],
+      };
+      const move = delta[event.key];
+      if (!move || !selection || isTypingTarget(event.target) || event.ctrlKey || event.metaKey) return;
+      event.preventDefault();
+      translateSelection(selection, move[0], move[1]);
+    }
+    window.addEventListener("keydown", handleArrows);
+    return () => window.removeEventListener("keydown", handleArrows);
+  });
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
@@ -1026,6 +1075,29 @@ function SceneGeometryEditor({
       layer.getBoundingClientRect(),
       world,
     );
+  }
+
+  // Moves one shape by (dx, dy) world units: any kind, depth lines included.
+  function translateSelection(target: Selection, dx: number, dy: number) {
+    if (dx === 0 && dy === 0) return;
+    const sameId = (item: { editorId: string }) => item.editorId === target.editorId;
+    const shiftRect = <T extends Rect>(item: T): T => ({ ...item, x: item.x + dx, y: item.y + dy });
+    const shiftPoly = <T extends EditorPolygon>(item: T): T => ({
+      ...item,
+      points: item.points.map((p) => ({ x: p.x + dx, y: p.y + dy })),
+      ...("depthY" in item && typeof item.depthY === "number" ? { depthY: item.depthY + dy } : {}),
+    });
+    onDataChange((previous) => {
+      switch (target.kind) {
+        case "collider": return { ...previous, colliders: previous.colliders.map((i) => (sameId(i) ? shiftRect(i) : i)) };
+        case "transition": return { ...previous, transitions: previous.transitions.map((i) => (sameId(i) ? shiftRect(i) : i)) };
+        case "interaction": return { ...previous, interactions: previous.interactions.map((i) => (sameId(i) ? shiftRect(i) : i)) };
+        case "spawn": return { ...previous, spawns: previous.spawns.map((i) => (sameId(i) ? { ...i, x: i.x + dx, y: i.y + dy } : i)) };
+        case "polygon": return { ...previous, polygons: previous.polygons.map((i) => (sameId(i) ? shiftPoly(i) : i)) };
+        case "occluder": return { ...previous, occluders: previous.occluders.map((i) => (sameId(i) ? shiftPoly(i) : i)) };
+        case "stepzone": return { ...previous, stepZones: previous.stepZones.map((i) => (sameId(i) ? shiftPoly(i) : i)) };
+      }
+    });
   }
 
   // Every item under a point, smallest first (any kind).
@@ -1140,12 +1212,28 @@ function SceneGeometryEditor({
     event.currentTarget.setPointerCapture(event.pointerId);
     const point = toWorld(event);
     setDrag({ start: point, current: point });
+    // Select mode, pressing on the shape that is already selected: dragging moves it (a plain click still
+    // cycles the selection, see handlePointerUp).
+    if (
+      mode === "select" &&
+      selection &&
+      pickAll(point).some((hit) => hit.kind === selection.kind && hit.editorId === selection.editorId)
+    ) {
+      setBodyDrag(point);
+    }
   }
 
   function handlePointerMove(event: ReactPointerEvent<HTMLDivElement>) {
     const point = toWorld(event);
 
     setCursor(point);
+
+    if (bodyDrag && selection) {
+      translateSelection(selection, point.x - bodyDrag.x, point.y - bodyDrag.y);
+      setBodyDrag(point);
+      setDrag((current) => (current ? { ...current, current: point } : current));
+      return;
+    }
 
     if (vertexDrag) {
       const moveVertex = <T extends EditorPolygon>(item: T): T =>
@@ -1182,6 +1270,8 @@ function SceneGeometryEditor({
       setVertexDrag(null);
       return;
     }
+
+    if (bodyDrag) setBodyDrag(null);
 
     if (!drag) {
       return;
@@ -1638,6 +1728,15 @@ function SceneGeometryEditor({
                 />
               </div>
             ))}
+            {moveRegion ? (
+              <div
+                style={{
+                  position: "absolute", left: moveRegion.x1, top: moveRegion.y1,
+                  width: moveRegion.x2 - moveRegion.x1, height: moveRegion.y2 - moveRegion.y1,
+                  border: "2px dashed #fff", background: "rgba(255,255,255,0.08)", pointerEvents: "none",
+                }}
+              />
+            ) : null}
             {previewRect ? (
               <div
                 className={styles.preview}
@@ -1799,7 +1898,7 @@ function SceneGeometryEditor({
           {mode === "spawn"
             ? "Click once to place the exact point where the feet will appear. The facing is the initial idle direction: arriving from the left → east, right → west, top → south, bottom → north."
             : mode === "select"
-              ? "Nothing is drawn in this mode: click an item on the map to select it (click the same spot again to cycle through stacked items, click empty floor to deselect), then press Delete or use the delete button. Colliders, free shapes, depth shapes, transitions, interactions and spawns can all be picked."
+              ? "Nothing is drawn in this mode: click an item on the map to select it (click the same spot again to cycle through stacked items, click empty floor to deselect), then press Delete or use the delete button. Colliders, free shapes, depth shapes, transitions, interactions and spawns can all be picked. Once selected, DRAG the shape to move it (a depth shape carries its depth line along), or use the arrow keys (1 unit, Shift = 10). Vertices of a selected free shape can still be dragged one by one."
               : mode === "stepzone"
               ? "Click points to outline the STONE path inside a scene whose floor is earth (the river bank before the forest, the mountain path). Inside it the Doctor's steps sound like stone; everywhere else as usual. Click the first point (or Enter) to close the shape. Export the scene and paste it into src/game/audio/stepZones.ts."
               : mode === "occluder"
@@ -1838,6 +1937,49 @@ function SceneGeometryEditor({
             spawns {spawns.length} · interactions {interactions.length}
           </div>
         </div>
+        <details className={styles.form}>
+          <summary className={styles.formTitle}>↔ Move / scale shapes</summary>
+          {(
+            [["dx", "Shift X"], ["dy", "Shift Y"], ["sx", "Scale X"], ["sy", "Scale Y"]] as const
+          ).map(([key, label]) => (
+            <label key={key} className={styles.formRow}>
+              {label}
+              <input value={moveForm[key]} onChange={(e) => setMoveForm({ ...moveForm, [key]: e.target.value })} />
+            </label>
+          ))}
+          <div className={styles.formTitle}>Only inside a box (empty = everything)</div>
+          {(
+            [["x1", "From X"], ["y1", "From Y"], ["x2", "To X"], ["y2", "To Y"]] as const
+          ).map(([key, label]) => (
+            <label key={key} className={styles.formRow}>
+              {label}
+              <input value={moveForm[key]} onChange={(e) => setMoveForm({ ...moveForm, [key]: e.target.value })} />
+            </label>
+          ))}
+          <div className={styles.formTitle}>What to move</div>
+          {SHAPE_KINDS.map((kind) => (
+            <label key={kind} className={styles.formRow}>
+              {kind}
+              <input
+                type="checkbox"
+                checked={moveKinds.has(kind)}
+                onChange={() => {
+                  const next = new Set(moveKinds);
+                  if (next.has(kind)) next.delete(kind); else next.add(kind);
+                  setMoveKinds(next);
+                }}
+              />
+            </label>
+          ))}
+          <div className={styles.formRow}>
+            <button type="button" className={styles.modeButton} onClick={applyMove}>Apply</button>
+            <button type="button" className={styles.modeButton} onClick={undoMove} disabled={moveUndo[moveUndo.length - 1]?.sceneId !== scene.id}>Undo move</button>
+          </div>
+          <div className={styles.hint}>
+            Scale is about the scene corner (0,0), then the shift. A box is drawn on the canvas while its four numbers are filled; a shape
+            moves when its centre is inside it. {moveStatus}
+          </div>
+        </details>
         <ListSection
           title="Colliders"
           kind="collider"
