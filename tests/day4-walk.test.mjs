@@ -75,8 +75,15 @@ function walker(sceneId, arrival) {
   assert.ok(spawn, `${sceneId} has arrival ${arrival}`);
   const cols = Math.floor(world.width / STEP) + 1, rows = Math.floor(world.height / STEP) + 1;
   const seen = new Uint8Array(cols * rows);
-  const sx = Math.round(spawn.x / STEP), sy = Math.round(spawn.y / STEP);
-  assert.ok(free(sx * STEP, sy * STEP), `${sceneId}.${arrival} is a free spot`);
+  let sx = Math.round(spawn.x / STEP), sy = Math.round(spawn.y / STEP);
+  if (!free(sx * STEP, sy * STEP)) {
+    // like the game's own check: the nearest free spot within 16 units (Day 4: the barrier at the Botica street door overlaps the arrival by ~10)
+    let found = false;
+    for (let r = 1; r <= 8 && !found; r++) for (let dx = -r; dx <= r && !found; dx++) for (let dy = -r; dy <= r && !found; dy++) {
+      if (free((sx + dx) * STEP, (sy + dy) * STEP)) { sx += dx; sy += dy; found = true; }
+    }
+    assert.ok(found, `${sceneId}.${arrival} is a free spot (or next to one)`);
+  }
   const stack = [sy * cols + sx];
   seen[sy * cols + sx] = 1;
   while (stack.length) {
@@ -116,6 +123,49 @@ test("Day 4, inside the cottage: from the door the Doctor reaches the seated Wit
   assert.ok(seated, "the seated Witch has a zone");
   assert.ok(w.touches(w.decor.zones.find((z) => z.id === seated[0])), "he can reach her");
   assert.equal(w.scene.exits.length, 0);
+});
+
+test("Day 4: every absorbed villager can be reached on foot from some arrival of their scene (night geometry and Day 4 blockers)", () => {
+  const interactions = getChapterInteractions("chapter-4");
+  const unreachable = [];
+  let people = 0;
+  for (const sceneId of Object.keys(WORLD_SCENES)) {
+    const instances = (getComposition(sceneId, "chapter-4")?.instances ?? []).filter((i) => interactions[i.instanceId]?.interactionId.startsWith("chapter4.artifact."));
+    if (!instances.length) continue;
+    const arrivals = Object.keys(sceneForChapter(WORLD_SCENES[sceneId], NIGHT_CHAPTER_ID).arrivals);
+    const walks = arrivals.map((name) => walker(sceneId, name));
+    for (const instance of instances) {
+      people += 1;
+      const found = walks.some((w) => {
+        const id = [...w.decor.zoneInstanceIds].find(([, inst]) => inst === instance.instanceId)?.[0];
+        return id && w.touches(w.decor.zones.find((z) => z.id === id));
+      });
+      if (!found) unreachable.push(`${sceneId}:${instance.instanceId}`);
+    }
+  }
+  assert.ok(people >= 12, `the villagers are placed (${people})`);
+  assert.deepEqual(unreachable, []);
+});
+
+test("Day 4: from the Botica street, with Day 4's blockers in place, the Doctor can still walk all the way to the Witch's cottage", () => {
+  const seenNodes = new Set();
+  const queue = [["apothecary-street", "from-apothecary-interior"]];
+  let reachedCottage = false;
+  while (queue.length) {
+    const [sceneId, arrival] = queue.shift();
+    const key = `${sceneId}|${arrival}`;
+    if (seenNodes.has(key)) continue;
+    seenNodes.add(key);
+    if (sceneId === "forest-cottage") { reachedCottage = true; continue; }
+    const scene = WORLD_SCENES[sceneId];
+    if (!scene || scene.kind !== "exterior" || !WORLD_SCENES[sceneId].arrivals[arrival]) continue;
+    let w;
+    try { w = walker(sceneId, arrival); } catch { continue; }
+    for (const exit of w.scene.exits) {
+      if (w.touches(exit.zone)) queue.push([exit.targetScene, exit.targetSpawn]);
+    }
+  }
+  assert.ok(reachedCottage, `the cottage is reachable (visited: ${[...seenNodes].join(", ")})`);
 });
 
 console.log(`

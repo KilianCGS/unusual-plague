@@ -67,11 +67,14 @@ test("every pose with an artifact has its own two Doctor thoughts, in both langu
     const b = resolveStoryInteraction(id, facts(), "es", "p");
     assert.deepEqual(a.conversation.lines, b.conversation.lines);
     assert.equal(a.conversation.id, `chapter4.artifact.${slug}`);
-    assert.equal(a.conversation.lines.length, 2);
+    // greeting (spoken) + silence (thought) + their own two thoughts (2026-11-19)
+    assert.equal(a.conversation.lines.length, 4);
+    assert.ok(!/^\(/.test(a.conversation.lines[0].text), "he greets out loud");
+    assert.ok(a.conversation.lines.slice(1).every((l) => /^\(.+\)$/.test(l.text)), "the rest is what he thinks");
   }
   assert.equal(new Set(Object.values(c4.ARTIFACT_PERSON_THOUGHTS).map((l) => l[0].text.es)).size, 12, "twelve different kinds of person, twelve different thoughts");
   // an unknown pose still gets a generic thought
-  assert.equal(resolveStoryInteraction("chapter4.artifact.somebodyNew", facts(), "en", "p").conversation.lines.length, 1);
+  assert.equal(resolveStoryInteraction("chapter4.artifact.somebodyNew", facts(), "en", "p").conversation.lines.length, 3);
 });
 
 test("the people who are awake have night lines, and Day 4 has an interaction table of its own", () => {

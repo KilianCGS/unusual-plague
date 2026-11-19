@@ -63,7 +63,7 @@ import { createSave, writeSave } from "../save/saveGame";
 import { TOOLS_NOTICED_ID, day3OpeningCopy, toolsNoticeCopy } from "../dialogue/toolsRenewal";
 import { APOTHECARY_NIGHT_BACKGROUND, NIGHT_CHAPTER_ID, sceneForChapter } from "./nightScenes";
 import { EndCard } from "../ui/EndCard";
-import { DAY4_COMPLETED_ID, DAY4_COTTAGE_DOOR_TARGET, DAY4_COTTAGE_SCENE, WITCH_FINAL_ID, WITCH_OUTSIDE_ID, WITCH_OUTSIDE_INSTANCE_ID, day4Closing, getDay4HiddenInstanceIds, witchDoorCall } from "../dialogue/chapter4Dialogues";
+import { DAY4_COMPLETED_ID, DAY4_WAKE_ID, day4Wake, DAY4_COTTAGE_DOOR_TARGET, DAY4_COTTAGE_SCENE, WITCH_FINAL_ID, WITCH_OUTSIDE_ID, WITCH_OUTSIDE_INSTANCE_ID, day4Closing, getDay4HiddenInstanceIds, witchDoorCall } from "../dialogue/chapter4Dialogues";
 import { DAY2_COMPLETED_ID } from "../patients/day2";
 import { DAY3_COMPLETED_ID } from "../patients/day3";
 import { messengerOpening } from "../dialogue/chapter2OpeningDialogues";
@@ -1436,6 +1436,17 @@ export function GameWorld({
   ]);
 
   // What the story keeps out of the world (the woman, once she has left).
+  // Day 4 (2026-11-19): he wakes puzzled by a light and a noise (once, in the Doctor's room).
+  useEffect(() => {
+    if (chapterId !== "chapter-4" || world.sceneId !== "doctor-room" || !isPlaying) return;
+    if (phaseRef.current !== "playing" || afterDialogueRef.current !== null || claimedRewardsRef.current.has(DAY4_WAKE_ID)) return;
+    const id = window.setTimeout(() => {
+      claimFlag(DAY4_WAKE_ID);
+      startDialogue(localizeConversation(day4Wake, language, DOCTOR_SPEAKER));
+    }, 900);
+    return () => window.clearTimeout(id);
+  }, [chapterId, world.sceneId, isPlaying, claimFlag, startDialogue, language]);
+
   // Day 4 (2026-11-19): the Witch outside her cottage leaves once she has asked him in (a fade, see below).
   const [day4WitchGone, setDay4WitchGone] = useState(false);
   const narrativeHiddenInstanceIds = useMemo(

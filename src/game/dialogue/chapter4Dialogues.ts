@@ -25,6 +25,36 @@ const witch = (es: string, en: string): LocalizedLine => ({ speaker: "subject", 
 const doctor = (es: string, en: string): LocalizedLine => ({ speaker: "doctor", text: { es, en } });
 const talk = (id: string, lines: LocalizedLine[]): LocalizedConversation => ({ id: `chapter4.${id}`, lines });
 
+// 2026-11-19 (Kilian): Day 4 begins with the Doctor waking up puzzled by a light and a noise, and every talk with a
+// villager goes the same way: he greets them, gets NO answer, sees them absorbed in the artifact and "diagnoses" them,
+// strangely and surprised. NEW TEXT (ES/EN), awaiting Kilian's review.
+export const DAY4_WAKE_ID = "chapter4.day4.wake";
+export const day4Wake: LocalizedConversation = talk("day4.wake", [
+  doctorThought("Me despierto sin saber por qué. Hay una luz azulada en la ventana y un zumbido que no sé de dónde viene.", "I wake without knowing why. There's a bluish light at the window and a hum I can't place."),
+  doctorThought("No es el viento, ni la luna, ni las velas. Es otra cosa. Y la noche está demasiado callada para tener un ruido así.", "It isn't the wind, the moon or the candles. It's something else. And the night is too quiet to have a sound like that."),
+  doctorThought("Cojo la bolsa y salgo a ver qué ocurre ahí fuera.", "I take my bag and go out to see what's happening."),
+]);
+
+// The greeting he tries and the silence he gets back, picked by who it is (always the same for the same person).
+const GREETINGS: LocalizedLine[] = [
+  doctor("Buenas noches. ¿Se encuentra bien?", "Good evening. Are you all right?"),
+  doctor("Perdone la hora. ¿Puedo ayudarle en algo?", "Forgive the hour. Can I help you with anything?"),
+  doctor("¿Me oye? Soy el Doctor.", "Can you hear me? It's the Doctor."),
+  doctor("Disculpe... ¿qué ha pasado aquí?", "Excuse me... what has happened here?"),
+];
+const SILENCES: LocalizedLine[] = [
+  doctorThought("No responde. Ni siquiera parpadea.", "No answer. Not even a blink."),
+  doctorThought("Nada. Es como si yo no estuviera.", "Nothing. As if I weren't here."),
+  doctorThought("Ni una palabra, ni un gesto. Solo esa luz en sus ojos.", "Not a word, not a gesture. Only that light in their eyes."),
+  doctorThought("Me mira sin verme. Está en otra parte.", "They look at me without seeing me. They're somewhere else."),
+];
+
+function absorbed(interactionId: string, own: LocalizedLine[]): LocalizedLine[] {
+  let hash = 0;
+  for (const char of interactionId) hash = (hash * 31 + char.charCodeAt(0)) % 997;
+  return [GREETINGS[hash % GREETINGS.length], SILENCES[(hash >> 1) % SILENCES.length], ...own];
+}
+
 // What the Doctor thinks when someone absorbed in an artifact does not look up.
 export const ARTIFACT_THOUGHTS: LocalizedLine[] = [
   doctorThought("No ha levantado la vista. Ni siquiera para saludar.", "She hasn't looked up. Not even to say hello."),
@@ -179,12 +209,12 @@ export function resolveChapter4(
     // Their own two thoughts when the pose has them (the same person always gets the same ones).
     const slug = interactionId.slice(ARTIFACT_PERSON_PREFIX.length);
     const own = ARTIFACT_PERSON_THOUGHTS[slug];
-    if (own) return { conversation: local(talk(`artifact.${slug}`, own)), effects: [] };
+    if (own) return { conversation: local(talk(`artifact.${slug}`, absorbed(interactionId, own))), effects: [] };
     // Otherwise a fixed generic thought per person.
     let hash = 0;
     for (const char of interactionId) hash = (hash * 31 + char.charCodeAt(0)) % 997;
     const index = hash % ARTIFACT_THOUGHTS.length;
-    return { conversation: local(talk(`artifact.${index}`, [ARTIFACT_THOUGHTS[index]])), effects: [] };
+    return { conversation: local(talk(`artifact.${index}`, absorbed(interactionId, [ARTIFACT_THOUGHTS[index]]))), effects: [] };
   }
 
   return null;

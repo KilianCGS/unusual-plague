@@ -140,8 +140,9 @@ test("the Witch's last conversation needs the feather (which is not spent) and h
   const b = talk("chapter4.artifact.baker", facts([]));
   assert.equal(a.conversation.id, b.conversation.id);
   assert.deepEqual(a.effects, []);
-  assert.equal(a.conversation.lines.length, 2, "her own two thoughts (2026-11-17)");
-  for (const line of a.conversation.lines) assert.match(line.text, /^\(.+\)$/);
+  assert.equal(a.conversation.lines.length, 4, "greeting + silence + her own two thoughts (2026-11-19)");
+  assert.doesNotMatch(a.conversation.lines[0].text, /^\(/, "he greets out loud");
+  for (const line of a.conversation.lines.slice(1)) assert.match(line.text, /^\(.+\)$/);
 });
 
 test("the errands panel shows 'see the Witch' on Day 4 and ticks it when she has spoken", () => {

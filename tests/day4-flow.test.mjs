@@ -98,5 +98,20 @@ test("the end card shows the epilogue about the artifacts before the end, in bot
   assert.ok(en.indexOf("nobody wants to be cured") !== -1 && en.indexOf("nobody wants to be cured") < en.indexOf("The end"));
 });
 
+test("Day 4 begins with the Doctor puzzled by a light and a noise, and every villager answers with silence", () => {
+  assert.ok(c4.day4Wake.lines.length >= 3);
+  assert.ok(c4.day4Wake.lines.every((l) => /^\(.+\)$/.test(l.text.es) && /^\(.+\)$/.test(l.text.en)), "all thoughts, ES and EN");
+  assert.ok(c4.day4Wake.lines.some((l) => /luz/.test(l.text.es)) && c4.day4Wake.lines.some((l) => /zumbido|ruido/.test(l.text.es)));
+  const game = fs.readFileSync(path.join(root, "src/game/world/GameWorld.tsx"), "utf8");
+  assert.ok(game.includes("DAY4_WAKE_ID") && game.includes('world.sceneId !== "doctor-room"'));
+  for (const slug of ["baker", "child", "fainted", "somebody"]) {
+    const out = talk(`chapter4.artifact.${slug}`, facts([]));
+    const [greet, silence] = out.conversation.lines;
+    assert.doesNotMatch(greet.text, /^\(/);
+    assert.match(silence.text, /^\(.+\)$/);
+    assert.deepEqual(out.effects, []);
+  }
+});
+
 console.log(`
 ${passed} tests passed`);
