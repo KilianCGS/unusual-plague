@@ -45,7 +45,33 @@ export const artifactsCompositions: DecorComposition[] = [
         "flipX": false,
         "colliderEnabled": true,
         "zOffset": 0
+      },
+      {
+        // 2026-11-19: the Witch OUTSIDE her cottage, facing us, conjuring. She asks him to come in and then leaves
+        // (see chapter4Dialogues.ts: WITCH_OUTSIDE_*).
+        "instanceId": "forest-cottage-witch-conjuring-front-01",
+        "assetId": "witch-conjuring-front",
+        "x": 659,
+        "y": 748,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
       }
+    ]
+  },
+  {
+    // 2026-11-19: INSIDE the cottage: the Witch seated, her cat and her ravens. The last conversation happens here.
+    "sceneId": "forest-cottage-interior",
+    "chapterId": "artifacts",
+    "instances": [
+      { "instanceId": "forest-cottage-interior-witch-crow-pecking-01", "assetId": "witch-crow-pecking", "x": 375, "y": 48, "scale": 1, "flipX": false, "colliderEnabled": false, "zOffset": 0 },
+      { "instanceId": "forest-cottage-interior-witch-crow-cawing-01", "assetId": "witch-crow-cawing", "x": 77, "y": 51, "scale": 1, "flipX": false, "colliderEnabled": false, "zOffset": 0 },
+      { "instanceId": "forest-cottage-interior-witch-crow-head-tilt-01", "assetId": "witch-crow-head-tilt", "x": 451, "y": 142, "scale": 1, "flipX": true, "colliderEnabled": false, "zOffset": 0 },
+      { "instanceId": "forest-cottage-interior-fireflies-01", "assetId": "fireflies", "x": 442, "y": 227, "scale": 1, "flipX": false, "colliderEnabled": false, "zOffset": 0 },
+      { "instanceId": "forest-cottage-interior-merchant-table-01", "assetId": "merchant-table", "x": 63, "y": 336, "scale": 1, "flipX": false, "colliderEnabled": true, "zOffset": 0 },
+      { "instanceId": "forest-cottage-interior-witch-tavern-sitting-01", "assetId": "witch-tavern-sitting", "x": 189, "y": 162, "scale": 1, "flipX": true, "colliderEnabled": false, "zOffset": 0 },
+      { "instanceId": "forest-cottage-interior-witch-cat-sitting-01", "assetId": "witch-cat-sitting", "x": 110, "y": 173, "scale": 0.89, "flipX": false, "colliderEnabled": false, "zOffset": 0 }
     ]
   }
 ];

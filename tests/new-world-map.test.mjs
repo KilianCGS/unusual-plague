@@ -145,8 +145,9 @@ test("every exit points to a real scene and a real arrival, and the way back exi
         target.arrivals[exit.targetSpawn],
         `${id}:${exit.name} -> ${exit.targetScene}.${exit.targetSpawn}`,
       );
+      // (the Witch's house is the end of the game: no way out of it, 2026-11-19)
       assert.ok(
-        target.exits.some((back) => back.targetScene === id),
+        target.id === "forest-cottage-interior" || target.exits.some((back) => back.targetScene === id),
         `${exit.targetScene} has no way back to ${id}`,
       );
     }
@@ -743,15 +744,11 @@ test("Forest <-> Forest Cottage <-> Forest Cottage Interior: wired both ways to 
     "from-forest-cottage",
   );
   assert.deepEqual(inside.arrivals["from-forest-cottage"], {
-    x: 256,
-    y: 307,
+    x: 258,
+    y: 320,
     direction: "south",
-  }); // forest-cottage-interior-spawn-1
-  assert.equal(exitTo(inside, "to-forest-cottage").zone.x, 224); // interior transition-1
-  assert.equal(
-    exitTo(inside, "to-forest-cottage").targetSpawn,
-    "from-forest-cottage-interior",
-  );
+  }); // forest-cottage-interior-spawn-1 (redrawn 2026-11-19)
+  assert.equal(exitTo(inside, "to-forest-cottage"), undefined, "the game ends inside: no way out (2026-11-19)");
   assert.deepEqual(cottage.arrivals["from-forest-cottage-interior"], {
     x: 353,
     y: 597,
@@ -759,8 +756,8 @@ test("Forest <-> Forest Cottage <-> Forest Cottage Interior: wired both ways to 
   }); // forest-cottage-spawn-2
 
   assert.equal(cottage.colliders.length, 25);
-  assert.equal(inside.colliders.length, 11);
-  assert.equal(inside.exits.length, 1);
+  assert.equal(inside.colliders.length, 10);
+  assert.equal(inside.exits.length, 0);
   assert.deepEqual(
     getComposition("forest-cottage-interior", "chapter-1").instances.map(i=>i.assetId),
     Array(4).fill("candle-flame"),

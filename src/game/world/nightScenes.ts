@@ -1,4 +1,9 @@
 import type { WorldScene } from "./worldScenes";
+import {
+  forestCottageNightColliders,
+  forestCottageNightSpawns,
+  forestCottageNightTransitions,
+} from "../new-world-map/geometry/forestCottageNightGeometry";
 
 // DAY 4 IS AT NIGHT (2026-11-12). In chapter-4 each exterior scene is drawn with its
 // night painting when there is one (ChatGPT's six, lined up on the day images by
@@ -61,7 +66,7 @@ export function sceneForChapter(scene: WorldScene, chapterId: string): WorldScen
   const painting = NIGHT_BACKGROUNDS[scene.id];
 
   if (painting) {
-    return { ...scene, visual: { ...scene.visual, backgroundSrc: painting } };
+    return withNightGeometry({ ...scene, visual: { ...scene.visual, backgroundSrc: painting } });
   }
 
   // Only the OUTDOOR scenes without a painting are graded: the interiors keep their own
@@ -69,6 +74,24 @@ export function sceneForChapter(scene: WorldScene, chapterId: string): WorldScen
   if (!NIGHT_GRADED_OUTDOORS.includes(scene.id)) return scene;
 
   return { ...scene, visual: { ...scene.visual, backgroundFilter: NIGHT_GRADE } };
+}
+
+// The scenes whose NIGHT painting is laid out differently from the day one carry geometry of their own (2026-11-19).
+// The Witch's cottage: its colliders, the door of the house (the only exit) and the arrival from the forest. There is
+// no way back to the forest on Day 4: once he is at the cottage the path north is closed.
+function withNightGeometry(scene: WorldScene): WorldScene {
+  if (scene.id !== "forest-cottage") return scene;
+  const door = forestCottageNightTransitions.find((t) => t.id === "forest-cottage-night-transition-1");
+  const arrival = forestCottageNightSpawns.find((s) => s.id === "forest-cottage-night-spawn-1");
+  if (!door || !arrival) return scene;
+  return {
+    ...scene,
+    colliders: forestCottageNightColliders,
+    exits: scene.exits
+      .filter((exit) => exit.name !== "to-forest")
+      .map((exit) => (exit.name === "to-forest-cottage-interior" ? { ...exit, zone: { x: door.x, y: door.y, width: door.width, height: door.height } } : exit)),
+    arrivals: { ...scene.arrivals, "from-forest": { x: arrival.x, y: arrival.y, direction: arrival.direction } },
+  };
 }
 
 // The Botica is drawn by its own scene, not by the generic renderer: its night painting

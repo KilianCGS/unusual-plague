@@ -13,6 +13,11 @@ import type { StoryFacts, StoryOutcome } from "./storyInteractions";
 // artifact thoughts (ARTIFACT_THOUGHTS) are untouched on purpose.
 export const WITCH_FINAL_INTERACTION_ID = "chapter4.cottage.witch";
 export const WITCH_FINAL_ID = "chapter4.witch.final";
+// 2026-11-19 (Kilian): first she waits OUTSIDE the cottage (facing us, conjuring), says the feather and her spell have
+// kept the Doctor from the artifacts, asks him to come in, and disappears (a fade). The last conversation is inside.
+export const WITCH_OUTSIDE_INTERACTION_ID = "chapter4.cottage.witchOutside";
+export const WITCH_OUTSIDE_ID = "chapter4.witch.outside";
+export const WITCH_OUTSIDE_INSTANCE_ID = "forest-cottage-witch-conjuring-front-01";
 export const DAY4_COMPLETED_ID = "chapter4.day4.completed";
 export const ARTIFACT_PERSON_PREFIX = "chapter4.artifact.";
 
@@ -84,13 +89,30 @@ export const ARTIFACT_PERSON_THOUGHTS: Readonly<Record<string, LocalizedLine[]>>
   ],
 };
 
+// 2026-11-19: if he walks to the door before speaking to her, the way is shut and she calls him over.
+export const witchDoorCall: LocalizedConversation = talk("witch.doorCall", [
+  witch("Aquí, Doctor. Primero tú y yo; la puerta no se abre sola.", "Here, Doctor. You and I first; the door won't open by itself."),
+]);
+
+// The door of her house (Day 4, from the night scene of the cottage) stays shut until she has asked him in.
+export const DAY4_COTTAGE_SCENE = "forest-cottage";
+export const DAY4_COTTAGE_DOOR_TARGET = "forest-cottage-interior";
+
+const OUTSIDE_LINES: LocalizedLine[] = [
+  witch("Has llegado. ¿Llevas la pluma? Bien. Toda la noche te ha rozado y no te ha prendido.", "You've arrived. Do you have the feather? Good. The whole night has brushed against you and hasn't caught you."),
+  doctor("Todo el pueblo mirando una luz, y yo aquí, mirándote a ti. No entiendo por qué a mí no me llama.", "The whole village staring at a light, and here I am, looking at you. I don't understand why it doesn't call me."),
+  witch("La pluma es de cuervo y mi hechizo la acompaña: mientras las lleves encima, esa luz no sabrá hablarte. Entra en casa, que fuera la noche escucha.", "The feather is a raven's and my spell goes with it: as long as you carry them, that light won't know how to speak to you. Come inside; out here the night is listening."),
+  witch("Te espero dentro.", "I'll be waiting inside."),
+];
+
 const FINAL_LINES: LocalizedLine[] = [
   witch("Llegas. Con la pluma, espero. Y con cara de haber corrido la noche entera.", "You came. With the feather, I hope. And looking as if you'd run all night."),
   doctor("Aquí está, a salvo. ¿Vas a decirme ya para qué, o seguimos con el misterio?", "Here it is, safe and sound. Are you going to tell me now what it's for, or do we keep the mystery?"),
   witch("Es de cuervo. Los cuervos avisan cuando algo cambia de sitio.", "It's a raven's. Ravens warn you when something changes place."),
   doctor("¿Qué ha cambiado de sitio?", "What has changed place?"),
   witch("La atención. Antes se repartía entre las cosas. Ahora tiene dueño.", "Attention. It used to be shared among things. Now it has an owner."),
-  doctor("Los artefactos... los he visto por todas partes.", "The artifacts... I've seen them everywhere."),
+  doctor("Los artefactos... los he visto por todas partes. Y a mí no me han atrapado.", "The artifacts... I've seen them everywhere. And they haven't caught me."),
+  witch("Te cubren la pluma y el hechizo. Pero no estás hecho de otra pasta, Doctor: ellos tampoco querían caer.", "The feather and the spell cover you. But you're not made of different stuff, Doctor: they didn't want to fall either."),
   witch("Los llamas así porque no sabes cómo se llaman. Yo tampoco. Funcionan igual.", "You call them that because you don't know their name. Neither do I. They work all the same."),
   doctor("Entonces no son una enfermedad. Ni un castigo.", "Then they aren't a disease. Nor a punishment."),
   witch("Eso depende de quién los mire. Tú los miras como médico, y por eso me fío de ti.", "That depends on who's looking. You look at them as a doctor, and that's why I trust you."),
@@ -119,10 +141,25 @@ export const day4Closing: LocalizedConversation = {
   ],
 };
 
+// The instances Day 4 keeps out of the world: the Witch outside, once she has asked him in and the screen faded.
+export function getDay4HiddenInstanceIds(gone: boolean): ReadonlySet<string> {
+  return gone ? new Set([WITCH_OUTSIDE_INSTANCE_ID]) : new Set();
+}
+
 export function resolveChapter4(
   interactionId: string, facts: StoryFacts, language: Language, subjectId: string,
 ): StoryOutcome | null {
   const local = (conversation: LocalizedConversation) => localizeConversation(conversation, language, subjectId);
+
+  if (interactionId === WITCH_OUTSIDE_INTERACTION_ID) {
+    if (countItem(facts.inventory, "black-feather") < 1) {
+      return { conversation: local(talk("witch.outsideNoFeather", NO_FEATHER_LINES)), effects: [] };
+    }
+    return {
+      conversation: local(talk("witch.outside", OUTSIDE_LINES)),
+      effects: facts.claimedRewards?.has(WITCH_OUTSIDE_ID) ? [] : [{ type: "claim-reward", rewardId: WITCH_OUTSIDE_ID }],
+    };
+  }
 
   if (interactionId === WITCH_FINAL_INTERACTION_ID) {
     if (facts.claimedRewards?.has(WITCH_FINAL_ID)) {

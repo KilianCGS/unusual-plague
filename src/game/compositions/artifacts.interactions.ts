@@ -1,6 +1,6 @@
 import { getDecorAsset } from "../decor/decorAssets";
 import type { DecorComposition, DecorInteraction } from "../decor/decorTypes";
-import { ARTIFACT_PERSON_PREFIX, WITCH_FINAL_INTERACTION_ID } from "../dialogue/chapter4Dialogues";
+import { ARTIFACT_PERSON_PREFIX, WITCH_FINAL_INTERACTION_ID, WITCH_OUTSIDE_INTERACTION_ID } from "../dialogue/chapter4Dialogues";
 import { artifactsCompositions } from "./artifacts";
 import { chapter1Interactions } from "./chapter-1.interactions";
 
@@ -8,7 +8,8 @@ import { chapter1Interactions } from "./chapter-1.interactions";
 // errands, no treatments), so nobody types ids by hand: they come from WHAT is placed in the Decorator chapter
 // "artifacts" (which the game reads as chapter-4):
 //   * a person drawn with an artifact (asset "<base>-smartphone")  -> chapter4.artifact.<slug>  (thoughts of the Doctor)
-//   * the Witch inside her cottage (forest-cottage / -interior)    -> chapter4.cottage.witch    (the last scene)
+//   * the Witch OUTSIDE her cottage (forest-cottage)               -> chapter4.cottage.witchOutside (asks him in, then leaves)
+//   * the Witch INSIDE her cottage (forest-cottage-interior)       -> chapter4.cottage.witch    (the last scene)
 //   * the four people who are awake at night (fisherman, old man with the jug, bartender, farm woman), drawn as
 //     their normal asset in their scene -> their Day 2 id, which has a night version (chapter34AmbientDialogues.ts).
 // Reach follows the scaled sprite bounds plus 16 units, like the other days.
@@ -51,7 +52,8 @@ function interactionIdFor(sceneId: string, assetId: string): string | undefined 
     return `${ARTIFACT_PERSON_PREFIX}${ARTIFACT_SLUGS[base] ?? base}`;
   }
   if (WITCH_SCENES.includes(sceneId) && assetId.startsWith("witch") && !/cat|crow/.test(assetId)) {
-    return WITCH_FINAL_INTERACTION_ID;
+    // 2026-11-19: OUTSIDE (forest-cottage) she welcomes him and asks him in; INSIDE she has the last conversation.
+    return sceneId === "forest-cottage" ? WITCH_OUTSIDE_INTERACTION_ID : WITCH_FINAL_INTERACTION_ID;
   }
   return AWAKE[`${sceneId}|${assetId}`];
 }

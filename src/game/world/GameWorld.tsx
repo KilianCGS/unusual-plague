@@ -63,7 +63,7 @@ import { createSave, writeSave } from "../save/saveGame";
 import { TOOLS_NOTICED_ID, day3OpeningCopy, toolsNoticeCopy } from "../dialogue/toolsRenewal";
 import { APOTHECARY_NIGHT_BACKGROUND, NIGHT_CHAPTER_ID, sceneForChapter } from "./nightScenes";
 import { EndCard } from "../ui/EndCard";
-import { DAY4_COMPLETED_ID, WITCH_FINAL_ID, day4Closing } from "../dialogue/chapter4Dialogues";
+import { DAY4_COMPLETED_ID, DAY4_COTTAGE_DOOR_TARGET, DAY4_COTTAGE_SCENE, WITCH_FINAL_ID, WITCH_OUTSIDE_ID, WITCH_OUTSIDE_INSTANCE_ID, day4Closing, getDay4HiddenInstanceIds, witchDoorCall } from "../dialogue/chapter4Dialogues";
 import { DAY2_COMPLETED_ID } from "../patients/day2";
 import { DAY3_COMPLETED_ID } from "../patients/day3";
 import { messengerOpening } from "../dialogue/chapter2OpeningDialogues";
@@ -1007,6 +1007,7 @@ export function GameWorld({
     );
   }, [chapterId, autosave, knownRecipeIds, collected]);
 
+  const witchCallUntilRef = useRef(0);
   const handleExit = useCallback(
     (exitName: string) => {
       const exit = WORLD_SCENES[world.sceneId].exits.find(
@@ -1019,6 +1020,21 @@ export function GameWorld({
           const lines = tutorialExitBlockedCopy[language];
           const text = lines[Math.floor(Math.random() * lines.length)];
           setPickupBark((current) => ({ id: (current?.id ?? 0) + 1, text }));
+          return;
+        }
+        // Day 4: the door of the Witch's house stays shut until she has spoken to him outside; touching it makes her
+        // call him over (a short dialogue, not more than once every few seconds while he stands on the zone).
+        if (
+          chapterId === "chapter-4" &&
+          world.sceneId === DAY4_COTTAGE_SCENE &&
+          exit.targetScene === DAY4_COTTAGE_DOOR_TARGET &&
+          !claimedRewardsRef.current.has(WITCH_OUTSIDE_ID)
+        ) {
+          const now = Date.now();
+          if (now >= witchCallUntilRef.current) {
+            witchCallUntilRef.current = now + 7000;
+            startDialogue(localizeConversation(witchDoorCall, language, WITCH_OUTSIDE_INSTANCE_ID));
+          }
           return;
         }
         // A shut door (the Witch's house): a short notice, no transition.
@@ -1045,7 +1061,7 @@ export function GameWorld({
         );
       }
     },
-    [world.sceneId, chapterId, language, claimFlag, startTransition, showNotice, tutorial.step],
+    [world.sceneId, chapterId, language, claimFlag, startTransition, showNotice, startDialogue, tutorial.step],
   );
 
   // The closing is ONE sequence: the narrative interlude over the supper
@@ -1420,10 +1436,17 @@ export function GameWorld({
   ]);
 
   // What the story keeps out of the world (the woman, once she has left).
+  // Day 4 (2026-11-19): the Witch outside her cottage leaves once she has asked him in (a fade, see below).
+  const [day4WitchGone, setDay4WitchGone] = useState(false);
   const narrativeHiddenInstanceIds = useMemo(
-    () => getNarrativeHiddenInstanceIds(claimedRewards),
-    [claimedRewards],
+    () => new Set([...getNarrativeHiddenInstanceIds(claimedRewards), ...getDay4HiddenInstanceIds(day4WitchGone)]),
+    [claimedRewards, day4WitchGone],
   );
+  useEffect(() => {
+    if (chapterId !== "chapter-4" || day4WitchGone || !claimedRewards.has(WITCH_OUTSIDE_ID)) return;
+    if (!isPlaying || phaseRef.current !== "playing" || afterDialogueRef.current !== null) return;
+    startStayFade(() => setDay4WitchGone(true));
+  }, [chapterId, day4WitchGone, claimedRewards, isPlaying, startStayFade]);
 
   // Once the fade into the bedroom is over, the examination starts (once).
   useEffect(() => {

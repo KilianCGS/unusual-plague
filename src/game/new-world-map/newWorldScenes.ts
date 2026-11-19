@@ -97,7 +97,6 @@ import {
 import {
   forestCottageInteriorColliders,
   forestCottageInteriorSpawns,
-  forestCottageInteriorTransitions,
 } from "../forest-cottage-interior/forestCottageInteriorGeometry";
 import {
   FOREST_COTTAGE_INTERIOR_VISUAL,
@@ -578,15 +577,8 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: FOREST_COTTAGE_INTERIOR_VISUAL,
     colliders: forestCottageInteriorColliders,
-    exits: [
-      exit(
-        "to-forest-cottage",
-        forestCottageInteriorTransitions,
-        "forest-cottage-interior-transition-1",
-        "forest-cottage",
-        "from-forest-cottage-interior",
-      ),
-    ],
+    // 2026-11-19: no way out; the game ends inside (forestCottageInteriorTransitions is empty).
+    exits: [],
     arrivals: {
       "from-forest-cottage": spawnAt(
         forestCottageInteriorSpawns,

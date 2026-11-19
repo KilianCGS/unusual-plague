@@ -69,8 +69,11 @@ test("Day 4 draws the nine scenes that have a night painting with it, and the fi
     assert.equal(night.visual.backgroundSrc, src, id);
     assert.equal(night.visual.backgroundFilter, undefined, `${id} has a painting, so no grade`);
     // everything but the picture is the day scene's: colliders, exits, arrivals, size
-    assert.equal(night.colliders, day.colliders);
-    assert.equal(night.exits, day.exits);
+    // (the Witch's cottage has geometry of its own at night, 2026-11-19: see the test below)
+    if (id !== "forest-cottage") {
+      assert.equal(night.colliders, day.colliders);
+      assert.equal(night.exits, day.exits);
+    }
     assert.equal(night.visual.assetWidth, day.visual.assetWidth);
     const file = path.join(root, "public", src);
     assert.ok(fs.existsSync(file), src);
@@ -78,6 +81,16 @@ test("Day 4 draws the nine scenes that have a night painting with it, and the fi
     assert.equal(png.readUInt32BE(16), sharpSizes[id][0], `${id} width`);
     assert.equal(png.readUInt32BE(20), sharpSizes[id][1], `${id} height`);
   }
+});
+
+test("the Witch's cottage at night has its own colliders, the door as the only exit (no way back to the forest) and the arrival from the forest", () => {
+  const night = sceneForChapter(WORLD_SCENES["forest-cottage"], NIGHT_CHAPTER_ID);
+  assert.equal(night.colliders.length, 24);
+  assert.deepEqual(night.exits.map((e) => e.name), ["to-forest-cottage-interior"]);
+  assert.deepEqual([night.exits[0].zone.x, night.exits[0].zone.y, night.exits[0].zone.width], [311, 494, 75]);
+  assert.deepEqual(night.arrivals["from-forest"], { x: 690, y: 100, direction: "south" });
+  // by day nothing changes: the path north is still there
+  assert.ok(WORLD_SCENES["forest-cottage"].exits.some((e) => e.name === "to-forest"));
 });
 
 test("a scene without a painting gets the night grade; other chapters and interiors are untouched", () => {
