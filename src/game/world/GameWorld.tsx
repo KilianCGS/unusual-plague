@@ -1456,6 +1456,8 @@ export function GameWorld({
   useEffect(() => {
     if (chapterId !== "chapter-4" || day4WitchGone || !claimedRewards.has(WITCH_OUTSIDE_ID)) return;
     if (!isPlaying || phaseRef.current !== "playing" || afterDialogueRef.current !== null) return;
+    // a short chime while she vanishes (an existing sound: the "recipe made" one, 2026-11-20)
+    playSound("craft.recipeCrafted");
     startStayFade(() => setDay4WitchGone(true));
   }, [chapterId, day4WitchGone, claimedRewards, isPlaying, startStayFade]);
 

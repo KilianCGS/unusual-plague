@@ -7,7 +7,7 @@ día 4, y la composición del Decorator "artifacts" se lee como día 4.
 
 ## Cómo es el día 4 (mecánica propuesta)
 
-- **Empieza** en la habitación del Doctor, de noche. Recado único: «Ir a ver a la bruja».
+- **Empieza** en la habitación del Doctor, de noche. Sin recado en el panel (2026-11-20: día solo narrativo).
 - **El pueblo:** la gente (sprites "smartphone") no levanta la vista. Hablarles da una línea
   corta del Doctor en pensamiento, sin conversación. Sin pacientes, sin tienda de pedidos.
 - **Zonas cerradas** (las dibujas tú con obstáculos): el bosque ancho, la granja y el paso de la

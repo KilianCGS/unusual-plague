@@ -145,15 +145,13 @@ test("the Witch's last conversation needs the feather (which is not spent) and h
   for (const line of a.conversation.lines.slice(1)) assert.match(line.text, /^\(.+\)$/);
 });
 
-test("the errands panel shows 'see the Witch' on Day 4 and ticks it when she has spoken", () => {
+test("Day 4 has no errand in the panel (2026-11-20: a narrative day, no 'go and see the Witch' mission)", () => {
   const { getObjectives } = at("src/game/objectives/objectives.ts");
   const c4 = at("src/game/dialogue/chapter4Dialogues.ts");
   assert.equal(getObjectives({}, "es").length, 0);
   assert.equal(getObjectives({}, "es", { chapterId: "chapter-3", claimed: new Set() }).length, 4, "Day 3 starts with four rumours (2026-11-18)");
-  const pending = getObjectives({}, "es", { chapterId: "chapter-4", claimed: new Set() });
-  assert.deepEqual(pending.map((o) => [o.text, o.done]), [["Ir a ver a la bruja", false]]);
-  const done = getObjectives({}, "en", { chapterId: "chapter-4", claimed: new Set([c4.WITCH_FINAL_ID]) });
-  assert.deepEqual(done.map((o) => [o.text, o.done]), [["Go and see the Witch", true]]);
+  assert.deepEqual(getObjectives({}, "es", { chapterId: "chapter-4", claimed: new Set() }), []);
+  assert.deepEqual(getObjectives({}, "en", { chapterId: "chapter-4", claimed: new Set([c4.WITCH_FINAL_ID]) }), []);
 });
 
 test("the end card says The end in both languages and the ending picture exists at its size", () => {

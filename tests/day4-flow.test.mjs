@@ -113,5 +113,14 @@ test("Day 4 begins with the Doctor puzzled by a light and a noise, and every vil
   }
 });
 
+test("two small sounds with what already exists (2026-11-20): something new in the errands panel, and the Witch vanishing", () => {
+  const sounds = at("src/game/audio/soundManifest.ts").SOUND_IDS;
+  const panel = fs.readFileSync(path.join(root, "src/game/objectives/ObjectivesPanel.tsx"), "utf8");
+  const game = fs.readFileSync(path.join(root, "src/game/world/GameWorld.tsx"), "utf8");
+  assert.ok(sounds.includes("ui.bookTab") && sounds.includes("craft.recipeCrafted"));
+  assert.ok(panel.includes('playSound("ui.bookTab")'), "the panel makes a sound when something new appears");
+  assert.match(game, /playSound\("craft\.recipeCrafted"\);\s+startStayFade/, "a chime as the Witch vanishes");
+});
+
 console.log(`
 ${passed} tests passed`);

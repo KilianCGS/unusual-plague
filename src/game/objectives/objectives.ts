@@ -68,13 +68,8 @@ export function getObjectives(
     }
   }
 
-  if (context?.chapterId === "chapter-4") {
-    errands.push({
-      id: "chapter4-witch",
-      text: language === "es" ? "Ir a ver a la bruja" : "Go and see the Witch",
-      done: context.claimed.has("chapter4.witch.final"),
-    });
-  }
+  // 2026-11-20 (Kilian): Day 4 has NO errand ("go and see the Witch" is gone): it is a narrative day, the player is
+  // meant to be surprised and to find the way by themself. The panel stays empty (and hidden) that night.
 
   return errands;
 }

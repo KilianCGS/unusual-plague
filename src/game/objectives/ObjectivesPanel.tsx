@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 
+import { playSound } from "../audio/audioPlayer";
 import { getBindings, useBindings } from "../controls/controlsStore";
 import { keyLabel, matchesAction } from "../controls/keybindings";
 import type { Language } from "../i18n/types";
@@ -44,6 +45,11 @@ export function ObjectivesPanel({
 
     if (!before) {
       return;
+    }
+
+    // 2026-11-20 (Kilian): a soft sound when something NEW appears in the panel (a new errand, or the rumours of a new day).
+    if ([...openNow].some((id) => !before.has(id))) {
+      playSound("ui.bookTab");
     }
 
     const completed = objectives.filter((o) => o.done && before.has(o.id)).map((o) => o.id);
