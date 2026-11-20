@@ -122,5 +122,19 @@ test("two small sounds with what already exists (2026-11-20): something new in t
   assert.match(game, /playSound\("craft\.recipeCrafted"\);\s+startStayFade/, "a chime as the Witch vanishes");
 });
 
+test("the end-of-game music (2026-11-20): from the closing of Day 4 through the epilogue until the end card button is pressed", () => {
+  const manifest = at("src/game/audio/soundManifest.ts");
+  assert.ok(manifest.SOUND_IDS.includes("music.end"));
+  const def = manifest.SOUNDS["music.end"];
+  assert.equal(def.src, "/game/audio/music/endgame.mp3");
+  assert.equal(def.loop, true);
+  assert.ok(fs.existsSync(path.join(root, "public", def.src)), "the file is there");
+  const game = fs.readFileSync(path.join(root, "src/game/world/GameWorld.tsx"), "utf8");
+  assert.match(game, /useLoopMusic\("music\.end", \(\(closingActive && closingChapter === "chapter-4"\) \|\| endVisible\) && !endLeaving/);
+  assert.ok(game.includes("onLeave") && game.includes("setEndLeaving(true)"), "pressing the end card button fades the music out first");
+  const card = fs.readFileSync(path.join(root, "src/game/ui/EndCard.tsx"), "utf8");
+  assert.ok(card.includes("onLeave"));
+});
+
 console.log(`
 ${passed} tests passed`);

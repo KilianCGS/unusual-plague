@@ -251,6 +251,8 @@ export function GameWorld({
   const [closingChapter, setClosingChapter] = useState("chapter-1");
   // The end card after the closing of Day 4 (the last screen of the game).
   const [endVisible, setEndVisible] = useState(false);
+  // the player pressed the button of the end card: the music fades out before the game starts over
+  const [endLeaving, setEndLeaving] = useState(false);
   const interludeActive = openingActive || closingActive || endVisible;
 
   // Main interfaces. They never open on top of each other, of a conversation
@@ -1405,6 +1407,10 @@ export function GameWorld({
     }
   }, [chapterId, isPlaying, claimedRewards, claimFlag]);
 
+  // The end of the game (2026-11-20): from the Doctor writing in his book (the Day 4 closing) through the epilogue, until
+  // the player leaves the end card.
+  useLoopMusic("music.end", ((closingActive && closingChapter === "chapter-4") || endVisible) && !endLeaving, 1800);
+
   // THE OPENING ENCOUNTER OF DAY 2. It belongs to the arrival that follows the
   // Botica's street door: read once, when the transition is over and control is
   // back. If its data is not there (no placement or no approved text) it does
@@ -1973,7 +1979,15 @@ export function GameWorld({
           transitionDuration: `${SCENE_FADE_MS}ms`,
         }}
       />
-      {endVisible ? <EndCard language={language} /> : null}
+      {endVisible ? (
+        <EndCard
+          language={language}
+          onLeave={() => {
+            setEndLeaving(true);
+            window.setTimeout(() => window.location.reload(), 1900);
+          }}
+        />
+      ) : null}
       {closingActive ? (
         <div className={dayClosingStyles.fadeIn}>
           <NarrativeInterlude

@@ -15,6 +15,7 @@ import type { Language } from "../../../game/i18n/types";
 import { IntroScreen } from "../../../game/intro/IntroScreen";
 import { NARRATIVE_ILLUSTRATIONS, type NarrativeIllustrationId } from "../../../game/narrative/illustrations";
 import { NarrativeInterlude } from "../../../game/narrative/NarrativeInterlude";
+import { useLoopMusic } from "../../../game/audio/useLoopMusic";
 import { EndCard } from "../../../game/ui/EndCard";
 import { useIsClient } from "../../../game/ui/useIsClient";
 
@@ -48,6 +49,8 @@ export default function TransitionsDevPage() {
   const [language, setLanguage] = useState<Language>("es");
   const [which, setWhich] = useState<Which | null>(null);
   const back = () => setWhich(null);
+  // the music of the end of the game plays over its closing and the end card, as in the game
+  useLoopMusic("music.end", which === "end" || which === "endcard", 1800);
 
   if (!isClient) return null;
 

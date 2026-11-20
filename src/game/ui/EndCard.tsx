@@ -37,7 +37,7 @@ const COPY: Record<Language, { end: string; thanks: string; again: string; epilo
 
 const EPILOGUE_STEP_S = 3.2;
 
-export function EndCard({ language }: { language: Language }) {
+export function EndCard({ language, onLeave }: { language: Language; onLeave?: () => void }) {
   const copy = COPY[language];
   const style: CSSProperties = {
     position: "fixed",
@@ -75,7 +75,7 @@ export function EndCard({ language }: { language: Language }) {
       <p style={{ margin: 0, fontSize: 16, ...fadeIn(lateStart + 1) }}>{copy.thanks}</p>
       <button
         type="button"
-        onClick={() => window.location.reload()}
+        onClick={() => (onLeave ? onLeave() : window.location.reload())}
         style={{
           ...fadeIn(lateStart + 2),
           marginTop: 12,
