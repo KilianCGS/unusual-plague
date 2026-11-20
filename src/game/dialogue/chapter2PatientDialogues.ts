@@ -19,6 +19,9 @@ const woodExam = talk("chapter2.woodcutter.exam", [
   doctor("Déjeme tomarle el pulso, con calma. ¿Ha parado a comer y beber?", "Let me take your pulse, nice and easy. Have you stopped to eat and drink?"),
   npc("He bebido un poco esta mañana. La comida sigue envuelta donde la dejé.", "I had a little to drink this morning. My food's still wrapped up where I left it."),
   doctor("Se le nota débil y con sed, pero tiene arreglo. ¿El mareo empezó mientras trabajaba?", "You look weak and thirsty, but it can be fixed. Did the dizziness begin while you were working?"),
+  doctor("Fíjese: labios secos, la piel pegajosa y el pulso rápido. Cuando el cuerpo pierde más agua de la que bebe, avisa así.", "Look: dry lips, clammy skin and a quick pulse. When the body loses more water than it drinks, that's how it warns you."),
+  npc("Mi abuelo decía que el cuerpo es como el pozo: si sacas más de lo que echas, se seca.", "My grandfather used to say the body is like a well: if you draw more than you pour in, it runs dry."),
+  doctor("Su abuelo tenía razón, y eso explica la sed y el mareo.", "Your grandfather was right, and that explains the thirst and the dizziness."),
   npc("¿Cuánto rato tengo que quedarme aquí sin hacer nada?", "How long do I have to sit here doing nothing?"),
   doctor("Descanse aquí un ratito mientras reviso lo que he observado.", "Rest here a little while I go over what I've observed."),
   doctor("Voy a anotar los síntomas para contrastarlos con el Compendio. Lo averiguamos juntos.", "I'll note down the symptoms to compare them with the Compendium. We'll work it out together."),
@@ -30,6 +33,9 @@ const smithExam = talk("chapter2.blacksmith.exam", [
   npc("Hace unos días. Era poca cosa. Luego cada golpe ha ido recordándomela.", "A few days ago. It was nothing much. Then every blow started reminding me of it."),
   doctor("Está inflamada. Seguir trabajando no le ha dado ocasión de mejorar, pero aún estamos a tiempo.", "It's swollen. Carrying on working hasn't given it a chance to improve, but we're still in time."),
   npc("Ya decía yo que el martillo sonaba distinto.", "I thought the hammer sounded different."),
+  doctor("Mire el borde: rojo, caliente y tirante, y el dolor late con el pulso. Cuando una herida se hincha y late, algo se ha colado dentro.", "Look at the edge: red, hot and tight, and the pain beats with your pulse. When a wound swells and throbs, something has got in."),
+  npc("En la fragua las heridas se curan solas, o se curan a martillazos.", "In the forge wounds heal by themselves, or by hammering."),
+  doctor("Esta no se cura a martillazos, se lo aseguro.", "This one won't heal by hammering, I assure you."),
   doctor("La zona está roja y cada vez duele más. Deje descansar la mano mientras reviso estos signos; no se preocupe.", "The area is red and increasingly painful. Rest your hand while I review these signs; don't worry."),
   doctor("Voy a anotar lo que he visto antes de decidir el mejor tratamiento.", "I'll note down what I've seen before deciding on the best treatment."),
   npc("Toda esa gente va a saber que estoy sentado.", "All those people will know I'm sitting down."),
@@ -44,13 +50,13 @@ const woodThanks = [
   npc("Mejor que mis manos no se lo van a encontrar.", "Better than my hands will, that's certain."),
 ];
 const woodCure = talk("chapter2.woodcutter.cure", [
-  doctor("Aquí tiene su bebida cítrica y su infusión. Tómese su tiempo; no son una excusa para volver al hacha.", "Here's your citrus drink and your infusion. Take your time; they're no excuse to go back to the axe."),
+  doctor("Aquí tiene su bebida cítrica y su infusión. La bebida repone lo que ha perdido y la infusión le asienta el cuerpo. Tómese su tiempo; no son una excusa para volver al hacha.", "Here's your citrus drink and your infusion. The drink puts back what you've lost and the infusion settles your body. Take your time; they're no excuse to go back to the axe."),
   npc("Eso iba a preguntarle.", "I was about to ask."),
   doctor("Por eso lo he dicho primero, ja. Hoy toca descansar y comer bien.", "That's why I said it first, ha. Today is for rest and a good meal."),
   npc("Entonces tendré que desenvolver la comida. Lleva esperándome más que usted.", "Then I'll have to unwrap my lunch. It's been waiting for me longer than you have."),
 ]);
 const smithCure = talk("chapter2.blacksmith.cure", [
-  doctor("Ya tengo la cataplasma y la compresa. Déjeme atender esa mano; verá qué alivio.", "I have the poultice and the compress. Let me see to that hand; you'll feel the relief."),
+  doctor("Ya tengo la cataplasma y la compresa. La cataplasma saca la hinchazón y la compresa limpia, y así la herida deja de latir. Déjeme atender esa mano; verá qué alivio.", "I have the poultice and the compress. The poultice draws out the swelling and the compress cleans, so the wound stops throbbing. Let me see to that hand; you'll feel the relief."),
   npc("Le prometo que hoy no cojo el martillo.", "I promise I won't pick up the hammer today."),
   doctor("Con la otra mano tampoco, que ya le conozco.", "Not with the other hand either; I know you."),
   npc("Se adelanta usted a todas mis buenas ideas.", "You get ahead of all my good ideas."),
@@ -62,12 +68,15 @@ const after = {
     doctor("¿Ha comido ya? Me alegra verlo con mejor cara.", "Have you eaten yet? I'm glad to see you looking better."),
     npc("Sí. Y el hacha sigue donde la dejó. Está siendo un día muy raro.", "Yes. And the axe is still where I left it. It's been a very strange day."),
     doctor("Pues que siga así un poco más. Se lo ha ganado.", "Then let it stay that way a little longer. You've earned it."),
+    npc("Un cuervo me ha estado mirando desde aquella rama toda la mañana. Ni un graznido. Eso no es de cuervos.", "A raven has been watching me from that branch all morning. Not a caw. That isn't like ravens."),
+    doctor("Los cuervos suelen saber más de lo que dicen. Fíjese en lo que callan.", "Ravens usually know more than they say. Pay attention to what they keep quiet."),
   ]),
   [BLACKSMITH_DAY2_ID]: talk("chapter2.blacksmith.after", [
     npc("He descubierto un ruido nuevo en el taller. El de la calle.", "I've discovered a new sound in the workshop. The street."),
     doctor("Suele oírse mejor sin martillar. La calle tiene su propia música.", "It's easier to hear without hammering. The street has its own music."),
     npc("No sé cómo trabaja la gente con tantas conversaciones alrededor.", "I don't know how people work with all those conversations around them."),
     doctor("Hoy no tiene que averiguarlo. Hoy basta con descansar.", "You don't need to find out today. Today, resting is enough."),
+    npc("Aunque, ahora que lo pienso, pasa menos gente que antes por la calle. Y la que pasa, con prisa y sin mirar.", "Although, now that I think of it, fewer people pass along the street than before. And those who do, in a hurry and without looking."),
   ]),
 };
 

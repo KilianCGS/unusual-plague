@@ -589,3 +589,25 @@ Después: «FIN» / «Gracias por jugar.»
 ### Decisiones abiertas que dejé yo (cámbialas si no te gustan)
 - La pluma y el hechizo protegen al Doctor: la explicación es mínima a propósito («ya inventaremos algo»).
 - La puerta de la casita se abre en cuanto ella ha hablado fuera; si entra sin hablarle, la de dentro habla igual.
+
+---
+
+## 20 nov: la nota del día 3 y diálogos más ricos (todo NUEVO, pendiente de revisión)
+
+### Nota recolectable del día 3, delante de la botica (`dialogue/chapter3Notes.ts`)
+1. (pensamiento) «Un pergamino atado con una cinta negra, clavado donde cualquiera pasa. Lo desenrollo y leo en voz baja.»
+2. «Doctor: el paso a la mina está cortado por un desprendimiento. Hay un guardia en la entrada y no deja pasar a nadie.»
+3. «En la cantera, un picapedrero se sostiene el brazo y no puede trabajar. Ha pedido que alguien lo vea. No se fíe de lo que dice el capataz: duele más de lo que cuenta.»
+4. (pensamiento) «Una mina cerrada y un brazo que no se mueve. Tengo por dónde empezar: la cantera.»
+
+### Pacientes del día 3 (`dialogue/chapter3PatientDialogues.ts`), reescritos con más carácter
+Cada examen lleva ahora una pista clínica que el Doctor explica; cada cura explica el porqué; las líneas «después» llevan una
+semilla muy sutil del día 4 (sin nombrar el artefacto): la calle callada (plumero), un zumbido hondo de noche (minero), una luz
+rara sobre el cantil (picapedrero), y la luz azulada del vecino que sigue quieto en la ventana (anciano del cántaro).
+
+### Pacientes del día 2 (`dialogue/chapter2PatientDialogues.ts`), añadidos
+- Leñador, examen: pista clínica («labios secos, la piel pegajosa y el pulso rápido…») y la imagen del pozo de su abuelo; cura:
+  qué hace cada preparado; después: un cuervo que lo mira sin graznar y el Doctor: «Los cuervos suelen saber más de lo que dicen».
+- Herrero, examen: pista clínica («rojo, caliente y tirante, y el dolor late con el pulso»); cura: qué hace la cataplasma y la
+  compresa; después: «pasa menos gente que antes por la calle, y la que pasa, con prisa y sin mirar».
+(Los diálogos del agricultor y de la investigación no se han tocado.)
