@@ -611,3 +611,14 @@ rara sobre el cantil (picapedrero), y la luz azulada del vecino que sigue quieto
 - Herrero, examen: pista clínica («rojo, caliente y tirante, y el dolor late con el pulso»); cura: qué hace la cataplasma y la
   compresa; después: «pasa menos gente que antes por la calle, y la que pasa, con prisa y sin mirar».
 (Los diálogos del agricultor y de la investigación no se han tocado.)
+
+---
+
+## 20 nov: cierre del día 4, ahora preocupado y duro (sustituye al anterior; NUEVO, pendiente de revisión)
+
+El Doctor sentado escribiendo (`dialogue/chapter4Dialogues.ts`, `day4Closing`), antes del negro y el epílogo:
+1. «Salgo de la casita y el bosque está en silencio. No es calma: es que nadie habla. Ni un grillo, ni una voz en el camino.»
+2. «Esta noche escribiré lo que he visto, y la mano me tiembla. Tantas caras bañadas en esa luz, tantos ojos vacíos. Y ninguno ha pedido ayuda.»
+3. «No hay fiebre, ni herida, ni nada que mi libro sepa nombrar. Y se extiende más deprisa que cualquier peste que haya visto. Nadie huye de ella: la buscan.»
+4. «Si esa luz me llamara a mí, ¿lo notaría? ¿O ya la estaría mirando sin saberlo?»
+5. «Lo que no se anota, se olvida. Y tengo miedo de olvidar cómo era este pueblo cuando hablaba.»

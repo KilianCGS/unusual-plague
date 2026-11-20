@@ -163,11 +163,15 @@ const FAREWELL_LINES: LocalizedLine[] = [
 ];
 
 // The closing of the game (the Doctor writing at night), his last thoughts.
+// 2026-11-20 (Kilian): the last thoughts must be WORRIED and HARSH, something that terrifies; the epilogue (EndCard) follows.
+// NEW TEXT (ES/EN), awaiting Kilian's review.
 export const day4Closing: LocalizedConversation = {
   id: "chapter4.day4.closing", lines: [
-    doctorThought("Salgo de la casita y la noche ya no está tan negra. Se adivina el día sobre el bosque, y qué bien sienta el aire.", "I step out of the cottage and the night is no longer so black. Day is guessing itself above the forest, and how good the air feels."),
-    doctorThought("Esta noche escribiré lo que he visto. Con cuidado: lo que no se anota, se olvida.", "Tonight I'll write down what I've seen. Carefully: what isn't noted is forgotten."),
-    doctorThought("Mañana empezaré por preguntar qué miran. Y a quién. Con una sonrisa, que abre más puertas que cualquier remedio.", "Tomorrow I'll begin by asking what they're looking at. And at whom. With a smile, which opens more doors than any remedy."),
+    doctorThought("Salgo de la casita y el bosque está en silencio. No es calma: es que nadie habla. Ni un grillo, ni una voz en el camino.", "I step out of the cottage and the forest is silent. It isn't calm: it's that nobody speaks. Not a cricket, not a voice on the road."),
+    doctorThought("Esta noche escribiré lo que he visto, y la mano me tiembla. Tantas caras bañadas en esa luz, tantos ojos vacíos. Y ninguno ha pedido ayuda.", "Tonight I'll write down what I've seen, and my hand trembles. So many faces bathed in that light, so many empty eyes. And not one asked for help."),
+    doctorThought("No hay fiebre, ni herida, ni nada que mi libro sepa nombrar. Y se extiende más deprisa que cualquier peste que haya visto. Nadie huye de ella: la buscan.", "There's no fever, no wound, nothing my book knows how to name. And it spreads faster than any plague I've seen. Nobody flees from it: they seek it out."),
+    doctorThought("Si esa luz me llamara a mí, ¿lo notaría? ¿O ya la estaría mirando sin saberlo?", "If that light called to me, would I notice? Or would I already be staring at it without knowing?"),
+    doctorThought("Lo que no se anota, se olvida. Y tengo miedo de olvidar cómo era este pueblo cuando hablaba.", "What isn't written down is forgotten. And I'm afraid of forgetting what this village was like when it talked."),
   ],
 };
 
