@@ -77,9 +77,9 @@ function walker(sceneId, arrival) {
   const seen = new Uint8Array(cols * rows);
   let sx = Math.round(spawn.x / STEP), sy = Math.round(spawn.y / STEP);
   if (!free(sx * STEP, sy * STEP)) {
-    // like the game's own check: the nearest free spot within 16 units (Day 4: the barrier at the Botica street door overlaps the arrival by ~10)
+    // like the game's own check: the nearest free spot within 8 units
     let found = false;
-    for (let r = 1; r <= 8 && !found; r++) for (let dx = -r; dx <= r && !found; dx++) for (let dy = -r; dy <= r && !found; dy++) {
+    for (let r = 1; r <= 4 && !found; r++) for (let dx = -r; dx <= r && !found; dx++) for (let dy = -r; dy <= r && !found; dy++) {
       if (free((sx + dx) * STEP, (sy + dy) * STEP)) { sx += dx; sy += dy; found = true; }
     }
     assert.ok(found, `${sceneId}.${arrival} is a free spot (or next to one)`);

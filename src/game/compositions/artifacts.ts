@@ -20,13 +20,14 @@ export const artifactsCompositions: DecorComposition[] = [
         "zOffset": 0
       },
       {
+        // 2026-11-19 (Kilian): visual only, a clue that the Witch is doing something: no collider.
         "instanceId": "apothecary-street-ch4-barrier-horizontal-01",
         "assetId": "ch4-barrier-horizontal",
         "x": 363,
         "y": 391,
         "scale": 1,
         "flipX": false,
-        "colliderEnabled": true,
+        "colliderEnabled": false,
         "zOffset": 0
       },
       {
