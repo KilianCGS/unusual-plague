@@ -433,3 +433,18 @@ main.title-screen.is-black .title-screen-fade {
   flex-wrap: wrap;
   gap: 0.6rem;
 }
+
+/* Credits inside the About panel (2026-11-20): smaller, quieter than the story paragraphs. */
+.about-credits-title {
+  margin: 1.1rem 0 0.5rem;
+  color: #2b1a14;
+  font-family: "UP Gothic", Georgia, serif;
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+}
+
+.about-panel .about-credits {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  opacity: 0.85;
+}

@@ -12,6 +12,7 @@ import { GothicText } from "../game/ui/GothicText";
 import { titleScreenCopy } from "../game/i18n/titleScreen";
 import type { Language } from "../game/i18n/types";
 import { saveCopy } from "../game/i18n/saveCopy";
+import { DeviceNotice } from "../game/ui/DeviceNotice";
 import type { GameDevStart } from "../game/world/devStart";
 import { readSave, saveFromText, saveToText, toDevStart, writeSave, type SaveGame } from "../game/save/saveGame";
 
@@ -315,6 +316,8 @@ export default function Home() {
         </button>
       </div>
 
+      <DeviceNotice language={language} />
+
       {isControlsOpen ? (
         <ControlsPanel language={language} onClose={() => setIsControlsOpen(false)} />
       ) : null}
@@ -365,6 +368,10 @@ export default function Home() {
             <p>{copy.aboutPanel.paragraphs[1]}</p>
             <p>{copy.aboutPanel.paragraphs[2]}</p>
             <p>{copy.aboutPanel.paragraphs[3]}</p>
+            <h3 className="about-credits-title">{copy.aboutPanel.creditsTitle}</h3>
+            {copy.aboutPanel.credits.map((line) => (
+              <p key={line} className="about-credits">{line}</p>
+            ))}
             <button
               className="begin-button about-panel-close"
               type="button"

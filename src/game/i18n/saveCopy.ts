@@ -3,6 +3,7 @@ import type { Language } from "./types";
 // Texts of the saved game on the title screen (2026-11-18). NEW TEXT, awaiting Kilian's review.
 export const saveCopy: Record<Language, {
   continueButton: string;
+  saved: string;
   saveButton: string;
   title: string;
   intro: string;
@@ -17,6 +18,7 @@ export const saveCopy: Record<Language, {
 }> = {
   es: {
     continueButton: "Continuar",
+    saved: "Partida guardada.",
     saveButton: "Partida",
     title: "Partida guardada",
     intro: "El juego se guarda solo cada amanecer, en este navegador. Aquí puedes copiar esa partida como texto o pegar la de otro navegador.",
@@ -31,6 +33,7 @@ export const saveCopy: Record<Language, {
   },
   en: {
     continueButton: "Continue",
+    saved: "Game saved.",
     saveButton: "Saved game",
     title: "Saved game",
     intro: "The game saves itself at every dawn, in this browser. Here you can copy that game as text or paste one from another browser.",

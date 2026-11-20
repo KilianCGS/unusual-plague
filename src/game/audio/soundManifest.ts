@@ -75,9 +75,12 @@ export const SOUNDS: Record<SoundId, SoundDef> = {
   "music.day2": def("music.day2", "music/day2-ambient.mp3", "music", true, 0.6),
   "music.day3": def("music.day3", "music/day3-ambient.mp3", "music", true, 0.6),
   "music.day4": def("music.day4", "music/day4-ambient.mp3", "music", true, 0.6),
-  // 2026-11-20 (Kilian): the music of the END of the game: from the moment the Doctor starts writing (after the closing
+  // 2026-11-20 (Kilian): the music of the END of the game. It is Beethoven's Moonlight Sonata, 1st movement, as performed by
+  // Paul Pitman for Musopen (public domain, Wikimedia Commons; Musopen asks for an in-line credit: see the credits). It
+  // replaces a third-party recording whose rights were unknown. Ogg Vorbis (Chrome, Firefox, Edge; older Safari may stay silent):
+  // the music of the END of the game: from the moment the Doctor starts writing (after the closing
   // transition) until the player leaves the end card.
-  "music.end": def("music.end", "music/endgame.mp3", "music", true, 0.6),
+  "music.end": def("music.end", "music/endgame.ogg", "music", true, 0.6),
   "music.intro": def("music.intro", "music/game-intro.mp3", "music", true),
   "ui.chestOpen": def("ui.chestOpen", "ui/chest-open.mp3", "ui"),
 };

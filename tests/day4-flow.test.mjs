@@ -126,7 +126,7 @@ test("the end-of-game music (2026-11-20): from the closing of Day 4 through the 
   const manifest = at("src/game/audio/soundManifest.ts");
   assert.ok(manifest.SOUND_IDS.includes("music.end"));
   const def = manifest.SOUNDS["music.end"];
-  assert.equal(def.src, "/game/audio/music/endgame.mp3");
+  assert.equal(def.src, "/game/audio/music/endgame.ogg");
   assert.equal(def.loop, true);
   assert.ok(fs.existsSync(path.join(root, "public", def.src)), "the file is there");
   const game = fs.readFileSync(path.join(root, "src/game/world/GameWorld.tsx"), "utf8");

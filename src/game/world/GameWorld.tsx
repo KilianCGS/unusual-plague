@@ -60,6 +60,7 @@ import { day1Closing } from "../dialogue/chapter1Day1Dialogues";
 import { day2Closing } from "../dialogue/chapter2ClosingDialogues";
 import { day3Closing } from "../dialogue/chapter3ClosingDialogues";
 import { createSave, writeSave } from "../save/saveGame";
+import { saveCopy } from "../i18n/saveCopy";
 import { NOTE_PREFIX, getNoteConversation } from "../dialogue/chapter3Notes";
 import { TOOLS_NOTICED_ID, day3OpeningCopy, toolsNoticeCopy } from "../dialogue/toolsRenewal";
 import { APOTHECARY_NIGHT_BACKGROUND, NIGHT_CHAPTER_ID, sceneForChapter } from "./nightScenes";
@@ -1007,7 +1008,7 @@ export function GameWorld({
     if (savedChapterRef.current === chapterId) return;
     savedChapterRef.current = chapterId;
     if (!autosave) return;
-    writeSave(
+    const saved = writeSave(
       createSave({
         chapterId,
         patients: patientsRef.current,
@@ -1019,7 +1020,10 @@ export function GameWorld({
         coins: coinsRef.current,
       }),
     );
-  }, [chapterId, autosave, knownRecipeIds, collected]);
+    // a short notice once the new day has begun, so the player knows he can stop here (2026-11-20)
+    // (no cleanup on purpose: a later change of these deps must not cancel the notice)
+    if (saved) window.setTimeout(() => showNotice(saveCopy[language].saved), 2500);
+  }, [chapterId, autosave, knownRecipeIds, collected, language, showNotice]);
 
   const witchCallUntilRef = useRef(0);
   const handleExit = useCallback(
