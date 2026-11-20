@@ -60,6 +60,7 @@ import { day1Closing } from "../dialogue/chapter1Day1Dialogues";
 import { day2Closing } from "../dialogue/chapter2ClosingDialogues";
 import { day3Closing } from "../dialogue/chapter3ClosingDialogues";
 import { createSave, writeSave } from "../save/saveGame";
+import { NOTE_PREFIX, getNoteConversation } from "../dialogue/chapter3Notes";
 import { TOOLS_NOTICED_ID, day3OpeningCopy, toolsNoticeCopy } from "../dialogue/toolsRenewal";
 import { APOTHECARY_NIGHT_BACKGROUND, NIGHT_CHAPTER_ID, sceneForChapter } from "./nightScenes";
 import { EndCard } from "../ui/EndCard";
@@ -832,6 +833,17 @@ export function GameWorld({
       if (shop) {
         setShopMessage(null);
         setOpenShop(shop);
+        return;
+      }
+
+      // A NOTE (Day 3): picking it up makes the Doctor read it; nothing goes to the bag.
+      if (source.itemId?.startsWith(NOTE_PREFIX) && source.instanceId) {
+        const note = getNoteConversation(source.itemId);
+        if (note) {
+          setCollected((current) => markCollected(current, source.instanceId!));
+          playSound("ui.pageTurn");
+          startDialogue(localizeConversation(note, language, DOCTOR_SPEAKER));
+        }
         return;
       }
 

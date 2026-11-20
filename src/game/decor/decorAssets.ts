@@ -1960,6 +1960,24 @@ const BASE_DECOR_ASSETS: DecorAsset[] = [
     defaultScale: 1,
   },
   {
+    // 2026-11-20 (Kilian): a scroll tied with a BLACK ribbon (a pick-up note, Day 3, in front of the Botica). Picking it up
+    // makes the Doctor read it (dialogue/chapter3Notes.ts); it has the usual pick-up aura. TEMPORARY ART: redrawn by hand
+    // (24x24) from Kilian's red-ribbon scroll; replace public/game/ambient/note-scroll/note.png with his file recoloured.
+    id: "note-scroll",
+    label: "Note: scroll with a black ribbon (pick-up, Day 3)",
+    category: "resources",
+    sprite: {
+      frames: ["/game/ambient/note-scroll/note.png"],
+      frameWidth: 24,
+      frameHeight: 24,
+      fps: 0,
+      loop: false,
+    },
+    anchor: { x: 0.5, y: 0.9 },
+    defaultScale: 1.5,
+    collectibleItemId: "note:day3-botica",
+  },
+  {
     // Witch's black cat, sitting. An asset of its own, independent of Witch:
     // it can be placed next to her, alone or elsewhere. Drawn facing screen-
     // right; use flipX on the instance to make it face left (the anchor is the

@@ -13,6 +13,24 @@ import type { DecorComposition } from "../decor/decorTypes";
 
 export const chapter3Compositions: DecorComposition[] = [
   {
+    // 2026-11-20 (Kilian): the note of Day 3, in front of the Botica, on the spot of the interaction zone he drew there
+    // (x429 y389 27x26): the instance sits at the bottom centre of that zone.
+    "sceneId": "apothecary-street",
+    "chapterId": "chapter-3",
+    "instances": [
+      {
+        "instanceId": "apothecary-street-note-scroll-01",
+        "assetId": "note-scroll",
+        "x": 442,
+        "y": 415,
+        "scale": 1.5,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      }
+    ]
+  },
+  {
     "sceneId": "bakery-interior",
     "chapterId": "chapter-3",
     "instances": [

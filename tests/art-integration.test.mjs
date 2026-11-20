@@ -448,6 +448,7 @@ test("world Mint, Mushroom, Resin and Orange: registered resources; only the Mus
     "medicinal-herb-pile",
     "mint-world",
     "mushroom-world",
+    "note-scroll",
     "orange-world",
     "orange-world-ambient",
     "pine-mushroom-world",
