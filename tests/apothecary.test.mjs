@@ -139,10 +139,10 @@ test("6-10. exactly 2 interaction zones: the stove (craft.fire) and the table (c
     },
     {
       id: "apothecary-main-zone-interaction-2",
-      x: 115,
-      y: 98,
-      width: 19,
-      height: 70,
+      x: 111,
+      y: 92,
+      width: 39,
+      height: 84,
       interactionId: "craft.manual",
     },
   ]);

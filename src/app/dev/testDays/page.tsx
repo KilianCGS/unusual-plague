@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 
 import type { Language } from "../../../game/i18n/types";
@@ -8,6 +8,7 @@ import { addItem } from "../../../game/inventory/inventory";
 import { ITEMS, getItemName } from "../../../game/items/items";
 import { useIsClient } from "../../../game/ui/useIsClient";
 import { createTestDayStart, type EconomyProfile, type TestDay } from "../../../game/world/economyStart";
+import type { SceneId } from "../../../game/world/worldScenes";
 import { GameWorld } from "../../../game/world/GameWorld";
 
 // DEV-ONLY (2026-11-20): pick any day and START it with the coins and the bag the economy says a player would have there,
@@ -22,6 +23,14 @@ const DAYS: { day: TestDay; label: string; note: string }[] = [
 
 const box: CSSProperties = { padding: "10px 14px", font: "14px monospace", color: "#f4ead5", background: "#1c1710", border: "2px solid #8a6a47", cursor: "pointer" };
 
+// URL parameters (2026-11-21, to take clean screenshots and to reproduce a situation quickly):
+//   ?day=2&profile=justo|recados&lang=es|en&scene=forest&spawn=from-outskirts&items=orange:2,cloth:1&coins=20&clean=1&go=1
+// `go=1` starts at once; `clean=1` hides this page's floating readout (no development panel on screen).
+function readParams() {
+  if (typeof window === "undefined") return {} as Record<string, string>;
+  return Object.fromEntries(new URLSearchParams(window.location.search));
+}
+
 export default function TestDaysPage() {
   const isClient = useIsClient();
   const [language, setLanguage] = useState<Language>("es");
@@ -31,14 +40,36 @@ export default function TestDaysPage() {
   const [extras, setExtras] = useState<{ itemId: string; quantity: number }[]>([]);
   const [extraItem, setExtraItem] = useState<string>("orange");
   const [run, setRun] = useState<number | null>(null);
+  const [params] = useState(readParams);
+  const [paramsApplied, setParamsApplied] = useState(false);
+  useEffect(() => {
+    if (paramsApplied || typeof window === "undefined") return;
+    const id = window.setTimeout(() => {
+      const d = Number(params.day);
+      if ([1, 2, 3, 4].includes(d)) setDay(d as TestDay);
+      if (params.profile === "justo" || params.profile === "recados") setProfile(params.profile);
+      if (params.lang === "es" || params.lang === "en") setLanguage(params.lang);
+      if (params.coins) setCoinsOverride(params.coins);
+      if (params.items) {
+        setExtras(params.items.split(",").flatMap((pair) => {
+          const [itemId, qty] = pair.split(":");
+          return itemId in ITEMS ? Array.from({ length: Math.max(1, Number(qty) || 1) }, () => ({ itemId, quantity: 1 })) : [];
+        }));
+      }
+      if (params.go === "1") setRun(0);
+      setParamsApplied(true);
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, [params, paramsApplied]);
 
   const built = useMemo(() => createTestDayStart(day, profile), [day, profile]);
   const coins = coinsOverride.trim() !== "" && Number.isFinite(Number(coinsOverride)) ? Math.max(0, Math.round(Number(coinsOverride))) : built.start.coins ?? 0;
   const start = useMemo(() => {
     let inventory = built.start.inventory;
     for (const extra of extras) inventory = addItem(inventory, extra.itemId, extra.quantity) ?? inventory;
-    return { ...built.start, coins, inventory };
-  }, [built, extras, coins]);
+    const scene = params.scene && params.spawn ? { sceneId: params.scene as SceneId, spawnName: params.spawn } : undefined;
+    return { ...built.start, coins, inventory, ...(scene ? { scene } : {}) };
+  }, [built, extras, coins, params]);
   const bag = start.inventory.slots.flatMap((slot) => (slot ? [`${getItemName(slot.itemId, language)} ×${slot.quantity}`] : []));
 
   if (!isClient) return null;
@@ -47,11 +78,11 @@ export default function TestDaysPage() {
     return (
       <>
         <GameWorld key={`${run}-${language}`} language={language} devStart={start} />
-        <aside style={{ position: "fixed", top: 8, left: 8, zIndex: 2000, display: "flex", gap: 6, padding: "6px 8px", font: "12px monospace", color: "#f4ead5", background: "rgba(9,9,9,0.85)", border: "1px solid #3f3427" }}>
+        {params.clean === "1" ? null : <aside style={{ position: "fixed", top: 8, left: 8, zIndex: 2000, display: "flex", gap: 6, padding: "6px 8px", font: "12px monospace", color: "#f4ead5", background: "rgba(9,9,9,0.85)", border: "1px solid #3f3427" }}>
           <strong>/dev/testDays · Día {day} · {profile} · {coins} monedas</strong>
           <button type="button" onClick={() => setRun((r) => (r ?? 0) + 1)}>Reiniciar</button>
           <button type="button" onClick={() => setRun(null)}>Elegir otro</button>
-        </aside>
+        </aside>}
       </>
     );
   }

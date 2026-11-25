@@ -75,10 +75,12 @@ export const apothecaryMainZoneInteractions: InteractionZone[] = [
   },
   {
     id: "apothecary-main-zone-interaction-2",
-    x: 115,
-    y: 98,
-    width: 19,
-    height: 70,
+    // 2026-11-21 (Kilian): a bit wider (it was x115 y98 19x70), mostly toward the side where the Doctor stands (the white
+    // oval, which stays as it is in tutorialPointers.ts).
+    x: 111,
+    y: 92,
+    width: 39,
+    height: 84,
     interactionId: "craft.manual",
   },
 ];

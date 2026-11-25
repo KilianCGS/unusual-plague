@@ -279,7 +279,7 @@ export default function Home() {
               </button>
             ) : null}
             <button
-              className="begin-button title-save-button"
+              className="begin-button title-save-button title-load-button"
               type="button"
               disabled={isInteractionLocked}
               onClick={() => {

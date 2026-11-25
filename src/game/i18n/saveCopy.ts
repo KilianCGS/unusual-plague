@@ -19,7 +19,7 @@ export const saveCopy: Record<Language, {
   es: {
     continueButton: "Continuar",
     saved: "Partida guardada.",
-    saveButton: "Partida",
+    saveButton: "Cargar partida",
     title: "Partida guardada",
     intro: "El juego se guarda solo cada amanecer, en este navegador. Aquí puedes copiar esa partida como texto o pegar la de otro navegador.",
     copy: "Copiar partida",
@@ -34,7 +34,7 @@ export const saveCopy: Record<Language, {
   en: {
     continueButton: "Continue",
     saved: "Game saved.",
-    saveButton: "Saved game",
+    saveButton: "Load game",
     title: "Saved game",
     intro: "The game saves itself at every dawn, in this browser. Here you can copy that game as text or paste one from another browser.",
     copy: "Copy saved game",

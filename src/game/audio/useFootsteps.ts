@@ -7,6 +7,7 @@ import { getRunFrameCount, getWalkFrameCount } from "../protagonist/protagonistR
 import type { SceneId } from "../world/worldScenes";
 import { playSound } from "./audioPlayer";
 import { footstepSoundAt } from "./footstepSurface";
+import { useStepTuning } from "./stepTuning";
 
 // The frames of the walk where a foot is planted on the ground. 2026-11-17 (Kilian: the walking steps were off, the
 // running ones perfect): measured on the sprites (public/game/characters/protagonist/walk) instead of by eye.
@@ -30,8 +31,32 @@ export function useFootsteps(
   sceneId: SceneId,
 ) {
   const lastFrame = useRef<number | null>(null);
+  const tuning = useStepTuning();
+  const lastStepAt = useRef(-Infinity);
+  const latest = useRef({ x: player.x, y: player.y });
+  useEffect(() => {
+    latest.current = { x: player.x, y: player.y };
+  });
+
+  // The step beat (stepTuning.ts): while the Doctor walks, one step every X ms, ignoring the sprite frames.
+  useEffect(() => {
+    if (!tuning.enabled || !player.isWalking) return;
+    const every = player.isRunning ? tuning.runMs : tuning.walkMs;
+    const rate = player.isRunning ? tuning.runRate : 1;
+    const step = () => {
+      // No double step when the walking state flickers against an obstacle: at least 60% of the beat since the last one.
+      const now = performance.now();
+      if (now - lastStepAt.current < every * 0.6) return;
+      lastStepAt.current = now;
+      playSound(footstepSoundAt(sceneId, latest.current.x, latest.current.y), { rate });
+    };
+    step();
+    const timer = window.setInterval(step, every);
+    return () => window.clearInterval(timer);
+  }, [tuning, player.isWalking, player.isRunning, sceneId]);
 
   useEffect(() => {
+    if (tuning.enabled) return;
     if (!player.isWalking) {
       lastFrame.current = null;
       return;
@@ -44,5 +69,5 @@ export function useFootsteps(
     if (feet.includes(player.frame)) {
       playSound(footstepSoundAt(sceneId, player.x, player.y), { rate: player.isRunning ? 1.15 : 1 });
     }
-  }, [player.frame, player.isWalking, player.isRunning, player.direction, player.x, player.y, sceneId]);
+  }, [tuning.enabled, player.frame, player.isWalking, player.isRunning, player.direction, player.x, player.y, sceneId]);
 }

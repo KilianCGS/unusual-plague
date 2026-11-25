@@ -121,7 +121,7 @@ test("the header and the button name the action of the station, and the button s
       );
     }
   }
-  assert.equal(craftingCopy.es.action.manual, "Preparar");
+  assert.equal(craftingCopy.es.action.manual, "Fabricar");
   assert.equal(craftingCopy.es.action.fire, "Cocinar");
 });
 

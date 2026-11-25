@@ -356,10 +356,11 @@ main.title-screen.is-black .title-screen-fade {
 
 /* A sheet of parchment in a wooden frame, like the game's own windows. */
 .about-panel {
-  width: min(100%, 680px);
-  max-height: calc(100dvh - 4rem);
+  /* 2026-11-21 (Kilian): no scroll when it opens: wider, tighter, smaller type. The scrollbar only shows if the window is really small. */
+  width: min(100%, 800px);
+  max-height: calc(100dvh - 2.4rem);
   overflow: auto;
-  padding: 1.8rem 2rem 1.6rem;
+  padding: 1.2rem 1.8rem 1.1rem;
   text-align: left;
   color: #2b1a14;
   font-family: "MedievalSharp", "IM Fell DW Pica", Georgia, serif;
@@ -374,23 +375,26 @@ main.title-screen.is-black .title-screen-fade {
 }
 
 .about-panel-title {
-  margin-bottom: 1.1rem;
+  margin-bottom: 0.7rem;
   color: #2b1a14;
+  /* the same lettering as "Créditos y licencias" (2026-11-21, Kilian) */
   font-family: "UP Gothic", Georgia, serif;
-  font-size: 1.7rem;
-  letter-spacing: 0.06em;
-  text-shadow: 1px 1px 0 rgba(255, 246, 222, 0.7);
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
 .about-panel p {
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.55rem;
   color: #3b2a1c;
-  font-size: 1.12rem;
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.42;
 }
 
 .about-panel-close {
-  margin-top: 0.5rem;
+  margin: 0.4rem 0 0.8rem;
+  padding: 0.3rem 1.2rem;
+  font-size: 1.05rem;
 }
 
 /* "Controls": the same quiet button, in the lower-right corner. */
@@ -410,6 +414,15 @@ main.title-screen.is-black .title-screen-fade {
 .title-save-button {
   font-size: 0.8em;
   opacity: 0.9;
+}
+
+/* "Cargar partida" (2026-11-21, Kilian): a bit further below the start button, slightly bigger letters, light green. */
+.title-load-button {
+  /* 2026-11-21 (Kilian): lower, a smaller plank (less padding) but bigger letters. */
+  margin-top: 1.8rem;
+  padding: clamp(0.25rem, 0.7vh, 0.4rem) clamp(0.8rem, 1.4vw, 1.3rem);
+  font-size: 1.25em;
+  color: #b9e8a8;
 }
 
 .save-text {
@@ -436,15 +449,16 @@ main.title-screen.is-black .title-screen-fade {
 
 /* Credits inside the About panel (2026-11-20): smaller, quieter than the story paragraphs. */
 .about-credits-title {
-  margin: 1.1rem 0 0.5rem;
+  margin: 0.8rem 0 0.4rem;
   color: #2b1a14;
   font-family: "UP Gothic", Georgia, serif;
   font-size: 1.2rem;
+  font-weight: 700;
   letter-spacing: 0.05em;
 }
 
 .about-panel .about-credits {
-  font-size: 0.95rem;
-  line-height: 1.45;
+  font-size: 0.85rem;
+  line-height: 1.38;
   opacity: 0.85;
 }
