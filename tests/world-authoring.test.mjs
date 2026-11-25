@@ -438,7 +438,7 @@ test("generic collectibles: a placed Mushroom is collectible exactly like the He
 });
 
 test("collecting respects the inventory: with room it adds the item; when full the item stays in the world", () => {
-  const empty = inv.createEmptyInventory();
+  const empty = inv.createEmptyInventory(8);
   const added = inv.addItem(empty, "mushroom", 1);
   assert.equal(inv.countItem(added, "mushroom"), 1);
   const full = ["a", "b", "c", "d", "e", "f", "g", "h"].reduce(

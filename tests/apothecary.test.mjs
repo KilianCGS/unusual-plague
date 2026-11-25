@@ -117,9 +117,9 @@ test("2. exactly 2 transitions, as drawn", () => {
   ]);
 });
 
-test("3-5. exactly 2 spawns, both facing south, as drawn", () => {
+test("3-5. exactly 2 spawns, as drawn (spawn-1 faces north since 2026-11-25; spawn-2 south)", () => {
   assert.deepEqual(geo.apothecaryMainZoneSpawns, [
-    { id: "apothecary-main-zone-spawn-1", x: 240, y: 238, direction: "south" },
+    { id: "apothecary-main-zone-spawn-1", x: 240, y: 238, direction: "north" },
     { id: "apothecary-main-zone-spawn-2", x: 240, y: 100, direction: "south" },
   ]);
 });

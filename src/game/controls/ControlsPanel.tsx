@@ -24,7 +24,7 @@ import {
 import styles from "./ControlsPanel.module.css";
 
 const MOVEMENT: readonly ControlAction[] = ["up", "down", "left", "right"];
-const OTHERS: readonly ControlAction[] = ["interact", "run", "book", "map", "objectives"];
+const OTHERS: readonly ControlAction[] = ["interact", "run", "book", "map", "objectives", "inventory"];
 
 // The controls screen: layouts to pick from, and every action's key(s) to change. Wood
 // frame and parchment like the game's other windows. It captures the next key press

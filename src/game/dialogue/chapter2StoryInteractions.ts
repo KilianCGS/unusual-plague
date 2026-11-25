@@ -63,16 +63,17 @@ const flourOffer = [
 ];
 
 // 2026-11-16 (Kilian): the seamstress of the apothecary street is the wife of the tavern man the Doctor
-// helped on Day 1. She gives him a backpack just for talking (one more slot, a comfort, not a reward to
-// earn). New text, awaiting Kilian's review.
+// helped on Day 1. She thanks him just for talking and gives him a piece of clean cloth (2026-11-25, Kilian: the
+// backpack's extra slot is gone, the Doctor's case has a fixed 15 places). It waits if the cloth does not fit.
+// The reward id keeps its old name so saves and tests that know it still work. New text, awaiting Kilian's review.
 export const SEAMSTRESS_INTERACTION_ID = "chapter2.apothecaryStreet.seamstress";
 export const SEAMSTRESS_BACKPACK_ID = "chapter2.seamstress.backpack";
 const backpackGift = talk("chapter2.apothecaryStreet.seamstress.backpack", [
   npc("¡Doctor! Usted es el que ayudó a mi marido en la taberna. Dice que ya no le duele la barriga, y que el sermón le dolió más.", "Doctor! You're the one who helped my husband at the tavern. He says his stomach doesn't hurt any more, and that the scolding hurt worse."),
   doctor("Entonces se curó del todo. Con el sermón no pude hacer nada.", "Then he's fully cured. I couldn't do anything about the scolding."),
-  npc("Lleva usted todo en los brazos. Tome, la mochila la cosí con retales de sobra. Le cabe una cosa más.", "You carry everything in your arms. Here, I sewed this backpack from leftover scraps. It holds one more thing."),
-  doctor("Es perfecta. Se lo agradezco de verdad.", "It's perfect. I truly thank you."),
-  npc("Agradézcaselo a mi marido: sin su barriga no habría mochila.", "Thank my husband: without his stomach there'd be no backpack."),
+  npc("Gracias de verdad, Doctor. Tome, un trozo de tela limpia de mis retales. A usted seguro que le hace más falta que a mí.", "Thank you truly, Doctor. Here, a piece of clean cloth from my scraps. I'm sure you need it more than I do."),
+  doctor("Es justo lo que andaba buscando. Se lo agradezco mucho.", "It's just what I was looking for. Thank you very much."),
+  npc("Agradézcaselo a mi marido: sin su barriga no habría tela de sobra.", "Thank my husband: without his stomach there'd be no spare cloth."),
 ]);
 
 // 2026-11-16 (Kilian): the baker gives ONE sugar, as a thank-you, in the first conversation of Day 2
@@ -100,10 +101,14 @@ export function resolveChapter2StoryInteraction(
       effects: [...(honey?.effects ?? []), { type: "claim-reward", rewardId: FLOUR_OFFERED_ID }],
     };
   }
-  if (interactionId === SEAMSTRESS_INTERACTION_ID && !facts.claimedRewards?.has(SEAMSTRESS_BACKPACK_ID)) {
+  if (
+    interactionId === SEAMSTRESS_INTERACTION_ID &&
+    !facts.claimedRewards?.has(SEAMSTRESS_BACKPACK_ID) &&
+    canAddItem(facts.inventory, "cloth")
+  ) {
     return {
       conversation: localizeConversation(backpackGift, language, subjectId),
-      effects: [{ type: "grow-inventory", slots: 1 }, { type: "claim-reward", rewardId: SEAMSTRESS_BACKPACK_ID }],
+      effects: [{ type: "give-item", itemId: "cloth", quantity: 1 }, { type: "claim-reward", rewardId: SEAMSTRESS_BACKPACK_ID }],
     };
   }
   if (

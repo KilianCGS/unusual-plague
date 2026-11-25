@@ -78,10 +78,10 @@ test("once the day is closed (its completed flag) nothing asks for it again and 
   assert.equal(de.shouldCloseDayNow("chapter-1", treated, flags, "apothecary-interior"), false);
 });
 
-test("the fast travel is off while the day is over, and the rule stays free of story words", () => {
+test("the fast travel stays available while the day is over (2026-11-25), and the rule stays free of story words", () => {
   const base = { sceneId: "plaza", phase: "playing", openingActive: false, tutorialStep: "done", dialogueActive: false, bookOpen: false, mapVisible: false, storageOpen: false, craftingOpen: false, inNarrativeScene: false };
   assert.equal(canFastTravel(base), true);
-  assert.equal(canFastTravel({ ...base, dayOver: true }), false);
+  assert.equal(canFastTravel({ ...base, dayOver: true }), true);
   assert.ok(!/patient|reward|quest|chapter|story/i.test(read("src/game/world/fastTravel.ts").replace(/\/\/.*$/gm, "")));
 });
 
@@ -96,12 +96,11 @@ test("the thoughts and the sign exist in both languages, one thought per day", (
   assert.equal(dayEndCopy.es.thoughts["chapter-1"], "Creo que por hoy he hecho un buen trabajo. Debería descansar.");
 });
 
-test("GameWorld wires it: thought, sign instead of the fast travel, closing at home", () => {
+test("GameWorld wires it: thought, sign beside the fast travel, closing at home", () => {
   const game = read("src/game/world/GameWorld.tsx");
   assert.ok(game.includes("shouldAnnounceDayEnd(chapterId"));
   assert.ok(game.includes("shouldCloseDayNow(chapterId"));
   assert.ok(game.includes("<DayEndSign"));
-  assert.ok(game.includes("dayOver,")); // fed to the fast travel rule
   assert.ok(game.includes("doctorThought(line"));
 });
 

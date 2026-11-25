@@ -28,6 +28,8 @@ import {
 } from "./protagonistRun";
 
 export type { Direction };
+// Space must be held this long where running is not allowed before the Doctor says why.
+const RUN_BLOCKED_HOLD_MS = 1000;
 // 0..3 or 0..7 walking, 0..7 or 0..11 running (see protagonistRun.ts).
 export type AnimationFrame = number;
 
@@ -121,6 +123,7 @@ export function useProtagonistController({
   const runDisabledRef = useRef(runDisabled);
   const onRunBlockedRef = useRef(onRunBlocked);
   const runBlockedShownRef = useRef(false);
+  const runBlockedSinceRef = useRef<number | null>(null);
   useEffect(() => {
     runDisabledRef.current = runDisabled;
     onRunBlockedRef.current = onRunBlocked;
@@ -173,14 +176,20 @@ export function useProtagonistController({
       // the speed and the animation.
       const runKeyDown = directionInput.run?.isArmed() === true;
       // Where running is not allowed Space only reports itself (once per press).
-      if (runDisabledRef.current) {
-        if (runKeyDown && !runBlockedShownRef.current) {
+      // 2026-11-25: only after Space has been held for a second, and once per hold.
+      if (runDisabledRef.current && runKeyDown) {
+        runBlockedSinceRef.current ??= timestamp;
+        if (
+          !runBlockedShownRef.current &&
+          timestamp - runBlockedSinceRef.current >= RUN_BLOCKED_HOLD_MS
+        ) {
           runBlockedShownRef.current = true;
           onRunBlockedRef.current?.();
         }
       }
-      if (!runKeyDown) {
+      if (!runKeyDown || !runDisabledRef.current) {
         runBlockedShownRef.current = false;
+        runBlockedSinceRef.current = null;
       }
       const running =
         activeDirection !== undefined && runKeyDown && !runDisabledRef.current;

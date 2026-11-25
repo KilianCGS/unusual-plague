@@ -6,7 +6,10 @@
 //
 // Every operation is pure: it returns a new state and never mutates the one it
 // receives, so it is safe to use with React state.
-export const INVENTORY_CAPACITY = 8;
+// 2026-11-25 (Kilian): the carried inventory is the Doctor's open case: 15 places in 3 rows of 5, fixed (the Day 2
+// backpack no longer adds a slot).
+export const INVENTORY_CAPACITY = 15;
+export const INVENTORY_COLUMNS = 5;
 
 // An id from the item catalog (src/game/items). Kept as a string here so the
 // inventory does not depend on the catalog.
@@ -45,6 +48,34 @@ export function growInventory(
     capacity: inventory.capacity + extra,
     slots: [...inventory.slots, ...Array.from({ length: extra }, () => null)],
   };
+}
+
+// Puts the content of slot `from` in slot `to`: into an empty slot it moves, into an occupied one the two swap
+// places. Nothing is merged, split or lost (there is one slot per item type). Returns the same inventory when
+// the move is not a move (same slot, or out of range).
+export function moveSlot(
+  inventory: InventoryState,
+  from: number,
+  to: number,
+): InventoryState {
+  const last = inventory.slots.length - 1;
+
+  if (
+    !Number.isInteger(from) ||
+    !Number.isInteger(to) ||
+    from === to ||
+    from < 0 ||
+    to < 0 ||
+    from > last ||
+    to > last
+  ) {
+    return inventory;
+  }
+
+  const slots = [...inventory.slots];
+  [slots[from], slots[to]] = [slots[to], slots[from]];
+
+  return { ...inventory, slots };
 }
 
 export function countOccupiedSlots(inventory: InventoryState): number {

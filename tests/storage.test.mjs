@@ -60,17 +60,17 @@ const test = (name, fn) => {
   console.log("ok -", name);
 };
 
-const stock = (pairs, base = inv.createEmptyInventory()) =>
+const stock = (pairs, base = inv.createEmptyInventory(8)) =>
   pairs.reduce((s, [id, q]) => inv.addItem(s, id, q), base);
 const storageOf = (pairs) => stock(pairs, st.createEmptyStorage());
 const snap = (x) => JSON.stringify(x);
 
 test("A. the Doctor's inventory holds 5 item types; the storage has its own generous capacity", () => {
-  assert.equal(inv.INVENTORY_CAPACITY, 8);
-  assert.equal(inv.createEmptyInventory().slots.length, 8);
-  assert.equal(createChapter1Inventory().capacity, 8);
+  assert.equal(inv.INVENTORY_CAPACITY, 15);
+  assert.equal(inv.createEmptyInventory().slots.length, 15);
+  assert.equal(createChapter1Inventory().capacity, 15);
   assert.equal(st.createEmptyStorage().capacity, st.STORAGE_CAPACITY);
-  assert.ok(st.STORAGE_CAPACITY > inv.INVENTORY_CAPACITY);
+  assert.ok(st.STORAGE_CAPACITY < inv.INVENTORY_CAPACITY, "2026-11-25: the chest (10) is smaller than the open case (15)");
   assert.ok(inv.isValidInventory(st.createEmptyStorage()));
 });
 
@@ -160,7 +160,7 @@ test("exactly TWO initial Empty flasks exist across the carried inventory and th
   const taken = st.transferStack(chest, doctor, "empty-flask");
   assert.equal(total(taken.destination, taken.source), 2);
   assert.equal(chest.capacity, st.STORAGE_CAPACITY);
-  assert.equal(st.STORAGE_CAPACITY, 15);
+  assert.equal(st.STORAGE_CAPACITY, 10);
 });
 
 test("I/J. gather.water needs the flask CARRIED (not stored); filling it uses it up", () => {

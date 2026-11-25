@@ -79,7 +79,7 @@ const P3DEF = ch1.CHAPTER1_PATIENTS[P3];
 const stock = (pairs) =>
   pairs.reduce(
     (s, [id, q]) => inv.addItem(s, id, q),
-    inv.createEmptyInventory(),
+    inv.createEmptyInventory(8),
   );
 const count = (f, id) => inv.countItem(f.inventory, id);
 // patient states: Patient 1 and 2 as given, Patient 3 as given

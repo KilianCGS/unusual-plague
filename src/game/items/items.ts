@@ -119,7 +119,7 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
   mushroom: {
     id: "mushroom",
     // Renamed 2026-11-11: the one from the mine; the forest one is the pine mushroom.
-    name: { es: "Hongo de cueva", en: "Cave mushroom" },
+    name: { es: "Champiñón de cueva", en: "Cave mushroom" },
     icon: `${RESOURCE_ICONS}/mushroom.png`,
   },
   honey: {
@@ -279,7 +279,7 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
   },
   "chopped-mushroom": {
     id: "chopped-mushroom",
-    name: { es: "Hongo troceado", en: "Chopped mushroom" },
+    name: { es: "Champiñón troceado", en: "Chopped mushroom" },
     icon: `${PREPARED_ICONS}/chopped-mushroom.png`,
   },
   "crushed-garlic": {

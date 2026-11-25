@@ -1,4 +1,9 @@
-import type { InventoryState } from "../inventory/inventory";
+import {
+  INVENTORY_CAPACITY,
+  addItem,
+  type InventoryState,
+} from "../inventory/inventory";
+import { STORAGE_CAPACITY } from "../storage/storage";
 import type { PatientCasesState } from "../patients/patientCases";
 import type { GameDevStart } from "../world/devStart";
 
@@ -85,7 +90,50 @@ export function validateSave(value: unknown): SaveGame | null {
   if (!isStringArray(save.claimedRewards) || !isStringArray(save.knownRecipeIds) || !isStringArray(save.collected)) return null;
   if (!isInventory(save.inventory) || !isInventory(save.storage)) return null;
   if (!Number.isInteger(save.coins) || save.coins < 0) return null;
-  return save;
+  return migrateInventories(save);
+}
+
+// 2026-11-25: saves from before the open case had a bag of 8-9 places and a chest of 15. The bag grows to the
+// case (the same things in the same places, new places empty); a chest bigger than today's keeps its things in
+// its first places, and what does not fit goes to the free places of the case. Nothing is ever dropped: if
+// even that is not enough, the chest keeps the extra places it needs (not expected: it never held that many).
+function migrateInventories(save: SaveGame): SaveGame {
+  let inventory = save.inventory;
+  let storage = save.storage;
+
+  if (inventory.capacity < INVENTORY_CAPACITY) {
+    inventory = {
+      capacity: INVENTORY_CAPACITY,
+      slots: [
+        ...inventory.slots,
+        ...Array.from({ length: INVENTORY_CAPACITY - inventory.slots.length }, () => null),
+      ],
+    };
+  }
+
+  if (storage.capacity > STORAGE_CAPACITY) {
+    const kept = storage.slots.filter((slot) => slot !== null);
+    const stay = kept.slice(0, STORAGE_CAPACITY);
+    const over = kept.slice(STORAGE_CAPACITY);
+    const rest = [];
+
+    for (const slot of over) {
+      const moved = addItem(inventory, slot.itemId, slot.quantity);
+      if (moved) inventory = moved;
+      else rest.push(slot);
+    }
+
+    const stored = [...stay, ...rest];
+    const capacity = Math.max(STORAGE_CAPACITY, stored.length);
+    storage = {
+      capacity,
+      slots: [...stored, ...Array.from({ length: capacity - stored.length }, () => null)],
+    };
+  }
+
+  return inventory === save.inventory && storage === save.storage
+    ? save
+    : { ...save, inventory, storage };
 }
 
 export function toDevStart(save: SaveGame): GameDevStart {

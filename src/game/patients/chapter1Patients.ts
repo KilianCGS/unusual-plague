@@ -5,6 +5,8 @@ import {
   type PatientCaseDefinition,
   type PatientCasesState,
 } from "./patientCases";
+import { CHAPTER2_PATIENTS } from "./chapter2Patients";
+import { CHAPTER3_PATIENTS } from "./chapter3Patients";
 
 // Chapter 1 patients: the baker's husband, the man on the tavern floor and the
 // injured miner. None of them depends on another: each is found by walking up
@@ -151,6 +153,7 @@ export function getAttentionInstanceIds(
   state: PatientCasesState,
   claimedRewards: ReadonlySet<string> = new Set(),
   inventory?: InventoryState,
+  chapterId?: string,
 ): ReadonlySet<string> {
   const instances = new Set(
     Object.entries(CHAPTER1_PATIENT_NPC_INSTANCES)
@@ -224,8 +227,46 @@ export function getAttentionInstanceIds(
     }
   }
 
+  // Days 2 and 3 (2026-11-25, Kilian: the blacksmith had no "!"): the day's patients get the same mark
+  // as Day 1's: not examined yet, or examined and both preparations in hand.
+  for (const entry of CHAPTER_PATIENT_MARKS[chapterId ?? ""] ?? []) {
+    const status = getPatientStatus(state, entry.patientId);
+    if (status === "hidden" || status === "discovered") {
+      instances.add(entry.instanceId);
+    } else if (
+      status === "examined" &&
+      inventory &&
+      entry.treatments.length > 0 &&
+      entry.treatments.every(({ itemId, quantity }) => countItem(inventory, itemId) >= quantity)
+    ) {
+      instances.add(entry.instanceId);
+    }
+  }
+
   return instances;
 }
+
+// The placed person of each patient of Days 2 and 3 and what his treatment needs (the same data as the cases:
+// chapter2Patients.ts / chapter3Patients.ts). Only the day's own cases mark, so a Day 3 person who is
+// also placed on Day 2 (the old man with the jug) is not marked early.
+type PatientMark = {
+  patientId: string;
+  instanceId: string;
+  treatments: readonly { itemId: string; quantity: number }[];
+};
+const CHAPTER_PATIENT_MARKS: Record<string, readonly PatientMark[]> = {
+  "chapter-2": [
+    { patientId: "chapter2-woodcutter", instanceId: "forest-woodcutter-day2-tired-01", treatments: CHAPTER2_PATIENTS["chapter2-woodcutter"].requiredTreatments },
+    { patientId: "chapter2-blacksmith", instanceId: "smithy-interior-blacksmith-day2-hurt-hand-01", treatments: CHAPTER2_PATIENTS["chapter2-blacksmith"].requiredTreatments },
+    { patientId: "chapter2-farmer", instanceId: "granary-interior-farmer-hoeing-sick-lying-01", treatments: [] },
+  ],
+  "chapter-3": [
+    { patientId: "chapter3-duster", instanceId: "bakery-street-woman-dusting-01", treatments: CHAPTER3_PATIENTS["chapter3-duster"].requiredTreatments },
+    { patientId: "chapter3-path-miner", instanceId: "quarry-stonecutter-resting-01", treatments: CHAPTER3_PATIENTS["chapter3-path-miner"].requiredTreatments },
+    { patientId: "chapter3-stonecutter", instanceId: "quarry-stonecutter-stool-01", treatments: CHAPTER3_PATIENTS["chapter3-stonecutter"].requiredTreatments },
+    { patientId: "chapter3-insomniac", instanceId: "tavern-street-elderly-man-with-jug-01", treatments: CHAPTER3_PATIENTS["chapter3-insomniac"].requiredTreatments },
+  ],
+};
 
 // The conversation partner during the examination (the sick husband, placed
 // in the Baker's Bedroom narrative scene).

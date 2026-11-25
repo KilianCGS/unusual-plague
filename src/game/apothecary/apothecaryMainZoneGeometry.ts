@@ -56,7 +56,7 @@ export const apothecaryMainZoneSpawns: {
   y: number;
   direction: Direction;
 }[] = [
-  { id: "apothecary-main-zone-spawn-1", x: 240, y: 238, direction: "south" },
+  { id: "apothecary-main-zone-spawn-1", x: 240, y: 238, direction: "north" },
   { id: "apothecary-main-zone-spawn-2", x: 240, y: 100, direction: "south" },
 ];
 

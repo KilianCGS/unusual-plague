@@ -90,12 +90,12 @@ export const tutorialCopy: Record<
       body: "Lo necesitarás para recoger muestras.",
     },
     bar: {
-      title: ["Tu inventario y tu dinero."],
-      body: "La barra de abajo es lo que llevas encima: tiene pocas casillas, así que elige bien.\nLas monedas, abajo a la derecha, sirven para comprar ingredientes a los comerciantes.",
+      title: ["Tu maletín y tu dinero."],
+      body: "El botón de abajo abre tu maletín, lo que llevas encima: 15 huecos, así que elige bien.\nLas monedas, abajo a la derecha, sirven para comprar ingredientes a los comerciantes.",
     },
     eye: {
-      title: ["Ojo abierto, ojo cerrado."],
-      body: "El ojo de la barra de abajo la esconde cuando te estorba y la vuelve a mostrar. Los objetos siguen contigo aunque no los veas.",
+      title: ["Abre el maletín con {inventory}."],
+      body: "Se abre y se cierra con {inventory} (Esc también lo cierra). Arrastra los objetos para ordenarlos como quieras: no cambia nada más.",
     },
     "exit-room": {
       title: ["Baja a la botica."],
@@ -179,12 +179,12 @@ export const tutorialCopy: Record<
       body: "You will need it to collect samples.",
     },
     bar: {
-      title: ["Your inventory and your money."],
-      body: "The bar below is what you carry: it has few slots, so choose wisely.\nThe coins, bottom right, are for buying ingredients from the merchants.",
+      title: ["Your case and your money."],
+      body: "The button below opens your case, what you carry: 15 slots, so choose wisely.\nThe coins, bottom right, are for buying ingredients from the merchants.",
     },
     eye: {
-      title: ["Eye open, eye closed."],
-      body: "The eye on the bar below hides it when it gets in your way and shows it again. Your items stay with you even when you cannot see them.",
+      title: ["Open the case with {inventory}."],
+      body: "It opens and closes with {inventory} (Esc closes it too). Drag objects to sort them any way you like: nothing else changes.",
     },
     "exit-room": {
       title: ["Go down to the apothecary."],

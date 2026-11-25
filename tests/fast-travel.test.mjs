@@ -161,7 +161,7 @@ test("the destination is the Botica, on the arrival of its street door: free flo
   const scene = WORLD_SCENES[FAST_TRAVEL_DESTINATION.sceneId];
   const arrival = scene.arrivals[FAST_TRAVEL_DESTINATION.spawnName];
   assert.ok(arrival, "the arrival exists");
-  assert.deepEqual(arrival, { x: 240, y: 238, direction: "south" });
+  assert.deepEqual(arrival, { x: 240, y: 238, direction: "north" });
   // it is the very arrival a walk in from the Apothecary Street uses
   const street = WORLD_SCENES["apothecary-street"].exits.find(
     (exit) => exit.targetScene === "apothecary-interior",

@@ -62,7 +62,7 @@ const test = (name, fn) => {
 };
 
 const stock = (pairs) =>
-  pairs.reduce((s, [id, q]) => inv.addItem(s, id, q), inv.createEmptyInventory());
+  pairs.reduce((s, [id, q]) => inv.addItem(s, id, q), inv.createEmptyInventory(8));
 const facts = (patients, pairs = [], claimed = []) => ({
   patients,
   inventory: stock(pairs),

@@ -14,7 +14,8 @@ import {
 // next to the carried inventory later. Crafting never reads it: the Doctor has
 // to take things out first.
 // 2026-11-18 (Kilian): one more row of the chest (5 columns): 10 -> 15 slots, to ease the bag of 8.
-export const STORAGE_CAPACITY = 15;
+// 2026-11-25 (Kilian): back to 10 (2 rows of 5), now that the carried case has 15 places.
+export const STORAGE_CAPACITY = 10;
 
 // What the chest's interaction zone reports to the owner of the game state.
 export const STORAGE_INTERACTION_ID = "storage.doctor-room";

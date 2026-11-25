@@ -56,12 +56,12 @@ const test = (name, fn) => {
 const HERB = "medicinal-herb";
 const types = (n) => Array.from({ length: n }, (_, i) => `item-${i + 1}`);
 const fill = (ids) =>
-  ids.reduce((state, id) => inv.addItem(state, id), inv.createEmptyInventory());
+  ids.reduce((state, id) => inv.addItem(state, id), inv.createEmptyInventory(8));
 
 test("1. the inventory starts with 8 empty slots", () => {
   const state = inv.createEmptyInventory();
-  assert.equal(state.slots.length, 8);
-  assert.equal(state.capacity, 8);
+  assert.equal(state.slots.length, 15);
+  assert.equal(state.capacity, 15);
   assert.equal(inv.countOccupiedSlots(state), 0);
 });
 
@@ -130,7 +130,7 @@ test("8. addItem is immutable", () => {
 });
 
 test("addItem rejects non-positive or fractional quantities", () => {
-  const empty = inv.createEmptyInventory();
+  const empty = inv.createEmptyInventory(8);
   for (const q of [0, -1, 1.5, NaN])
     assert.equal(inv.addItem(empty, HERB, q), null);
 });
@@ -146,7 +146,7 @@ test("9. a picked-up instance is identified by its instanceId (immutably)", () =
 
 test("10. itemId and instanceId are not confused: two instances, one item, one stack", () => {
   let collected = col.NO_COLLECTED;
-  let state = inv.createEmptyInventory();
+  let state = inv.createEmptyInventory(8);
   for (const instanceId of ["forest-herb-01", "forest-herb-02"]) {
     state = inv.addItem(state, HERB);
     collected = col.markCollected(collected, instanceId);

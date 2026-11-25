@@ -161,7 +161,7 @@ test("leaving the Doctor's Room: the Doctor arrives in the Apothecary at the app
   assert.deepEqual(arrivals["from-apothecary-street"], {
     x: 240,
     y: 238,
-    direction: "south",
+    direction: "north",
   });
   // nothing in the scene overrides the arrival's facing
   assert.ok(
@@ -277,8 +277,8 @@ test("gameplay is blocked while the opening runs, and its end starts the tutoria
 test("a new game: no Empty flask in the pocket, ONE in the Storage chest", () => {
   const pocket = createChapter1Inventory();
   const chest = createChapter1Storage();
-  assert.equal(pocket.capacity, 8);
-  assert.equal(chest.capacity, 15);
+  assert.equal(pocket.capacity, 15);
+  assert.equal(chest.capacity, 10);
   assert.equal(inv.countItem(pocket, "empty-flask"), 0);
   assert.equal(inv.countOccupiedSlots(pocket), 0);
   // 2026-11-16 (Kilian): TWO flasks, one stack (the river gives 2 waters, so he carries 2 flasks)
@@ -469,7 +469,7 @@ test("the flask is what counts: another item, a failed transfer or no change nev
   assert.equal(carries(other.destination), false);
 
   // a failed transfer (pocket full of OTHER things) leaves the pocket untouched
-  const full = ["a", "b", "c", "d", "e", "f", "g", "h"].reduce(
+  const full = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o"].reduce(
     (state, id) => inv.addItem(state, id, 1),
     pocket,
   );

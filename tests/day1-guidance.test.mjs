@@ -84,8 +84,8 @@ test("the farm woman: with the orange already in his bag she smells it and offer
 
 test("cooking waits 3 seconds, and the Doctor carries 8 things", () => {
   assert.ok(read("src/game/crafting/CraftingOverlay.tsx").includes("{ fire: 3000 }"));
-  assert.equal(inv.INVENTORY_CAPACITY, 8);
-  assert.equal(inv.createEmptyInventory().slots.length, 8);
+  assert.equal(inv.INVENTORY_CAPACITY, 15);
+  assert.equal(inv.createEmptyInventory().slots.length, 15);
 });
 
 test("the miner points to the quarry camp after his examination; the camp's coal giver is the stonecutter resting on the ground", () => {

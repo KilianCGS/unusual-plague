@@ -101,7 +101,11 @@ import { noRunLines } from "../i18n/noRun";
 import { runBarkLines } from "../i18n/runBarks";
 import { ControlsPanel } from "../controls/ControlsPanel";
 import { PauseMenu } from "../controls/PauseMenu";
-import { InventoryHud } from "../inventory/InventoryHud";
+import { BriefcaseChip, BriefcaseOverlay } from "../inventory/BriefcaseOverlay";
+import { countOccupiedSlots, moveSlot } from "../inventory/inventory";
+import { useInventoryHotkey } from "../inventory/useInventoryHotkey";
+import { useBindings } from "../controls/controlsStore";
+import { keyLabel } from "../controls/keybindings";
 import { isInventoryHudVisible } from "../inventory/inventoryHudVisibility";
 import { storageCopy } from "../i18n/storage";
 import { STORAGE_INTERACTION_ID, transferStack } from "../storage/storage";
@@ -269,6 +273,9 @@ export function GameWorld({
   const [doctorRunning, setDoctorRunning] = useState(false);
   // The Apothecary storage chest interface (another main interface).
   const [storageOpen, setStorageOpen] = useState(false);
+  // The Doctor's open case (his carried inventory), opened with its key (I by default).
+  const [inventoryOpen, setInventoryOpen] = useState(false);
+  const bindings = useBindings();
   // The crafting station being used (null = none). Another main interface.
   // The kitchen is cooking (the Botica draws steam over the pot).
   const [cooking, setCooking] = useState(false);
@@ -398,6 +405,7 @@ export function GameWorld({
     !dialogue.active &&
     craftingStation === null &&
     !storageOpen &&
+    !inventoryOpen &&
     openShop === null &&
     !pauseOpen &&
     !inNarrativeScene;
@@ -446,6 +454,7 @@ export function GameWorld({
     !mapVisible &&
     craftingStation === null &&
     !storageOpen &&
+    !inventoryOpen &&
     openShop === null &&
     !pauseOpen &&
     !inNarrativeScene;
@@ -493,6 +502,13 @@ export function GameWorld({
         setBookOpen(true);
       }
     },
+  });
+
+  // The case key opens and closes the open case, only in plain play (once the tutorial has shown the HUD).
+  useInventoryHotkey({
+    open: inventoryOpen,
+    canOpen: canOpenInterface && !bookOpen && !mapVisible && isTutorialHudUnlocked(tutorial.step),
+    setOpen: setInventoryOpen,
   });
 
   const changePhase = useCallback((nextPhase: Phase) => {
@@ -548,10 +564,9 @@ export function GameWorld({
     dialogueActive: dialogue.active,
     bookOpen,
     mapVisible,
-    storageOpen: storageOpen || openShop !== null,
+    storageOpen: storageOpen || openShop !== null || inventoryOpen,
     craftingOpen: craftingStation !== null,
     inNarrativeScene,
-    dayOver,
   });
   // Recharge: 120 s after each trip. `now` only ticks while the bar is filling.
   const [fastTravelReadyAt, setFastTravelReadyAt] = useState(0);
@@ -739,6 +754,17 @@ export function GameWorld({
     },
     [language, applyStoryEffects],
   );
+
+  // Dragging (or click, click) in the open case: the contents of one place go to another, or swap.
+  const handleInventoryMove = useCallback((from: number, to: number) => {
+    const next = moveSlot(inventoryRef.current, from, to);
+
+    if (next === inventoryRef.current) return;
+
+    inventoryRef.current = next;
+    setInventory(next);
+    playSound("ui.itemClickDrop");
+  }, []);
 
   // Click on a stack in the storage interface: the whole stack goes to the
   // other side, or nothing moves and a short notice says why.
@@ -1687,9 +1713,14 @@ export function GameWorld({
           glow={tutorialStepNow === "fast-travel"}
         />
       ) : null}
-      {inventoryHudVisible ? (
+      {inventoryHudVisible && !inventoryOpen ? (
         <HudScale scale={hudScale} origin="bottom center">
-          <InventoryHud inventory={inventory} language={language} />
+          <BriefcaseChip
+            language={language}
+            keyLabel={keyLabel(bindings.inventory[0], language)}
+            freeSlots={inventory.capacity - countOccupiedSlots(inventory)}
+            onOpen={() => setInventoryOpen(true)}
+          />
         </HudScale>
       ) : null}
       {inventoryHudVisible ? (
@@ -1711,8 +1742,8 @@ export function GameWorld({
   // that is only discovered still waits for its visit, a treated one may still
   // owe its thank-you).
   const attentionInstanceIds = useMemo(
-    () => getAttentionInstanceIds(patients, claimedRewards, inventory),
-    [patients, claimedRewards, inventory],
+    () => getAttentionInstanceIds(patients, claimedRewards, inventory, chapterId),
+    [patients, claimedRewards, inventory, chapterId],
   );
 
   // What the known cases still need to be prepared; any other recipe is refused
@@ -1924,6 +1955,15 @@ export function GameWorld({
           message={shopMessage}
           onBuy={(entry) => handleBuy(openShop, entry)}
           onClose={() => setOpenShop(null)}
+        />
+      ) : null}
+      {inventoryOpen ? (
+        <BriefcaseOverlay
+          inventory={inventory}
+          language={language}
+          keyLabel={keyLabel(bindings.inventory[0], language)}
+          onMove={handleInventoryMove}
+          onClose={() => setInventoryOpen(false)}
         />
       ) : null}
       {storageOpen ? (

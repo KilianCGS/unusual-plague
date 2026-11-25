@@ -38,7 +38,7 @@ const state = {
   claimedRewards: new Set(["chapter1.day1.completed", "chapter2.errand.elderSyrup"]),
   knownRecipeIds: new Set(["fire.mint-infusion"]),
   inventory: inv.addItem(inv.createEmptyInventory(), "cloth", 2),
-  storage: inv.createEmptyInventory(),
+  storage: inv.createEmptyInventory(10),
   collected: new Set(["forest-medicinal-herb-01"]),
   coins: 17,
 };
@@ -79,6 +79,35 @@ test("the game autosaves when a day begins, only when asked to, and the title ca
   for (const dev of ["day2", "day3", "day4"]) {
     assert.ok(!fs.readFileSync(path.join(root, `src/app/dev/${dev}/page.tsx`), "utf8").includes("autosave"), `${dev} dev page never overwrites the save`);
   }
+});
+
+
+test("an old save (bag of 9, chest of 15) opens with the 15-place case and the 10-place chest, losing nothing", () => {
+  const stockOf = (capacity, pairs) => pairs.reduce((s, [id, q]) => inv.addItem(s, id, q), inv.createEmptyInventory(capacity));
+  const oldBag = stockOf(9, [["cloth", 2], ["salt", 1]]);
+  const types = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"];
+  const oldChest = stockOf(15, types.map((id, n) => [id, n + 1]));
+  const legacy = save.createSave({ ...state, inventory: oldBag, storage: oldChest });
+  const back = save.saveFromText(save.saveToText(legacy));
+  assert.equal(back.inventory.capacity, 15);
+  assert.equal(back.inventory.slots.length, 15);
+  assert.equal(inv.countItem(back.inventory, "cloth"), 2);
+  assert.deepEqual(back.inventory.slots[0], { itemId: "cloth", quantity: 2 }, "what was carried keeps its place");
+  assert.equal(back.storage.capacity, 10);
+  assert.equal(back.storage.slots.length, 10);
+  // the two chest items that did not fit now travel in the case; nothing is lost
+  const together = Object.fromEntries(types.map((id) => [id, inv.countItem(back.storage, id) + inv.countItem(back.inventory, id)]));
+  assert.deepEqual(together, Object.fromEntries(types.map((id) => [id, inv.countItem(oldChest, id)])));
+});
+
+test("a chest that cannot hand its extra things to the case keeps the places it needs (nothing is dropped)", () => {
+  const names = Array.from({ length: 15 }, (_, n) => `t${n}`);
+  const crowdedCase = names.reduce((s, id) => inv.addItem(s, id, 1), inv.createEmptyInventory());
+  const crowdedChest = names.reduce((s, id) => inv.addItem(s, `c-${id}`, 1), inv.createEmptyInventory(15));
+  const legacy = save.createSave({ ...state, inventory: crowdedCase, storage: crowdedChest });
+  const back = save.saveFromText(save.saveToText(legacy));
+  assert.equal(inv.countOccupiedSlots(back.storage), 15);
+  assert.equal(back.storage.capacity, 15);
 });
 
 console.log(`\n${passed} tests passed`);

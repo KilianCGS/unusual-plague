@@ -143,4 +143,16 @@ test("the controls screen and the pause menu exist, are reachable and block the 
   }
 });
 
+
+test("the open case has its own key: I (WASD, ZQSD), H where I is already up; old stored bindings are completed", () => {
+  assert.deepEqual(kb.PRESETS.wasd.inventory, ["i"]);
+  assert.deepEqual(kb.PRESETS.zqsd.inventory, ["i"]);
+  assert.deepEqual(kb.PRESETS.ijkl.inventory, ["h"]);
+  const old = kb.cloneBindings(kb.defaultBindings());
+  delete old.inventory;
+  assert.deepEqual(kb.sanitizeBindings(old).inventory, ["i"], "a saved set from before the case still loads");
+  assert.deepEqual(kb.sanitizeBindings(old).up, ["w", "ArrowUp"]);
+  assert.ok(read("src/game/inventory/useInventoryHotkey.ts").includes('matchesAction(getBindings(), "inventory"'));
+});
+
 console.log(`\n${passed} tests passed`);

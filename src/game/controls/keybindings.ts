@@ -12,7 +12,8 @@ export type ControlAction =
   | "run"
   | "book"
   | "map"
-  | "objectives";
+  | "objectives"
+  | "inventory";
 
 export const CONTROL_ACTIONS: readonly ControlAction[] = [
   "up",
@@ -24,6 +25,8 @@ export const CONTROL_ACTIONS: readonly ControlAction[] = [
   "book",
   "map",
   "objectives",
+  // The Doctor's open case (2026-11-25). Last, so a bindings object saved before it existed can be completed.
+  "inventory",
 ];
 
 // Movement has a main key and an alternative; every other action has one key.
@@ -38,6 +41,7 @@ export const SLOTS_PER_ACTION: Record<ControlAction, number> = {
   book: 1,
   map: 1,
   objectives: 1,
+  inventory: 1,
 };
 
 export type Bindings = Record<ControlAction, string[]>;
@@ -59,6 +63,7 @@ export const PRESETS: Record<PresetId, Bindings> = {
     book: ["q"],
     map: ["Tab"],
     objectives: ["r"],
+    inventory: ["i"],
   },
   // For AZERTY keyboards: ZQSD, the book moves to A (Q is "left" here).
   zqsd: {
@@ -71,6 +76,7 @@ export const PRESETS: Record<PresetId, Bindings> = {
     book: ["a"],
     map: ["Tab"],
     objectives: ["r"],
+    inventory: ["i"],
   },
   // Everything under the right hand.
   ijkl: {
@@ -83,6 +89,8 @@ export const PRESETS: Record<PresetId, Bindings> = {
     book: ["u"],
     map: ["Tab"],
     objectives: ["p"],
+    // I is "up" in this layout.
+    inventory: ["h"],
   },
 };
 
@@ -162,7 +170,9 @@ export function sanitizeBindings(value: unknown): Bindings {
   const seen = new Set<string>();
 
   for (const action of CONTROL_ACTIONS) {
-    const keys = candidate[action];
+    let keys = candidate[action];
+    // Saved before the case existed: it gets its default key if that key is still free.
+    if (keys === undefined && action === "inventory") keys = fallback[action];
     if (!Array.isArray(keys) || keys.length !== SLOTS_PER_ACTION[action]) return fallback;
     for (const key of keys) {
       if (typeof key !== "string" || !isAssignable(key) || normalizeKey(key) !== key || seen.has(key)) {

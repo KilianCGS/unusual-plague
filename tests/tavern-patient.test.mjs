@@ -84,7 +84,7 @@ const BEE = "chapter1.mill.beekeeper";
 const stock = (pairs) =>
   pairs.reduce(
     (s, [id, q]) => inv.addItem(s, id, q),
-    inv.createEmptyInventory(),
+    inv.createEmptyInventory(8),
   );
 const state = (status, baker = "treated") => ({
   [ch1.BAKER_HUSBAND_ID]: baker,

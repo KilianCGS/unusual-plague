@@ -61,7 +61,7 @@ const ing = (...ids) => ids.map((itemId) => ({ itemId, quantity: 1 }));
 const stock = (pairs) =>
   pairs.reduce(
     (state, [id, q]) => inv.addItem(state, id, q),
-    inv.createEmptyInventory(),
+    inv.createEmptyInventory(8),
   );
 const recipeById = (id) => RECIPES.find((r) => r.id === id);
 const permutations = (list) =>

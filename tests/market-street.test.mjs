@@ -72,25 +72,26 @@ test("the three stall sprites exist (128x96) and are registered in the Decorator
   }
 });
 
-test("the backpack adds ONE slot, keeping what is carried, and the world applies it", () => {
-  const base = inv.addItem(inv.createEmptyInventory(), "cloth", 2);
+test("growInventory still adds ONE slot, keeping what is carried (no longer used by the game since 2026-11-25)", () => {
+  const base = inv.addItem(inv.createEmptyInventory(8), "cloth", 2);
   const grown = inv.growInventory(base, 1);
   assert.equal(grown.capacity, 9);
   assert.equal(grown.slots.length, 9);
   assert.equal(inv.countItem(grown, "cloth"), 2);
   assert.ok(inv.isValidInventory(grown));
-  assert.equal(inv.createEmptyInventory().slots.length, 8);
+  assert.equal(inv.createEmptyInventory().slots.length, 15);
   assert.ok(read("src/game/world/GameWorld.tsx").includes('effect.type === "grow-inventory"'));
 });
 
-test("the seamstress gives the backpack once, just by talking, then goes back to her ambient talk", () => {
+test("the seamstress thanks the Doctor and gives one clean cloth once, just by talking, then goes back to her ambient talk (2026-11-25: no backpack slot)", () => {
   const facts = (claimed = []) => ({ patients: {}, inventory: inv.createEmptyInventory(), claimedRewards: new Set(claimed) });
   const first = ch2.resolveChapter2StoryInteraction(ch2.SEAMSTRESS_INTERACTION_ID, facts(), "es", "s");
-  assert.ok(first.effects.some((e) => e.type === "grow-inventory" && e.slots === 1));
+  assert.ok(first.effects.some((e) => e.type === "give-item" && e.itemId === "cloth" && e.quantity === 1));
+  assert.ok(!first.effects.some((e) => e.type === "grow-inventory"));
   assert.ok(first.effects.some((e) => e.type === "claim-reward" && e.rewardId === ch2.SEAMSTRESS_BACKPACK_ID));
-  assert.ok(first.conversation.lines.some((l) => l.text.includes("mochila")));
+  assert.ok(first.conversation.lines.some((l) => l.text.includes("tela limpia")));
   const en = ch2.resolveChapter2StoryInteraction(ch2.SEAMSTRESS_INTERACTION_ID, facts(), "en", "s");
-  assert.ok(en.conversation.lines.some((l) => /backpack/.test(l.text)));
+  assert.ok(en.conversation.lines.some((l) => /clean cloth/.test(l.text)));
   const again = ch2.resolveChapter2StoryInteraction(ch2.SEAMSTRESS_INTERACTION_ID, facts([ch2.SEAMSTRESS_BACKPACK_ID]), "es", "s");
   assert.ok(!again || !again.effects.some((e) => e.type === "grow-inventory"));
 });

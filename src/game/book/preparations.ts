@@ -20,7 +20,7 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
     en: "A mixture of crushed herb and ground charcoal applied to the affected area.",
   },
   "mushroom-soup": {
-    es: "Caldo suave de hongos, agua y una pizca de sal.",
+    es: "Caldo suave de champiñones, agua y una pizca de sal.",
     en: "A light mushroom broth made with water and a pinch of salt.",
   },
   "milk-with-honey": {
@@ -73,7 +73,7 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
     en: "Onion cut into small pieces on the board. Ready for cooking.",
   },
   "chopped-mushroom": {
-    es: "Hongos cortados en láminas y trozos. Lista para el caldo.",
+    es: "Champiñones cortados en láminas y trozos. Lista para el caldo.",
     en: "Mushrooms cut into slices and pieces. Ready for the broth.",
   },
   "crushed-garlic": {

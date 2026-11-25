@@ -198,10 +198,12 @@ function cure(patientId, talkId) {
 }
 
 // ================================================================== DAY 2 ===============================
-test("Day 2: the seamstress's backpack (one more slot), then the three cases", () => {
-  assert.equal(state.inventory.capacity, 8);
+test("Day 2: the seamstress's thank-you (one clean cloth, no extra slot), then the three cases", () => {
+  assert.equal(state.inventory.capacity, 15);
+  const clothBefore = inv.countItem(state.inventory, "cloth");
   talk("chapter2.apothecaryStreet.seamstress", "backpack");
-  assert.equal(state.inventory.capacity, 9, "the backpack adds a slot");
+  assert.equal(state.inventory.capacity, 15, "the open case has a fixed 15 places");
+  assert.equal(inv.countItem(state.inventory, "cloth"), clothBefore + 1, "she gives one clean cloth");
   cure(WOODCUTTER, "chapter2.forest.woodcutter");
   cure(BLACKSMITH, "chapter2.smithy.blacksmith");
   cure(FARMER, "chapter2.granary.farmer");

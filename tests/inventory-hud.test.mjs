@@ -91,8 +91,8 @@ test("the HUD draws exactly the 5 slots of the carried inventory", () => {
   const markup = html(
     h(InventoryHud, { inventory: sampleInventory(), language: "es" }),
   );
-  assert.equal(count(markup, "data-inventory-slot"), 8);
-  assert.equal(inv.INVENTORY_CAPACITY, 8);
+  assert.equal(count(markup, "data-inventory-slot"), 15);
+  assert.equal(inv.INVENTORY_CAPACITY, 15);
   assert.ok(markup.includes("data-inventory-hud"));
 });
 
@@ -122,13 +122,13 @@ test("quantity is drawn only when there is more than one unit; empty slots are m
   ).replace(/<span[^>]*data-slot-tooltip[^>]*>.*?<\/span>/g, "");
   assert.equal(count(markup, "×3"), 1);
   assert.equal(count(markup, "×1"), 0, "a single unit shows no number");
-  assert.equal(count(markup, 'data-empty="true"'), 6);
+  assert.equal(count(markup, 'data-empty="true"'), 13);
   assert.equal(count(markup, 'data-empty="false"'), 2);
   // an empty inventory: five empty slots, nothing else
   const empty = html(
     h(InventoryHud, { inventory: inv.createEmptyInventory(), language: "es" }),
   );
-  assert.equal(count(empty, 'data-empty="true"'), 8);
+  assert.equal(count(empty, 'data-empty="true"'), 15);
   assert.equal(count(empty, "data-item-icon="), 0);
   assert.equal(count(empty, "×"), 0);
 });
@@ -142,7 +142,7 @@ test("same source of truth: the HUD follows the state and keeps holes where item
   state = inv.removeItem(state, WATER, 1);
   const after = html(h(InventoryHud, { inventory: state, language: "es" }));
   assert.equal(count(after, `data-item-id="${WATER}"`), 0);
-  assert.equal(count(after, 'data-empty="true"'), 7);
+  assert.equal(count(after, 'data-empty="true"'), 14);
 
   // the HUD is a pure function of the state: same state, same markup
   assert.equal(
@@ -175,7 +175,7 @@ test("Storage and Crafting draw their slots with the same shared contents, uncha
       onClose: () => {},
     }),
   );
-  assert.equal(count(storage, "data-storage-slot"), 16);
+  assert.equal(count(storage, "data-storage-slot"), 30);
   assert.equal(count(storage, "data-item-icon="), 4);
   assert.equal(count(storage, "×3"), 2);
   assert.equal(
@@ -193,7 +193,7 @@ test("Storage and Crafting draw their slots with the same shared contents, uncha
       onClose: () => {},
     }),
   );
-  assert.equal(count(crafting, "data-inventory-slot"), 8);
+  assert.equal(count(crafting, "data-inventory-slot"), 15);
   // (the hover labels repeat the numbers; this counts the slots themselves)
   const slotsOnly = crafting.replace(
     /<span[^>]*data-slot-tooltip[^>]*>.*?<\/span>/g,
@@ -325,31 +325,22 @@ test("GameWorld mounts the bar in the scene overlay layer (the camera frame) in 
   }
 });
 
-test("there is no Inventory screen: no overlay, no hotkey, I does nothing", () => {
+test("the open case (2026-11-25): an overlay and a hotkey read from the bindings, no hard-coded I", () => {
   for (const file of [
-    "src/game/inventory/InventoryOverlay.tsx",
-    "src/game/inventory/InventoryOverlay.module.css",
-    "src/game/inventory/useInventoryHotkeys.ts",
+    "src/game/inventory/BriefcaseOverlay.tsx",
+    "src/game/inventory/BriefcaseOverlay.module.css",
+    "src/game/inventory/useInventoryHotkey.ts",
+    "public/game/ui/briefcase/briefcase.png",
   ]) {
-    assert.ok(!fs.existsSync(path.join(root, file)), `${file} is gone`);
+    assert.ok(fs.existsSync(path.join(root, file)), `${file} exists`);
   }
-  const world = fs.readFileSync(
-    path.join(root, "src/game/world/GameWorld.tsx"),
-    "utf8",
-  );
-  assert.ok(!/InventoryOverlay|inventoryOpen|InventoryHotkeys/.test(world));
-  // nothing in the game listens for the I key
-  const hotkeyFiles = fs
-    .readdirSync(path.join(root, "src/game"), { recursive: true })
-    .filter((file) => /use\w*Hotkeys?\.ts$/.test(String(file)));
-  assert.ok(hotkeyFiles.length > 0);
-  for (const file of hotkeyFiles) {
-    const source = fs.readFileSync(
-      path.join(root, "src/game", String(file)),
-      "utf8",
-    );
-    assert.ok(!/["']i["']|["']I["']|KeyI\b/.test(source), `${file} ignores I`);
-  }
+  const world = fs.readFileSync(path.join(root, "src/game/world/GameWorld.tsx"), "utf8");
+  assert.ok(world.includes("<BriefcaseOverlay") && world.includes("<BriefcaseChip") && world.includes("useInventoryHotkey("));
+  assert.ok(!world.includes("<InventoryHud"), "the old bar is gone from the game");
+  // the key is the player's binding, never a fixed letter in a handler
+  const hotkey = fs.readFileSync(path.join(root, "src/game/inventory/useInventoryHotkey.ts"), "utf8");
+  assert.ok(hotkey.includes('matchesAction(getBindings(), "inventory"'));
+  assert.ok(!/["']i["']|["']I["']|KeyI/.test(hotkey));
 });
 
 test("the 'obtained' notice carries the quantity, in both languages", () => {

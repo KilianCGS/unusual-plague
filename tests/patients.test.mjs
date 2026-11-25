@@ -88,7 +88,7 @@ const DEF = ch1.CHAPTER1_PATIENTS[HUSBAND];
 const stock = (pairs) =>
   pairs.reduce(
     (s, [id, q]) => inv.addItem(s, id, q),
-    inv.createEmptyInventory(),
+    inv.createEmptyInventory(8),
   );
 const withStatus = (status) =>
   status === "hidden" ? {} : { [HUSBAND]: status };
@@ -928,10 +928,10 @@ test('the "!" follows the real reward: a full inventory keeps it, a successful r
   const game = readFileSync("src/game/world/GameWorld.tsx", "utf8");
   assert.ok(
     game.includes(
-      "getAttentionInstanceIds(patients, claimedRewards, inventory)",
+      "getAttentionInstanceIds(patients, claimedRewards, inventory, chapterId)",
     ),
   );
-  assert.ok(game.includes("[patients, claimedRewards, inventory]"));
+  assert.ok(game.includes("[patients, claimedRewards, inventory, chapterId]"));
   // no second marker component and no new status
   assert.ok(!/RewardMark|SaltMark|PendingMark/.test(game));
   assert.ok(
@@ -1119,11 +1119,11 @@ test("the Empty flasks (two, since 2026-11-16) start in the Doctor's Storage, no
   const initialFile = at("src/game/inventory/initialInventory.ts");
   const initial = initialFile.createChapter1Inventory();
   const chest = initialFile.createChapter1Storage();
-  assert.equal(initial.capacity, 8);
-  assert.equal(initial.slots.length, 8);
+  assert.equal(initial.capacity, 15);
+  assert.equal(initial.slots.length, 15);
   assert.equal(inv.countOccupiedSlots(initial), 0);
   assert.equal(inv.countItem(initial, "empty-flask"), 0);
-  assert.equal(chest.capacity, 15);
+  assert.equal(chest.capacity, 10);
   assert.deepEqual(chest.slots[0], { itemId: "empty-flask", quantity: 2 });
   assert.equal(inv.countOccupiedSlots(chest), 1);
   assert.ok(inv.isValidInventory(initial) && inv.isValidInventory(chest));

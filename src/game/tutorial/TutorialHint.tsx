@@ -58,7 +58,7 @@ export function TutorialHint({
   const bindings = useBindings();
   // "{interact}", "{book}" ... inside a text are the player's own keys.
   const withKeys = (text: string) =>
-    text.replace(/\{(interact|book|run|map|objectives)\}/g, (_, action: keyof typeof bindings) =>
+    text.replace(/\{(interact|book|run|map|objectives|inventory)\}/g, (_, action: keyof typeof bindings) =>
       keyLabel(bindings[action][0], language),
     );
   const bodyLines = copy.body.split("\n").map(withKeys);
