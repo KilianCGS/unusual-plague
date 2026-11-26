@@ -17,6 +17,20 @@ export type TutorialHintCopy = {
   body: string;
 };
 
+// 2026-11-27 (Kilian): the note shown ONCE, the first time a symbol over a character is on screen (after the tutorial).
+// New text, awaiting Kilian's review.
+export const SYMBOLS_HINT_FLAG = "hint.symbols.seen";
+export const symbolsHintCopy: Record<Language, TutorialHintCopy> = {
+  es: {
+    title: ["Los símbolos sobre la gente."],
+    body: "Un ! amarillo es un paciente; uno azul, alguien con un recado.\nUn ? tiene algo que te hace falta. Con un brillo alrededor: ya lo has aceptado. Desaparecen al terminar.",
+  },
+  en: {
+    title: ["The symbols over people."],
+    body: "A yellow ! is a patient; a blue one, someone with an errand.\nA ? has something you need. Glowing: you have already taken it on. They go away once it is done.",
+  },
+};
+
 // The label of the button / key of the steps that wait for an acknowledgement.
 export const tutorialContinueCopy: Record<Language, { label: string; key: string }> = {
   es: { label: "Entendido", key: "Enter" },

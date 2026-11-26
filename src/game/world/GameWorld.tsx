@@ -82,7 +82,7 @@ import {
   formatObtainedNotice,
   itemFeedbackCopy,
 } from "../i18n/items";
-import { tutorialContinueCopy, tutorialCopy, tutorialExitBlockedCopy } from "../i18n/tutorial";
+import { SYMBOLS_HINT_FLAG, symbolsHintCopy, tutorialContinueCopy, tutorialCopy, tutorialExitBlockedCopy } from "../i18n/tutorial";
 import type { Language } from "../i18n/types";
 import {
   addItem,
@@ -113,6 +113,7 @@ import { StorageOverlay, type StorageSide } from "../storage/StorageOverlay";
 import { getItemName } from "../items/items";
 import { MapOverlay } from "../map/MapOverlay";
 import { getAttentionMarks } from "../patients/attentionMarks";
+import { getComposition } from "../compositions";
 import {
   BAKER_HUSBAND_ID,
   CHAPTER1_INITIAL_PATIENTS,
@@ -1751,6 +1752,23 @@ export function GameWorld({
     [patients, claimedRewards, inventory, chapterId],
   );
 
+  // 2026-11-27: the first time (after the tutorial) a symbol is over somebody in the scene, a note explains them, once.
+  const symbolOnScreen = useMemo(
+    () =>
+      attentionMarks.size > 0 &&
+      (getComposition(world.sceneId, chapterId)?.instances.some((instance) => attentionMarks.has(instance.instanceId)) ?? false),
+    [attentionMarks, world.sceneId, chapterId],
+  );
+  const [symbolsHintOpen, setSymbolsHintOpen] = useState(false);
+  if (!symbolsHintOpen && symbolOnScreen && tutorial.step === "done" && isPlaying && !claimedRewards.has(SYMBOLS_HINT_FLAG)) {
+    setSymbolsHintOpen(true);
+  }
+  const handleSymbolsHintContinue = useCallback(() => {
+    playSound("ui.bookTab");
+    setSymbolsHintOpen(false);
+    claimFlag(SYMBOLS_HINT_FLAG);
+  }, [claimFlag]);
+
   // What the known cases still need to be prepared; any other recipe is refused
   // in the crafting interface ("I don't need that right now").
   const activeTreatments = useMemo(
@@ -1994,6 +2012,16 @@ export function GameWorld({
           placement={hintStep === "exit-room" || hintStep === "exit-botica" ? "top" : "bottom"}
           raised={isTutorialHudUnlocked(tutorialStep)}
           onContinue={ACK_STEPS.includes(tutorialStep) ? handleTutorialContinue : undefined}
+          continueLabel={tutorialContinueCopy[language].label}
+          language={language}
+        />
+      ) : null}
+      {symbolsHintOpen && !showHint ? (
+        <TutorialHint
+          key={`symbols-${language}`}
+          copy={symbolsHintCopy[language]}
+          raised
+          onContinue={handleSymbolsHintContinue}
           continueLabel={tutorialContinueCopy[language].label}
           language={language}
         />
