@@ -70,4 +70,12 @@ test("the scene draws the symbol it is given, 25% smaller, with the aura class w
   assert.ok(css.includes("width: 9px") && css.includes("height: 18px") && css.includes(".accepted"));
 });
 
+test("the first symbol on screen after the tutorial explains them once (a flag kept in the save)", () => {
+  const { SYMBOLS_HINT_FLAG, symbolsHintCopy } = at("src/game/i18n/tutorial.ts");
+  for (const lang of ["es", "en"]) assert.ok(symbolsHintCopy[lang].title.length && symbolsHintCopy[lang].body.includes("?"), lang);
+  const game = fs.readFileSync(path.join(root, "src/game/world/GameWorld.tsx"), "utf8");
+  assert.ok(game.includes('tutorial.step === "done"') && game.includes("claimedRewards.has(SYMBOLS_HINT_FLAG)") && game.includes("claimFlag(SYMBOLS_HINT_FLAG)"));
+  assert.equal(SYMBOLS_HINT_FLAG, "hint.symbols.seen");
+});
+
 console.log(`\n${passed} tests passed`);
