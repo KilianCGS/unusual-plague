@@ -40,8 +40,8 @@ const test = (name, fn) => { fn(); passed++; console.log("ok -", name); };
 
 test("a patient the Doctor knows and has not treated gets a yellow symbol over their place; hidden and treated ones none", () => {
   const m = markersMod.getMapMarkers({ "chapter2-blacksmith": "discovered", "chapter2-woodcutter": "examined", "chapter2-farmer": "treated" }, new Set(), "chapter-2");
-  assert.deepEqual(m.smithy, { patients: 1, errands: 0 });
-  assert.deepEqual(m.forest, { patients: 1, errands: 0 });
+  assert.deepEqual(m.smithy, { patients: 1, acceptedPatients: 0, errands: 0 }); // discovered: no aura
+  assert.deepEqual(m.forest, { patients: 1, acceptedPatients: 1, errands: 0 }); // examined: aura
   assert.equal(m.mill, undefined, "treated: no symbol");
   assert.equal(markersMod.getMapMarkers({}, new Set(), "chapter-3").quarry, undefined, "a case not met yet is never marked (Day 3 gives only a rumour)");
 });
@@ -54,7 +54,7 @@ test("two patients in one place give two symbols", () => {
 test("an errand somebody asked for and not delivered gets a blue symbol; delivered or not asked, none", () => {
   const trade = Object.values(NPC_TRADES).find((t) => t.interactionId === "chapter2.tavernStreet.sitting");
   const asked = new Set([errandAskedFlag(trade)]);
-  assert.deepEqual(markersMod.getMapMarkers({}, asked, "chapter-2").tavern, { patients: 0, errands: 1 });
+  assert.deepEqual(markersMod.getMapMarkers({}, asked, "chapter-2").tavern, { patients: 0, acceptedPatients: 0, errands: 1 });
   assert.equal(markersMod.getMapMarkers({}, new Set([errandAskedFlag(trade), trade.rewardId]), "chapter-2").tavern, undefined);
   assert.equal(markersMod.getMapMarkers({}, new Set(), "chapter-2").tavern, undefined);
   // the same chapter filter as the errands panel applies (a trade limited to some days is marked only on those)
@@ -77,6 +77,9 @@ test("the map uses the new engravings, one per place, 512 x 512 with alpha", () 
   }
   const overlay = read("src/game/map/MapOverlay.tsx");
   assert.ok(overlay.includes("NewMap.png") && overlay.includes("ICON_BOX") && overlay.includes("data-map-symbol") && overlay.includes("data-map-legend"));
+  // 2026-11-26: the accepted symbols glow, and the river fades at both ends
+  assert.ok(overlay.includes("data-map-symbol-accepted") && overlay.includes("styles.accepted"));
+  assert.ok(overlay.includes('mask="url(#river-segment-mask)"'));
 });
 
 test("the map is toggled by its key from the bindings (M by default), Esc closes it", () => {

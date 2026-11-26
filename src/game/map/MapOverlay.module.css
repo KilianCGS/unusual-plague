@@ -77,3 +77,26 @@
     animation: none;
   }
 }
+
+/* 2026-11-26 (Kilian): a case already accepted (patient examined, errand asked) glows with a soft aura of its own
+   colour that breathes slowly, the same as its mark in the world. Sizes are in map units (the stage is 1920 wide). */
+.accepted {
+  filter: drop-shadow(0 0 4px var(--mark-color)) drop-shadow(0 0 10px var(--mark-color));
+  animation: map-mark-aura 2.4s ease-in-out infinite;
+}
+
+@keyframes map-mark-aura {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 3px var(--mark-color)) drop-shadow(0 0 7px var(--mark-color));
+  }
+  50% {
+    filter: drop-shadow(0 0 5px var(--mark-color)) drop-shadow(0 0 15px var(--mark-color));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accepted {
+    animation: none;
+  }
+}

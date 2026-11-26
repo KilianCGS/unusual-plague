@@ -6,7 +6,9 @@ import type { MapLocationId } from "./mapLocations";
 // a blue one over each place where somebody has asked him for an errand, one symbol per patient or errand.
 // Derived from the cases and the claimed flags (never stored), like the errands panel. A case the Doctor has not met
 // (hidden: Day 3 only gives a rumour in the panel) is NOT marked: the map never reveals what the story has not shown.
-export type MapMarkers = Partial<Record<MapLocationId, { patients: number; errands: number }>>;
+// 2026-11-26 (Kilian): as in the world, a case already accepted glows with a soft aura: a patient examined (of the
+// `patients`, `acceptedPatients` are examined) and every errand on the map (it is only marked once it was asked).
+export type MapMarkers = Partial<Record<MapLocationId, { patients: number; acceptedPatients: number; errands: number }>>;
 
 // Where each patient is found.
 export const PATIENT_MAP_LOCATION: Readonly<Record<string, MapLocationId>> = {
@@ -39,16 +41,17 @@ export function getMapMarkers(
   chapterId: string,
 ): MapMarkers {
   const markers: MapMarkers = {};
-  const add = (location: MapLocationId, kind: "patients" | "errands") => {
-    const entry = markers[location] ?? { patients: 0, errands: 0 };
+  const add = (location: MapLocationId, kind: "patients" | "errands", accepted = false) => {
+    const entry = markers[location] ?? { patients: 0, acceptedPatients: 0, errands: 0 };
     entry[kind] += 1;
+    if (accepted && kind === "patients") entry.acceptedPatients += 1;
     markers[location] = entry;
   };
 
   // A patient the Doctor knows about and has not treated yet.
   for (const [patientId, location] of Object.entries(PATIENT_MAP_LOCATION)) {
     const status = getPatientStatus(patients, patientId);
-    if (status === "discovered" || status === "examined") add(location, "patients");
+    if (status === "discovered" || status === "examined") add(location, "patients", status === "examined");
   }
 
   // An errand somebody asked for and the Doctor has not delivered.
