@@ -110,8 +110,8 @@ test("every world pick-up has a soft aura (no \"?\") and news characters keep th
   assert.ok(scene.includes("<PickupAura"));
   assert.ok(!scene.includes('kind="item"'));
   const mark = read("src/game/ui/AttentionMark.tsx");
-  assert.ok(!mark.includes('"?"'));
-  assert.ok(mark.includes("!"));
+  assert.ok(mark.includes("QUESTION")); // 2026-11-27: "!" for the person concerned, "?" for whoever has something for the case
+  assert.ok(mark.includes("EXCLAMATION"));
   assert.ok(/animation:\s*pickup-aura-breathe/.test(read("src/game/ui/PickupAura.module.css")));
 });
 

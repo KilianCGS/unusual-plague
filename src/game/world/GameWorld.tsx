@@ -112,10 +112,10 @@ import { STORAGE_INTERACTION_ID, transferStack } from "../storage/storage";
 import { StorageOverlay, type StorageSide } from "../storage/StorageOverlay";
 import { getItemName } from "../items/items";
 import { MapOverlay } from "../map/MapOverlay";
+import { getAttentionMarks } from "../patients/attentionMarks";
 import {
   BAKER_HUSBAND_ID,
   CHAPTER1_INITIAL_PATIENTS,
-  getAttentionInstanceIds,
 } from "../patients/chapter1Patients";
 import {
   advancePatient,
@@ -1745,8 +1745,9 @@ export function GameWorld({
   // The characters with news for the Doctor: derived from the cases (a case
   // that is only discovered still waits for its visit, a treated one may still
   // owe its thank-you).
-  const attentionInstanceIds = useMemo(
-    () => getAttentionInstanceIds(patients, claimedRewards, inventory, chapterId),
+  // 2026-11-27: which symbol (yellow / blue, ! / ?, with or without aura), see patients/attentionMarks.ts.
+  const attentionMarks = useMemo(
+    () => getAttentionMarks(patients, claimedRewards, inventory, chapterId),
     [patients, claimedRewards, inventory, chapterId],
   );
 
@@ -1878,7 +1879,7 @@ export function GameWorld({
           onInteract={handleInteract}
           collectedInstanceIds={collected}
           hiddenInstanceIds={narrativeHiddenInstanceIds}
-          attentionInstanceIds={attentionInstanceIds}
+          attentionMarks={attentionMarks}
           attentionPoints={attentionPoints}
           worldLabels={worldLabels}
           renderOverlay={renderSceneOverlay}

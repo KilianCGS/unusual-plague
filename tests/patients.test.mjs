@@ -928,7 +928,7 @@ test('the "!" follows the real reward: a full inventory keeps it, a successful r
   const game = readFileSync("src/game/world/GameWorld.tsx", "utf8");
   assert.ok(
     game.includes(
-      "getAttentionInstanceIds(patients, claimedRewards, inventory, chapterId)",
+      "getAttentionMarks(patients, claimedRewards, inventory, chapterId)",
     ),
   );
   assert.ok(game.includes("[patients, claimedRewards, inventory, chapterId]"));

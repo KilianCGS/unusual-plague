@@ -1,9 +1,9 @@
-/* World-space "!": a pixel-art exclamation mark (a yellow bar and dot with a dark outline), no
-   animation. Sized in scene units so it scales with the scene. */
+/* World-space symbol over a character: a pixel-art "!" or "?" with a dark outline (yellow: patient, blue: errand).
+   Sized in scene units so it scales with the scene (2026-11-27: 25% smaller than the old 12 x 24). */
 .mark {
   position: absolute;
-  width: 12px;
-  height: 24px;
+  width: 9px;
+  height: 18px;
   transform: translate(-50%, -100%);
   pointer-events: none;
   user-select: none;
@@ -11,4 +11,26 @@
 
 .mark svg {
   display: block;
+}
+
+/* Accepted (the patient examined, the errand asked): a soft aura of its own colour that breathes slowly. */
+.accepted svg {
+  filter: drop-shadow(0 0 2px var(--mark-color)) drop-shadow(0 0 4px var(--mark-color));
+  animation: mark-aura 2.4s ease-in-out infinite;
+}
+
+@keyframes mark-aura {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 1px var(--mark-color)) drop-shadow(0 0 3px var(--mark-color));
+  }
+  50% {
+    filter: drop-shadow(0 0 2px var(--mark-color)) drop-shadow(0 0 6px var(--mark-color));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .accepted svg {
+    animation: none;
+  }
 }

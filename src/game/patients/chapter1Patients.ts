@@ -249,12 +249,12 @@ export function getAttentionInstanceIds(
 // The placed person of each patient of Days 2 and 3 and what his treatment needs (the same data as the cases:
 // chapter2Patients.ts / chapter3Patients.ts). Only the day's own cases mark, so a Day 3 person who is
 // also placed on Day 2 (the old man with the jug) is not marked early.
-type PatientMark = {
+export type PatientMark = {
   patientId: string;
   instanceId: string;
   treatments: readonly { itemId: string; quantity: number }[];
 };
-const CHAPTER_PATIENT_MARKS: Record<string, readonly PatientMark[]> = {
+export const CHAPTER_PATIENT_MARKS: Record<string, readonly PatientMark[]> = {
   "chapter-2": [
     { patientId: "chapter2-woodcutter", instanceId: "forest-woodcutter-day2-tired-01", treatments: CHAPTER2_PATIENTS["chapter2-woodcutter"].requiredTreatments },
     { patientId: "chapter2-blacksmith", instanceId: "smithy-interior-blacksmith-day2-hurt-hand-01", treatments: CHAPTER2_PATIENTS["chapter2-blacksmith"].requiredTreatments },

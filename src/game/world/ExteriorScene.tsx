@@ -15,6 +15,7 @@ import type { CollectedInstanceIds } from "../collectibles/collectibles";
 import { getChapterInteractions, getComposition } from "../compositions";
 import { SHOW_COLLISION_DEBUG } from "../debugFlags";
 import { AttentionMark } from "../ui/AttentionMark";
+import type { AttentionMarks } from "../patients/attentionMarks";
 import { WorldLabel } from "../ui/WorldLabel";
 import { PickupAura } from "../ui/PickupAura";
 import { getShop } from "../shop/shops";
@@ -118,7 +119,7 @@ export function ExteriorScene({
   promptLabelFor,
   collectedInstanceIds,
   hiddenInstanceIds,
-  attentionInstanceIds,
+  attentionMarks,
   attentionPoints,
   worldLabels,
 }: {
@@ -158,7 +159,8 @@ export function ExteriorScene({
   // collider, no interaction.
   hiddenInstanceIds?: ReadonlySet<string>;
   // Placed characters that show the "!" (they have news for the Doctor).
-  attentionInstanceIds?: ReadonlySet<string>;
+  // The symbol over each character with news (patientes / errands), see patients/attentionMarks.ts.
+  attentionMarks?: AttentionMarks;
   // "!" marks drawn at fixed scene points (bottom-centre), for painted zones.
   attentionPoints?: readonly { id: string; x: number; y: number }[];
   // Short words floating at fixed scene points (bottom-centre), e.g. "Sleep" over the bed.
@@ -389,16 +391,20 @@ export function ExteriorScene({
               highlight={instance.instanceId === highlightedInstanceId}
             />
           ))}
-          {decor.sprites.map(({ asset, instance }) =>
-            attentionInstanceIds?.has(instance.instanceId) ? (
+          {decor.sprites.map(({ asset, instance }) => {
+            const mark = attentionMarks?.get(instance.instanceId);
+            return mark ? (
               <AttentionMark
                 key={`${instance.instanceId}-attention`}
                 x={instance.x}
                 y={getInstanceHeadTop(asset, instance) - 4}
                 zIndex={Math.round(instance.y) + instance.zOffset + 1000}
+                kind={mark.kind}
+                glyph={mark.glyph === "?" ? "question" : "exclamation"}
+                accepted={mark.accepted}
               />
-            ) : null,
-          )}
+            ) : null;
+          })}
           {decor.sprites.map(({ asset, instance }) => {
             if (!asset.collectibleItemId) {
               return null;
@@ -422,7 +428,7 @@ export function ExteriorScene({
             <PickupAura key={glow.id} x={glow.x} y={glow.y} width={glow.width} height={glow.height} zIndex={Math.round(glow.y) - 1} />
           ))}
           {attentionPoints?.map((point) => (
-            <AttentionMark key={point.id} x={point.x} y={point.y} zIndex={Math.round(point.y) + 1000} />
+            <AttentionMark key={point.id} x={point.x} y={point.y} zIndex={Math.round(point.y) + 1000} glyph="question" />
           ))}
           {worldLabels?.map((label) => (
             <WorldLabel key={label.id} x={label.x} y={label.y} zIndex={Math.round(label.y) + 1000} text={label.text} />
