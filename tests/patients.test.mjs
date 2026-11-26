@@ -266,7 +266,7 @@ test("PACIENTES and PREPARADOS exist in English too", () => {
 test("PREPARADOS shows only the revealed recipes, with ingredients and station", () => {
   const texts = (status, lang = "es") =>
     book
-      .buildBookSections(bookContext(status, [], lang))[3]
+      .buildBookSections(bookContext(status, [], lang)).find((s) => s.id === "preparations")
       .spreads.flatMap((s) => s.texts ?? [])
       .map((t) => t.content.join(""));
   assert.ok(

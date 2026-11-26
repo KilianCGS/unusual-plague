@@ -1892,7 +1892,7 @@ export function GameWorld({
       )}
       {bookOpen ? (
         <BookOverlay
-          context={{ language, patients, inventory, knownRecipeIds, storyFlags: claimedRewards, diagnosisPatientId: diagnosis?.patientId }}
+          context={{ language, patients, inventory, knownRecipeIds, storyFlags: claimedRewards, diagnosisPatientId: diagnosis?.patientId, chapterId }}
           // While the tutorial teaches page turning, the book opens on a section
           // with several pages made of things the Doctor already knows
           // (PACIENTES has a single page at the start). INGREDIENTES, not

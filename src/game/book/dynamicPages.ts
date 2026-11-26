@@ -13,6 +13,7 @@ import { PLAIN_BASE_LAYER, type BookSpread } from "./bookPages";
 import type { BookTextBlock } from "./bookText";
 import { PREPARATION_DESCRIPTIONS, getPreparationUse } from "./preparations";
 import { DIAGNOSIS_SYMPTOMS } from "../patients/diagnosis";
+import { PATIENT_IDS_BY_CHAPTER } from "../patients/chapterPatients";
 
 // The PACIENTES and PREPARADOS pages are not fixed content: they are drawn from
 // the patient cases, the inventory and the recipes the Doctor knows. Nothing
@@ -25,6 +26,8 @@ export type BookContext = {
   knownRecipeIds: ReadonlySet<string>;
   storyFlags?: ReadonlySet<string>;
   diagnosisPatientId?: string;
+  // The day being played: PACIENTES shows only that day's cases (left out = every case the Doctor knows).
+  chapterId?: string;
 };
 
 // Text columns of the open book (art space 688x384): left page and right page.
@@ -69,9 +72,15 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
   const { language, patients, inventory } = context;
   const copy = bookCopy[language];
   const definitions = getPatientDefinitions(context.storyFlags);
-  const ids = getVisiblePatientIds(patients).filter(
-    (id) => definitions[id],
+  // 2026-11-26 (Kilian): only the day's own patients, the treated ones last.
+  const ofToday = context.chapterId ? new Set(PATIENT_IDS_BY_CHAPTER[context.chapterId] ?? []) : null;
+  const visible = getVisiblePatientIds(patients).filter(
+    (id) => definitions[id] && (!ofToday || ofToday.has(id)),
   );
+  const ids = [
+    ...visible.filter((id) => getPatientStatus(patients, id) !== "treated"),
+    ...visible.filter((id) => getPatientStatus(patients, id) === "treated"),
+  ];
 
   if (ids.length === 0) {
     return [
@@ -87,7 +96,10 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
     const definition = definitions[id];
     const status = getPatientStatus(patients, id);
     const texts: BookTextBlock[] = [
-      text(`${id}-name`, "heading", LEFT, NAME_Y, definition.name[language]),
+      {
+        ...text(`${id}-name`, "heading", LEFT, NAME_Y, definition.name[language]),
+        ...(status === "treated" ? { tone: "good" as const } : {}),
+      },
     ];
 
     if (status === "discovered") {
@@ -153,15 +165,16 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
       });
 
       if (status === "treated") {
-        texts.push(
-          text(
+        texts.push({
+          ...text(
             `${id}-treated`,
             "heading",
             RIGHT,
             LINES_Y + definition.requiredTreatments.length * LINE_STEP + 18,
             copy.treated,
           ),
-        );
+          tone: "good" as const,
+        });
       }
     }
 

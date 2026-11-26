@@ -547,6 +547,15 @@ and known recipes. Ailment definitions are separate from individual patient case
 The current Book uses image layers and optional text in a 688x384 art coordinate
 space. Painted ingredient spreads are their own visual source; do not duplicate
 text already baked into those images with another text layer.
+The Spanish ingredient spreads now include short source hints, and both Spanish
+and English ingredient spreads have an empty hand-drawn circle by every item.
+That circle is a visual anchor for a runtime quantity overlay: show the total
+units currently available across the Doctor's briefcase and the room chest.
+Keep the circles blank in the image assets; the count must remain dynamic and
+must not be baked into the artwork. Render the count in green when above zero
+and red when it is zero. The runtime number overlay is still pending.
+The English pages also include translated source hints. Both language sets use
+five matching ingredient spreads.
 
 ## Patients
 

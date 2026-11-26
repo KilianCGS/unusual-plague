@@ -78,7 +78,7 @@ test("the Book records symptoms while a diagnosis is pending and withholds diagn
   const texts=sections[0].spreads[0].texts;
   assert.ok(texts.some(t=>t.id===id+'-symptoms'&&t.content[0]===DIAGNOSIS_SYMPTOMS[id][language]));
   assert.ok(!texts.some(t=>t.id.endsWith('-diagnosis')||t.id.includes('-need-')));
-  const ailments=sections[1].spreads;assert.equal(ailments.length,10);
+  const ailments=sections.find(s=>s.id==='ailments').spreads;assert.equal(ailments.length,10);
   const poisoning=ailments.find(s=>s.id==='ailment-poisoning');
   assert.ok(poisoning.texts.some(t=>t.id==='poisoning-name'&&t.content[0]===(language==='es'?'Envenenamiento':'Poisoning')));
  }

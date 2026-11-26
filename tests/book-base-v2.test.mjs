@@ -135,7 +135,7 @@ test("PACIENTES, DOLENCIAS and PREPARADOS draw on the V2 base; INGREDIENTES gets
   // the empty states (no patients, no recipes) use it too
   const empty = buildBookSections(context("es", {}));
   assert.equal(empty[0].spreads[0].layers[0].src, BASE);
-  assert.equal(empty[3].spreads[0].layers[0].src, BASE);
+  assert.equal(empty.find((s) => s.id === "preparations").spreads[0].layers[0].src, BASE);
   assert.equal(BOOK_SECTIONS[0].spreads[0].layers[0].src, BASE);
 });
 
@@ -173,15 +173,15 @@ test("the content stays dynamic and grows by itself: pages follow the patients, 
   const all = buildBookSections(context("es", ALL_PATIENTS, ALL_KNOWN));
   assert.ok(all[0].spreads.length > onlyBaker[0].spreads.length);
   assert.equal(all[0].spreads.length, 3, "one spread per known patient");
-  assert.ok(all[3].spreads.length >= 2, "recipes have individual illustrated spreads");
+  assert.ok(all.find((s) => s.id === "preparations").spreads.length >= 2, "recipes have individual illustrated spreads");
   assert.equal(
-    all[1].spreads.length,
+    all.find((s) => s.id === "ailments").spreads.length,
     AILMENTS.length,
     "one spread per ailment",
   );
   // recipes that are not known do not appear
   const none = buildBookSections(context("es", ALL_PATIENTS, []));
-  assert.equal(none[3].spreads.length, 1);
+  assert.equal(none.find((s) => s.id === "preparations").spreads.length, 1);
   // the layout is not tied to the current patients: it reads the data
   const src = read("src/game/book/dynamicPages.ts");
   assert.ok(
@@ -247,7 +247,7 @@ test("all twenty-three preparations occupy one localized leaf each, two per open
   const { RECIPES } = at("src/game/crafting/recipes.ts");
   const known = RECIPES.map(recipe => recipe.id);
   for (const language of ["es", "en"]) {
-    const preparations = buildBookSections(context(language, {}, known))[3];
+    const preparations = buildBookSections(context(language, {}, known)).find((s) => s.id === "preparations");
     assert.equal(preparations.spreads.length, 12);
     preparations.spreads.forEach((spread, index) => {
       const recipes = RECIPES.slice(index * 2, index * 2 + 2);

@@ -18,5 +18,7 @@ export type BookTextBlock = {
   y: number;
   width: number;
   align?: "left" | "center";
+  // "good": drawn in green (a treated patient, 2026-11-26).
+  tone?: "good";
   content: RichText;
 };

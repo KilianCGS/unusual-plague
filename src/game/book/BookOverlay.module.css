@@ -82,6 +82,11 @@
   text-underline-offset: 4px;
 }
 
+/* a treated patient: name and mark in green ink (2026-11-26) */
+.good {
+  color: #2e6a30;
+}
+
 .heading {
   font-size: 20px;
   line-height: 1.1;

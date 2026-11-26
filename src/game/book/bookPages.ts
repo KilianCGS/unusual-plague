@@ -183,11 +183,11 @@ function ailmentSpread(ailment: Ailment, language: Language = "es"): BookSpread 
 // hold the paper, the edges, the drawings and the writing: one per language and
 // in the same conceptual order in both, so the page the Doctor is on stays the
 // same when the language changes:
-//   1 Milk / Medicinal herb / Mushroom / Water
-//   2 Alcohol / Flour / Charcoal / Cloth
-//   3 Orange / Mint / Honey / Resin
-//   4 Animal fat / Garlic / Salt / Leech
-//   5 Bone / Pine mushroom / Sugar / Onion (the basic ingredients added later)
+//   1 Milk / Mushroom / Medicinal herb / Water
+//   2 Alcohol / Charcoal / Flour / Cloth
+//   3 Orange / Honey / Mint / Resin
+//   4 Animal fat / Salt / Garlic / Leech
+//   5 Bone / Sugar / Pine mushroom / Onion (the basic ingredients added later)
 const INGREDIENT_SPREAD_COUNTS: Record<Language, number> = { es: 5, en: 5 };
 
 function ingredientSpreads(language: Language): BookSpread[] {
@@ -265,14 +265,13 @@ export function buildBookSections(context: BookContext): BookSection[] {
   const tabs = bookCopy[context.language].tabs;
   const [, ailments, ingredients] = BOOK_SECTIONS;
 
+  // 2026-11-26 (Kilian): Pacientes first, then the order the tutorial teaches them (Ingredientes, Preparados, Dolencias).
   return [
     {
       id: "patients",
       label: tabs.patients,
       spreads: buildPatientSpreads(context),
     },
-    { ...ailments, label: tabs.ailments, spreads: AILMENTS.map(ailment =>
-      ailmentSpread(context.language === "en" ? { ...ailment, ...AILMENTS_EN[ailment.id] } : ailment, context.language)) },
     {
       ...ingredients,
       label: tabs.ingredients,
@@ -283,5 +282,7 @@ export function buildBookSections(context: BookContext): BookSection[] {
       label: tabs.preparations,
       spreads: buildPreparationSpreads(context),
     },
+    { ...ailments, label: tabs.ailments, spreads: AILMENTS.map(ailment =>
+      ailmentSpread(context.language === "en" ? { ...ailment, ...AILMENTS_EN[ailment.id] } : ailment, context.language)) },
   ];
 }

@@ -167,15 +167,15 @@ test("accessible names: one short description per spread and language, not the p
   }
   assert.equal(
     bookCopy.es.ingredientSpreadAlts[0],
-    "Ingredientes: leche, hierba medicinal, hongo y agua",
+    "Ingredientes: leche, champiñón de cueva, hierba medicinal y agua",
   );
   assert.equal(
     bookCopy.en.ingredientSpreadAlts[0],
-    "Ingredients: milk, medicinal herb, mushroom and water",
+    "Ingredients: milk, mushroom, medicinal herb and water",
   );
   assert.equal(
     bookCopy.en.ingredientSpreadAlts[3],
-    "Ingredients: animal fat, garlic, salt and leech",
+    "Ingredients: animal fat, salt, garlic and leech",
   );
 });
 
@@ -205,23 +205,23 @@ test("the other tabs and the tutorial Book are untouched", () => {
   const es = buildBookSections(context("es"));
   assert.deepEqual(
     es.map((s) => s.id),
-    ["patients", "ailments", "ingredients", "preparations"],
+    ["patients", "ingredients", "preparations", "ailments"], // 2026-11-26: the tutorial order after Pacientes
   );
   assert.deepEqual(
     es.map((s) => s.label),
-    ["Pacientes", "Dolencias", "Ingredientes", "Preparados"],
+    ["Pacientes", "Ingredientes", "Preparados", "Dolencias"],
   );
   const en = buildBookSections(context("en"));
   assert.deepEqual(
     en.map((s) => s.label),
-    ["Patients", "Ailments", "Ingredients", "Remedies"],
+    ["Patients", "Ingredients", "Remedies", "Ailments"],
   );
   // PACIENTES and PREPARADOS stay text pages built from the game state;
   // DOLENCIAS keeps its two layers, with smooth ink illustrations on parchment.
   assert.ok(es[0].spreads[0].texts.length > 0);
-  assert.ok(es[3].spreads[0].texts.length > 0);
+  assert.ok(es.find((s) => s.id === "preparations").spreads[0].texts.length > 0);
   assert.ok(
-    es[1].spreads.every(
+    es.find((s) => s.id === "ailments").spreads.every(
       (s) => s.layers.length === 2 && s.layers[0].smooth && s.layers[1].smooth
         && s.layers[1].fit === "contain" && s.layers[1].blend === "multiply",
     ),
@@ -231,7 +231,7 @@ test("the other tabs and the tutorial Book are untouched", () => {
   assert.ok(
     /initialSectionId=\{[\s\S]*"ingredients"[\s\S]*undefined/.test(game),
   );
-  assert.ok(es[2].spreads.length > 1);
+  assert.ok(es.find((s) => s.id === "ingredients").spreads.length > 1);
 });
 
 console.log(`\n${passed} tests passed`);
