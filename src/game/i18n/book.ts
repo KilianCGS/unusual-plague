@@ -61,7 +61,7 @@ export const bookCopy: Record<Language, BookCopy> = {
     ],
     station: "Estación",
     stations: { manual: "Mesa", fire: "Cocina", mortar: "Mortero", chop: "Tabla" },
-    indexLegend: "✓ en el maletín · ✓* en el baúl · ✗ falta algo",
+    indexLegend: "En verde, ingredientes disponibles. Saca del baúl los que necesites.",
     backToPatient: "← Paciente",
   },
   en: {
@@ -90,7 +90,7 @@ export const bookCopy: Record<Language, BookCopy> = {
     ],
     station: "Station",
     stations: { manual: "Work table", fire: "Stove", mortar: "Mortar", chop: "Board" },
-    indexLegend: "✓ in your bag · ✓* in the chest · ✗ missing",
+    indexLegend: "Green means the ingredients are available. Move items from the chest into your bag to craft.",
     backToPatient: "← Patient",
   },
 };

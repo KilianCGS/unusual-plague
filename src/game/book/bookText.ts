@@ -20,9 +20,8 @@ export type BookTextBlock = {
   y: number;
   width: number;
   align?: "left" | "center" | "right";
-  // "good": drawn in green (a treated patient, an ingredient the Doctor has); "bad": in red (none of it).
-  // "chest" (2026-11-27): amber, everything is there but some of it waits in the chest.
-  tone?: "good" | "bad" | "chest";
+  // "good": drawn in green (a treated patient, an ingredient the Doctor has, a remedy he can make); "bad": in red (none of it).
+  tone?: "good" | "bad";
   // A link: clicking the text turns to the spread with this id in the same section (the index of PREPARADOS), or, as
   // "<sectionId>:<spreadId>", to a spread of another section (a patient's treatment > its recipe, 2026-11-27).
   link?: string;

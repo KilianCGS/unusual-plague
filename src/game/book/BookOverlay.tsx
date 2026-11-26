@@ -11,7 +11,7 @@ import {
   buildBookSections,
   type BookSpread,
 } from "./bookPages";
-import type { BookContext } from "./dynamicPages";
+import { PREPARATION_INDEX_ID, type BookContext } from "./dynamicPages";
 import styles from "./BookOverlay.module.css";
 import { useFitScale } from "./useFitScale";
 
@@ -227,6 +227,13 @@ export function BookOverlay({
                 >
                   {copy.backToPatient}
                 </button>
+              ) : null}
+              {spread.id === PREPARATION_INDEX_ID ? (
+                // 2026-11-26 (Kilian): what the green of the index means, in a plate under the book, not on the page
+                <div className={styles.indexHint} data-book-index-hint>
+                  <span className={styles.indexHintSwatch} aria-hidden="true" />
+                  {copy.indexLegend}
+                </div>
               ) : null}
               <div className={styles.tabs} role="tablist">
                 {sections.map((candidate, index) => (

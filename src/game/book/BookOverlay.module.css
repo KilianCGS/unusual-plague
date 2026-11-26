@@ -91,11 +91,6 @@
   color: #9b2a1f;
 }
 
-/* everything is there, but some of it waits in the chest (2026-11-27) */
-.chest {
-  color: #a0620e;
-}
-
 /* the number inside an ingredient's circle (2026-11-27) */
 .count {
   font-size: 22px;
@@ -401,6 +396,33 @@
 
 .cover:hover .coverHint {
   color: #e9dbb9;
+}
+
+/* The index's colour key, a small plate under the book (2026-11-26), in book pixels like the rest of the stage. */
+.indexHint {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  padding: 6px 12px 7px;
+  font: 400 13px/1.1 var(--book-font);
+  color: #2b1a14;
+  background: #e9dbb9;
+  border: 2px solid #2b1a14;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.indexHintSwatch {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  background: #2e6a30;
+  border: 1px solid #1c1009;
 }
 
 /* "← Patient" (2026-11-27): back to the patient's page a recipe was opened from, at the top left, just outside the

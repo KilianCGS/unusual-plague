@@ -51,20 +51,21 @@ test("availability counts the DIRECT ingredients: case, chest, or missing", () =
   assert.equal(pages.recipeAvailability(ointmentBase, stock([["animal-fat", 1]]), stock([["resin", 1]], 10)), "chest");
 });
 
-test("each line of the index: a mark that differs by shape (✓ / ✓* / ✗) and by colour, the name as a link, the station", () => {
+test("each line of the index (2026-11-26): just the name, green when it can be made (case or chest), plain ink otherwise; a link; the station", () => {
   const ctx = { language: "es", patients: {}, inventory: stock([["medicinal-paste", 1]]), storage: stock([["flour", 1]], 10), knownRecipeIds: new Set(RECIPES.map((r) => r.id)) };
   const index = pages.buildPreparationSpreads(ctx)[0];
   const line = index.texts.find((t) => t.id === "index-poultice");
-  assert.ok(line.content[0].startsWith("✓* ") && line.tone === "chest" && line.link);
+  assert.ok(!/^[✓✗]/.test(line.content[0]), "no mark before the name");
+  assert.ok(line.tone === "good" && line.link, "the flour waits in the chest: still green");
   const station = index.texts.find((t) => t.id === "index-poultice-station");
   assert.equal(station.content[0], bookCopy.es.stations.manual);
   assert.equal(station.align, "right");
-  assert.ok(index.texts.some((t) => t.id === "index-legend"));
+  assert.ok(!index.texts.some((t) => t.id === "index-legend"), "the colour key is no longer on the page");
   const missing = index.texts.find((t) => t.id === "index-strong-broth");
-  assert.ok(missing.content[0].startsWith("✗ ") && missing.tone === "bad");
+  assert.ok(!/^[✓✗]/.test(missing.content[0]) && missing.tone === undefined && missing.link, "missing: plain ink, still a link");
 });
 
-test("with the 24 recipes known the index still ends on the page, legend included, in both languages", () => {
+test("with the 24 recipes known the index still ends on the page, in both languages", () => {
   for (const language of ["es", "en"]) {
     const index = pages.buildPreparationSpreads({ language, patients: {}, inventory: inv.createEmptyInventory(), knownRecipeIds: new Set(RECIPES.map((r) => r.id)) })[0];
     const lowest = Math.max(...index.texts.map((t) => t.y));
@@ -95,6 +96,12 @@ test("the book jumps between tabs on such a link and offers \"← Patient\" back
   assert.ok(overlay.includes('target.includes(":")') && overlay.includes("data-book-return") && overlay.includes("setReturnTo(null)"));
   assert.equal(bookCopy.es.backToPatient, "← Paciente");
   assert.equal(bookCopy.en.backToPatient, "← Patient");
+});
+
+test("the index's colour key is a plate under the book, shown only on the index, in both languages", () => {
+  const overlay = read("src/game/book/BookOverlay.tsx");
+  assert.ok(overlay.includes("spread.id === PREPARATION_INDEX_ID") && overlay.includes("data-book-index-hint") && overlay.includes("copy.indexLegend"));
+  assert.ok(bookCopy.es.indexLegend.includes("baúl") && bookCopy.en.indexLegend.includes("chest"));
 });
 
 console.log(`\n${passed} tests passed`);

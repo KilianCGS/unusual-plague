@@ -317,8 +317,6 @@ export function recipeAvailability(
   return recipe.inputs.every(({ itemId, quantity }) => total(itemId) >= quantity) ? "chest" : "missing";
 }
 
-const AVAILABILITY_MARK: Record<RecipeAvailability, string> = { ready: "✓", chest: "✓*", missing: "✗" };
-const AVAILABILITY_TONE: Record<RecipeAvailability, BookTextBlock["tone"]> = { ready: "good", chest: "chest", missing: "bad" };
 // The station sits at the right end of each line of the index.
 const INDEX_STATION_WIDTH = 74;
 
@@ -346,12 +344,14 @@ function buildPreparationIndex(known: readonly Recipe[], context: BookContext): 
       for (const recipe of recipes) {
         const itemId = recipe.output.itemId;
         const position = known.indexOf(recipe);
-        const availability = recipeAvailability(recipe, context.inventory, context.storage);
+        // 2026-11-26 (Kilian): no marks and no red, not to give away too much: green when everything is there (in
+        // the case or the chest), the plain ink otherwise. Every name still turns to its recipe.
+        const available = recipeAvailability(recipe, context.inventory, context.storage) !== "missing";
         texts.push(
           {
             ...text(`index-${itemId}`, "preparationBody", { x: column.x, width: column.width - INDEX_STATION_WIDTH }, y,
-              `${AVAILABILITY_MARK[availability]} ${getItemName(itemId, language)}`),
-            tone: AVAILABILITY_TONE[availability],
+              getItemName(itemId, language)),
+            ...(available ? { tone: "good" as const } : {}),
             link: `preparations-${Math.floor(position / 2) + 1}`,
           },
           {
@@ -365,7 +365,6 @@ function buildPreparationIndex(known: readonly Recipe[], context: BookContext): 
       y += 14;
     }
   }
-  // the legend, at the foot of the right page (the marks differ by shape too, not only by colour)
-  texts.push(text("index-legend", "preparationNote", RIGHT, 340, copy.indexLegend, "center"));
+  // What the green means is told in a small plate UNDER the book (BookOverlay), not on the page (2026-11-26).
   return { id: PREPARATION_INDEX_ID, layers: [PLAIN_BASE_LAYER], texts };
 }

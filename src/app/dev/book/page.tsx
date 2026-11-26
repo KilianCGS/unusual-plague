@@ -30,19 +30,20 @@ const SPAWN: SpawnPoint = { x: 640, y: 352, direction: "east" };
 // description, use, ingredients and steps) can be looked at.
 // 2026-11-27: everything else of the book can be looked at too (TEST DATA):
 //  * the bag: empty, everything in the case, or everything split between the case and the chest, to see the three
-//    marks of the index (✓ in the case, ✓* in the chest, ✗ missing) and the counts in the ingredient circles;
+//    colours of the index (green: it can be made, from the case or the chest; plain ink: something is missing) and the
+//    counts in the ingredient circles;
 //  * the patients: none, or the three of Day 2 examined (their treatments link to their recipes, "← Patient" comes back).
 const ALL_RECIPE_IDS: ReadonlySet<string> = new Set(RECIPES.map((recipe) => recipe.id));
 const ALL_INPUT_ITEM_IDS = [...new Set(RECIPES.flatMap((recipe) => recipe.inputs.map((input) => input.itemId)))];
 type Bag = "empty" | "case" | "split";
 const BAG_LABEL: Record<Bag, string> = {
-  empty: "vacío (todo ✗)",
-  case: "todo en el maletín (todo ✓)",
-  split: "repartido maletín / baúl (✓, ✓* y ✗)",
+  empty: "vacío (índice todo en negro)",
+  case: "todo en el maletín (índice todo en verde)",
+  split: "repartido maletín / baúl (verdes y negros)",
 };
 const stock = (ids: readonly string[]): InventoryState =>
   ids.reduce((bag, itemId) => addItem(bag, itemId as InventoryItemId, 3) ?? bag, createEmptyInventory(ids.length + 4));
-// The split: every other ingredient in the case, the rest in the chest; the last few nowhere (so some lines are ✗).
+// The split: every other ingredient in the case, the rest in the chest; the last few nowhere (so some lines are in plain ink).
 const caseHalf = ALL_INPUT_ITEM_IDS.filter((_, index) => index % 2 === 0);
 const chestHalf = ALL_INPUT_ITEM_IDS.filter((_, index) => index % 2 === 1).slice(0, -3);
 const DAY2_EXAMINED = { "chapter2-blacksmith": "examined", "chapter2-woodcutter": "examined", "chapter2-farmer": "examined" } as const;
