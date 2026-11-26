@@ -12,7 +12,7 @@ rápido. Si algo no se entiende, **eso es justo lo que queremos saber**.
   en la pantalla de título aparece «Continuar» y retoma al empezar el último día guardado.
 
 ## Los 14 puntos a tener en cuenta (anota con la hora)
-1. **Los primeros minutos:** ¿entiendes qué son el libro, el cofre, el panel de recados (R) y el mapa? ¿Qué te faltó saber?
+1. **Los primeros minutos:** ¿entiendes qué son el libro, el cofre, el maletín (tecla I), el panel de recados (R) y el mapa? ¿Qué te faltó saber?
 2. **Qué hacer a continuación:** cada vez que no sepas qué hacer, apunta qué intentas y cuánto tardas en salir.
 3. **Dónde conseguir cosas:** cada vez que dudes de dónde sacar un ingrediente o creas que el juego no te deja hacer algo.
 4. **El libro (Compendio):** ¿te ayuda a saber qué le pasa a cada paciente y qué hacer? ¿Algo está poco claro o no coincide
