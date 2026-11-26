@@ -135,10 +135,10 @@ test("G/H. the Empty flask is an ordinary item: it can be retrieved from the che
   const doctor = createChapter1Inventory();
   const chest = createChapter1Storage();
   assert.equal(inv.countItem(doctor, "empty-flask"), 0);
-  assert.equal(inv.countItem(chest, "empty-flask"), 2); // two flasks since 2026-11-16
+  assert.equal(inv.countItem(chest, "empty-flask"), 3); // three flasks since 2026-11-27
   // retrieve them (the normal full-stack transfer, nothing special)
   const taken = st.transferStack(chest, doctor, "empty-flask");
-  assert.equal(inv.countItem(taken.destination, "empty-flask"), 2);
+  assert.equal(inv.countItem(taken.destination, "empty-flask"), 3);
   assert.equal(inv.countItem(taken.source, "empty-flask"), 0);
   // ...and put them back
   const stored = st.transferStack(
@@ -146,19 +146,19 @@ test("G/H. the Empty flask is an ordinary item: it can be retrieved from the che
     taken.source,
     "empty-flask",
   );
-  assert.equal(inv.countItem(stored.destination, "empty-flask"), 2);
+  assert.equal(inv.countItem(stored.destination, "empty-flask"), 3);
   assert.equal(inv.countItem(stored.source, "empty-flask"), 0);
 });
 
-test("exactly TWO initial Empty flasks exist across the carried inventory and the Storage", () => {
+test("exactly THREE initial Empty flasks exist across the carried inventory and the Storage", () => {
   const total = (a, b) =>
     inv.countItem(a, "empty-flask") + inv.countItem(b, "empty-flask");
   const doctor = createChapter1Inventory();
   const chest = createChapter1Storage();
-  assert.equal(total(doctor, chest), 2); // (two since 2026-11-16)
+  assert.equal(total(doctor, chest), 3); // (three since 2026-11-27)
   // taking them never duplicates them
   const taken = st.transferStack(chest, doctor, "empty-flask");
-  assert.equal(total(taken.destination, taken.source), 2);
+  assert.equal(total(taken.destination, taken.source), 3);
   assert.equal(chest.capacity, st.STORAGE_CAPACITY);
   assert.equal(st.STORAGE_CAPACITY, 10);
 });
@@ -193,8 +193,8 @@ test("I/J. gather.water needs the flask CARRIED (not stored); filling it uses it
   assert.deepEqual(
     filled.effects.map((e) => [e.type, e.itemId, e.quantity]),
     [
-      ["take-item", "empty-flask", 2], // one flask per unit of water (2026-11-16)
-      ["give-item", "water", 2],
+      ["take-item", "empty-flask", 1], // one flask per use of the river (2026-11-27)
+      ["give-item", "water", 1],
     ],
   );
 
@@ -300,7 +300,7 @@ test("K. the baker's husband stays completable within 6 slots (gather > craft > 
   ).destination;
   // fill the flasks (both are used up, one per unit of water: 2 water), take 1 herb and 1 cloth:
   // water + herb + cloth = 3 types
-  doctor = inv.removeItem(doctor, "empty-flask", 2);
+  doctor = inv.removeItem(doctor, "empty-flask", 2); // two of his three flasks are filled
   doctor = stock(
     [
       ["water", 2],
@@ -322,8 +322,8 @@ test("K. the baker's husband stays completable within 6 slots (gather > craft > 
     pc.getPatientStatus(treated.state, ch1.BAKER_HUSBAND_ID),
     "treated",
   );
-  // each empty flask came back with its water: he had two, both were filled, so he has two again
-  assert.equal(inv.countItem(treated.inventory, "empty-flask"), 2);
+  // each empty flask came back with its water: he had three, two were filled, so he has three again (2026-11-27)
+  assert.equal(inv.countItem(treated.inventory, "empty-flask"), 3);
 });
 
 console.log(`\n${passed} tests passed`);

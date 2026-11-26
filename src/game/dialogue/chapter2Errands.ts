@@ -64,7 +64,7 @@ const drinkReminder = talk("seated.reminder", [
   npc("¿La bebida? Aquí me tiene, sentado, esperando con paciencia y con sed.", "The drink? Here I am, sitting, waiting with patience and with thirst."),
 ]);
 const drinkReady = talk("seated.ready", [
-  doctor("Bebida rehidratante: agua, azúcar y sal. Sabe a poco y hace mucho.", "Rehydration drink: water, sugar and salt. It tastes of little and does a lot."),
+  doctor("Bebida hidratante: agua, azúcar y sal. Sabe a poco y hace mucho.", "Hydrating drink: water, sugar and salt. It tastes of little and does a lot."),
   npc("Como todo lo bueno de esta calle. Aquí tiene sus nueve monedas.", "Like everything good on this street. Here are your nine coins."),
   doctor("¿Se la bebe usted?", "Will you drink it yourself?"),
   npc("Yo no. La guardo para el próximo que salga de la taberna arrepentido.", "Not me. I'm keeping it for the next one who walks out of the tavern full of regret."),
@@ -103,6 +103,6 @@ export const CHAPTER2_ERRAND_TRADES: Record<string, NpcTrade> = {
     ask: drinkAsk,
     ready: drinkReady,
     missing: { all: drinkReminder },
-    objective: { es: "Llevar una bebida rehidratante al hombre sentado de la calle de la taberna", en: "Bring a rehydration drink to the seated man on the tavern street" },
+    objective: { es: "Llevar una bebida hidratante al hombre sentado de la calle de la taberna", en: "Bring a hydrating drink to the seated man on the tavern street" },
   },
 };

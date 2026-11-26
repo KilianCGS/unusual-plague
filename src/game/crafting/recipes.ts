@@ -196,7 +196,8 @@ export const RECIPES: Recipe[] = [
   {
     id: "fire.onion-syrup",
     station: "fire",
-    inputs: [{ itemId: "chopped-onion", quantity: 1 }, { itemId: "sugar", quantity: 1 }],
+    // 2026-11-27 (Kilian): from the base syrup, like the balsamic syrup (it was chopped onion + sugar).
+    inputs: [{ itemId: "syrup", quantity: 1 }, { itemId: "chopped-onion", quantity: 1 }],
     output: { itemId: "onion-syrup", quantity: 1 },
   },
   {

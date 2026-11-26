@@ -17,6 +17,6 @@ export function createChapter1Inventory(): InventoryState {
 // exactly two Empty flasks in the game; taking them moves the whole stack.
 export function createChapter1Storage(): InventoryState {
   return (
-    addItem(createEmptyStorage(), "empty-flask", 2) ?? createEmptyStorage()
+    addItem(createEmptyStorage(), "empty-flask", 3) ?? createEmptyStorage()
   );
 }

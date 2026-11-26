@@ -533,10 +533,9 @@ test("water: the river fills one flask per unit (2 flasks, 2 units, the flasks a
     null,
   );
 
-  // no known need (discovered / hidden): nothing to gather
-  assert.equal(decide("discovered", FLASK), "not-needed");
-  assert.equal(decide("hidden", FLASK), "not-needed");
-  assert.deepEqual(water("discovered", FLASK).effects, []);
+  // 2026-11-27: with an empty flask he can always fill one, needed or not (errands need water too)
+  assert.equal(decide("discovered", FLASK), "gather");
+  assert.equal(decide("hidden", FLASK), "gather");
 
   // no flask: no water, even with a need
   assert.equal(decide("examined", []), "no-container");
@@ -544,100 +543,20 @@ test("water: the river fills one flask per unit (2 flasks, 2 units, the flasks a
   assert.ok(water("examined", []).notice.includes("recipiente"));
   assert.equal(water("examined", []).conversation, null);
 
-  // need Water x2: the filling gives both units and uses up the two empty flasks (one each)
-  const filling = [
-    { type: "take-item", itemId: "empty-flask", quantity: 2 },
-    { type: "give-item", itemId: "water", quantity: 2 },
-  ];
+  // 2026-11-27 (Kilian): one use of the river fills ONE empty flask (one water), whatever is needed
   const first = story.resolveStoryInteraction(
     "gather.water",
     { patients: withStatus("examined"), inventory: stock(FLASK) },
     "es",
     "river",
   );
-  assert.deepEqual(first.effects, filling);
+  assert.deepEqual(first.effects, [
+    { type: "take-item", itemId: "empty-flask", quantity: 1 },
+    { type: "give-item", itemId: "water", quantity: 1 },
+  ]);
   assert.equal(first.conversation, null);
-  // what the game does with those effects
-  let state = inv.removeItem(stock(FLASK), "empty-flask", 2);
-  state = inv.addItem(state, "water", 2);
-  assert.equal(inv.countItem(state, "water"), 2);
-  assert.equal(inv.countItem(state, "empty-flask"), 0, "the flask is now full");
-  // only the missing amount: with one unit already carried, one more is enough
-  const topUp = story.resolveStoryInteraction(
-    "gather.water",
-    {
-      patients: withStatus("examined"),
-      inventory: inv.addItem(stock(FLASK), "water", 1),
-    },
-    "es",
-    "river",
-  );
-  assert.deepEqual(topUp.effects[1], {
-    type: "give-item",
-    itemId: "water",
-    quantity: 1,
-  });
-  // water for both treatments is carried: the river says enough
-  const second = story.resolveStoryInteraction(
-    "gather.water",
-    { patients: withStatus("examined"), inventory: state },
-    "es",
-    "river",
-  );
-  assert.deepEqual(second.effects, []);
-  assert.ok(
-    second.notice.includes("recipiente") ||
-      second.notice.includes("suficiente"),
-  );
-  // (no flask: it is in use) with a second flask the river still refuses
-  const spare = inv.addItem(state, "empty-flask", 1);
-  assert.deepEqual(
-    story.resolveStoryInteraction(
-      "gather.water",
-      { patients: withStatus("examined"), inventory: spare },
-      "es",
-      "river",
-    ).effects,
-    [],
-  );
-  assert.equal(
-    story.resolveStoryInteraction(
-      "gather.water",
-      { patients: withStatus("examined"), inventory: spare },
-      "en",
-      "river",
-    ).notice,
-    "I already have enough water.",
-  );
   assert.equal(story.GATHER_SOURCES["gather.water"].requires, "empty-flask");
-  assert.equal(story.GATHER_SOURCES["gather.water"].quantity, 2);
-
-  // a future open case that needs more water re-enables the river by itself
-  // (nothing was stored about the river)
-  const registry = at("src/game/patients/patientRegistry.ts").PATIENT_CASES;
-  registry["test.second"] = {
-    id: "test.second",
-    requiredTreatments: [{ itemId: "medicinal-infusion", quantity: 1 }],
-  };
-  try {
-    const both = { [HUSBAND]: "examined", "test.second": "examined" };
-    assert.equal(
-      story.getGatherDecision("gather.water", {
-        patients: both,
-        inventory: spare,
-      }),
-      "gather", // Water x2 carried, x3 now needed
-    );
-    assert.equal(
-      story.getGatherDecision("gather.water", {
-        patients: { [HUSBAND]: "examined" },
-        inventory: spare,
-      }),
-      "not-needed",
-    );
-  } finally {
-    delete registry["test.second"];
-  }
+  assert.equal(story.GATHER_SOURCES["gather.water"].quantity, 1);
   // and spending the water elsewhere makes it useful again
   assert.equal(
     story.getGatherDecision("gather.water", {
@@ -1124,7 +1043,7 @@ test("the Empty flasks (two, since 2026-11-16) start in the Doctor's Storage, no
   assert.equal(inv.countOccupiedSlots(initial), 0);
   assert.equal(inv.countItem(initial, "empty-flask"), 0);
   assert.equal(chest.capacity, 10);
-  assert.deepEqual(chest.slots[0], { itemId: "empty-flask", quantity: 2 });
+  assert.deepEqual(chest.slots[0], { itemId: "empty-flask", quantity: 3 });
   assert.equal(inv.countOccupiedSlots(chest), 1);
   assert.ok(inv.isValidInventory(initial) && inv.isValidInventory(chest));
   assert.equal(getItemName("empty-flask", "es"), "Frasco vacío");

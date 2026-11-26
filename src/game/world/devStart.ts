@@ -71,7 +71,7 @@ function getDay1CollectedInstanceIds(): ReadonlySet<string> {
 
 function day2StartInventory() {
   let inventory = createChapter1Inventory();
-  for (const [itemId, quantity] of [["empty-flask", 2], ["orange", 2], ["cloth", 1], ["medicinal-herb", 2]] as const) {
+  for (const [itemId, quantity] of [["empty-flask", 3], ["orange", 2], ["cloth", 1], ["medicinal-herb", 2]] as const) {
     inventory = addItem(inventory, itemId, quantity) ?? inventory;
   }
   return inventory;
@@ -137,7 +137,7 @@ export function createDay2ClosingDevStart(): GameDevStart {
 export function createDay3DevStart(): GameDevStart {
   const day2 = createDay2ClosingDevStart();
   let inventory = day2.inventory;
-  for (const [itemId, quantity] of [["empty-flask", 2], ["mint", 1], ["honey", 1], ["garlic", 1], ["orange", 2]] as const) {
+  for (const [itemId, quantity] of [["empty-flask", 3], ["mint", 1], ["honey", 1], ["garlic", 1], ["orange", 2]] as const) {
     inventory = addItem(inventory, itemId, quantity) ?? inventory;
   }
   return {

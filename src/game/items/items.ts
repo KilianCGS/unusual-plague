@@ -334,7 +334,7 @@ export const ITEMS: Record<ItemId, ItemDefinition> = {
   },
   "rehydration-drink": {
     id: "rehydration-drink",
-    name: { es: "Bebida reconstituyente", en: "Rehydration drink" },
+    name: { es: "Bebida hidratante", en: "Hydrating drink" }, // 2026-11-27 (Kilian)
     icon: `${PREPARED_ICONS}/rehydration-drink.png`,
   },
   "strong-broth": {

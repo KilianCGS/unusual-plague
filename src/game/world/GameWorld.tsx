@@ -323,6 +323,8 @@ export function GameWorld({
         : learnedRecipeIds,
     [devStart, learnedRecipeIds],
   );
+  // Effects a conversation hands over when it ends (2026-11-27: the Witch's leech), see StoryOutcome.effectsAtEnd.
+  const pendingEffectsRef = useRef<StoryEffect[] | null>(null);
   // What happens when the conversation on screen ends (a scripted flow).
   const afterDialogueRef = useRef<
     | "go-to-examination"
@@ -955,7 +957,9 @@ export function GameWorld({
         return;
       }
 
-      if (outcome?.conversation && applyStoryEffects(outcome.effects)) {
+      if (outcome?.conversation && (outcome.effectsAtEnd || applyStoryEffects(outcome.effects))) {
+        // effects deferred to the end of the conversation (the Witch's leech)
+        pendingEffectsRef.current = outcome.effectsAtEnd ? outcome.effects : null;
         if (outcome.patientId) {
           examiningPatientRef.current = outcome.patientId;
         }
@@ -1329,6 +1333,13 @@ export function GameWorld({
       return;
     }
 
+    // What a conversation hands over when it ends (see StoryOutcome.effectsAtEnd).
+    const pendingEffects = pendingEffectsRef.current;
+    pendingEffectsRef.current = null;
+    if (pendingEffects && !applyStoryEffects(pendingEffects)) {
+      showNotice(itemFeedbackCopy[language].inventoryFull);
+    }
+
     const action = afterDialogueRef.current;
 
     afterDialogueRef.current = null;
@@ -1360,6 +1371,9 @@ export function GameWorld({
     updateDiagnosis,
     startStayFade,
     claimFlag,
+    applyStoryEffects,
+    showNotice,
+    language,
   ]);
 
   // The day closes by itself when the LAST case is done: only at a moment of

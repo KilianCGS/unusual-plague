@@ -217,9 +217,9 @@ test("UI pass of 2026-11-16: centred notes, higher chest, flasks, coins like the
   const world = read("src/game/world/GameWorld.tsx");
   assert.ok(world.includes('placement={hintStep === "exit-room" || hintStep === "exit-botica" ? "top" : "bottom"}'), "book and chest notes centred, door notes at the top");
   assert.ok(read("src/game/storage/StorageOverlay.module.css").includes("align-items: flex-start"));
-  // two flasks, one stack
+  // three flasks since 2026-11-27, one stack
   const initial = at("src/game/inventory/initialInventory.ts").createChapter1Storage();
-  assert.deepEqual(initial.slots[0], { itemId: "empty-flask", quantity: 2 });
+  assert.deepEqual(initial.slots[0], { itemId: "empty-flask", quantity: 3 });
   // the coin HUD: number first, then the coin; same bottom line as the inventory bar
   const coinTsx = read("src/game/money/CoinHud.tsx");
   assert.ok(coinTsx.indexOf("styles.count") < coinTsx.indexOf("styles.coin"), "number above the coin");

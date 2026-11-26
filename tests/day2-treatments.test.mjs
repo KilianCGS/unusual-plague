@@ -80,9 +80,12 @@ function complete(facts,id){
     // the herbs wait in the chest (they are not needed for this case)
     stash(facts,'medicinal-herb');
     facts.inventory=addItem(facts.inventory,'mint',1);assert.ok(facts.inventory);
-    const water=interact('gather.water',facts);
-    assert.equal(water.effects.find(e=>e.type==='give-item').quantity,2);
-    apply(facts,water);
+    // 2026-11-27: one flask per use of the river; the citrus drink and the infusion need two
+    for(let use=0;use<2;use++){
+      const water=interact('gather.water',facts);
+      assert.equal(water.effects.find(e=>e.type==='give-item').quantity,1);
+      apply(facts,water);
+    }
     // the sugar of the citrus drink is BOUGHT from the merchant (money has to be needed)
     stash(facts,'empty-flask');facts.inventory=addItem(facts.inventory,'sugar',1);assert.ok(facts.inventory);
     make(facts,'fire.citrus-drink');make(facts,'fire.mint-infusion');
@@ -151,7 +154,8 @@ test('carried intermediates reduce raw supply requests; flour comes from the sac
   const facts={patients:{[SMITH]:'examined'},inventory:addItem(createEmptyInventory(),'medicinal-paste',1),claimedRewards:new Set()};
   assert.equal(interact('chapter2.farm.woman',facts),null,'herb is covered by the carried paste');
   const baker=interact('chapter2.bakery.baker',facts);
-  assert.deepEqual(baker.effects,[{type:'claim-reward',rewardId:FLOUR}],'the baker only allows the sack; she gives no honey');
+  // 2026-11-27 (Kilian): she also puts one flour and one sugar in his hands in that first talk (no honey)
+  assert.deepEqual(baker.effects,[{type:'give-item',itemId:'flour',quantity:1},{type:'give-item',itemId:'sugar',quantity:1},{type:'claim-reward',rewardId:'chapter2.bakery.baker.sugar'},{type:'claim-reward',rewardId:FLOUR}],'flour and sugar in hand, and the sack allowed; no honey');
   assert.deepEqual(interact('chapter2.mill.beekeeper',facts).effects,[],'the carried paste already covers the honey');
   assert.deepEqual(interact('chapter2.mill.beekeeper',{...facts,inventory:createEmptyInventory()}).effects,[{type:'give-item',itemId:'honey',quantity:1}]);
   // 2026-11-16: her NEXT talk gives one sugar (own flag); once that is claimed she has nothing more to give

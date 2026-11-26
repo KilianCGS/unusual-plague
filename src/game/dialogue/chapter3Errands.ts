@@ -2,7 +2,7 @@ import type { NpcTrade } from "./npcTrades";
 import type { LocalizedConversation, LocalizedLine } from "./localizedConversation";
 
 // THE VOLUNTARY ERRANDS OF DAY 3 (2026-11-18, Kilian chose them): the carpenter of the Smithy Street asks for a
-// cold cloth and the elderly couple of the plaza for a rehydration drink. Same mechanism as the errands of
+// cold cloth and the elderly couple of the plaza for a hydrating drink. Same mechanism as the errands of
 // Days 1-2 (chapter1Errands.ts, chapter2Errands.ts): the first talk is the request, then a reminder, then the
 // delivery. Optional; they pay a little in coins.
 //
@@ -42,7 +42,7 @@ const coupleReminder = talk("couple.reminder", [
   npc("¿La bebida, doctor? Seguimos aquí sentados, con paciencia y con sed.", "The drink, doctor? We're still sitting here, with patience and with thirst."),
 ]);
 const coupleReady = talk("couple.ready", [
-  doctor("Bebida rehidratante: agua, azúcar y sal. Sabe a poco y hace mucho.", "Rehydration drink: water, sugar and salt. It tastes of little and does a lot."),
+  doctor("Bebida hidratante: agua, azúcar y sal. Sabe a poco y hace mucho.", "Hydrating drink: water, sugar and salt. It tastes of little and does a lot."),
   npc("Los dos a medias, como siempre. Aquí tiene sus seis monedas.", "Half each, as always. Here are your six coins."),
   doctor("Beban despacio, a sorbitos.", "Drink slowly, in little sips."),
 ]);
@@ -70,6 +70,6 @@ export const CHAPTER3_ERRAND_TRADES: Record<string, NpcTrade> = {
     ask: coupleAsk,
     ready: coupleReady,
     missing: { all: coupleReminder },
-    objective: { es: "Llevar una bebida rehidratante a los ancianos de la plaza", en: "Bring a rehydration drink to the elderly couple in the plaza" },
+    objective: { es: "Llevar una bebida hidratante a los ancianos de la plaza", en: "Bring a hydrating drink to the elderly couple in the plaza" },
   },
 };

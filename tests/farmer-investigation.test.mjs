@@ -92,12 +92,13 @@ test('the complete farmer path is playable with five slots, Day 1 leftovers in t
   apply(f,interact('chapter2.mine.recoveringMiner',f));
   assert.equal(interact('chapter2.farm.woman',f)?.effects?.length??0,0,'the farm woman no longer hands out herbs');
   apply(f,interact('gather.water',f));
+  apply(f,interact('gather.water',f)); // one flask per use since 2026-11-27: the suspension and the infusion take one each
   for(const id of ['mortar.crushed-coal','manual.charcoal-suspension','fire.medicinal-infusion']){
     const next=craft(f.inventory,RECIPES.find(r=>r.id===id));assert.ok(next,id);f.inventory=next;
   }
   const treatment=interact('chapter2.granary.farmer',f);
   assert.deepEqual(treatment.effects,[{type:'treat',patientId:ID}]);apply(f,treatment);
-  assert.equal(f.patients[ID],'treated');assert.equal(countItem(f.inventory,'empty-flask'),2); // (he carries two since 2026-11-16: each comes back with its water)
+  assert.equal(f.patients[ID],'treated');assert.equal(countItem(f.inventory,'empty-flask'),3); // (he carries three since 2026-11-27: each comes back with its water)
   assert.equal(countItem(f.inventory,'charcoal-suspension'),0);
   assert.deepEqual(interact('chapter2.granary.farmer',f).effects,[]);
   assert.equal(interact('chapter2.farm.woman',f).conversation.id,'chapter2.farm.woman.farmerTreated');

@@ -635,18 +635,19 @@ function fillFlask(state) {
   return next;
 }
 
-test("filling the empty flasks gives one water per flask and uses the flasks up", () => {
-  const filled = fillFlask(stock([["empty-flask", 2]]));
-  assert.equal(count(filled, "water"), 2);
-  assert.equal(count(filled, "empty-flask"), 0);
+test("each use of the river fills ONE empty flask (2026-11-27), needed or not", () => {
+  const once = fillFlask(stock([["empty-flask", 2]]));
+  assert.equal(count(once, "water"), 1);
+  assert.equal(count(once, "empty-flask"), 1);
+  const twice = fillFlask(once);
+  assert.equal(count(twice, "water"), 2);
+  assert.equal(count(twice, "empty-flask"), 0);
   // with ONE flask he gets ONE water (never more water than flasks)
   const single = fillFlask(stock([["empty-flask", 1]]));
   assert.equal(count(single, "water"), 1);
   assert.equal(count(single, "empty-flask"), 0);
-  // the river gives nothing more while the water he needs is carried (no extra water)
-  assert.deepEqual(river(filled).effects, []);
-  // not even with another flask: it never creates flasks or water out of nothing
-  assert.deepEqual(river(inv.addItem(filled, "empty-flask", 1)).effects, []);
+  // no empty flask left: nothing (it never creates flasks or water out of nothing)
+  assert.deepEqual(river(twice).effects, []);
   // without the flask the river does nothing
   assert.deepEqual(river(stock([])).effects, []);
 });
@@ -663,6 +664,7 @@ for (const [name, order] of [
         ["cloth", 1],
       ]),
     );
+    state = fillFlask(state); // one flask per use of the river (2026-11-27)
     assert.equal(count(state, "water"), 2);
 
     const first = make(state, order[0]);
@@ -686,13 +688,13 @@ for (const [name, order] of [
 
 test("both orders end exactly the same", () => {
   const run = (order) => {
-    let state = fillFlask(
+    let state = fillFlask(fillFlask(
       stock([
         ["empty-flask", 2],
         ["medicinal-herb", 1],
         ["cloth", 1],
       ]),
-    );
+    ));
     for (const step of order) state = make(state, step).inventory;
     return JSON.stringify(
       state.slots
@@ -705,13 +707,13 @@ test("both orders end exactly the same", () => {
 });
 
 test("only a successful craft uses the water: an invalid recipe, the wrong station or no space change nothing", () => {
-  const state = fillFlask(
+  const state = fillFlask(fillFlask(
     stock([
       ["empty-flask", 2],
       ["medicinal-herb", 1],
       ["cloth", 1],
     ]),
-  );
+  )); // two uses of the river (one flask each since 2026-11-27)
   const snapshot = JSON.stringify(state);
   // no such recipe (water + water), and recipes at the wrong station
   assert.equal(

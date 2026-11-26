@@ -1,5 +1,5 @@
 import type { Language } from "../i18n/types";
-import { canAddItem, countItem } from "../inventory/inventory";
+import { addItem, canAddItem, countItem } from "../inventory/inventory";
 import { FARMER_DAY2_ID } from "../patients/chapter2Patients";
 import { getPatientStatus } from "../patients/patientCases";
 import { chapter2AmbientDialogues } from "./chapter2AmbientDialogues";
@@ -62,6 +62,16 @@ const flourOffer = [
   npc("Sírvase del saco del rincón, Doctor. Con la cantidad que pueda llevar bastará.", "Help yourself from the sack in the corner, Doctor. Whatever you can carry will do."),
 ];
 
+// 2026-11-27 (Kilian): in that same first conversation she puts a flour and a sugar in his hands (the sugar was a
+// second visit before); the sack stays there for more flour. Only if both fit; otherwise the old offer and the sugar
+// later. New text, awaiting Kilian's review.
+const flourAndSugarGift = [
+  doctor("¿Podría llevarme algo de harina si la necesito?", "Could I take some flour if I need it?"),
+  npc("Tome, Doctor: harina y un puñado de azúcar del obrador. Con lo de ayer le debo algo más que palabras.", "Here, Doctor: some flour and a handful of sugar from the bakery. After yesterday I owe you more than words."),
+  npc("Si le hace falta más harina, sírvase del saco del rincón.", "If you need more flour, help yourself from the sack in the corner."),
+  doctor("No hacía falta, pero se lo agradezco de verdad.", "You didn't have to, but I truly thank you."),
+];
+
 // 2026-11-16 (Kilian): the seamstress of the apothecary street is the wife of the tavern man the Doctor
 // helped on Day 1. She thanks him just for talking and gives him a piece of clean cloth (2026-11-25, Kilian: the
 // backpack's extra slot is gone, the Doctor's case has a fixed 15 places). It waits if the cloth does not fit.
@@ -94,11 +104,32 @@ export function resolveChapter2StoryInteraction(
   if (interactionId === BEEKEEPER_INTERACTION_ID) return resolveBeekeeperHoney(facts, language, subjectId);
   if (interactionId === "chapter2.bakery.baker" && !facts.claimedRewards?.has(FLOUR_OFFERED_ID)) {
     const honey = resolveChapter2Supplies(interactionId, facts, language, subjectId);
-    const offer = localizeConversation(talk("chapter2.bakery.baker.flour", flourOffer), language, subjectId).lines;
+    // room for both, after what the honey of the same conversation brings (the effects apply all or nothing)
+    let afterHoney = facts.inventory;
+    for (const effect of honey?.effects ?? []) {
+      if (effect.type === "give-item") afterHoney = addItem(afterHoney, effect.itemId, effect.quantity) ?? afterHoney;
+    }
+    const withFlour = addItem(afterHoney, "flour", 1);
+    const bothFit = !facts.claimedRewards?.has(BAKER_SUGAR_ID) && withFlour !== null && addItem(withFlour, "sugar", 1) !== null;
+    const offer = localizeConversation(
+      talk(bothFit ? "chapter2.bakery.baker.flourAndSugar" : "chapter2.bakery.baker.flour", bothFit ? flourAndSugarGift : flourOffer),
+      language,
+      subjectId,
+    ).lines;
     const base = honey?.conversation ?? localizeConversation(chapter2AmbientDialogues[interactionId], language, subjectId);
     return {
       conversation: { ...base, id: `${base.id}.flour`, lines: [...base.lines, ...offer] },
-      effects: [...(honey?.effects ?? []), { type: "claim-reward", rewardId: FLOUR_OFFERED_ID }],
+      effects: [
+        ...(honey?.effects ?? []),
+        ...(bothFit
+          ? [
+              { type: "give-item" as const, itemId: "flour", quantity: 1 },
+              { type: "give-item" as const, itemId: "sugar", quantity: 1 },
+              { type: "claim-reward" as const, rewardId: BAKER_SUGAR_ID },
+            ]
+          : []),
+        { type: "claim-reward", rewardId: FLOUR_OFFERED_ID },
+      ],
     };
   }
   if (
@@ -172,5 +203,7 @@ export function resolveChapter2StoryInteraction(
       { type: "give-item", itemId: "leech", quantity: 1 },
       { type: "claim-reward", rewardId: DAY2_LEECH_REWARD_ID },
     ] : [],
+    // 2026-11-27 (Kilian): the leech is handed over when she has finished talking
+    effectsAtEnd: room,
   };
 }

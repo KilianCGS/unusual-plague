@@ -94,8 +94,8 @@ export const PREPARATION_DESCRIPTIONS: Partial<Record<ItemId, Record<Language, s
     en: "Bone simmered slowly with water and salt. A restoring broth.",
   },
   "onion-syrup": {
-    es: "Cebolla y azúcar cocidas hasta formar un jarabe espeso para la tos.",
-    en: "Onion and sugar cooked into a thick syrup for a cough.",
+    es: "Jarabe base cocido con cebolla troceada: espeso y bueno para la tos.",
+    en: "Base syrup cooked with chopped onion: thick and good for a cough.",
   },
   "rehydration-drink": {
     es: "Agua con azúcar y sal. Devuelve las fuerzas a quien está agotado.",

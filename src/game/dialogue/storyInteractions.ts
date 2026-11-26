@@ -124,6 +124,9 @@ export type StoryOutcome = {
   after?: "go-to-examination" | "examine-in-place";
   // The case that `after` is about.
   patientId?: string;
+  // 2026-11-27: the effects happen when the conversation ENDS, not when it starts (the Witch hands over the leech at
+  // the end of what she says). The resolver must already have checked that they fit.
+  effectsAtEnd?: boolean;
 };
 
 export type StoryFacts = {
@@ -157,7 +160,8 @@ export const GATHER_SOURCES: Record<
   string,
   { itemId: string; requires: string; quantity: number }
 > = {
-  "gather.water": { itemId: "water", requires: "empty-flask", quantity: 2 },
+  // 2026-11-27 (Kilian): one flask per use of the river.
+  "gather.water": { itemId: "water", requires: "empty-flask", quantity: 1 },
 };
 
 export type GatherDecision = "gather" | "no-container" | "not-needed";
@@ -179,13 +183,9 @@ export function getGatherDecision(
     return "no-container";
   }
 
-  const missing = getActiveMissingIngredients(
-    facts.patients,
-    getPatientDefinitions(facts.claimedRewards),
-    facts.inventory,
-  );
-
-  return missingOf(missing, source.itemId) > 0 ? "gather" : "not-needed";
+  // 2026-11-27 (Kilian): whenever he carries an empty flask he can fill one, needed or not (an errand needs water
+  // too, and the water is never wasted: its flask comes back when it is used).
+  return "gather";
 }
 
 function missingOf(missing: readonly ItemNeed[], itemId: string): number {
@@ -771,11 +771,7 @@ export function resolveStoryInteraction(
       // One flask per unit of water (2026-11-16, Kilian: the flasks and the water are one to one): each empty
       // flask is filled (used up) and gives one unit, as many as are still missing, at most `quantity`, and
       // at most the flasks carried. Each flask comes back as its water is used (craft()).
-      const units = Math.min(
-        source.quantity,
-        missingOf(missing, source.itemId),
-        countItem(facts.inventory, source.requires),
-      );
+      const units = Math.min(source.quantity, countItem(facts.inventory, source.requires));
 
       return {
         conversation: null,
