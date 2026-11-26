@@ -26,6 +26,9 @@ type BookCopy = {
   ingredientSpreadAlts: string[];
   station: string;
   stations: Record<CraftStation, string>;
+  // 2026-11-27: the index of PREPARADOS says what can be made, and the way back to the patient a recipe was opened from.
+  indexLegend: string;
+  backToPatient: string;
 };
 
 export const bookCopy: Record<Language, BookCopy> = {
@@ -58,6 +61,8 @@ export const bookCopy: Record<Language, BookCopy> = {
     ],
     station: "Estación",
     stations: { manual: "Mesa", fire: "Cocina", mortar: "Mortero", chop: "Tabla" },
+    indexLegend: "✓ en el maletín · ✓* en el baúl · ✗ falta algo",
+    backToPatient: "← Paciente",
   },
   en: {
     tabs: {
@@ -85,6 +90,8 @@ export const bookCopy: Record<Language, BookCopy> = {
     ],
     station: "Station",
     stations: { manual: "Work table", fire: "Stove", mortar: "Mortar", chop: "Board" },
+    indexLegend: "✓ in your bag · ✓* in the chest · ✗ missing",
+    backToPatient: "← Patient",
   },
 };
 

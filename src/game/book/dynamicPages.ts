@@ -1,4 +1,4 @@
-import { RECIPES, expandKnownRecipeIds } from "../crafting/recipes";
+import { RECIPES, expandKnownRecipeIds, type Recipe } from "../crafting/recipes";
 import { ailmentNames, bookCopy } from "../i18n/book";
 import type { Language } from "../i18n/types";
 import { countItem, type InventoryState } from "../inventory/inventory";
@@ -156,15 +156,18 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
         const done =
           status === "treated" || countItem(inventory, itemId) >= quantity;
 
-        texts.push(
-          text(
+        // 2026-11-27 (Kilian): each preparation opens its recipe in PREPARADOS (when the recipe is known)
+        const recipeSpread = preparationSpreadIdOf(itemId, context.knownRecipeIds);
+        texts.push({
+          ...text(
             `${id}-need-${index}`,
             "body",
             RIGHT,
             LINES_Y + index * LINE_STEP,
             `${done ? "☑" : "☐"} ${getItemName(itemId, language)}`,
           ),
-        );
+          ...(recipeSpread ? { link: `preparations:${recipeSpread}` } : {}),
+        });
       });
 
       if (status === "treated") {
@@ -199,22 +202,33 @@ function estimateLines(content: string, role: "preparationBody" | "preparationNo
 // Where the texts of a leaf must end (the lower edge of the written area of the page).
 const PAGE_TEXT_BOTTOM = 358;
 
+// The known recipes in the order of their leaves: grouped by category (preparationCategories.ts), in the recipes' own
+// order inside each (2026-11-27, Kilian).
+function knownRecipesInOrder(knownRecipeIds: ReadonlySet<string>) {
+  const expanded = expandKnownRecipeIds(knownRecipeIds);
+  return RECIPES.filter(recipe => expanded.has(recipe.id))
+    .map((recipe, order) => ({ recipe, order }))
+    .sort((a, b) => preparationCategoryRank(a.recipe.output.itemId) - preparationCategoryRank(b.recipe.output.itemId) || a.order - b.order)
+    .map(({ recipe }) => recipe);
+}
+
+// The spread of PREPARADOS where a known preparation is written (the index comes first), or null if it is not known.
+export function preparationSpreadIdOf(itemId: string, knownRecipeIds: ReadonlySet<string>): string | null {
+  const position = knownRecipesInOrder(knownRecipeIds).findIndex((recipe) => recipe.output.itemId === itemId);
+  return position < 0 ? null : `preparations-${Math.floor(position / 2) + 1}`;
+}
+
 // One known preparation per physical leaf, two per opening.
 export function buildPreparationSpreads(context: BookContext): BookSpread[] {
   const { language, knownRecipeIds } = context;
   const copy = bookCopy[language];
-  const expanded = expandKnownRecipeIds(knownRecipeIds);
-  // 2026-11-27 (Kilian): grouped by category (preparationCategories.ts), in the recipes' own order inside each.
-  const known = RECIPES.filter(recipe => expanded.has(recipe.id))
-    .map((recipe, order) => ({ recipe, order }))
-    .sort((a, b) => preparationCategoryRank(a.recipe.output.itemId) - preparationCategoryRank(b.recipe.output.itemId) || a.order - b.order)
-    .map(({ recipe }) => recipe);
+  const known = knownRecipesInOrder(knownRecipeIds);
 
   if (known.length === 0) {
     return [emptySpread("preparations-empty", copy.noRecipes.title, copy.noRecipes.note)];
   }
 
-  const spreads: BookSpread[] = [buildPreparationIndex(known.map((recipe) => recipe.output.itemId), language)];
+  const spreads: BookSpread[] = [buildPreparationIndex(known, context)];
   for (let start = 0; start < known.length; start += 2) {
     const texts: BookTextBlock[] = [];
     const layers: BookSpread["layers"] = [PLAIN_BASE_LAYER];
@@ -290,7 +304,27 @@ export function buildPreparationSpreads(context: BookContext): BookSpread[] {
 export const PREPARATION_INDEX_ID = "preparations-index";
 const INDEX_LINE = 17;
 
-function buildPreparationIndex(knownOutputs: readonly string[], language: Language): BookSpread {
+// What the Doctor can do with a recipe right now, by its DIRECT ingredients (a step before counts only if it is made):
+// "ready" everything is in the case, "chest" everything is there but some of it is in the chest, "missing" not enough.
+export type RecipeAvailability = "ready" | "chest" | "missing";
+export function recipeAvailability(
+  recipe: { inputs: readonly { itemId: string; quantity: number }[] },
+  inventory: InventoryState,
+  storage?: InventoryState,
+): RecipeAvailability {
+  if (recipe.inputs.every(({ itemId, quantity }) => countItem(inventory, itemId) >= quantity)) return "ready";
+  const total = (itemId: string) => countItem(inventory, itemId) + (storage ? countItem(storage, itemId) : 0);
+  return recipe.inputs.every(({ itemId, quantity }) => total(itemId) >= quantity) ? "chest" : "missing";
+}
+
+const AVAILABILITY_MARK: Record<RecipeAvailability, string> = { ready: "✓", chest: "✓*", missing: "✗" };
+const AVAILABILITY_TONE: Record<RecipeAvailability, BookTextBlock["tone"]> = { ready: "good", chest: "chest", missing: "bad" };
+// The station sits at the right end of each line of the index.
+const INDEX_STATION_WIDTH = 74;
+
+function buildPreparationIndex(known: readonly Recipe[], context: BookContext): BookSpread {
+  const { language } = context;
+  const copy = bookCopy[language];
   const texts: BookTextBlock[] = [
     text("index-title", "heading", LEFT, 22, language === "es" ? "ÍNDICE" : "INDEX", "center"),
   ];
@@ -304,21 +338,34 @@ function buildPreparationIndex(knownOutputs: readonly string[], language: Langua
     for (const group of groups) {
       texts.push(text(`index-${group}`, "preparationTitle", column, y, PREPARATION_CATEGORY_NAMES[group][language].toUpperCase()));
       y += 24;
-      const outputs = knownOutputs.filter((itemId) => PREPARATION_CATEGORY[itemId] === group);
-      if (outputs.length === 0) {
+      const recipes = known.filter((recipe) => PREPARATION_CATEGORY[recipe.output.itemId] === group);
+      if (recipes.length === 0) {
         texts.push(text(`index-${group}-none`, "preparationNote", column, y, language === "es" ? "Aún ninguno." : "None yet."));
         y += INDEX_LINE;
       }
-      for (const itemId of outputs) {
-        const position = knownOutputs.indexOf(itemId);
-        texts.push({
-          ...text(`index-${itemId}`, "preparationBody", column, y, `· ${getItemName(itemId, language)}`),
-          link: `preparations-${Math.floor(position / 2) + 1}`,
-        });
+      for (const recipe of recipes) {
+        const itemId = recipe.output.itemId;
+        const position = known.indexOf(recipe);
+        const availability = recipeAvailability(recipe, context.inventory, context.storage);
+        texts.push(
+          {
+            ...text(`index-${itemId}`, "preparationBody", { x: column.x, width: column.width - INDEX_STATION_WIDTH }, y,
+              `${AVAILABILITY_MARK[availability]} ${getItemName(itemId, language)}`),
+            tone: AVAILABILITY_TONE[availability],
+            link: `preparations-${Math.floor(position / 2) + 1}`,
+          },
+          {
+            ...text(`index-${itemId}-station`, "preparationNote",
+              { x: column.x + column.width - INDEX_STATION_WIDTH, width: INDEX_STATION_WIDTH }, y + 2, copy.stations[recipe.station]),
+            align: "right",
+          },
+        );
         y += INDEX_LINE;
       }
       y += 14;
     }
   }
+  // the legend, at the foot of the right page (the marks differ by shape too, not only by colour)
+  texts.push(text("index-legend", "preparationNote", RIGHT, 340, copy.indexLegend, "center"));
   return { id: PREPARATION_INDEX_ID, layers: [PLAIN_BASE_LAYER], texts };
 }

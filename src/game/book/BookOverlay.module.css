@@ -91,6 +91,11 @@
   color: #9b2a1f;
 }
 
+/* everything is there, but some of it waits in the chest (2026-11-27) */
+.chest {
+  color: #a0620e;
+}
+
 /* the number inside an ingredient's circle (2026-11-27) */
 .count {
   font-size: 22px;
@@ -396,4 +401,26 @@
 
 .cover:hover .coverHint {
   color: #e9dbb9;
+}
+
+/* "← Patient" (2026-11-27): back to the patient's page a recipe was opened from, at the top left, just outside the
+   book (the tabs take the top edge). */
+.returnLink {
+  position: absolute;
+  top: 10px;
+  right: calc(100% + 6px);
+  white-space: nowrap;
+  z-index: 3;
+  padding: 3px 8px 4px;
+  font: 700 12px/1 var(--ui-font);
+  color: #2b1a14;
+  background: #e9dbb9;
+  border: 2px solid #2b1a14;
+  cursor: pointer;
+}
+
+.returnLink:hover,
+.returnLink:focus-visible {
+  background: #f6ecd0;
+  outline: none;
 }

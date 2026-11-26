@@ -84,6 +84,9 @@ export function BookOverlay({
     ),
   );
   const [spreadIndex, setSpreadIndex] = useState(0);
+  // 2026-11-27: the patient's page a recipe was opened from (its section and spread), for "← Patient"; any other
+  // change of tab forgets it.
+  const [returnTo, setReturnTo] = useState<{ section: number; spread: number } | null>(null);
 
   // Opening the book sounds like turning a page (the same sound).
   useEffect(() => {
@@ -103,6 +106,7 @@ export function BookOverlay({
     if (index !== sectionIndex) playSound("ui.bookTab");
     setSectionIndex(index);
     setSpreadIndex(0);
+    setReturnTo(null);
   }
 
   function turnPage(delta: -1 | 1) {
@@ -169,8 +173,17 @@ export function BookOverlay({
               <SpreadView
                 spread={spread}
                 onLink={(target) => {
-                  const next = section.spreads.findIndex(({ id }) => id === target);
-                  if (next < 0 || next === spreadIndex) return;
+                  // "<section>:<spread>" opens a spread of another tab (a patient's treatment > its recipe)
+                  const [sectionId, spreadId] = target.includes(":") ? target.split(":") : [section.id, target];
+                  const nextSection = sections.findIndex(({ id }) => id === sectionId);
+                  if (nextSection < 0) return;
+                  const next = sections[nextSection].spreads.findIndex(({ id }) => id === spreadId);
+                  if (next < 0 || (nextSection === sectionIndex && next === spreadIndex)) return;
+                  if (nextSection !== sectionIndex) {
+                    setReturnTo(section.id === "patients" ? { section: sectionIndex, spread: spreadIndex } : null);
+                    setSectionIndex(nextSection);
+                    onSectionChange?.(sections[nextSection].id);
+                  }
                   setSpreadIndex(next);
                   playSound("ui.pageTurn");
                   onPageChange?.();
@@ -198,6 +211,21 @@ export function BookOverlay({
                   <span className={styles.arrowFace}>
                     <span className={styles.glyphRight} />
                   </span>
+                </button>
+              ) : null}
+              {returnTo && sections[returnTo.section] ? (
+                <button
+                  type="button"
+                  className={styles.returnLink}
+                  data-book-return
+                  onClick={() => {
+                    setSectionIndex(returnTo.section);
+                    setSpreadIndex(returnTo.spread);
+                    setReturnTo(null);
+                    playSound("ui.pageTurn");
+                  }}
+                >
+                  {copy.backToPatient}
                 </button>
               ) : null}
               <div className={styles.tabs} role="tablist">
