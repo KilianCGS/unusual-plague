@@ -4,6 +4,10 @@ import { BLACKSMITH_DAY2_ID, FARMER_DAY2_ID, WOODCUTTER_DAY2_ID } from "../patie
 import { PATH_MINER_DAY3_ID, STONECUTTER_DAY3_ID, DUSTER_DAY3_ID, INSOMNIAC_DAY3_ID } from "../patients/chapter3Patients";
 import { errandAskedFlag, NPC_TRADES } from "../dialogue/npcTrades";
 import { getPatientStatus, type PatientCasesState } from "../patients/patientCases";
+import { getPatientDefinitions } from "../patients/patientRegistry";
+import { getRequiredIngredients } from "../crafting/needs";
+import { countItem, type InventoryState } from "../inventory/inventory";
+import { getItemName } from "../items/items";
 
 // THE ERRANDS PANEL: what the Doctor has pending, derived from the cases (never
 // stored). A case becomes an errand the moment the Doctor knows about it (the
@@ -12,7 +16,16 @@ import { getPatientStatus, type PatientCasesState } from "../patients/patientCas
 // sources of the same shape.
 //
 // Every text here is NEW and awaits Kilian's review.
-export type Objective = { id: string; text: string; done: boolean };
+// 2026-11-27 (Kilian): an EXAMINED patient also carries what his treatment needs, for the panel to unfold: each
+// preparation (ticked when carried) and the ingredients still needed to make the ones not carried (ticked when the
+// case + the chest hold enough). Never shown before the examination: the diagnosis would be given away.
+export type TreatmentLine = { itemId: string; name: string; quantity: number; have: boolean };
+export type Objective = {
+  id: string;
+  text: string;
+  done: boolean;
+  treatment?: { preparations: TreatmentLine[]; ingredients: TreatmentLine[] };
+};
 
 export const PATIENT_OBJECTIVES: Readonly<Record<string, Record<Language, string>>> = {
   [BAKER_HUSBAND_ID]: { es: "Tratar al marido de la panadera", en: "Treat the baker's husband" },
@@ -37,25 +50,29 @@ export const DAY3_LEADS: Readonly<Record<string, Record<Language, string>>> = {
   [INSOMNIAC_DAY3_ID]: { es: "El anciano del cántaro lleva noches sin dormir", en: "The old man with the jug has gone nights without sleep" },
 };
 
-export const objectivesCopy: Record<Language, { title: string; toggleHint: string }> = {
-  es: { title: "Recados", toggleHint: "[R]" },
-  en: { title: "Errands", toggleHint: "[R]" },
+export const objectivesCopy: Record<Language, { title: string; toggleHint: string; treatment: string; ingredients: string }> = {
+  es: { title: "Recados", toggleHint: "[R]", treatment: "Tratamiento", ingredients: "Ingredientes" },
+  en: { title: "Errands", toggleHint: "[R]", treatment: "Treatment", ingredients: "Ingredients" },
 };
 
 export function getObjectives(
   patients: PatientCasesState,
   language: Language,
   // Day 4 has no patients: its only errand is to see the Witch (2026-11-12).
-  context?: { chapterId: string; claimed: ReadonlySet<string> },
+  context?: { chapterId: string; claimed: ReadonlySet<string>; inventory?: InventoryState; storage?: InventoryState },
 ): Objective[] {
-  const errands = Object.entries(PATIENT_OBJECTIVES).flatMap(([patientId, text]) => {
+  const errands: Objective[] = Object.entries(PATIENT_OBJECTIVES).flatMap(([patientId, text]) => {
     const status = getPatientStatus(patients, patientId);
 
     if (status === "hidden") {
       const lead = context?.chapterId === "chapter-3" ? DAY3_LEADS[patientId] : undefined;
       return lead ? [{ id: patientId, text: lead[language], done: false }] : [];
     }
-    return [{ id: patientId, text: text[language], done: status === "treated" }];
+    const treatment =
+      status === "examined" && context?.inventory
+        ? getTreatment(patientId, language, context.claimed, context.inventory, context.storage)
+        : undefined;
+    return [{ id: patientId, text: text[language], done: status === "treated", ...(treatment ? { treatment } : {}) }];
   });
 
   // The voluntary errands the Doctor has been asked for (2026-11-15), pending or done.
@@ -72,4 +89,33 @@ export function getObjectives(
   // meant to be surprised and to find the way by themself. The panel stays empty (and hidden) that night.
 
   return errands;
+}
+
+// What an examined patient's treatment needs (see TreatmentLine). Same data as the patient's page of the Compendium:
+// the preparations are ticked as there (carried); the ingredients add what the chest holds.
+function getTreatment(
+  patientId: string,
+  language: Language,
+  claimed: ReadonlySet<string>,
+  inventory: InventoryState,
+  storage?: InventoryState,
+): Objective["treatment"] {
+  const definition = getPatientDefinitions(claimed)[patientId];
+  if (!definition || definition.requiredTreatments.length === 0) return undefined;
+  const owned = (itemId: string) => countItem(inventory, itemId) + (storage ? countItem(storage, itemId) : 0);
+
+  return {
+    preparations: definition.requiredTreatments.map(({ itemId, quantity }) => ({
+      itemId,
+      name: getItemName(itemId, language),
+      quantity,
+      have: countItem(inventory, itemId) >= quantity,
+    })),
+    ingredients: getRequiredIngredients(definition.requiredTreatments, inventory).map(({ itemId, quantity }) => ({
+      itemId,
+      name: getItemName(itemId, language),
+      quantity,
+      have: owned(itemId) >= quantity,
+    })),
+  };
 }

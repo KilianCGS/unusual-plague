@@ -90,6 +90,10 @@ export function ObjectivesPanel({
   }, [keyboardActive]);
 
   const shown = objectives.filter((o) => !o.done || justDone.includes(o.id));
+  // The patient whose treatment is unfolded: the first open one that has a treatment, until the player picks another
+  // (a click on a patient's line) or folds it (a click on the same line).
+  const [picked, setPicked] = useState<string | null | undefined>(undefined);
+  const unfolded = picked === undefined ? shown.find((o) => o.treatment && !o.done)?.id ?? null : picked;
 
   if (shown.length === 0) {
     return null;
@@ -123,7 +127,41 @@ export function ObjectivesPanel({
               <span className={styles.box} aria-hidden="true">
                 {objective.done ? "✓" : ""}
               </span>
-              <span className={styles.text}>{objective.text}</span>
+              {objective.treatment ? (
+                <div className={styles.body}>
+                  <button
+                    type="button"
+                    className={styles.toggle}
+                    aria-expanded={unfolded === objective.id}
+                    onClick={() => setPicked(unfolded === objective.id ? null : objective.id)}
+                  >
+                    <span className={styles.text}>{objective.text}</span>
+                    <span className={styles.caret} aria-hidden="true">{unfolded === objective.id ? "▾" : "▸"}</span>
+                  </button>
+                  {unfolded === objective.id ? (
+                    <div className={styles.treatment} data-objective-treatment>
+                      <span className={styles.sub}>{copy.treatment}</span>
+                      {objective.treatment.preparations.map((line) => (
+                        <span key={line.itemId} className={styles.line} data-have={line.have}>
+                          {line.have ? "✓" : "□"} {line.name}{line.quantity > 1 ? ` ×${line.quantity}` : ""}
+                        </span>
+                      ))}
+                      {objective.treatment.ingredients.length > 0 ? (
+                        <>
+                          <span className={styles.sub}>{copy.ingredients}</span>
+                          {objective.treatment.ingredients.map((line) => (
+                            <span key={line.itemId} className={styles.line} data-have={line.have}>
+                              {line.have ? "✓" : "✗"} {line.name} ×{line.quantity}
+                            </span>
+                          ))}
+                        </>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <span className={styles.text}>{objective.text}</span>
+              )}
             </li>
           ))}
         </ul>

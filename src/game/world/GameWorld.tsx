@@ -1699,8 +1699,8 @@ export function GameWorld({
   };
   // The errands panel's list: derived from the cases, never stored.
   const objectives = useMemo(
-    () => getObjectives(patients, language, { chapterId, claimed: claimedRewards }),
-    [patients, language, chapterId, claimedRewards],
+    () => getObjectives(patients, language, { chapterId, claimed: claimedRewards, inventory, storage }),
+    [patients, language, chapterId, claimedRewards, inventory, storage],
   );
   // The size of the inventory bar and the coins in this scene (1 unless the scene sets its own).
   const hudScale = ("visual" in scene ? scene.visual.hudScale : undefined) ?? 1;
