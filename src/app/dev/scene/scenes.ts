@@ -237,17 +237,16 @@ const OLD_DEV_SCENES: DevScene[] = [
   {
     id: "mine-interior",
     label: "Interior Mina",
-    // Unmodified copy of the approved 1602x982 mine interior. Same zoom
-    // approach as the other new interiors: 0.36 unit per asset pixel gives a
-    // 577x354 world, and zoomMultiplier 1.5 shows all of it (fixed camera).
-    // Its geometry (old art, old size) is a placeholder until it is repainted
-    // in /dev/collisions.
+    // 2026-11-27 (Kilian): NEW mine interior, 1357x909 (the old one, 1602x982, made walking hard). Same density as
+    // before: 0.36 unit per asset pixel gives a 489x327 world, and zoomMultiplier 1.5 shows all of it (fixed camera).
+    // 2026-11-26: its geometry was redrawn by Kilian in /dev/collisions. The Day 1 mushrooms moved to the Natural Cave;
+    // the miner keeps his old spot until Kilian places him again in the Decorator.
     backgroundSrc: "/game/areas/mine-interior/mine-interior-background.png",
-    assetWidth: 1602,
-    assetHeight: 982,
-    // On the floor just inside the entrance.
-    initialAssetX: 800,
-    initialAssetY: 700,
+    assetWidth: 1357,
+    assetHeight: 909,
+    // On the open floor in the middle.
+    initialAssetX: 680,
+    initialAssetY: 640,
     logicalUnitsPerAssetPixel: 0.36,
     zoomMultiplier: 1.5,
   },

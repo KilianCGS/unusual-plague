@@ -59,7 +59,7 @@ const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
 const { getSceneInteractionZones } = at(
   "src/game/interactions/sceneInteractions.ts",
 );
-const { rectsIntersect } = at("src/game/collision.ts");
+const { rectsIntersect, rectIntersectsPolygon } = at("src/game/collision.ts");
 const { findAvailableInteraction } = at(
   "src/game/interactions/interactionZone.ts",
 );
@@ -953,7 +953,8 @@ function reachability(sceneId) {
     y >= 19 &&
     x <= W &&
     y <= H &&
-    !colliders.some((c) => rectsIntersect(feet({ x, y }), c));
+    !colliders.some((c) => rectsIntersect(feet({ x, y }), c)) &&
+    !(scene.polygonColliders ?? []).some((p) => rectIntersectsPolygon(feet({ x, y }), p));
   const arrival = Object.values(scene.arrivals)[0];
   const step = 3;
   const seen = new Set([`${arrival.x},${arrival.y}`]);
@@ -984,7 +985,7 @@ test("24. everything Patient 2 needs can be reached on foot, and the circuit has
     "tavern-interior": [BARTENDER, PATIENT],
     "mill-farmland": [BEE], // (the orange branch was removed on 2026-11-16: oranges are bought)
     farm: [FARM],
-    "mine-interior": ["collect.mushroom"],
+    "mine-natural-cave": ["collect.mushroom"], // moved from the mine on 2026-11-26
     outskirts: ["gather.water"],
   };
   for (const [sceneId, interactionIds] of Object.entries(needs)) {

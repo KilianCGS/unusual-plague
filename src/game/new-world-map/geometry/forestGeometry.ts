@@ -4,9 +4,9 @@ import type { Direction } from "../../protagonist/useProtagonistController";
 import type { InteractionZone } from "../../interactions/interactionZone";
 
 // 2026-11-18 (Kilian): the whole forest geometry redrawn for the repainted 1362x1103 background, exported from
-// /dev/collisions as he authored it. The ids of the exits changed meaning: transition-3 is now the EAST exit (glade),
-// transition-4 the WEST one (outskirts); spawn-1 is the east arrival, spawn-2 the west one (see newWorldScenes.ts).
-// transition-1 (x1391) is a leftover outside the 1362-wide world and is not wired to anything.
+// /dev/collisions as he authored it. 2026-11-26 re-export: transition-1 is the SOUTH exit (cottage), transition-2 the
+// EAST one (glade), transition-3 the WEST one (outskirts); spawn-1 is the east arrival, spawn-2 the west one, spawn-3
+// the south one (see newWorldScenes.ts).
 
 // COLLIDERS (red): floor the feet cannot occupy.
 export const forestColliders: SceneCollider[] = [
@@ -20,51 +20,52 @@ export const forestColliders: SceneCollider[] = [
   { id: "forest-8", x: 568, y: 859, width: 36, height: 22 },
   { id: "forest-9", x: 0, y: 774, width: 495, height: 32 },
   { id: "forest-10", x: 376, y: 803, width: 115, height: 64 },
-  { id: "forest-11", x: -23, y: 292, width: 401, height: 171 },
-  { id: "forest-12", x: 320, y: 92, width: 80, height: 87 },
-  { id: "forest-13", x: 819, y: 94, width: 74, height: 65 },
-  { id: "forest-14", x: 712, y: 0, width: 298, height: 92 },
-  { id: "forest-15", x: 0, y: 0, width: 707, height: 54 },
-  { id: "forest-16", x: 299, y: 60, width: 99, height: 36 },
-  { id: "forest-17", x: 399, y: 56, width: 66, height: 32 },
-  { id: "forest-18", x: 645, y: 184, width: 80, height: 19 },
-  { id: "forest-19", x: 732, y: 424, width: 77, height: 37 },
-  { id: "forest-20", x: 694, y: 392, width: 124, height: 44 },
-  { id: "forest-21", x: 971, y: 373, width: 313, height: 160 },
-  { id: "forest-22", x: 1029, y: 336, width: 241, height: 41 },
-  { id: "forest-23", x: 761, y: 191, width: 461, height: 65 },
-  { id: "forest-24", x: 965, y: 276, width: 134, height: 93 },
-  { id: "forest-25", x: 814, y: 274, width: 163, height: 38 },
-  { id: "forest-26", x: 896, y: 309, width: 75, height: 33 },
-  { id: "forest-27", x: 950, y: 411, width: 25, height: 17 },
-  { id: "forest-28", x: 931, y: 459, width: 38, height: 60 },
-  { id: "forest-29", x: 906, y: 370, width: 45, height: 17 },
-  { id: "forest-30", x: 1276, y: 340, width: 144, height: 167 },
-  { id: "forest-32", x: 994, y: 1008, width: 353, height: 30 },
-  { id: "forest-33", x: 1076, y: 977, width: 150, height: 27 },
-  { id: "forest-34", x: 517, y: 1051, width: 70, height: 52 },
-  { id: "forest-35", x: 858, y: 1049, width: 58, height: 51 },
-  { id: "forest-36", x: 0, y: 638, width: 13, height: 114 },
-  { id: "forest-37", x: 467, y: 525, width: 28, height: 16 },
-  { id: "forest-38", x: 316, y: 176, width: 11, height: 176 },
-  { id: "forest-39", x: 863, y: 161, width: 31, height: 48 },
-  { id: "forest-40", x: 891, y: 390, width: 45, height: 80 },
-  { id: "forest-41", x: 934, y: 340, width: 11, height: 25 },
-  { id: "forest-42", x: 816, y: 269, width: 19, height: 5 },
-  { id: "forest-43", x: 587, y: 1061, width: 63, height: 37 },
-  { id: "forest-44", x: 814, y: 928, width: 57, height: 70 },
-  { id: "forest-45", x: 1208, y: 784, width: 154, height: 95 },
-  { id: "forest-46", x: 1162, y: 879, width: 92, height: 26 },
-  { id: "forest-47", x: 975, y: 900, width: 117, height: 14 },
-  { id: "forest-48", x: 878, y: 921, width: 91, height: 27 },
-  { id: "forest-49", x: 963, y: 913, width: 21, height: 8 },
-  { id: "forest-50", x: 896, y: 0, width: 466, height: 275 },
+  { id: "forest-11", x: 320, y: 92, width: 80, height: 87 },
+  { id: "forest-12", x: 819, y: 94, width: 74, height: 65 },
+  { id: "forest-13", x: 712, y: 0, width: 298, height: 92 },
+  { id: "forest-14", x: 0, y: 0, width: 707, height: 54 },
+  { id: "forest-15", x: 299, y: 60, width: 99, height: 36 },
+  { id: "forest-16", x: 399, y: 56, width: 66, height: 32 },
+  { id: "forest-17", x: 645, y: 184, width: 80, height: 19 },
+  { id: "forest-18", x: 971, y: 373, width: 313, height: 160 },
+  { id: "forest-19", x: 1029, y: 336, width: 241, height: 41 },
+  { id: "forest-20", x: 965, y: 276, width: 134, height: 93 },
+  { id: "forest-21", x: 814, y: 274, width: 163, height: 38 },
+  { id: "forest-22", x: 896, y: 309, width: 75, height: 33 },
+  { id: "forest-23", x: 950, y: 411, width: 25, height: 17 },
+  { id: "forest-24", x: 931, y: 459, width: 38, height: 60 },
+  { id: "forest-25", x: 906, y: 370, width: 45, height: 17 },
+  { id: "forest-26", x: 1276, y: 340, width: 144, height: 167 },
+  { id: "forest-27", x: 994, y: 1008, width: 353, height: 30 },
+  { id: "forest-28", x: 1076, y: 977, width: 150, height: 27 },
+  { id: "forest-29", x: 517, y: 1051, width: 70, height: 52 },
+  { id: "forest-30", x: 858, y: 1049, width: 58, height: 51 },
+  { id: "forest-31", x: 0, y: 638, width: 13, height: 114 },
+  { id: "forest-32", x: 316, y: 176, width: 11, height: 176 },
+  { id: "forest-33", x: 863, y: 161, width: 31, height: 48 },
+  { id: "forest-34", x: 891, y: 390, width: 45, height: 80 },
+  { id: "forest-35", x: 934, y: 340, width: 11, height: 25 },
+  { id: "forest-36", x: 816, y: 269, width: 19, height: 5 },
+  { id: "forest-37", x: 587, y: 1061, width: 63, height: 37 },
+  { id: "forest-38", x: 814, y: 928, width: 57, height: 70 },
+  { id: "forest-39", x: 1208, y: 784, width: 154, height: 95 },
+  { id: "forest-40", x: 1162, y: 879, width: 92, height: 26 },
+  { id: "forest-41", x: 975, y: 900, width: 117, height: 14 },
+  { id: "forest-42", x: 878, y: 921, width: 91, height: 27 },
+  { id: "forest-43", x: 963, y: 913, width: 21, height: 8 },
+  { id: "forest-44", x: 896, y: 0, width: 466, height: 275 },
 ];
 
 // FREE-HAND COLLIDERS (red shapes): same job as the colliders above,
 // drawn point by point. The shape closes itself; it may be concave.
 export const forestPolygonColliders: PolygonCollider[] = [
   { id: "forest-poly-1", points: [{ x: 455, y: 161 }, { x: 466, y: 186 }, { x: 483, y: 186 }, { x: 619, y: 140 }, { x: 625, y: 128 }, { x: 619, y: 117 }] },
+  { id: "forest-poly-2", points: [{ x: 810, y: 389 }, { x: 839, y: 388 }, { x: 856, y: 400 }, { x: 857, y: 416 }, { x: 837, y: 428 }, { x: 799, y: 434 }, { x: 781, y: 449 }, { x: 744, y: 450 }, { x: 738, y: 439 }, { x: 749, y: 418 }, { x: 732, y: 413 }, { x: 703, y: 413 }, { x: 678, y: 396 }, { x: 676, y: 376 }, { x: 717, y: 375 }, { x: 748, y: 382 }, { x: 810, y: 384 }, { x: 818, y: 388 }] },
+  { id: "forest-poly-3", points: [{ x: 805, y: 97 }, { x: 794, y: 110 }, { x: 770, y: 115 }, { x: 770, y: 126 }, { x: 776, y: 133 }, { x: 781, y: 133 }, { x: 794, y: 124 }, { x: 794, y: 140 }, { x: 786, y: 148 }, { x: 803, y: 147 }, { x: 816, y: 137 }, { x: 823, y: 136 }, { x: 826, y: 139 }, { x: 826, y: 161 }, { x: 831, y: 172 }, { x: 812, y: 170 }, { x: 807, y: 189 }, { x: 790, y: 182 }, { x: 789, y: 179 }, { x: 777, y: 193 }, { x: 777, y: 198 }, { x: 761, y: 199 }, { x: 759, y: 214 }, { x: 749, y: 217 }, { x: 755, y: 227 }, { x: 759, y: 227 }, { x: 756, y: 244 }, { x: 770, y: 252 }, { x: 772, y: 269 }, { x: 789, y: 270 }, { x: 789, y: 286 }, { x: 798, y: 299 }, { x: 803, y: 304 }, { x: 822, y: 309 }, { x: 840, y: 309 }, { x: 873, y: 303 }, { x: 885, y: 291 }, { x: 899, y: 248 }, { x: 898, y: 199 }, { x: 886, y: 161 }, { x: 868, y: 128 }, { x: 845, y: 103 }, { x: 826, y: 95 }, { x: 802, y: 94 }] },
+  { id: "forest-poly-4", points: [{ x: 382, y: 407 }, { x: 384, y: 421 }, { x: 407, y: 426 }, { x: 408, y: 433 }, { x: 391, y: 442 }, { x: 384, y: 437 }, { x: 380, y: 442 }, { x: 379, y: 456 }, { x: 366, y: 458 }, { x: 361, y: 443 }, { x: 353, y: 445 }, { x: 341, y: 454 }, { x: 300, y: 450 }, { x: 299, y: 470 }, { x: 293, y: 476 }, { x: 245, y: 476 }, { x: 229, y: 467 }, { x: 203, y: 467 }, { x: 190, y: 460 }, { x: 166, y: 467 }, { x: 136, y: 466 }, { x: 135, y: 460 }, { x: 128, y: 456 }, { x: 126, y: 442 }, { x: 110, y: 442 }, { x: 103, y: 438 }, { x: 98, y: 434 }, { x: 97, y: 424 }, { x: 94, y: 433 }, { x: 86, y: 439 }, { x: 73, y: 437 }, { x: 73, y: 431 }, { x: 63, y: 429 }, { x: 35, y: 449 }, { x: 2, y: 451 }, { x: 0, y: 447 }, { x: 0, y: 389 }, { x: 16, y: 359 }, { x: 17, y: 323 }, { x: 16, y: 305 }, { x: 1, y: 284 }, { x: 1, y: 273 }, { x: 27, y: 259 }, { x: 79, y: 246 }, { x: 140, y: 242 }, { x: 172, y: 227 }, { x: 177, y: 221 }, { x: 202, y: 219 }, { x: 229, y: 200 }, { x: 294, y: 200 }, { x: 299, y: 214 }, { x: 299, y: 269 }, { x: 319, y: 300 }, { x: 335, y: 315 }, { x: 352, y: 347 }, { x: 356, y: 359 }, { x: 356, y: 374 }, { x: 369, y: 403 }, { x: 382, y: 412 }] },
+  { id: "forest-poly-5", points: [{ x: 496, y: 768 }, { x: 505, y: 768 }, { x: 517, y: 757 }, { x: 485, y: 739 }, { x: 474, y: 736 }, { x: 421, y: 737 }, { x: 374, y: 743 }, { x: 325, y: 743 }, { x: 278, y: 741 }, { x: 245, y: 731 }, { x: 195, y: 733 }, { x: 178, y: 726 }, { x: 147, y: 729 }, { x: 82, y: 729 }, { x: 35, y: 741 }, { x: 6, y: 743 }, { x: 0, y: 748 }, { x: 0, y: 785 }, { x: 182, y: 798 }, { x: 388, y: 798 }, { x: 407, y: 792 }, { x: 441, y: 790 }, { x: 482, y: 781 }, { x: 495, y: 777 }, { x: 496, y: 768 }, { x: 503, y: 766 }] },
+  { id: "forest-poly-6", points: [{ x: 560, y: 768 }, { x: 552, y: 770 }, { x: 547, y: 778 }, { x: 549, y: 785 }, { x: 558, y: 789 }, { x: 570, y: 789 }, { x: 575, y: 783 }, { x: 571, y: 775 }, { x: 556, y: 770 }, { x: 559, y: 768 }] },
+  { id: "forest-poly-7", points: [{ x: 453, y: 468 }, { x: 447, y: 468 }, { x: 443, y: 472 }, { x: 445, y: 483 }, { x: 457, y: 488 }, { x: 466, y: 488 }, { x: 467, y: 485 }, { x: 467, y: 473 }, { x: 453, y: 467 }] },
 ];
 
 // DEPTH SHAPES (violet): part of the background that covers the Doctor
@@ -84,9 +85,9 @@ export const forestOccluders: OcclusionShape[] = [
 
 // TRANSITIONS (yellow): activation zones. No destination yet.
 export const forestTransitions: (LogicalRect & { id: string })[] = [
-  { id: "forest-transition-2", x: 648, y: 1058, width: 201, height: 45 },
-  { id: "forest-transition-3", x: 1314, y: 512, width: 48, height: 141 },
-  { id: "forest-transition-4", x: 0, y: 465, width: 48, height: 111 },
+  { id: "forest-transition-1", x: 648, y: 1058, width: 201, height: 45 },
+  { id: "forest-transition-2", x: 1314, y: 512, width: 48, height: 141 },
+  { id: "forest-transition-3", x: 0, y: 465, width: 48, height: 111 },
 ];
 
 // SPAWNS (blue): exact feet position on arrival, plus facing.

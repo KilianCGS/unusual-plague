@@ -329,10 +329,10 @@ export const chapter2Compositions: DecorComposition[] = [
       {
         "instanceId": "mine-interior-miner-recovering-working-01",
         "assetId": "miner-recovering-working",
-        "x": 382,
-        "y": 110,
-        "scale": 0.7,
-        "flipX": false,
+        "x": 120,
+        "y": 259,
+        "scale": 0.77,
+        "flipX": true,
         "colliderEnabled": false,
         "zOffset": 0
       }

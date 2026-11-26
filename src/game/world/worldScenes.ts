@@ -46,11 +46,14 @@ import {
 } from "../mill-farmland/millFarmlandGeometry";
 import {
   mineInteriorColliders,
+  mineInteriorOccluders,
+  mineInteriorPolygonColliders,
   mineInteriorSpawns,
   mineInteriorTransitions,
 } from "../mine-interior/mineInteriorGeometry";
 import {
   mineNaturalCaveColliders,
+  mineNaturalCavePolygonColliders,
   mineNaturalCaveSpawns,
   mineNaturalCaveTransitions,
 } from "../mine-natural-cave/mineNaturalCaveGeometry";
@@ -685,6 +688,8 @@ export const OLD_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visualOf("mine-interior"),
     colliders: mineInteriorColliders,
+    polygonColliders: mineInteriorPolygonColliders,
+    occluders: mineInteriorOccluders,
     exits: [
       {
         // South exit: back to the Mountain Path.
@@ -702,13 +707,14 @@ export const OLD_WORLD_SCENES: Record<
       },
     ],
     arrivals: {
+      // 2026-11-26 (the new mine): spawn-1 stands above the south exit, spawn-2 by the passage to the cave.
       "from-mountain-path": spawnAt(
         mineInteriorSpawns,
-        "mine-interior-spawn-2",
+        "mine-interior-spawn-1",
       ),
       "from-mine-natural-cave": spawnAt(
         mineInteriorSpawns,
-        "mine-interior-spawn-1",
+        "mine-interior-spawn-2",
       ),
     },
   },
@@ -717,6 +723,7 @@ export const OLD_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visualOf("mine-natural-cave"),
     colliders: mineNaturalCaveColliders,
+    polygonColliders: mineNaturalCavePolygonColliders,
     exits: [
       {
         name: "to-mine-interior",
@@ -731,7 +738,7 @@ export const OLD_WORLD_SCENES: Record<
     arrivals: {
       "from-mine-interior": spawnAt(
         mineNaturalCaveSpawns,
-        "mine-natural-cave-spawn-2",
+        "mine-natural-cave-spawn-1",
       ),
     },
   },

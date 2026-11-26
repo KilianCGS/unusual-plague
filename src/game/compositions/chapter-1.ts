@@ -379,28 +379,36 @@ export const chapter1Compositions: DecorComposition[] = [
       {
         "instanceId": "mine-interior-injured-miner-01",
         "assetId": "injured-miner",
-        "x": 148,
-        "y": 263,
-        "scale": 0.72,
-        "flipX": false,
+        "x": 337,
+        "y": 142,
+        "scale": 0.62,
+        "flipX": true,
         "colliderEnabled": false,
         "zOffset": 0
-      },
+      }
+    ]
+  },
+  {
+    "sceneId": "mine-natural-cave",
+    "chapterId": "chapter-1",
+    // 2026-11-26 (Kilian): the Day 1 Mushrooms moved here from the mine. His export also listed the two bats; they
+    // are already in days-1-3-environment.ts at the same spot, so they are not repeated here.
+    "instances": [
       {
-        "instanceId": "mine-interior-mushroom-world-02",
+        "instanceId": "mine-natural-cave-mushroom-world-01",
         "assetId": "mushroom-world",
-        "x": 365,
-        "y": 108,
+        "x": 321,
+        "y": 244,
         "scale": 0.75,
         "flipX": false,
         "colliderEnabled": false,
         "zOffset": 0
       },
       {
-        "instanceId": "mine-interior-mushroom-world-01",
+        "instanceId": "mine-natural-cave-mushroom-world-02",
         "assetId": "mushroom-world",
-        "x": 430,
-        "y": 238,
+        "x": 265,
+        "y": 142,
         "scale": 0.75,
         "flipX": false,
         "colliderEnabled": false,

@@ -19,11 +19,14 @@ import {
 import {
   bakeryStreetColliders,
   bakeryStreetOccluders,
+  bakeryStreetPolygonColliders,
   bakeryStreetSpawns,
   bakeryStreetTransitions,
 } from "./geometry/bakeryStreetGeometry";
 import {
   farmColliders,
+  farmOccluders,
+  farmPolygonColliders,
   farmSpawns,
   farmTransitions,
 } from "./geometry/farmGeometry";
@@ -36,6 +39,8 @@ import {
 } from "./geometry/forestGeometry";
 import {
   forestCottageColliders,
+  forestCottageOccluders,
+  forestCottagePolygonColliders,
   forestCottageSpawns,
   forestCottageTransitions,
 } from "./geometry/forestCottageGeometry";
@@ -74,6 +79,7 @@ import {
 import {
   outskirtsColliders,
   outskirtsOccluders,
+  outskirtsPolygonColliders,
   outskirtsSpawns,
   outskirtsTransitions,
 } from "./geometry/outskirtsGeometry";
@@ -86,11 +92,14 @@ import {
 } from "./geometry/plazaGeometry";
 import {
   smithyStreetColliders,
+  smithyStreetOccluders,
+  smithyStreetPolygonColliders,
   smithyStreetSpawns,
   smithyStreetTransitions,
 } from "./geometry/smithyStreetGeometry";
 import {
   tavernStreetColliders,
+  tavernStreetOccluders,
   tavernStreetSpawns,
   tavernStreetTransitions,
 } from "./geometry/tavernStreetGeometry";
@@ -361,6 +370,7 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("bakery-street"),
     colliders: bakeryStreetColliders,
+    polygonColliders: bakeryStreetPolygonColliders,
     occluders: bakeryStreetOccluders,
     exits: [
       exit(
@@ -391,6 +401,8 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("smithy-street"),
     colliders: smithyStreetColliders,
+    polygonColliders: smithyStreetPolygonColliders,
+    occluders: smithyStreetOccluders,
     exits: [
       exit(
         "to-smithy-interior",
@@ -431,6 +443,7 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("calle-taberna"),
     colliders: tavernStreetColliders,
+    occluders: tavernStreetOccluders,
     exits: [
       exit(
         "to-plaza",
@@ -468,6 +481,7 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("outskirts-brook-provisional"),
     colliders: outskirtsColliders,
+    polygonColliders: outskirtsPolygonColliders,
     occluders: outskirtsOccluders,
     exits: [
       exit(
@@ -510,7 +524,7 @@ export const NEW_WORLD_SCENES: Record<
       exit(
         "to-outskirts",
         forestTransitions,
-        "forest-transition-4",
+        "forest-transition-3",
         "outskirts",
         "from-forest",
       ),
@@ -518,7 +532,7 @@ export const NEW_WORLD_SCENES: Record<
       exit(
         "to-forest-cottage",
         forestTransitions,
-        "forest-transition-2",
+        "forest-transition-1",
         "forest-cottage",
         "from-forest",
       ),
@@ -526,7 +540,7 @@ export const NEW_WORLD_SCENES: Record<
       exit(
         "to-forest-glade",
         forestTransitions,
-        "forest-transition-3",
+        "forest-transition-2",
         "forest-glade",
         "from-forest",
       ),
@@ -545,6 +559,8 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: FOREST_COTTAGE_VISUAL,
     colliders: forestCottageColliders,
+    polygonColliders: forestCottagePolygonColliders,
+    occluders: forestCottageOccluders,
     exits: [
       // North path: back to the Forest.
       exit(
@@ -591,6 +607,8 @@ export const NEW_WORLD_SCENES: Record<
     kind: "exterior",
     visual: visual("farm"),
     colliders: farmColliders,
+    polygonColliders: farmPolygonColliders,
+    occluders: farmOccluders,
     exits: [
       exit(
         "to-mill-farmland",

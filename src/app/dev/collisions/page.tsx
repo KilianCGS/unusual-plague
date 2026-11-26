@@ -35,6 +35,8 @@ import {
 } from "../../../game/farm/farmGeometry";
 import {
   mineInteriorColliders,
+  mineInteriorOccluders,
+  mineInteriorPolygonColliders,
   mineInteriorSpawns,
   mineInteriorTransitions,
 } from "../../../game/mine-interior/mineInteriorGeometry";
@@ -45,6 +47,7 @@ import {
 } from "../../../game/mill-farmland/millFarmlandGeometry";
 import {
   mineNaturalCaveColliders,
+  mineNaturalCavePolygonColliders,
   mineNaturalCaveSpawns,
   mineNaturalCaveTransitions,
 } from "../../../game/mine-natural-cave/mineNaturalCaveGeometry";
@@ -92,11 +95,14 @@ import {
 import {
   bakeryStreetColliders as nwBakeryStreetColliders,
   bakeryStreetOccluders as nwBakeryStreetOccluders,
+  bakeryStreetPolygonColliders as nwBakeryStreetPolygonColliders,
   bakeryStreetSpawns as nwBakeryStreetSpawns,
   bakeryStreetTransitions as nwBakeryStreetTransitions,
 } from "../../../game/new-world-map/geometry/bakeryStreetGeometry";
 import {
   farmColliders as nwFarmColliders,
+  farmOccluders as nwFarmOccluders,
+  farmPolygonColliders as nwFarmPolygonColliders,
   farmSpawns as nwFarmSpawns,
   farmTransitions as nwFarmTransitions,
 } from "../../../game/new-world-map/geometry/farmGeometry";
@@ -109,6 +115,8 @@ import {
 } from "../../../game/new-world-map/geometry/forestGeometry";
 import {
   forestCottageColliders,
+  forestCottageOccluders,
+  forestCottagePolygonColliders,
   forestCottageSpawns,
   forestCottageTransitions,
 } from "../../../game/new-world-map/geometry/forestCottageGeometry";
@@ -128,6 +136,7 @@ import {
 import {
   outskirtsColliders as nwOutskirtsColliders,
   outskirtsOccluders as nwOutskirtsOccluders,
+  outskirtsPolygonColliders as nwOutskirtsPolygonColliders,
   outskirtsSpawns as nwOutskirtsSpawns,
   outskirtsTransitions as nwOutskirtsTransitions,
 } from "../../../game/new-world-map/geometry/outskirtsGeometry";
@@ -140,11 +149,14 @@ import {
 } from "../../../game/new-world-map/geometry/plazaGeometry";
 import {
   tavernStreetColliders as nwTavernStreetColliders,
+  tavernStreetOccluders as nwTavernStreetOccluders,
   tavernStreetSpawns as nwTavernStreetSpawns,
   tavernStreetTransitions as nwTavernStreetTransitions,
 } from "../../../game/new-world-map/geometry/tavernStreetGeometry";
 import {
   smithyStreetColliders as nwSmithyStreetColliders,
+  smithyStreetOccluders as nwSmithyStreetOccluders,
+  smithyStreetPolygonColliders as nwSmithyStreetPolygonColliders,
   smithyStreetSpawns as nwSmithyStreetSpawns,
   smithyStreetTransitions as nwSmithyStreetTransitions,
 } from "../../../game/new-world-map/geometry/smithyStreetGeometry";
@@ -460,11 +472,14 @@ const PERSISTED_GEOMETRY: Record<
   },
   "mine-interior": {
     colliders: mineInteriorColliders,
+    polygons: mineInteriorPolygonColliders,
+    occluders: mineInteriorOccluders,
     transitions: mineInteriorTransitions,
     spawns: mineInteriorSpawns,
   },
   "mine-natural-cave": {
     colliders: mineNaturalCaveColliders,
+    polygons: mineNaturalCavePolygonColliders,
     transitions: mineNaturalCaveTransitions,
     spawns: mineNaturalCaveSpawns,
   },
@@ -504,22 +519,27 @@ const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
   },
   "bakery-street": {
     colliders: nwBakeryStreetColliders,
+    polygons: nwBakeryStreetPolygonColliders,
     occluders: nwBakeryStreetOccluders,
     transitions: nwBakeryStreetTransitions,
     spawns: nwBakeryStreetSpawns,
   },
   "smithy-street": {
     colliders: nwSmithyStreetColliders,
+    polygons: nwSmithyStreetPolygonColliders,
+    occluders: nwSmithyStreetOccluders,
     transitions: nwSmithyStreetTransitions,
     spawns: nwSmithyStreetSpawns,
   },
   "calle-taberna": {
     colliders: nwTavernStreetColliders,
+    occluders: nwTavernStreetOccluders,
     transitions: nwTavernStreetTransitions,
     spawns: nwTavernStreetSpawns,
   },
   "outskirts-brook-provisional": {
     colliders: nwOutskirtsColliders,
+    polygons: nwOutskirtsPolygonColliders,
     occluders: nwOutskirtsOccluders,
     transitions: nwOutskirtsTransitions,
     spawns: nwOutskirtsSpawns,
@@ -533,11 +553,15 @@ const NEW_WORLD_GEOMETRY: typeof PERSISTED_GEOMETRY = {
   },
   "forest-cottage": {
     colliders: forestCottageColliders,
+    polygons: forestCottagePolygonColliders,
+    occluders: forestCottageOccluders,
     transitions: forestCottageTransitions,
     spawns: forestCottageSpawns,
   },
   farm: {
     colliders: nwFarmColliders,
+    polygons: nwFarmPolygonColliders,
+    occluders: nwFarmOccluders,
     transitions: nwFarmTransitions,
     spawns: nwFarmSpawns,
   },

@@ -509,8 +509,8 @@ test("dev start: chapter 2, the Doctor's Room, Day 1 finished, tutorial done, th
   // what Day 1 consumed is already collected, as in a real Day 1
   for (const id of [
     "forest-medicinal-herb-dev-01",
-    "mine-interior-mushroom-world-01",
-    "mine-interior-mushroom-world-02",
+    "mine-natural-cave-mushroom-world-01",
+    "mine-natural-cave-mushroom-world-02",
   ]) {
     assert.ok(start.collected.has(id), id);
   }

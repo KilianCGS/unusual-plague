@@ -301,42 +301,26 @@ test("Doctor Room chest: the hand-drawn zone of the new room uses the existing S
   );
 });
 
-test("Mine Interior: exactly the authored miner and the two Mushrooms; Natural Cave has no Mushroom", () => {
+test("Mine Interior: exactly the authored miner; the two Mushrooms are in the Natural Cave (2026-11-26)", () => {
   assert.deepEqual(placed("mine-interior"), [
     {
       instanceId: "mine-interior-injured-miner-01",
       assetId: "injured-miner",
-      x: 148,
-      y: 263,
-      scale: 0.72,
-      flipX: false,
-      colliderEnabled: false,
-      zOffset: 0,
-    },
-    {
-      instanceId: "mine-interior-mushroom-world-02",
-      assetId: "mushroom-world",
-      x: 365,
-      y: 108,
-      scale: 0.75,
-      flipX: false,
-      colliderEnabled: false,
-      zOffset: 0,
-    },
-    {
-      instanceId: "mine-interior-mushroom-world-01",
-      assetId: "mushroom-world",
-      x: 430,
-      y: 238,
-      scale: 0.75,
-      flipX: false,
+      x: 337,
+      y: 142,
+      scale: 0.62,
+      flipX: true,
       colliderEnabled: false,
       zOffset: 0,
     },
   ]);
   const cave = getComposition("mine-natural-cave", "chapter-1");
-  assert.ok(
-    !(cave?.instances ?? []).some((i) => i.assetId === "mushroom-world"),
+  assert.deepEqual(
+    cave.instances.filter((i) => i.assetId === "mushroom-world").map((i) => [i.instanceId, i.x, i.y, i.scale]),
+    [
+      ["mine-natural-cave-mushroom-world-01", 321, 244, 0.75],
+      ["mine-natural-cave-mushroom-world-02", 265, 142, 0.75],
+    ],
   );
 });
 
@@ -416,7 +400,7 @@ test("generic collectibles: a placed Mushroom is collectible exactly like the He
     assert.ok(!after.sprites.some((s) => s.instance.instanceId === instanceId));
     assert.ok(!after.zones.some((z) => z.id === zone.id));
   };
-  collectible("mine-interior", "mine-interior-mushroom-world-02", "mushroom");
+  collectible("mine-natural-cave", "mine-natural-cave-mushroom-world-02", "mushroom");
   collectible("forest", "forest-medicinal-herb-dev-01", "medicinal-herb");
   // both assets name their item; nothing else is needed
   assert.equal(getDecorAsset("mushroom-world").collectibleItemId, "mushroom");

@@ -56,7 +56,7 @@ const { getComposition, getChapterInteractions } = at(
   "src/game/compositions/index.ts",
 );
 const { WORLD_SCENES } = at("src/game/world/worldScenes.ts");
-const { rectsIntersect } = at("src/game/collision.ts");
+const { rectsIntersect, rectIntersectsPolygon } = at("src/game/collision.ts");
 const { chapter1AmbientDialogues } = at(
   "src/game/dialogue/chapter1Dialogues.ts",
 );
@@ -429,19 +429,19 @@ test("Witch 8. Witch never depends on a case: the same talk with any state of Pa
   assert.ok(chapter1AmbientDialogues[WITCH], "an ambient fallback exists");
 });
 
-// ======================================================= MUSHROOMS (the mine)
+// ======================================================= MUSHROOMS (the natural cave, 2026-11-26)
 test("Mushrooms. two independent collectibles of Mushroom x1: the same resource, each gone on its own", () => {
-  const composition = getComposition("mine-interior", "chapter-1");
+  const composition = getComposition("mine-natural-cave", "chapter-1");
   const find = (id) => composition.instances.find((i) => i.instanceId === id);
-  const a = find("mine-interior-mushroom-world-02");
-  const b = find("mine-interior-mushroom-world-01");
+  const a = find("mine-natural-cave-mushroom-world-01");
+  const b = find("mine-natural-cave-mushroom-world-02");
   assert.deepEqual(
     [a.assetId, a.x, a.y, a.scale],
-    ["mushroom-world", 365, 108, 0.75],
+    ["mushroom-world", 321, 244, 0.75],
   );
   assert.deepEqual(
     [b.assetId, b.x, b.y, b.scale],
-    ["mushroom-world", 430, 238, 0.75],
+    ["mushroom-world", 265, 142, 0.75],
   );
   assert.equal(a.assetId, b.assetId, "no 'witch mushroom' vs 'soup mushroom'");
   const asset = getDecorAsset("mushroom-world");
@@ -479,10 +479,10 @@ test("Mushrooms. two independent collectibles of Mushroom x1: the same resource,
   assert.equal(inv.countItem(two, "mushroom"), 2);
   assert.equal(inv.countOccupiedSlots(two), 1);
   // the injured miner stands exactly where it was authored
-  const miner = find("mine-interior-injured-miner-01");
+  const miner = getComposition("mine-interior", "chapter-1").instances.find((i) => i.instanceId === "mine-interior-injured-miner-01");
   assert.deepEqual(
     [miner.assetId, miner.x, miner.y, miner.scale],
-    ["injured-miner", 148, 263, 0.72],
+    ["injured-miner", 337, 142, 0.62],
   );
   assert.equal(miner.colliderEnabled, false);
 });
@@ -1059,7 +1059,9 @@ function reachability(sceneId, arrivalName) {
     y >= 19 &&
     x <= W &&
     y <= H &&
-    !colliders.some((c) => rectsIntersect(feet({ x, y }), c));
+    !colliders.some((c) => rectsIntersect(feet({ x, y }), c)) &&
+    // 2026-11-26: the caves are drawn mostly with free-hand shapes
+    !(scene.polygonColliders ?? []).some((p) => rectIntersectsPolygon(feet({ x, y }), p));
   const arrival = scene.arrivals[arrivalName];
   const seen = new Set([`${arrival.x},${arrival.y}`]);
   const queue = [[arrival.x, arrival.y]];
@@ -1103,15 +1105,16 @@ test("everything involved can be reached on foot, with the coordinates as author
     BARTENDER,
     "chapter1.tavern.sickPatient",
   ]);
-  const mine = check("mine-interior", "from-mountain-path", [
-    MINER,
+  check("mine-interior", "from-mountain-path", [MINER]);
+  // 2026-11-26: the two Mushrooms of Day 1 are in the Natural Cave now
+  const cave = check("mine-natural-cave", "from-mine-interior", [
     "collect.mushroom",
   ]);
   assert.equal(
-    mine.zones.filter((z) => z.interactionId === "collect.mushroom").length,
+    cave.zones.filter((z) => z.interactionId === "collect.mushroom").length,
     2,
   );
-  check("mine-interior", "from-mine-natural-cave", [MINER, "collect.mushroom"]);
+  check("mine-interior", "from-mine-natural-cave", [MINER]);
   check("quarry", "from-mountain-path", [MOUNTAIN]); // the coal-giver stands at the quarry
 });
 

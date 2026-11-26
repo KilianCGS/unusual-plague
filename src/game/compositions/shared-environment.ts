@@ -1210,12 +1210,34 @@ export const sharedEnvironmentCompositions: Pick<DecorComposition, "sceneId" | "
   },
   {
     "sceneId": "mine-interior",
+    // 2026-11-26 (Kilian): the three flames of the lanterns of the new mine background (the old single one fell under
+    // the tunnel lantern as a pale smudge).
     "instances": [
       {
         "instanceId": "mine-interior-candle-flame-01",
         "assetId": "candle-flame",
-        "x": 166,
-        "y": 71,
+        "x": 163,
+        "y": 66,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "mine-interior-candle-flame-02",
+        "assetId": "candle-flame",
+        "x": 56,
+        "y": 170,
+        "scale": 1,
+        "flipX": false,
+        "colliderEnabled": false,
+        "zOffset": 0
+      },
+      {
+        "instanceId": "mine-interior-candle-flame-03",
+        "assetId": "candle-flame",
+        "x": 306,
+        "y": 79,
         "scale": 1,
         "flipX": false,
         "colliderEnabled": false,

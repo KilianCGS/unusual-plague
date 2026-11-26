@@ -212,7 +212,7 @@ test("every arrival is inside the world, on free floor, away from every exit zon
         `${id}.${name} outside the world`,
       );
       assert.ok(
-        !collidesWithScene(r, scene.colliders),
+        !collidesWithScene(r, scene.colliders, scene.polygonColliders ?? []),
         `${id}.${name} in collision`,
       );
       assert.ok(
@@ -288,7 +288,7 @@ function reachable(scene, from) {
       if (r.x < 0 || r.y < 0) continue;
       if (r.x + r.width > world.width || r.y + r.height > world.height)
         continue;
-      if (collidesWithScene(r, scene.colliders)) continue;
+      if (collidesWithScene(r, scene.colliders, scene.polygonColliders ?? [])) continue;
       seen.add(key(nx, ny));
       stack.push([nx, ny]);
     }
@@ -566,10 +566,11 @@ test("Mountain Path <-> Mine Interior <-> Mine Natural Cave: wired to the hand-d
   // the south door of the mine (bottom of the room) leads to the Mountain
   // Path, the arch up on the right leads to the cave
   assert.ok(to(mine, "mountain-path").zone.y > size(mine).height * 0.8);
-  assert.ok(to(mine, "mine-natural-cave").zone.y < size(mine).height * 0.4);
+  // 2026-11-26: the new mine (1357x909) redrawn by Kilian; the cave passage is at mid height on the right
+  assert.ok(to(mine, "mine-natural-cave").zone.y < size(mine).height * 0.6);
   assert.deepEqual(
     mine.exits.map((e) => e.zone.x).sort((a, b) => a - b),
-    [266, 473],
+    [271, 454],
   );
   assert.equal(to(cave, "mine-interior").zone.x, 67);
 
@@ -601,7 +602,7 @@ test("Mountain Path <-> Mine Interior <-> Mine Natural Cave: wired to the hand-d
         `${scene.id}.${name} outside the world`,
       );
       assert.ok(
-        !collidesWithScene(r, scene.colliders),
+        !collidesWithScene(r, scene.colliders, scene.polygonColliders ?? []),
         `${scene.id}.${name} in collision`,
       );
       const floor = reachable(scene, spawn);
@@ -728,7 +729,7 @@ test("Forest <-> Forest Cottage <-> Forest Cottage Interior: wired both ways to 
   const exitTo = (scene, name) => scene.exits.find((e) => e.name === name);
 
   // the exact zones and spawns used by each hop
-  assert.equal(exitTo(forest, "to-forest-cottage").zone.x, 648); // forest-transition-2 (redrawn 2026-11-18)
+  assert.equal(exitTo(forest, "to-forest-cottage").zone.x, 648); // forest-transition-1 (renumbered 2026-11-26)
   assert.equal(exitTo(forest, "to-forest-cottage").targetSpawn, "from-forest");
   assert.deepEqual(cottage.arrivals["from-forest"], {
     x: 690,
@@ -738,7 +739,7 @@ test("Forest <-> Forest Cottage <-> Forest Cottage Interior: wired both ways to 
   assert.equal(exitTo(cottage, "to-forest").zone.x, 650); // forest-cottage-transition-1
   assert.equal(exitTo(cottage, "to-forest").targetSpawn, "from-forest-cottage");
 
-  assert.equal(exitTo(cottage, "to-forest-cottage-interior").zone.x, 311); // forest-cottage-transition-2
+  assert.equal(exitTo(cottage, "to-forest-cottage-interior").zone.x, 290); // forest-cottage-transition-2 (redrawn 2026-11-26)
   assert.equal(
     exitTo(cottage, "to-forest-cottage-interior").targetSpawn,
     "from-forest-cottage",
@@ -755,7 +756,7 @@ test("Forest <-> Forest Cottage <-> Forest Cottage Interior: wired both ways to 
     direction: "south",
   }); // forest-cottage-spawn-2
 
-  assert.equal(cottage.colliders.length, 25);
+  assert.equal(cottage.colliders.length, 23); // redrawn 2026-11-26 (plus free-hand shapes)
   assert.equal(inside.colliders.length, 10);
   assert.equal(inside.exits.length, 0);
   assert.deepEqual(
@@ -777,7 +778,7 @@ test("Forest <-> Forest Cottage <-> Forest Cottage Interior: wired both ways to 
         `${scene.id}.${name} outside the world`,
       );
       assert.ok(
-        !collidesWithScene(r, scene.colliders),
+        !collidesWithScene(r, scene.colliders, scene.polygonColliders ?? []),
         `${scene.id}.${name} in collision`,
       );
       const floor = reachable(scene, spawn);

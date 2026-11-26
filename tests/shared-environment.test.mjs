@@ -47,8 +47,9 @@ let passed=0;const test=(name,fn)=>{fn();passed++;console.log(`ok - ${name}`);};
 // 2026-11-16: +13 more in the forest glade (bushes, tufts and ferns)
 // 2026-11-17: -1, the mountain path campfire (Kilian asked to remove it)
 // 2026-11-18: +10 (5 river currents in the river, 5 bee swarms: 1 in the forest, 4 at the mill): "en todos los capitulos"
-test('131 approved placements remain identical in every current and future chapter',()=>{
-  assert.equal(shared.reduce((n,c)=>n+c.instances.length,0),131);
+// 2026-11-26: +2, the mine has three lantern flames (one per lantern of the new background) instead of one
+test('133 approved placements remain identical in every current and future chapter',()=>{
+  assert.equal(shared.reduce((n,c)=>n+c.instances.length,0),133);
   for(const c of shared)for(const chapterId of ['chapter-1','chapter-2','chapter-3','artifacts','final','future-day']){
     const result=getComposition(c.sceneId,chapterId);
     assert.equal(result.chapterId,chapterId);
@@ -72,7 +73,7 @@ test('only animated nonblocking noncollectible vegetation and fire belong to the
     assert.equal(resolved.colliders.length,0);assert.equal(resolved.zones.length,0);
   }
   // (2026-11-16: the forest gained 3 ferns, 5 tufts, 2 tall and 3 round bushes)
-  assert.deepEqual(counts,{'fern-weed':29,'grass-tuft':31,'bush-tall':11,'bush-round':10,'campfire':1,'candle-flame':39,'river-current':5,'bee-swarm':5});
+  assert.deepEqual(counts,{'fern-weed':29,'grass-tuft':31,'bush-tall':11,'bush-round':10,'campfire':1,'candle-flame':41,'river-current':5,'bee-swarm':5});
   for(const chapter of ['chapter-1','chapter-2','future-day']) {
     assert.deepEqual(getComposition('apothecary-interior',chapter).instances,
       getComposition('apothecary-main-zone',chapter).instances);
