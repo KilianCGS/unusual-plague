@@ -324,6 +324,8 @@ test("the old pilot villager and its Plaza interaction zones are gone", () => {
   assert.deepEqual(getSceneNpcs("plaza"), []);
   assert.deepEqual(getSceneInteractionZones("plaza").map(zone => zone.interactionId), [
     "world.plaza.noticeboard", "world.plaza.well", "world.plaza.statue",
+    // 2026-11-27: the other three sides of the well (all draw water)
+    "world.plaza.well", "world.plaza.well", "world.plaza.well",
   ]);
 });
 

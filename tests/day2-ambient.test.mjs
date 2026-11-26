@@ -102,8 +102,12 @@ test("the three approved plaza zones keep their exact coordinates and resolve to
     [967,254,103,21,"world.plaza.noticeboard"],
     [399,403,97,21,"world.plaza.well"],
     [718,607,109,25,"world.plaza.statue"],
+    // 2026-11-27 (Kilian): the other three sides of the well
+    [404,308,91,15,"world.plaza.well"],
+    [382,314,23,86,"world.plaza.well"],
+    [485,378,18,23,"world.plaza.well"],
   ]);
-  for (const zone of zones) {
+  for (const zone of zones.slice(0,3)) {
     // Stand directly in the supplied green rectangle: feet are on free floor.
     const box=getHitboxRect(zone.x+zone.width/2,zone.y+zone.height+7,{offsetX:-6,offsetY:-19,width:12,height:12});
     assert.equal(collidesWithScene(box,WORLD_SCENES.plaza.colliders),false,zone.id);

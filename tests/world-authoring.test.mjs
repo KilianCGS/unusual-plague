@@ -474,7 +474,7 @@ test("Patient 2 adds no gather source, no provider and no collectible Honey or M
     ch1.INJURED_MINER_ID,
   ]);
   assert.equal(RECIPES.length, 24); // 2026-11-17: + the base syrup. + crushed herb (mortar) + the cooking family, minus 3 recipes removed on 2026-11-16
-  assert.deepEqual(Object.keys(GATHER_SOURCES), ["gather.water"]);
+  assert.deepEqual(Object.keys(GATHER_SOURCES), ["gather.water", "world.plaza.well"]); // 2026-11-27: the plaza well too
   assert.deepEqual(NPC_PROVIDES, {}); // the merchant sells cloth now
   for (const asset of DECOR_ASSETS) {
     assert.ok(

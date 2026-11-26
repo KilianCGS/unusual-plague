@@ -162,6 +162,8 @@ export const GATHER_SOURCES: Record<
 > = {
   // 2026-11-27 (Kilian): one flask per use of the river.
   "gather.water": { itemId: "water", requires: "empty-flask", quantity: 1 },
+  // 2026-11-27 (Kilian): the plaza well gives water too, the same way (any of its zones).
+  "world.plaza.well": { itemId: "water", requires: "empty-flask", quantity: 1 },
 };
 
 export type GatherDecision = "gather" | "no-container" | "not-needed";
