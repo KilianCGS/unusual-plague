@@ -94,7 +94,7 @@ test("seeing an ingredient teaches its chopping or grinding recipe", () => {
 
 test("the kitchen opens the board and the board returns to the kitchen; Cook still waits 3 s, Chop does not", () => {
   const overlay = read("src/game/crafting/CraftingOverlay.tsx");
-  assert.ok(overlay.includes("data-crafting-board") && overlay.includes("onBackToKitchen"));
+  assert.ok(overlay.includes("data-crafting-tab") && overlay.includes("onBackToKitchen") && overlay.includes("onOpenBoard")); // 2026-11-27: tabs Cook | Chop
   assert.ok(overlay.includes("{ fire: 3000 }"), "only the kitchen waits");
   const world = read("src/game/world/GameWorld.tsx");
   assert.ok(world.includes('setCraftingStation("chop")') && world.includes('setCraftingStation("fire")'));

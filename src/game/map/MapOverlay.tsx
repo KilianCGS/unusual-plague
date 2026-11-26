@@ -246,6 +246,15 @@ export function MapOverlay({
             <stop offset="0%" stopColor="#4a2411" stopOpacity="0.45" />
             <stop offset="100%" stopColor="#4a2411" stopOpacity="0" />
           </linearGradient>
+          <linearGradient id="river-segment-fade" gradientUnits="userSpaceOnUse" x1="0" y1="290" x2="0" y2="920">
+            <stop offset="0" stopColor="white" stopOpacity="0" />
+            <stop offset="9%" stopColor="white" stopOpacity="1" />
+            <stop offset="91%" stopColor="white" stopOpacity="1" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
+          </linearGradient>
+          <mask id="river-segment-mask" maskUnits="userSpaceOnUse" x="0" y="0" width={STAGE.width} height={STAGE.height}>
+            <rect x="0" y="0" width={STAGE.width} height={STAGE.height} fill="url(#river-segment-fade)" />
+          </mask>
           <clipPath id="parchment-clip">
             <path d={PARCHMENT} />
           </clipPath>
@@ -283,11 +292,13 @@ export function MapOverlay({
           </text>
           <path d="M790 196 q85 12 170 2 q85 -10 170 0" fill="none" stroke={MAP_INK} strokeWidth={2.2} strokeLinecap="round" opacity={0.7} />
 
-          {/* the river: dark bank, water, a pale ripple line */}
-          <path d={RIVER_PATH} fill="none" stroke={MAP_INK} strokeWidth={30} strokeLinecap="round" opacity={0.55} />
-          <path d={RIVER_PATH} fill="none" stroke={WATER_DARK} strokeWidth={25} strokeLinecap="round" opacity={0.9} />
-          <path d={RIVER_PATH} fill="none" stroke={WATER} strokeWidth={19} strokeLinecap="round" />
-          <path d={RIVER_PATH} fill="none" stroke={PAPER} strokeWidth={2.4} strokeLinecap="round" strokeDasharray="12 16" opacity={0.75} />
+          {/* temporary river fade preview */}
+          <g mask="url(#river-segment-mask)">
+            <path d={RIVER_PATH} fill="none" stroke={MAP_INK} strokeWidth={30} strokeLinecap="round" opacity={0.55} />
+            <path d={RIVER_PATH} fill="none" stroke={WATER_DARK} strokeWidth={25} strokeLinecap="round" opacity={0.9} />
+            <path d={RIVER_PATH} fill="none" stroke={WATER} strokeWidth={19} strokeLinecap="round" />
+            <path d={RIVER_PATH} fill="none" stroke={PAPER} strokeWidth={2.4} strokeLinecap="round" strokeDasharray="12 16" opacity={0.75} />
+          </g>
 
           {MAP_LINKS.map(([fromId, toId], index) => {
             const from = byId.get(fromId);

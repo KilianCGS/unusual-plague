@@ -99,7 +99,7 @@ test("the guard: grinding the herb another cure needs whole leaves the cases sho
 
 test("wiring: the mortar button opens the grinding view, the guard and copy exist in both languages", () => {
   const overlay = read("src/game/crafting/CraftingOverlay.tsx");
-  assert.ok(overlay.includes("data-crafting-mortar"));
+  assert.ok(overlay.includes("data-crafting-tab")); // 2026-11-27: tabs Prepare | Grind instead of the mortar icon
   assert.ok(overlay.includes("onOpenMortar"));
   assert.ok(overlay.includes('setMessage("needed-elsewhere")'));
   assert.ok(overlay.indexOf('setMessage("needed-elsewhere")') < overlay.indexOf("onInventoryChange(result.inventory)"));

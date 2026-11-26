@@ -127,7 +127,7 @@ test("the header and the button name the action of the station, and the button s
 
 test("the Doctor's inventory: the 8 carried slots in order, with quantities and hover labels", () => {
   const markup = render("manual", SAMPLE);
-  assert.ok(markup.includes(">Inventario del Doctor</h3>"));
+  assert.ok(markup.includes(">Maletín</h3>"));
   assert.equal(count(markup, "data-inventory-slot"), 15);
   assert.deepEqual(
     [...markup.matchAll(/data-inventory-slot[^>]*data-item-id="([^"]*)"/g)].map(
@@ -141,7 +141,7 @@ test("the Doctor's inventory: the 8 carried slots in order, with quantities and 
   assert.equal(count(markup, "title="), 0);
   // empty inventory slots cannot be clicked: 5 empty + 2 empty ingredient
   // slots + the action button (nothing selected yet) = 8 disabled buttons
-  assert.equal(count(markup, 'disabled=""'), 15);
+  assert.equal(count(markup, 'disabled=""') - count(markup, 'data-ready="false" disabled=""'), 15); // (2026-11-27: the recipes that cannot be made yet are disabled too, not counted here)
 });
 
 test("an item without an icon (Medicinal paste) falls back to its readable name", () => {
@@ -176,8 +176,8 @@ test("source: derived quantities, limit feedback, no-space feedback and only the
   assert.ok(source.includes("setMessage(null)"));
   // the success modal shows the quantity
   assert.ok(source.includes("created.quantity"));
-  // crafting never reads which recipes the Doctor knows
-  assert.ok(!/knownRecipe/.test(source.replace(/\/\/.*$/gm, "")));
+  // making something never depends on which recipes the Doctor knows (2026-11-27: they only feed the list and the preview)
+  assert.ok(source.includes("combine(inventory, station, selection)"));
   // the result goes through the same inventory callback, once, on success only
   assert.equal(count(source, "onInventoryChange("), 2); // at once, or when the kitchen wait ends
 });
@@ -199,6 +199,37 @@ test("success modal and old texts: no obsolete references remain", () => {
       read("src/app/dev/crafting/page.tsx"),
     ),
   );
+});
+
+test("one layout for every station (2026-11-27): tabs, the known recipes of the tab, a result slot and the bag", () => {
+  const props = (station, extra = {}) => ({
+    station,
+    inventory: stock([["water", 1], ["cloth", 1], ["alcohol", 1]]),
+    language: "es",
+    onInventoryChange: () => {},
+    onClose: () => {},
+    onOpenMortar: () => {},
+    onBackToTable: () => {},
+    onOpenBoard: () => {},
+    onBackToKitchen: () => {},
+    ...extra,
+  });
+  const table = html(h(CraftingOverlay, props("manual", { knownRecipeIds: new Set(["manual.cold-cloth"]) })));
+  // the table's tabs, Prepare active; the kitchen's are Cook | Chop
+  assert.ok(table.includes('data-crafting-tab="manual"') && table.includes('data-crafting-tab="mortar"'));
+  const kitchen = html(h(CraftingOverlay, props("fire", { knownRecipeIds: new Set() })));
+  assert.ok(kitchen.includes('data-crafting-tab="fire"') && kitchen.includes('data-crafting-tab="chop"'));
+  // only the known recipes of this tab are listed, ticked when they can be made
+  assert.equal(count(table, "data-recipe="), 1);
+  assert.ok(table.includes('data-recipe="manual.cold-cloth" data-ready="true"'));
+  assert.ok(kitchen.includes(craftingCopy.es.noRecipesHere));
+  // the result slot waits with a "?" while nothing is chosen; the bag has its own heading
+  assert.ok(table.includes("data-crafting-result") && table.includes(">?</span>"));
+  assert.ok(table.includes(">Maletín</h3>"));
+  // no mortar or board icon any more
+  assert.ok(!table.includes("mortar.png") && !kitchen.includes("cutting-board.png"));
+  // the bag's items can be dragged to the slots
+  assert.ok(table.includes('draggable="true"'));
 });
 
 console.log(`

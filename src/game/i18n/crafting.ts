@@ -32,13 +32,17 @@ type CraftingCopy = {
   // The wait of the kitchen: the bar's text and how to cancel it.
   preparing: string;
   preparingHint: string;
+  // 2026-11-27: the list of the station's known recipes, and the result slot while the slots form none.
+  recipesHeading: string;
+  noRecipesHere: string;
+  resultUnknown: string;
 };
 
 export const craftingCopy: Record<Language, CraftingCopy> = {
   es: {
     title: { manual: "Preparar", fire: "Cocinar", mortar: "Triturar", chop: "Trocear" },
     ingredients: "Ingredientes",
-    inventoryHeading: "Inventario del Doctor",
+    inventoryHeading: "Maletín",
     action: { manual: "Fabricar", fire: "Cocinar", mortar: "Triturar", chop: "Trocear" },
     close: "Cerrar",
     noRecipe: "Estos ingredientes no parecen combinar bien aquí.",
@@ -54,11 +58,14 @@ export const craftingCopy: Record<Language, CraftingCopy> = {
     preparingHint: "Esc para cancelar",
     created: "Has preparado",
     closeModal: "Cerrar",
+    recipesHeading: "Recetas aquí",
+    noRecipesHere: "Aún no conoces ninguna.",
+    resultUnknown: "Combina los ingredientes de una receta.",
   },
   en: {
     title: { manual: "Prepare", fire: "Cook", mortar: "Grind", chop: "Chop" },
     ingredients: "Ingredients",
-    inventoryHeading: "Doctor's inventory",
+    inventoryHeading: "Bag",
     action: { manual: "Craft", fire: "Cook", mortar: "Grind", chop: "Chop" },
     close: "Close",
     noRecipe: "These ingredients don't seem to combine well here.",
@@ -73,5 +80,8 @@ export const craftingCopy: Record<Language, CraftingCopy> = {
     preparingHint: "Esc to cancel",
     created: "Prepared",
     closeModal: "Close",
+    recipesHeading: "Recipes here",
+    noRecipesHere: "You don't know any yet.",
+    resultUnknown: "Combine the ingredients of a recipe.",
   },
 };

@@ -1956,6 +1956,7 @@ export function GameWorld({
           onOpenBoard={() => setCraftingStation("chop")}
           onBackToKitchen={() => setCraftingStation("fire")}
           onCookingChange={setCooking}
+          knownRecipeIds={knownRecipeIds}
           onInventoryChange={(next) => {
             inventoryRef.current = next;
             setInventory(next);

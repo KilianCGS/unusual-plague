@@ -7,7 +7,7 @@ import type { CSSProperties } from "react";
 import { craftingCopy } from "../i18n/crafting";
 import { farmerAnalysisLabel } from "../dialogue/chapter2AnalysisDialogues";
 import type { Language } from "../i18n/types";
-import type { InventoryState } from "../inventory/inventory";
+import { countItem, type InventoryState } from "../inventory/inventory";
 import { getMissingIngredients, type ItemNeed } from "./needs";
 import { getItemIcon, getItemName } from "../items/items";
 import { ItemIcon } from "../items/ItemIcon";
@@ -23,7 +23,7 @@ import {
   selectItem,
   type CraftSelection,
 } from "./crafting";
-import type { CraftStation } from "./recipes";
+import { RECIPES, expandKnownRecipeIds, type CraftStation, type Recipe } from "./recipes";
 import styles from "./CraftingOverlay.module.css";
 
 // What the feedback line says (null = nothing). It clears as soon as the
@@ -37,12 +37,6 @@ type Message =
   | "needed-elsewhere"
   | null;
 
-// The mortar's picture (a fixture of the work table, not an item).
-const MORTAR_ICON = "/game/ui/mortar.png";
-// The kitchen's cutting board (a fixture of the stove, not an item).
-const BOARD_ICON = "/game/ui/cutting-board.png";
-// A small pixel arrow for the "back" buttons (the pixel font has no arrow glyph).
-const BACK_ARROW = "/game/ui/arrow-left.png";
 
 // How many raw ingredients the known cases still lack in total.
 function totalMissing(treatments: readonly ItemNeed[], inventory: InventoryState) {
@@ -82,6 +76,7 @@ export function CraftingOverlay({
   onOpenBoard,
   onBackToKitchen,
   onCookingChange,
+  knownRecipeIds,
 }: {
   station: CraftStation;
   inventory: InventoryState;
@@ -108,6 +103,9 @@ export function CraftingOverlay({
   onBackToKitchen?: () => void;
   // Tells the scene behind that the kitchen is cooking (steam and a livelier fire).
   onCookingChange?: (cooking: boolean) => void;
+  // The recipes the Doctor knows: the list of the station and the result preview only show these (left out, as in
+  // /dev/crafting: every recipe).
+  knownRecipeIds?: ReadonlySet<string>;
 }) {
   const copy = craftingCopy[language];
   const [selection, setSelection] = useState<CraftSelection>(() =>
@@ -124,6 +122,21 @@ export function CraftingOverlay({
   const selectedCount = selection.filter(
     (selected) => selected !== null,
   ).length;
+  // 2026-11-27 (Kilian): every station looks and works the same. Its tabs (the table: Prepare | Grind; the kitchen:
+  // Cook | Chop) replace the mortar and board icons; the known recipes of the tab are listed (a click on one that
+  // can be made fills the slots); the result shows as soon as the slots form a known recipe; the bag sits on the
+  // right and its items can be dragged to the slots (or clicked, as before).
+  const known = knownRecipeIds ? expandKnownRecipeIds(knownRecipeIds) : null;
+  const stationRecipes = RECIPES.filter((recipe) => recipe.station === station && (!known || known.has(recipe.id)));
+  const matched = matchRecipe(stationRecipes, selection);
+  const tabs: { station: CraftStation; go?: () => void }[] | null =
+    station === "manual" || station === "mortar"
+      ? onOpenMortar || onBackToTable
+        ? [{ station: "manual", go: onBackToTable }, { station: "mortar", go: onOpenMortar }]
+        : null
+      : onOpenBoard || onBackToKitchen
+        ? [{ station: "fire", go: onBackToKitchen }, { station: "chop", go: onOpenBoard }]
+        : null;
 
   // Esc: closes the success modal first, otherwise the station. Space closes
   // the modal. (Q and TAB are blocked by the owner while this is open.)
@@ -197,6 +210,17 @@ export function CraftingOverlay({
       setMessage(null);
       setSelection(selectItem(inventory, selection, itemId));
     }
+  }
+
+  // A click on a recipe of the list that can be made puts its ingredients in the slots (nothing is consumed yet).
+  function fillRecipe(recipe: Recipe) {
+    let next = createEmptySelection(station);
+    for (const input of recipe.inputs) {
+      for (let unit = 0; unit < input.quantity; unit++) next = selectItem(inventory, next, input.itemId);
+    }
+    playSound("ui.itemClickDrop");
+    setMessage(null);
+    setSelection(next);
   }
 
   function handleSlotClick(slotIndex: number) {
@@ -285,168 +309,184 @@ export function CraftingOverlay({
           >
             ×
           </button>
-          <h2 className={styles.title}>{copy.title[station]}</h2>
-          {station === "manual" && onOpenMortar ? (
-            <button
-              type="button"
-              className={styles.mortar}
-              data-crafting-mortar
-              aria-label={copy.mortar.label}
-              disabled={modalOpen}
-              onClick={onOpenMortar}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={MORTAR_ICON} alt="" width={48} height={48} draggable={false} />
-              <span className={styles.mortarLabel}>{copy.mortar.label}</span>
-            </button>
-          ) : null}
-          {station === "fire" && onOpenBoard ? (
-            <button
-              type="button"
-              className={styles.mortar}
-              data-crafting-board
-              aria-label={copy.board.label}
-              disabled={modalOpen}
-              onClick={onOpenBoard}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={BOARD_ICON} alt="" width={48} height={48} draggable={false} />
-              <span className={styles.mortarLabel}>{copy.board.label}</span>
-            </button>
-          ) : null}
-          {station === "chop" && onBackToKitchen ? (
-            <button
-              type="button"
-              className={styles.back}
-              data-crafting-back
-              disabled={modalOpen}
-              onClick={onBackToKitchen}
-            >
-              <img src={BACK_ARROW} alt="" width={9} height={9} className={styles.backArrow} draggable={false} />
-              {copy.board.back}
-            </button>
-          ) : null}
-          {station === "mortar" && onBackToTable ? (
-            <button
-              type="button"
-              className={styles.back}
-              data-crafting-back
-              disabled={modalOpen}
-              onClick={onBackToTable}
-            >
-              <img src={BACK_ARROW} alt="" width={9} height={9} className={styles.backArrow} draggable={false} />
-              {copy.mortar.back}
-            </button>
-          ) : null}
-          {station === "manual" && onAnalyzeSample ? (
-            <button type="button" className={styles.action} onClick={onAnalyzeSample} disabled={modalOpen}>
-              {farmerAnalysisLabel[language]}
-            </button>
-          ) : null}
-          <p className={styles.counter} data-crafting-counter>
-            {station === "mortar" || station === "chop" ? copy.mortar.ingredient : copy.ingredients} {selectedCount}/{selection.length}
-          </p>
-
-          <div className={styles.selection} data-crafting-selection>
-            {selection.map((selected, index) => (
-              <div key={index} className={styles.selectionCell}>
-                {index > 0 ? <span className={styles.plus}>+</span> : null}
+          {tabs ? (
+            <div className={styles.tabs} role="tablist">
+              {tabs.map((tab) => (
                 <button
+                  key={tab.station}
                   type="button"
-                  className={styles.cell}
-                  data-selection-slot
-                  data-item-id={selected ?? undefined}
-                  aria-label={
-                    selected ? getItemName(selected, language) : undefined
-                  }
-                  disabled={selected === null}
-                  onClick={() => handleSlotClick(index)}
+                  role="tab"
+                  aria-selected={tab.station === station}
+                  className={tab.station === station ? `${styles.tab} ${styles.tabActive}` : styles.tab}
+                  data-crafting-tab={tab.station}
+                  disabled={modalOpen}
+                  onClick={() => {
+                    if (tab.station !== station) tab.go?.();
+                  }}
                 >
-                  {selected ? (
-                    getItemIcon(selected) ? (
-                      <ItemIcon itemId={selected} className={styles.cellIcon} />
+                  {copy.title[tab.station]}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <h2 className={styles.title}>{copy.title[station]}</h2>
+          )}
+          <div className={styles.columns}>
+            <div className={styles.work}>
+              {station === "manual" && onAnalyzeSample ? (
+                <button type="button" className={styles.action} onClick={onAnalyzeSample} disabled={modalOpen}>
+                  {farmerAnalysisLabel[language]}
+                </button>
+              ) : null}
+              <p className={styles.counter} data-crafting-counter>
+                {station === "mortar" || station === "chop" ? copy.mortar.ingredient : copy.ingredients} {selectedCount}/{selection.length}
+              </p>
+
+              <div
+                className={styles.selection}
+                data-crafting-selection
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  const itemId = event.dataTransfer.getData("text/plain");
+                  if (itemId) handleInventoryClick(itemId);
+                }}
+              >
+                {selection.map((selected, index) => (
+                  <div key={index} className={styles.selectionCell}>
+                    {index > 0 ? <span className={styles.plus}>+</span> : null}
+                    <button
+                      type="button"
+                      className={styles.cell}
+                      data-selection-slot
+                      data-item-id={selected ?? undefined}
+                      aria-label={selected ? getItemName(selected, language) : undefined}
+                      disabled={selected === null}
+                      onClick={() => handleSlotClick(index)}
+                    >
+                      {selected ? (
+                        getItemIcon(selected) ? (
+                          <ItemIcon itemId={selected} className={styles.cellIcon} />
+                        ) : (
+                          <span className={styles.cellName}>{getItemName(selected, language)}</span>
+                        )
+                      ) : null}
+                    </button>
+                  </div>
+                ))}
+                <span className={styles.arrow} aria-hidden="true">→</span>
+                <div className={styles.result} data-crafting-result={matched?.output.itemId}>
+                  {matched ? (
+                    getItemIcon(matched.output.itemId) ? (
+                      <ItemIcon itemId={matched.output.itemId} className={styles.cellIcon} />
                     ) : (
-                      <span className={styles.cellName}>
-                        {getItemName(selected, language)}
-                      </span>
+                      <span className={styles.cellName}>{getItemName(matched.output.itemId, language)}</span>
                     )
-                  ) : null}
-                </button>
+                  ) : (
+                    <span className={styles.resultUnknown}>?</span>
+                  )}
+                </div>
               </div>
-            ))}
-          </div>
+              <p className={styles.resultName} data-crafting-result-name>
+                {matched ? getItemName(matched.output.itemId, language) : copy.resultUnknown}
+              </p>
 
-          <button
-            type="button"
-            className={styles.action}
-            data-crafting-combine
-          disabled={!canAttemptCombine(selection, station)}
-            onClick={handleCombine}
-          >
-            {copy.action[station]}
-          </button>
-          <p
-            className={styles.message}
-            role="status"
-            data-crafting-message={message ?? undefined}
-          >
-            {message === "no-recipe"
-              ? copy.noRecipe
-              : message === "no-space"
-                ? copy.noSpace
-                : message === "limit"
-                  ? copy.limitReached
-                  : message === "enough"
-                    ? copy.alreadyEnough
-                  : message === "not-needed"
-                    ? copy.notNeeded
-                    : message === "needed-elsewhere"
-                      ? copy.neededElsewhere
-                      : " "}
-          </p>
+              <button
+                type="button"
+                className={styles.action}
+                data-crafting-combine
+                disabled={!canAttemptCombine(selection, station)}
+                onClick={handleCombine}
+              >
+                {copy.action[station]}
+              </button>
+              <p className={styles.message} role="status" data-crafting-message={message ?? undefined}>
+                {message === "no-recipe"
+                  ? copy.noRecipe
+                  : message === "no-space"
+                    ? copy.noSpace
+                    : message === "limit"
+                      ? copy.limitReached
+                      : message === "enough"
+                        ? copy.alreadyEnough
+                        : message === "not-needed"
+                          ? copy.notNeeded
+                          : message === "needed-elsewhere"
+                            ? copy.neededElsewhere
+                            : " "}
+              </p>
 
-          <hr className={styles.divider} />
-          <h3 className={styles.heading}>{copy.inventoryHeading}</h3>
-          <div className={styles.inventory}>
-            {inventory.slots.map((slot, index) => {
-              // What is still free to select: the real stock minus the units
-              // already in the ingredient slots. The inventory is untouched.
-              const free = slot
-                ? {
-                    itemId: slot.itemId,
-                    quantity: availableUnits(inventory, selection, slot.itemId),
-                  }
-                : null;
-              const spent = free !== null && free.quantity === 0;
+              <h3 className={styles.heading}>{copy.recipesHeading}</h3>
+              <ul className={styles.recipes} data-crafting-recipes>
+                {stationRecipes.length === 0 ? (
+                  <li className={styles.recipeNone}>{copy.noRecipesHere}</li>
+                ) : (
+                  stationRecipes.map((recipe) => {
+                    const ready = recipe.inputs.every((input) => countItem(inventory, input.itemId) >= input.quantity);
 
-              return (
-                <button
-                  key={index}
-                  type="button"
-                  className={styles.slot}
-                  data-inventory-slot
-                  data-item-id={slot?.itemId}
-                  data-spent={spent}
-                  disabled={free === null}
-                  aria-disabled={spent || undefined}
-                  aria-label={
-                    free
-                      ? `${getItemName(free.itemId, language)} x${free.quantity}`
-                      : undefined
-                  }
-                  onClick={() => slot && handleInventoryClick(slot.itemId)}
-                >
-                  <InventorySlotContents
-                    slot={free}
-                    language={language}
-                    classes={styles}
-                  />
-                  {free ? (
-                    <InventorySlotTooltip slot={free} language={language} />
-                  ) : null}
-                </button>
-              );
-            })}
+                    return (
+                      <li key={recipe.id}>
+                        <button
+                          type="button"
+                          className={styles.recipe}
+                          data-recipe={recipe.id}
+                          data-ready={ready}
+                          disabled={!ready || modalOpen}
+                          onClick={() => fillRecipe(recipe)}
+                        >
+                          <span className={styles.recipeMark} aria-hidden="true">{ready ? "✓" : "✗"}</span>
+                          <span className={styles.recipeName}>{getItemName(recipe.output.itemId, language)}</span>
+                          <span className={styles.recipeInputs}>
+                            {recipe.inputs
+                              .map(({ itemId, quantity }) => `${getItemName(itemId, language)}${quantity > 1 ? ` ×${quantity}` : ""}`)
+                              .join(" + ")}
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })
+                )}
+              </ul>
+            </div>
+
+            <div className={styles.side}>
+              <h3 className={styles.heading}>{copy.inventoryHeading}</h3>
+              <div className={styles.inventory}>
+                {inventory.slots.map((slot, index) => {
+                  // What is still free to select: the real stock minus the units
+                  // already in the ingredient slots. The inventory is untouched.
+                  const free = slot
+                    ? {
+                        itemId: slot.itemId,
+                        quantity: availableUnits(inventory, selection, slot.itemId),
+                      }
+                    : null;
+                  const spent = free !== null && free.quantity === 0;
+
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      className={styles.slot}
+                      data-inventory-slot
+                      data-item-id={slot?.itemId}
+                      data-spent={spent}
+                      disabled={free === null}
+                      aria-disabled={spent || undefined}
+                      aria-label={free ? `${getItemName(free.itemId, language)} x${free.quantity}` : undefined}
+                      draggable={free !== null && !spent}
+                      onDragStart={(event) => {
+                        if (slot) event.dataTransfer.setData("text/plain", slot.itemId);
+                      }}
+                      onClick={() => slot && handleInventoryClick(slot.itemId)}
+                    >
+                      <InventorySlotContents slot={free} language={language} classes={styles} />
+                      {free ? <InventorySlotTooltip slot={free} language={language} /> : null}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -476,5 +516,22 @@ export function CraftingOverlay({
         </div>
       ) : null}
     </div>
+  );
+}
+
+// The known recipe of this tab that the slots form exactly (the same ingredients, the same number of each), if any.
+function matchRecipe(recipes: readonly Recipe[], selection: CraftSelection): Recipe | null {
+  const chosen = selection.filter((selected): selected is string => selected !== null);
+  if (chosen.length === 0) return null;
+  const counts = new Map<string, number>();
+  for (const itemId of chosen) counts.set(itemId, (counts.get(itemId) ?? 0) + 1);
+
+  return (
+    recipes.find((recipe) => {
+      const need = new Map<string, number>();
+      for (const { itemId, quantity } of recipe.inputs) need.set(itemId, (need.get(itemId) ?? 0) + quantity);
+      if (need.size !== counts.size) return false;
+      return [...need].every(([itemId, quantity]) => counts.get(itemId) === quantity);
+    }) ?? null
   );
 }
