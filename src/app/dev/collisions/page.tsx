@@ -1438,6 +1438,30 @@ function SceneGeometryEditor({
     setSelection({ kind: mode, editorId: newRect.editorId });
   }
 
+  // 2026-11-27 (Kilian, to redraw a scene from scratch): empties the active layer, or the whole scene in SELECT.
+  // Only the editor's copy changes: nothing reaches the game until it is exported and handed over.
+  function deleteAll() {
+    const what = mode === "select" ? "EVERYTHING in this scene" : `every ${mode === "collider" ? "collider (rectangles and free shapes)" : mode} of this scene`;
+    if (!window.confirm(`Delete ${what}? This cannot be undone.`)) return;
+    const layers: Record<Exclude<Mode, "select">, Partial<SceneData>> = {
+      collider: { colliders: [], polygons: [] },
+      polygon: { polygons: [] },
+      transition: { transitions: [] },
+      spawn: { spawns: [] },
+      interaction: { interactions: [] },
+      occluder: { occluders: [] },
+      stepzone: { stepZones: [] },
+    };
+    onDataChange((previous) =>
+      mode === "select"
+        ? { colliders: [], transitions: [], spawns: [], interactions: [], polygons: [], occluders: [], stepZones: [] }
+        : { ...previous, ...layers[mode] },
+    );
+    setSelection(null);
+    setDraftPoints([]);
+    setStroke(null);
+  }
+
   function selectMode(nextMode: Mode) {
     setDrag(null);
     setDraftPoints([]);
@@ -1851,6 +1875,19 @@ function SceneGeometryEditor({
           title="Takes back the last point while drawing; otherwise deletes the last shape created (Ctrl+Z)"
         >
           ↶ Undo (Ctrl+Z)
+        </button>
+        <button
+          type="button"
+          className={styles.modeButton}
+          style={{ borderColor: "#ff5c5c", color: "#ffb3b3" }}
+          data-delete-all
+          onClick={(event) => {
+            event.currentTarget.blur();
+            deleteAll();
+          }}
+          title="In SELECT: everything of this scene. In a layer: every shape of that layer (collider: rectangles and free shapes). Asks first; it cannot be undone."
+        >
+          🗑 {mode === "select" ? "Delete ALL in this scene" : `Delete all ${KINDS.find((entry) => entry.kind === mode)?.label.replace(/^\S+\s/, "") ?? ""}`}
         </button>
         {mode === "collider" ? (
           <div className={styles.modes} role="group" aria-label="Collider shape">
