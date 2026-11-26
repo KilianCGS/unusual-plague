@@ -82,9 +82,20 @@
   text-underline-offset: 4px;
 }
 
-/* a treated patient: name and mark in green ink (2026-11-26) */
+/* a treated patient, an ingredient the Doctor has: green ink (2026-11-26); none of it: red ink */
 .good {
   color: #2e6a30;
+}
+
+.bad {
+  color: #9b2a1f;
+}
+
+/* the number inside an ingredient's circle (2026-11-27) */
+.count {
+  font-size: 22px;
+  line-height: 26px;
+  font-weight: 700;
 }
 
 .heading {

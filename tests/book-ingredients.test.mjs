@@ -79,7 +79,9 @@ test("INGREDIENTES has its 5 spreads in both languages, one complete image each"
     section.spreads.forEach((spread, index) => {
       assert.equal(spread.id, `ingredients-${index + 1}`);
       assert.equal(spread.layers.length, 1, "one full-size layer");
-      assert.equal(spread.texts, undefined, "no text drawn over the image");
+      // 2026-11-27: the only text drawn over the image is the number inside each of its four circles
+      assert.equal(spread.texts.length, 4, "one count per painted circle");
+      assert.ok(spread.texts.every((t) => t.role === "count" && /^\d+$/.test(t.content[0])), "only numbers");
       const [layer] = spread.layers;
       assert.deepEqual(
         [layer.x, layer.y, layer.width, layer.height],

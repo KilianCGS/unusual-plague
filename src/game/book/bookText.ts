@@ -8,7 +8,9 @@ export type RichText = readonly RichTextFragment[];
 // weight. "name" = the title under an illustration, "heading" = a section
 // title on a page, "body" = running text, "note" = small placeholder text.
 export type BookTextRole = "name" | "heading" | "body" | "note"
-  | "preparationTitle" | "preparationBody" | "preparationNote";
+  | "preparationTitle" | "preparationBody" | "preparationNote"
+  // the number inside an ingredient's circle (2026-11-27)
+  | "count";
 
 // A block of text placed on a spread, in BOOK pixels (688x384 art space).
 export type BookTextBlock = {
@@ -18,7 +20,7 @@ export type BookTextBlock = {
   y: number;
   width: number;
   align?: "left" | "center";
-  // "good": drawn in green (a treated patient, 2026-11-26).
-  tone?: "good";
+  // "good": drawn in green (a treated patient, an ingredient the Doctor has); "bad": in red (none of it).
+  tone?: "good" | "bad";
   content: RichText;
 };

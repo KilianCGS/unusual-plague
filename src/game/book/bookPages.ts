@@ -17,6 +17,8 @@ import {
   type BookContext,
 } from "./dynamicPages";
 import type { BookTextBlock } from "./bookText";
+import { INGREDIENT_CIRCLES } from "./ingredientCircles";
+import { countItem } from "../inventory/inventory";
 
 export const BOOK_WIDTH = 688;
 export const BOOK_HEIGHT = 384;
@@ -190,17 +192,37 @@ function ailmentSpread(ailment: Ailment, language: Language = "es"): BookSpread 
 //   5 Bone / Sugar / Pine mushroom / Onion (the basic ingredients added later)
 const INGREDIENT_SPREAD_COUNTS: Record<Language, number> = { es: 5, en: 5 };
 
-function ingredientSpreads(language: Language): BookSpread[] {
+function ingredientSpreads(language: Language, context?: BookContext): BookSpread[] {
   const alts = bookCopy[language].ingredientSpreadAlts;
 
   return Array.from({ length: INGREDIENT_SPREAD_COUNTS[language] }, (_, index) => {
     const number = String(index + 1).padStart(2, "0");
-
-    return fullSpread(
+    const spread = fullSpread(
       `ingredients-${index + 1}`,
       `${UI_DIR}/ingredients/${language}/ingredients-${number}.png`,
       alts[index],
     );
+
+    if (!context) return spread;
+
+    // 2026-11-27: how many the Doctor has (his case + the chest), inside each painted circle: green, or red at zero.
+    const texts: BookTextBlock[] = (INGREDIENT_CIRCLES[language][index] ?? []).map(({ itemId, x, y, r }) => {
+      const units =
+        countItem(context.inventory, itemId) + (context.storage ? countItem(context.storage, itemId) : 0);
+
+      return {
+        id: `ingredient-count-${itemId}`,
+        role: "count",
+        x: x - r,
+        y: y - 13,
+        width: r * 2,
+        align: "center",
+        tone: units > 0 ? "good" : "bad",
+        content: [String(units)],
+      };
+    });
+
+    return { ...spread, texts };
   });
 }
 
@@ -275,7 +297,7 @@ export function buildBookSections(context: BookContext): BookSection[] {
     {
       ...ingredients,
       label: tabs.ingredients,
-      spreads: ingredientSpreads(context.language),
+      spreads: ingredientSpreads(context.language, context),
     },
     {
       id: "preparations",

@@ -28,6 +28,8 @@ export type BookContext = {
   diagnosisPatientId?: string;
   // The day being played: PACIENTES shows only that day's cases (left out = every case the Doctor knows).
   chapterId?: string;
+  // The chest of his room: INGREDIENTES counts what is in it too (left out = only what he carries).
+  storage?: InventoryState;
 };
 
 // Text columns of the open book (art space 688x384): left page and right page.

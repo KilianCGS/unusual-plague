@@ -261,7 +261,7 @@ function SpreadView({ spread }: { spread: BookSpread }) {
       {spread.texts?.map((block) => (
         <p
           key={block.id}
-          className={`${styles.text} ${styles[block.role]}${block.tone === "good" ? ` ${styles.good}` : ""}`}
+          className={`${styles.text} ${styles[block.role]}${block.tone ? ` ${styles[block.tone]}` : ""}`}
           style={{
             left: block.x,
             top: BOOK_TOP + block.y,
