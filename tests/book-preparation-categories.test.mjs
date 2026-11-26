@@ -57,7 +57,7 @@ test("the leaves are grouped by category, in the order of the categories", () =>
 test("a leaf says its category in English too", () => {
   const ctx = { language: "en", patients: {}, inventory: inv.createEmptyInventory(), knownRecipeIds: new Set(["fire.mint-infusion"]) };
   const label = buildPreparationSpreads(ctx)[1].texts.find((t) => t.id === "fire.mint-infusion-category").content[0];
-  assert.equal(label, "HERBS AND VEGETABLES");
+  assert.equal(label, "LIQUIDS");
 });
 
 test("the first spread is the index: the four groups and the known remedies, each a link to its own page", () => {
@@ -83,7 +83,7 @@ test("only what is known is listed; an empty group says so", () => {
   const ctx = { language: "en", patients: {}, inventory: inv.createEmptyInventory(), knownRecipeIds: new Set(["fire.mint-infusion"]) };
   const index = buildPreparationSpreads(ctx)[0];
   assert.deepEqual(index.texts.filter((t) => t.link).map((t) => t.id), ["index-mint-infusion"]);
-  assert.ok(index.texts.some((t) => t.id === "index-liquids-none" && t.content[0] === "None yet."));
+  assert.ok(index.texts.some((t) => t.id === "index-herbs-none" && t.content[0] === "None yet."));
 });
 
 test("the book turns to a link's page when it is clicked", () => {

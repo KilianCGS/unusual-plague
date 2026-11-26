@@ -157,7 +157,7 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
           status === "treated" || countItem(inventory, itemId) >= quantity;
 
         // 2026-11-27 (Kilian): each preparation opens its recipe in PREPARADOS (when the recipe is known)
-        const recipeSpread = preparationSpreadIdOf(itemId, context.knownRecipeIds);
+        const recipeSpread = preparationSpreadIdOf(itemId, context.knownRecipeIds, context.language);
         texts.push({
           ...text(
             `${id}-need-${index}`,
@@ -202,19 +202,22 @@ function estimateLines(content: string, role: "preparationBody" | "preparationNo
 // Where the texts of a leaf must end (the lower edge of the written area of the page).
 const PAGE_TEXT_BOTTOM = 358;
 
-// The known recipes in the order of their leaves: grouped by category (preparationCategories.ts), in the recipes' own
-// order inside each (2026-11-27, Kilian).
-function knownRecipesInOrder(knownRecipeIds: ReadonlySet<string>) {
+// The known recipes in the order of their leaves: grouped by category (preparationCategories.ts, 2026-11-27) and, inside
+// each, in alphabetical order of their names in the book's language (2026-11-26, Kilian), so the index and the leaves
+// follow the same order.
+function knownRecipesInOrder(knownRecipeIds: ReadonlySet<string>, language: Language) {
   const expanded = expandKnownRecipeIds(knownRecipeIds);
+  const collator = new Intl.Collator(language, { sensitivity: "base" });
   return RECIPES.filter(recipe => expanded.has(recipe.id))
-    .map((recipe, order) => ({ recipe, order }))
-    .sort((a, b) => preparationCategoryRank(a.recipe.output.itemId) - preparationCategoryRank(b.recipe.output.itemId) || a.order - b.order)
+    .map((recipe) => ({ recipe, name: getItemName(recipe.output.itemId, language) }))
+    .sort((a, b) => preparationCategoryRank(a.recipe.output.itemId) - preparationCategoryRank(b.recipe.output.itemId)
+      || collator.compare(a.name, b.name))
     .map(({ recipe }) => recipe);
 }
 
 // The spread of PREPARADOS where a known preparation is written (the index comes first), or null if it is not known.
-export function preparationSpreadIdOf(itemId: string, knownRecipeIds: ReadonlySet<string>): string | null {
-  const position = knownRecipesInOrder(knownRecipeIds).findIndex((recipe) => recipe.output.itemId === itemId);
+export function preparationSpreadIdOf(itemId: string, knownRecipeIds: ReadonlySet<string>, language: Language): string | null {
+  const position = knownRecipesInOrder(knownRecipeIds, language).findIndex((recipe) => recipe.output.itemId === itemId);
   return position < 0 ? null : `preparations-${Math.floor(position / 2) + 1}`;
 }
 
@@ -222,7 +225,7 @@ export function preparationSpreadIdOf(itemId: string, knownRecipeIds: ReadonlySe
 export function buildPreparationSpreads(context: BookContext): BookSpread[] {
   const { language, knownRecipeIds } = context;
   const copy = bookCopy[language];
-  const known = knownRecipesInOrder(knownRecipeIds);
+  const known = knownRecipesInOrder(knownRecipeIds, language);
 
   if (known.length === 0) {
     return [emptySpread("preparations-empty", copy.noRecipes.title, copy.noRecipes.note)];
@@ -326,16 +329,17 @@ function buildPreparationIndex(known: readonly Recipe[], context: BookContext): 
   const texts: BookTextBlock[] = [
     text("index-title", "heading", LEFT, 22, language === "es" ? "ÍNDICE" : "INDEX", "center"),
   ];
-  // left page: herbs, then spices and naturals; right page: liquids, then the others
+  // left page: herbs, spices and naturals, the others; right page: the liquids, the longest group (2026-11-26: the
+  // soup, the citrus drink and the infusions joined it, so the others moved to the left page)
   const pages: [PreparationCategory[], { x: number; width: number }, number][] = [
-    [["herbs", "naturals"], LEFT, 56],
-    [["liquids", "others"], RIGHT, 56],
+    [["herbs", "naturals", "others"], LEFT, 52],
+    [["liquids"], RIGHT, 52],
   ];
   for (const [groups, column, top] of pages) {
     let y = top;
     for (const group of groups) {
       texts.push(text(`index-${group}`, "preparationTitle", column, y, PREPARATION_CATEGORY_NAMES[group][language].toUpperCase()));
-      y += 24;
+      y += 22;
       const recipes = known.filter((recipe) => PREPARATION_CATEGORY[recipe.output.itemId] === group);
       if (recipes.length === 0) {
         texts.push(text(`index-${group}-none`, "preparationNote", column, y, language === "es" ? "Aún ninguno." : "None yet."));
@@ -362,7 +366,8 @@ function buildPreparationIndex(known: readonly Recipe[], context: BookContext): 
         );
         y += INDEX_LINE;
       }
-      y += 14;
+      // a little tighter since three groups share the left page (2026-11-26)
+      y += 8;
     }
   }
   // What the green means is told in a small plate UNDER the book (BookOverlay), not on the page (2026-11-26).

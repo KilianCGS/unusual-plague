@@ -16,15 +16,12 @@ export const PREPARATION_CATEGORY_NAMES: Record<PreparationCategory, Record<Lang
 
 // The group of each remedy (by the item it makes).
 export const PREPARATION_CATEGORY: Readonly<Record<string, PreparationCategory>> = {
+  // 2026-11-26 (Kilian): the soup, the citrus drink and the infusions are liquids, the paste a natural, the charcoal
+  // suspension one of the others.
   "crushed-herb": "herbs",
-  "medicinal-infusion": "herbs",
-  "mint-infusion": "herbs",
-  "medicinal-paste": "herbs",
   "chopped-onion": "herbs",
   "chopped-mushroom": "herbs",
-  "mushroom-soup": "herbs",
   "crushed-garlic": "herbs",
-  "citrus-drink": "herbs",
   syrup: "liquids",
   "balsamic-syrup": "liquids",
   "onion-syrup": "liquids",
@@ -32,7 +29,11 @@ export const PREPARATION_CATEGORY: Readonly<Record<string, PreparationCategory>>
   "milk-with-honey": "liquids",
   "bone-broth": "liquids",
   "strong-broth": "liquids",
-  "charcoal-suspension": "liquids",
+  "mushroom-soup": "liquids",
+  "citrus-drink": "liquids",
+  "medicinal-infusion": "liquids",
+  "mint-infusion": "liquids",
+  "medicinal-paste": "naturals",
   "ointment-base": "naturals",
   "medicinal-ointment": "naturals",
   poultice: "naturals",
@@ -40,6 +41,7 @@ export const PREPARATION_CATEGORY: Readonly<Record<string, PreparationCategory>>
   "cold-cloth": "others",
   "medicinal-compress": "others",
   "crushed-coal": "others",
+  "charcoal-suspension": "others",
 };
 
 // The position of a remedy in the book: its group first (an unknown one goes last).

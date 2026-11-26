@@ -246,12 +246,15 @@ test("the tutorial Book is untouched: it still opens on INGREDIENTES, which keep
 test("all twenty-three preparations occupy one localized leaf each, two per opening", () => {
   const { RECIPES } = at("src/game/crafting/recipes.ts");
   const known = RECIPES.map(recipe => recipe.id);
-  // 2026-11-27: the leaves follow the categories (preparationCategories.ts), the recipes' order inside each
+  // 2026-11-27: the leaves follow the categories (preparationCategories.ts); 2026-11-26: alphabetical inside each, by
+  // the name in the book's language
   const { preparationCategoryRank } = at("src/game/book/preparationCategories.ts");
-  const ordered = RECIPES.map((recipe, order) => ({ recipe, order }))
-    .sort((a, b) => preparationCategoryRank(a.recipe.output.itemId) - preparationCategoryRank(b.recipe.output.itemId) || a.order - b.order)
-    .map(({ recipe }) => recipe);
+  const { getItemName } = at("src/game/items/items.ts");
   for (const language of ["es", "en"]) {
+    const collator = new Intl.Collator(language, { sensitivity: "base" });
+    const ordered = [...RECIPES]
+      .sort((a, b) => preparationCategoryRank(a.output.itemId) - preparationCategoryRank(b.output.itemId)
+        || collator.compare(getItemName(a.output.itemId, language), getItemName(b.output.itemId, language)));
     const preparations = buildBookSections(context(language, {}, known)).find((s) => s.id === "preparations");
     assert.equal(preparations.spreads.length, 13, "the index, then 12 openings");
     assert.equal(preparations.spreads[0].id, "preparations-index");
