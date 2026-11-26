@@ -750,6 +750,7 @@ function SceneGeometryEditor({
   // vertex of the selected shape being dragged.
   const [shape, setShape] = useState<Shape>("rect");
   const [draftPoints, setDraftPoints] = useState<Point[]>([]);
+  const draftPointsNow = draftPoints;
   // index -1 on a depth shape is its depth line.
   // Dragging the BODY of the selected shape (select mode): where the pointer last was (2026-11-18).
   const [bodyDrag, setBodyDrag] = useState<Point | null>(null);
@@ -761,6 +762,9 @@ function SceneGeometryEditor({
   // Everything created in this session, oldest first, for Undo.
   const [history, setHistory] = useState<Selection[]>([]);
   const [cursor, setCursor] = useState<Point | null>(null);
+  // 2026-11-27 (Kilian): a free-hand shape can also be DRAWN: press, drag the outline, release (the stroke is
+  // simplified into a few points). Clicking point by point still works as before.
+  const [stroke, setStroke] = useState<Point[] | null>(null);
   const [copyStatus, setCopyStatus] = useState("");
   // MOVE SHAPES (2026-11-18): shift / scale everything drawn in this scene (optionally inside a box).
   const [moveForm, setMoveForm] = useState({ dx: "0", dy: "0", sx: "1", sy: "1", x1: "", y1: "", x2: "", y2: "" });
@@ -895,7 +899,8 @@ function SceneGeometryEditor({
 
   // Closes the free-hand shape being drawn: a red collider, or in the depth
   // mode a violet shape whose depth line starts at its lowest point.
-  const closeDraft = useCallback(() => {
+  const closeDraft = useCallback((drawn?: Point[]) => {
+    const draftPoints = drawn ?? draftPointsNow;
     if (draftPoints.length < 3 || polygonArea(draftPoints) < MIN_POLYGON_AREA) {
       return;
     }
@@ -954,7 +959,7 @@ function SceneGeometryEditor({
     ]);
     setDraftPoints([]);
     setSelection({ kind: "polygon", editorId: created.editorId });
-  }, [draftPoints, mode, onDataChange]);
+  }, [draftPointsNow, mode, onDataChange]);
 
   // Undo: while drawing it takes back the last point; otherwise it deletes
   // the most recent shape created in this session (of any kind).
@@ -1212,6 +1217,9 @@ function SceneGeometryEditor({
     event.currentTarget.setPointerCapture(event.pointerId);
     const point = toWorld(event);
     setDrag({ start: point, current: point });
+    if (((mode === "collider" && shape === "free") || mode === "occluder" || mode === "stepzone") && draftPoints.length === 0) {
+      setStroke([point]);
+    }
     // Select mode, pressing on the shape that is already selected: dragging moves it (a plain click still
     // cycles the selection, see handlePointerUp).
     if (
@@ -1258,6 +1266,11 @@ function SceneGeometryEditor({
       return;
     }
 
+    if (stroke) {
+      const last = stroke[stroke.length - 1];
+      if (Math.hypot(point.x - last.x, point.y - last.y) >= STROKE_STEP) setStroke([...stroke, point]);
+    }
+
     setDrag((current) => (current ? { ...current, current: point } : current));
   }
 
@@ -1300,7 +1313,14 @@ function SceneGeometryEditor({
 
     if ((mode === "collider" && shape === "free") || mode === "occluder" || mode === "stepzone") {
       // Free-hand: every click adds a point; a click on the first point (or
-      // Enter) closes the shape.
+      // Enter) closes the shape. A press-and-drag draws the whole outline at once.
+      const drawn = stroke;
+      setStroke(null);
+      // a closed outline ends where it began, so "it was a drag" is: some point of the stroke went far from the start
+      if (drawn && drawn.length >= 3 && drawn.some((p) => Math.hypot(p.x - drag.start.x, p.y - drag.start.y) > SPAWN_CLICK_TOLERANCE)) {
+        closeDraft(simplifyStroke([...drawn, end], STROKE_TOLERANCE));
+        return;
+      }
       if (Math.hypot(end.x - drag.start.x, end.y - drag.start.y) > SPAWN_CLICK_TOLERANCE) {
         return;
       }
@@ -1567,6 +1587,15 @@ function SceneGeometryEditor({
                   strokeWidth={isSelected("stepzone", item.editorId) ? 2 : 1}
                 />
               ))}
+              {stroke && stroke.length > 1 ? (
+                <polyline
+                  points={stroke.map((p) => `${p.x},${p.y}`).join(" ")}
+                  fill="none"
+                  vectorEffect="non-scaling-stroke"
+                  stroke={draftColor}
+                  strokeWidth={2}
+                />
+              ) : null}
               {draftPoints.length > 0 ? (
                 <>
                   <polyline
@@ -1861,8 +1890,8 @@ function SceneGeometryEditor({
         ) : null}
         {freeHand ? (
           <p className={styles.hint}>
-            Click to place points. Click the first point (white) or press Enter
-            to close the shape (3 points minimum). Backspace removes the last
+            Press and drag to draw the outline in one stroke (it closes when you release), or click to place
+            points one by one: click the first point (white) or press Enter to close the shape (3 points minimum). Backspace removes the last
             point, Esc cancels. Select a finished shape (row or click in
             rectangle mode) to drag its vertices.{" "}
             {draftPoints.length > 0 ? `${draftPoints.length} points placed.` : ""}
@@ -1870,7 +1899,7 @@ function SceneGeometryEditor({
               <button
                 type="button"
                 className={styles.copyButton}
-                onClick={closeDraft}
+                onClick={() => closeDraft()}
               >
                 Close shape
               </button>
@@ -2233,4 +2262,39 @@ export default function CollisionsDevPage() {
       )}
     </main>
   );
+}
+
+// A drawn stroke (2026-11-27): a point is added every STROKE_STEP world units while dragging; on release the line is
+// simplified (Ramer-Douglas-Peucker) so the shape keeps its outline with few, editable vertices.
+const STROKE_STEP = 3;
+const STROKE_TOLERANCE = 2;
+
+function simplifyStroke(points: Point[], tolerance: number): Point[] {
+  if (points.length <= 3) return points;
+  const distance = (p: Point, a: Point, b: Point) => {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const length = Math.hypot(dx, dy);
+    if (length === 0) return Math.hypot(p.x - a.x, p.y - a.y);
+    return Math.abs(dy * p.x - dx * p.y + b.x * a.y - b.y * a.x) / length;
+  };
+  const keep = (from: number, to: number, out: Set<number>) => {
+    let farthest = -1;
+    let max = 0;
+    for (let i = from + 1; i < to; i++) {
+      const d = distance(points[i], points[from], points[to]);
+      if (d > max) {
+        max = d;
+        farthest = i;
+      }
+    }
+    if (farthest !== -1 && max > tolerance) {
+      out.add(farthest);
+      keep(from, farthest, out);
+      keep(farthest, to, out);
+    }
+  };
+  const kept = new Set([0, points.length - 1]);
+  keep(0, points.length - 1, kept);
+  return [...kept].sort((a, b) => a - b).map((i) => ({ x: Math.round(points[i].x), y: Math.round(points[i].y) }));
 }
