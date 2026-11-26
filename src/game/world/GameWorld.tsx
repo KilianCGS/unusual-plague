@@ -2048,6 +2048,17 @@ export function GameWorld({
           onResume={() => setPauseOpen(false)}
           onControls={() => setControlsOpen(true)}
           onQuit={onQuit}
+          // 2026-11-27 (Kilian): save at any moment from the pause (the real game only; loading starts in the room)
+          onSave={autosave ? () => writeSave(createSave({
+            chapterId,
+            patients: patientsRef.current,
+            claimedRewards: claimedRewardsRef.current,
+            knownRecipeIds,
+            inventory: inventoryRef.current,
+            storage: storageRef.current,
+            collected,
+            coins: coinsRef.current,
+          })) : undefined}
         />
       ) : null}
       {controlsOpen ? (

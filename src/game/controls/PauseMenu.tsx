@@ -17,17 +17,22 @@ export function PauseMenu({
   onResume,
   onControls,
   onQuit,
+  onSave,
   controlsOpen,
 }: {
   language: Language;
   onResume: () => void;
   onControls: () => void;
   onQuit?: () => void;
+  // Saves the game now (the real game only); true when it was written.
+  onSave?: () => boolean;
   // The controls screen is on top: this menu stops listening to Esc.
   controlsOpen: boolean;
 }) {
   const copy = controlsCopy[language].pause;
   const [confirming, setConfirming] = useState(false);
+  // What the last press of "Save game" did (shown under the buttons).
+  const [saveResult, setSaveResult] = useState<"saved" | "failed" | null>(null);
 
   useEffect(() => {
     if (controlsOpen) return;
@@ -69,6 +74,16 @@ export function PauseMenu({
               <button type="button" className={styles.button} data-pause-resume onClick={onResume}>
                 {copy.resume}
               </button>
+              {onSave ? (
+                <button
+                  type="button"
+                  className={styles.button}
+                  data-pause-save
+                  onClick={() => setSaveResult(onSave() ? "saved" : "failed")}
+                >
+                  {copy.save}
+                </button>
+              ) : null}
               <button type="button" className={styles.button} data-pause-controls onClick={onControls}>
                 {copy.controls}
               </button>
@@ -78,6 +93,11 @@ export function PauseMenu({
                 </button>
               ) : null}
             </div>
+            {saveResult ? (
+              <p className={styles.warning} role="status" data-pause-save-result={saveResult}>
+                {saveResult === "saved" ? copy.saved : copy.saveFailed}
+              </p>
+            ) : null}
             </>
           )}
         </div>

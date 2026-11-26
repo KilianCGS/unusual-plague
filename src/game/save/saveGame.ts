@@ -83,7 +83,8 @@ function isInventory(value: unknown): value is InventoryState {
 export function validateSave(value: unknown): SaveGame | null {
   if (typeof value !== "object" || value === null) return null;
   const save = value as SaveGame;
-  const days = ["chapter-2", "chapter-3", "chapter-4"];
+  // 2026-11-27: Day 1 too, now that the game can be saved from the pause menu at any moment.
+  const days = ["chapter-1", "chapter-2", "chapter-3", "chapter-4"];
   if (save.version !== SAVE_VERSION || !days.includes(save.chapterId)) return null;
   if (typeof save.patients !== "object" || save.patients === null || Array.isArray(save.patients)) return null;
   if (!Object.values(save.patients).every((status) => typeof status === "string")) return null;

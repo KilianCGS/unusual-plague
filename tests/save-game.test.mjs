@@ -64,7 +64,9 @@ test("broken, foreign or tampered texts are refused", () => {
   const text = save.saveToText(good);
   for (const bad of ["", "hello", "UP1:", "UP1:!!!", text.slice(0, -6), "UP2:" + text.slice(4)]) assert.equal(save.saveFromText(bad), null, bad);
   const enc = (o) => "UP1:" + Buffer.from(JSON.stringify(o)).toString("base64");
-  assert.equal(save.saveFromText(enc({ ...good, chapterId: "chapter-1" })), null, "Day 1 is never saved");
+  // 2026-11-27: Day 1 can be saved from the pause menu; an unknown day cannot
+  assert.equal(save.saveFromText(enc({ ...good, chapterId: "chapter-1" })).chapterId, "chapter-1");
+  assert.equal(save.saveFromText(enc({ ...good, chapterId: "chapter-9" })), null, "an unknown day is refused");
   assert.equal(save.saveFromText(enc({ ...good, coins: -4 })), null);
   assert.equal(save.saveFromText(enc({ ...good, version: 9 })), null);
   assert.equal(save.saveFromText(enc({ ...good, inventory: { capacity: 3, slots: [null] } })), null);
@@ -108,6 +110,13 @@ test("a chest that cannot hand its extra things to the case keeps the places it 
   const back = save.saveFromText(save.saveToText(legacy));
   assert.equal(inv.countOccupiedSlots(back.storage), 15);
   assert.equal(back.storage.capacity, 15);
+});
+
+test("the pause menu saves the game at any moment (the real game only)", () => {
+  const menu = fs.readFileSync(path.join(root, "src/game/controls/PauseMenu.tsx"), "utf8");
+  assert.ok(menu.includes("data-pause-save") && menu.includes("onSave()"));
+  const game = fs.readFileSync(path.join(root, "src/game/world/GameWorld.tsx"), "utf8");
+  assert.ok(game.includes("onSave={autosave ? () => writeSave(createSave({"));
 });
 
 console.log(`\n${passed} tests passed`);

@@ -25,6 +25,10 @@ type ControlsCopy = {
     quitWarning: string;
     quitConfirm: string;
     quitCancel: string;
+    // 2026-11-27: save the game from the pause menu.
+    save: string;
+    saved: string;
+    saveFailed: string;
   };
 };
 
@@ -60,9 +64,12 @@ export const controlsCopy: Record<Language, ControlsCopy> = {
       resume: "Continuar",
       controls: "Controles",
       quit: "Volver al título",
-      quitWarning: "Se perderá el progreso de esta partida (todavía no se guarda).",
+      quitWarning: "Se perderá lo que hayas hecho desde la última vez que guardaste.",
       quitConfirm: "Sí, salir",
       quitCancel: "No, seguir",
+      save: "Guardar partida",
+      saved: "Partida guardada. Al cargarla empezarás en tu habitación.",
+      saveFailed: "No se ha podido guardar en este navegador.",
     },
   },
   en: {
@@ -96,9 +103,12 @@ export const controlsCopy: Record<Language, ControlsCopy> = {
       resume: "Resume",
       controls: "Controls",
       quit: "Back to title",
-      quitWarning: "This game's progress will be lost (saving does not exist yet).",
+      quitWarning: "Anything done since you last saved will be lost.",
       quitConfirm: "Yes, quit",
       quitCancel: "No, keep playing",
+      save: "Save game",
+      saved: "Game saved. Loading it starts you in your room.",
+      saveFailed: "The game could not be saved in this browser.",
     },
   },
 };
