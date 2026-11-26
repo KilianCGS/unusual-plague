@@ -15,13 +15,13 @@ export const briefcaseCopy: Record<Language, BriefcaseCopy> = {
     emptySlot: "Hueco vacío",
     hint: "Arrastra para ordenar · {key} o Esc para cerrar",
     open: "Abrir el maletín",
-    chip: "Maletín · {free} libres",
+    chip: "Abrir maletín",
   },
   en: {
-    title: "Case",
+    title: "Bag",
     emptySlot: "Empty slot",
     hint: "Drag to sort · {key} or Esc to close",
-    open: "Open the case",
-    chip: "Case · {free} free",
+    open: "Open the bag",
+    chip: "Open bag",
   },
 };

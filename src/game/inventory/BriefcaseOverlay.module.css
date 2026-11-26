@@ -49,34 +49,36 @@
   min-height: 0;
   padding: 0;
   font-family: var(--ui-font);
-  color: #f4ead5;
-  background: rgba(22, 10, 8, 0.62);
-  border: 2px solid rgba(214, 170, 110, 0.5);
+  color: #2b1a14;
+  /* 2026-11-25 (Kilian): cream places, like the parchment of the other windows */
+  background: rgba(233, 219, 185, 0.9);
+  border: 2px solid #8a6a4a;
   border-radius: 4px;
   cursor: default;
 }
 
 .slot[data-occupied="true"] {
   cursor: grab;
-  background: rgba(40, 20, 14, 0.72);
+  background: rgba(240, 226, 192, 0.96);
 }
 
 .slot:hover,
 .slot:focus-visible {
   z-index: 2;
-  border-color: #f0cf8a;
+  background: rgba(248, 237, 208, 0.98);
+  border-color: #2b1a14;
   outline: none;
 }
 
 /* The place being dragged from, and the one it would land on. */
 .slot[data-picked="true"] {
-  border-color: #ffd60a;
-  box-shadow: 0 0 0 2px rgba(255, 214, 10, 0.45);
+  border-color: #d99a00;
+  box-shadow: 0 0 0 3px rgba(255, 214, 10, 0.6);
 }
 
 .slot[data-over="true"] {
-  border-color: #9fe39f;
-  background: rgba(60, 100, 60, 0.55);
+  border-color: #3f8f3f;
+  background: rgba(190, 228, 170, 0.97);
 }
 
 .slot .itemIcon {
@@ -102,8 +104,8 @@
   bottom: 2px;
   font-size: clamp(11px, 1.6vw, 20px);
   font-weight: 700;
-  color: #fff4d2;
-  text-shadow: 1px 1px 0 #1c110c, -1px 1px 0 #1c110c, 1px -1px 0 #1c110c, -1px -1px 0 #1c110c;
+  color: #2b1a14;
+  text-shadow: 1px 1px 0 #f6ecd0, -1px 1px 0 #f6ecd0, 1px -1px 0 #f6ecd0, -1px -1px 0 #f6ecd0;
 }
 
 .hint {

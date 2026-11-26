@@ -70,8 +70,8 @@ export const tutorialCopy: Record<
       body: "Podrás volver a abrirlo siempre que lo necesites.",
     },
     map: {
-      title: ["Mantén ", { action: "map" }, " para consultar el mapa."],
-      body: "Te mostrará dónde estás y te ayudará a orientarte por la ciudad.",
+      title: ["Pulsa ", { action: "map" }, " para abrir el mapa."],
+      body: "Te muestra dónde estás. Un ! amarillo marca un lugar con un paciente por tratar; uno azul, un recado pendiente. Pulsa {map} otra vez o Esc para cerrarlo.",
     },
     move: {
       title: ["Usa ", { move: 0 }, " o ", { move: 1 }, " para moverte."],
@@ -159,8 +159,8 @@ export const tutorialCopy: Record<
       body: "You can open it again whenever you need it.",
     },
     map: {
-      title: ["Hold ", { action: "map" }, " to check the map."],
-      body: "It shows where you are and helps you find your way around town.",
+      title: ["Press ", { action: "map" }, " to open the map."],
+      body: "It shows where you are. A yellow ! marks a place with a patient to treat; a blue one, a pending errand. Press {map} again or Esc to close it.",
     },
     move: {
       title: ["Use ", { move: 0 }, " or ", { move: 1 }, " to move."],
@@ -179,11 +179,11 @@ export const tutorialCopy: Record<
       body: "You will need it to collect samples.",
     },
     bar: {
-      title: ["Your case and your money."],
-      body: "The button below opens your case, what you carry: 15 slots, so choose wisely.\nThe coins, bottom right, are for buying ingredients from the merchants.",
+      title: ["Your bag and your money."],
+      body: "The button below opens your bag, what you carry: 15 slots, so choose wisely.\nThe coins, bottom right, are for buying ingredients from the merchants.",
     },
     eye: {
-      title: ["Open the case with {inventory}."],
+      title: ["Open the bag with {inventory}."],
       body: "It opens and closes with {inventory} (Esc closes it too). Drag objects to sort them any way you like: nothing else changes.",
     },
     "exit-room": {

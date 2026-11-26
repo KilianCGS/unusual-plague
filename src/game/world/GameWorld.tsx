@@ -102,7 +102,7 @@ import { runBarkLines } from "../i18n/runBarks";
 import { ControlsPanel } from "../controls/ControlsPanel";
 import { PauseMenu } from "../controls/PauseMenu";
 import { BriefcaseChip, BriefcaseOverlay } from "../inventory/BriefcaseOverlay";
-import { countOccupiedSlots, moveSlot } from "../inventory/inventory";
+import { moveSlot } from "../inventory/inventory";
 import { useInventoryHotkey } from "../inventory/useInventoryHotkey";
 import { useBindings } from "../controls/controlsStore";
 import { keyLabel } from "../controls/keybindings";
@@ -125,7 +125,8 @@ import {
 import { getChapterTreatments, getPatientMissingIngredients } from "../patients/patientNeeds";
 import { getCraftingTargets } from "../crafting/needs";
 import { SCENE_TO_MAP_LOCATION } from "../map/mapLocations";
-import { useMapHold } from "../map/useMapHold";
+import { getMapMarkers } from "../map/mapMarkers";
+import { useMapToggle } from "../map/useMapToggle";
 import { useDirectionInput } from "../protagonist/useDirectionInput";
 import { NarrativeInterlude } from "../narrative/NarrativeInterlude";
 import { getLockedDoorNotice } from "./lockedDoors";
@@ -282,7 +283,8 @@ export function GameWorld({
   const [craftingStation, setCraftingStation] = useState<CraftStation | null>(
     null,
   );
-  const mapHeld = useMapHold();
+  // The map is opened and closed with its key (M by default).
+  const [mapOpen, setMapOpen] = useState(false);
   // STORY STATE (session only). The status of each patient case is the only
   // thing stored about a case; "can he be treated", the ticks in the Book and
   // the "!" over the baker are derived from it and the inventory. The recipes
@@ -409,7 +411,10 @@ export function GameWorld({
     openShop === null &&
     !pauseOpen &&
     !inNarrativeScene;
-  const mapVisible = mapHeld && canOpenInterface && !bookOpen;
+  const mapVisible = mapOpen && canOpenInterface && !bookOpen;
+  // Anything that takes the screen closes the map for good (it does not come back by itself afterwards).
+  if (mapOpen && !(canOpenInterface && !bookOpen)) setMapOpen(false);
+  useMapToggle({ open: mapOpen, canOpen: canOpenInterface && !bookOpen, setOpen: setMapOpen });
   const pendingRef = useRef<{
     sceneId: SceneId;
     spawnName: string;
@@ -1718,7 +1723,6 @@ export function GameWorld({
           <BriefcaseChip
             language={language}
             keyLabel={keyLabel(bindings.inventory[0], language)}
-            freeSlots={inventory.capacity - countOccupiedSlots(inventory)}
             onOpen={() => setInventoryOpen(true)}
           />
         </HudScale>
@@ -1913,7 +1917,11 @@ export function GameWorld({
           onChoose={chooseDiagnosis} onConsult={consultDiagnosis} />
       ) : null}
       {mapVisible ? (
-        <MapOverlay currentLocationId={SCENE_TO_MAP_LOCATION[world.sceneId]} language={language} />
+        <MapOverlay
+          currentLocationId={SCENE_TO_MAP_LOCATION[world.sceneId]}
+          language={language}
+          markers={getMapMarkers(patients, claimedRewards, chapterId)}
+        />
       ) : null}
       {craftingStation ? (
         <CraftingOverlay

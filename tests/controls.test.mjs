@@ -29,14 +29,14 @@ const test = (name, fn) => {
   console.log("ok -", name);
 };
 
-test("the default is WASD with the arrows as the alternative, E, Space, Q, Tab and R", () => {
+test("the default is WASD with the arrows as the alternative, E, Space, Q, M and R", () => {
   const b = kb.defaultBindings();
   assert.deepEqual(b.up, ["w", "ArrowUp"]);
   assert.deepEqual(b.left, ["a", "ArrowLeft"]);
   assert.deepEqual(b.interact, ["e"]);
   assert.deepEqual(b.run, ["Space"]);
   assert.deepEqual(b.book, ["q"]);
-  assert.deepEqual(b.map, ["Tab"]);
+  assert.deepEqual(b.map, ["m"]);
   assert.deepEqual(b.objectives, ["r"]);
   assert.equal(kb.presetOf(b), "wasd");
 });
@@ -114,7 +114,7 @@ test("every handler reads the bindings; no fixed movement / book / map / interac
   const checks = [
     ["src/game/protagonist/useDirectionInput.ts", ['matchesAction(getBindings(), "run"', "directionOfKey(getBindings()"]],
     ["src/game/book/useBookHotkeys.ts", ['matchesAction(getBindings(), "book"']],
-    ["src/game/map/useMapHold.ts", ['matchesAction(getBindings(), "map"']],
+    ["src/game/map/useMapToggle.ts", ['matchesAction(getBindings(), "map"']],
     ["src/game/interactions/useInteraction.ts", ['matchesAction(getBindings(), "interact"']],
     ["src/game/objectives/ObjectivesPanel.tsx", ['matchesAction(getBindings(), "objectives"']],
   ];
@@ -122,7 +122,7 @@ test("every handler reads the bindings; no fixed movement / book / map / interac
     const src = read(file);
     for (const needle of needles) assert.ok(src.includes(needle), `${file}: ${needle}`);
   }
-  assert.ok(!/event\.key === "(q|Q|e|E|r|R|Tab)"/.test(read("src/game/book/useBookHotkeys.ts") + read("src/game/map/useMapHold.ts") + read("src/game/interactions/useInteraction.ts")));
+  assert.ok(!/event\.key === "(q|Q|e|E|r|R|Tab)"/.test(read("src/game/book/useBookHotkeys.ts") + read("src/game/map/useMapToggle.ts") + read("src/game/interactions/useInteraction.ts")));
   assert.ok(!/directionKeys\b/.test(read("src/game/protagonist/useDirectionInput.ts")));
 });
 

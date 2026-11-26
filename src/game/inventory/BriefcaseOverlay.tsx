@@ -122,12 +122,10 @@ export function BriefcaseOverlay({
 export function BriefcaseChip({
   language,
   keyLabel,
-  freeSlots,
   onOpen,
 }: {
   language: Language;
   keyLabel: string;
-  freeSlots: number;
   onOpen: () => void;
 }) {
   const copy = briefcaseCopy[language];
@@ -143,7 +141,7 @@ export function BriefcaseChip({
       onClick={onOpen}
     >
       <span className={styles.chipKey}>{keyLabel}</span>
-      <span>{copy.chip.replace("{free}", String(freeSlots))}</span>
+      <span>{copy.chip}</span>
     </button>
   );
 }
