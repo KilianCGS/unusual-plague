@@ -253,8 +253,9 @@ test("all twenty-three preparations occupy one localized leaf each, two per open
     .map(({ recipe }) => recipe);
   for (const language of ["es", "en"]) {
     const preparations = buildBookSections(context(language, {}, known)).find((s) => s.id === "preparations");
-    assert.equal(preparations.spreads.length, 12);
-    preparations.spreads.forEach((spread, index) => {
+    assert.equal(preparations.spreads.length, 13, "the index, then 12 openings");
+    assert.equal(preparations.spreads[0].id, "preparations-index");
+    preparations.spreads.slice(1).forEach((spread, index) => {
       const recipes = ordered.slice(index * 2, index * 2 + 2);
       assert.equal(spread.layers.length, 1 + recipes.length);
       recipes.forEach((recipe, side) => {

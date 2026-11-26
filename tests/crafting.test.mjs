@@ -855,7 +855,7 @@ test("knowing a chained recipe reveals intermediate preparation pages without re
   const {buildPreparationSpreads}=at("src/game/book/dynamicPages.ts");
   for(const language of ['es','en']){
     const spreads=buildPreparationSpreads({language,patients:{},inventory:stock([]),knownRecipeIds:known});
-    assert.equal(spreads.length,1, 'two known preparations share an opening, one per leaf');
+    assert.equal(spreads.length,2, 'the index, then two known preparations share an opening, one per leaf');
     assert.ok(spreads.some(s=>s.texts.some(t=>t.id==='manual.medicinal-compress-steps')));
   }
 });
@@ -892,11 +892,11 @@ test("Book recipe availability tracks carried stock without deleting learned rec
   const {buildPreparationSpreads}=at("src/game/book/dynamicPages.ts");
   for(const language of ['es','en']){
     const context={language,patients:{},inventory:stock([['water',1],['mint',1]]),knownRecipeIds:new Set(['fire.mint-infusion'])};
-    const availability=ctx=>buildPreparationSpreads(ctx)[0].texts.find(t=>t.id==='fire.mint-infusion-availability').content[0];
+    const availability=ctx=>buildPreparationSpreads(ctx)[1].texts.find(t=>t.id==='fire.mint-infusion-availability').content[0];
     assert.match(availability(context),language==='es'?/disponibles/:/available/);
     const spent={...context,inventory:stock([])};
     assert.match(availability(spent),language==='es'?/Faltan/:/missing/);
-    assert.ok(buildPreparationSpreads(spent)[0].texts.some(t=>t.id==='fire.mint-infusion-name'));
+    assert.ok(buildPreparationSpreads(spent)[1].texts.some(t=>t.id==='fire.mint-infusion-name'));
     assert.ok(at('src/game/i18n/recipeDiscovery.ts').recipeDiscoveryCopy[language].includes('(Q)'));
   }
 });

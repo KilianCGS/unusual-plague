@@ -136,6 +136,23 @@
   line-height: 14px;
 }
 
+/* A link of the index (and the way back to it): a text that can be clicked (2026-11-27). */
+.link {
+  padding: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.link:hover,
+.link:focus-visible {
+  color: #8c2a1f;
+  text-decoration: underline;
+  outline: none;
+}
+
 /* Preparations named inside a text. */
 .emphasis {
   font-style: italic;

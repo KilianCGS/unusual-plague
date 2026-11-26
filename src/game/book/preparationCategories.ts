@@ -1,65 +1,48 @@
 import type { Language } from "../i18n/types";
 
-// THE CATEGORIES OF PREPARADOS (2026-11-27, Kilian): the known recipes are shown grouped, in this order, and every page
-// says which group it belongs to. Every recipe of crafting/recipes.ts must have one (a test checks it).
-export type PreparationCategory =
-  | "bases"
-  | "crushed"
-  | "cloth"
-  | "syrups"
-  | "infusions"
-  | "broths"
-  | "complex";
+// THE GROUPS OF PREPARADOS (2026-11-27, Kilian): each remedy belongs to the group of the ingredient that rules it. The
+// known remedies are shown in this order, every page says its group, and the first page of the section is an index of
+// the groups. Every recipe of crafting/recipes.ts must have one (a test checks it).
+export type PreparationCategory = "herbs" | "liquids" | "naturals" | "others";
 
-export const PREPARATION_CATEGORY_ORDER: readonly PreparationCategory[] = [
-  "bases",
-  "crushed",
-  "cloth",
-  "syrups",
-  "infusions",
-  "broths",
-  "complex",
-];
+export const PREPARATION_CATEGORY_ORDER: readonly PreparationCategory[] = ["herbs", "liquids", "naturals", "others"];
 
 export const PREPARATION_CATEGORY_NAMES: Record<PreparationCategory, Record<Language, string>> = {
-  bases: { es: "Bases", en: "Bases" },
-  crushed: { es: "Triturados y troceados", en: "Crushed and chopped" },
-  cloth: { es: "Preparados con tela", en: "Cloth remedies" },
-  syrups: { es: "Jarabes", en: "Syrups" },
-  infusions: { es: "Infusiones", en: "Infusions" },
-  broths: { es: "Caldos y bebidas", en: "Broths and drinks" },
-  complex: { es: "Preparaciones complejas", en: "Complex preparations" },
+  herbs: { es: "Hierbas y vegetales", en: "Herbs and vegetables" },
+  liquids: { es: "Líquidos", en: "Liquids" },
+  naturals: { es: "Especias y naturales", en: "Spices and naturals" },
+  others: { es: "Otros", en: "Others" },
 };
 
-// The category of each preparation (by the item it makes).
+// The group of each remedy (by the item it makes).
 export const PREPARATION_CATEGORY: Readonly<Record<string, PreparationCategory>> = {
-  syrup: "bases",
-  "ointment-base": "bases",
-  "medicinal-paste": "bases",
-  "crushed-coal": "crushed",
-  "crushed-herb": "crushed",
-  "crushed-garlic": "crushed",
-  "chopped-onion": "crushed",
-  "chopped-mushroom": "crushed",
-  "disinfected-bandage": "cloth",
-  "cold-cloth": "cloth",
-  "medicinal-compress": "cloth",
-  "balsamic-syrup": "syrups",
-  "onion-syrup": "syrups",
-  "medicinal-infusion": "infusions",
-  "mint-infusion": "infusions",
-  "mushroom-soup": "broths",
-  "milk-with-honey": "broths",
-  "bone-broth": "broths",
-  "strong-broth": "broths",
-  "citrus-drink": "broths",
-  "rehydration-drink": "broths",
-  "medicinal-ointment": "complex",
-  poultice: "complex",
-  "charcoal-suspension": "complex",
+  "crushed-herb": "herbs",
+  "medicinal-infusion": "herbs",
+  "mint-infusion": "herbs",
+  "medicinal-paste": "herbs",
+  "chopped-onion": "herbs",
+  "chopped-mushroom": "herbs",
+  "mushroom-soup": "herbs",
+  "crushed-garlic": "herbs",
+  "citrus-drink": "herbs",
+  syrup: "liquids",
+  "balsamic-syrup": "liquids",
+  "onion-syrup": "liquids",
+  "rehydration-drink": "liquids",
+  "milk-with-honey": "liquids",
+  "bone-broth": "liquids",
+  "strong-broth": "liquids",
+  "charcoal-suspension": "liquids",
+  "ointment-base": "naturals",
+  "medicinal-ointment": "naturals",
+  poultice: "naturals",
+  "disinfected-bandage": "others",
+  "cold-cloth": "others",
+  "medicinal-compress": "others",
+  "crushed-coal": "others",
 };
 
-// The position of a preparation in the book: its category first (an unknown one goes last), then nothing else changes.
+// The position of a remedy in the book: its group first (an unknown one goes last).
 export function preparationCategoryRank(itemId: string): number {
   const category = PREPARATION_CATEGORY[itemId];
   return category ? PREPARATION_CATEGORY_ORDER.indexOf(category) : PREPARATION_CATEGORY_ORDER.length;

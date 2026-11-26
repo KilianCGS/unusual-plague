@@ -166,7 +166,16 @@ export function BookOverlay({
         >
           {isOpen ? (
             <>
-              <SpreadView spread={spread} />
+              <SpreadView
+                spread={spread}
+                onLink={(target) => {
+                  const next = section.spreads.findIndex(({ id }) => id === target);
+                  if (next < 0 || next === spreadIndex) return;
+                  setSpreadIndex(next);
+                  playSound("ui.pageTurn");
+                  onPageChange?.();
+                }}
+              />
               {hasPrevious ? (
                 <button
                   type="button"
@@ -237,7 +246,7 @@ export function BookOverlay({
   );
 }
 
-function SpreadView({ spread }: { spread: BookSpread }) {
+function SpreadView({ spread, onLink }: { spread: BookSpread; onLink: (target: string) => void }) {
   return (
     <div className={styles.spread} data-spread={spread.id}>
       {spread.layers.map((layer) => (
@@ -258,28 +267,41 @@ function SpreadView({ spread }: { spread: BookSpread }) {
           }}
         />
       ))}
-      {spread.texts?.map((block) => (
-        <p
-          key={block.id}
-          className={`${styles.text} ${styles[block.role]}${block.tone ? ` ${styles[block.tone]}` : ""}`}
-          style={{
-            left: block.x,
-            top: BOOK_TOP + block.y,
-            width: block.width,
-            textAlign: block.align ?? "left",
-          }}
-        >
-          {block.content.map((fragment, index) =>
-            typeof fragment === "string" ? (
-              fragment
-            ) : (
-              <em key={index} className={styles.emphasis}>
-                {fragment.emphasis}
-              </em>
-            ),
-          )}
-        </p>
-      ))}
+      {spread.texts?.map((block) => {
+        const className = `${styles.text} ${styles[block.role]}${block.tone ? ` ${styles[block.tone]}` : ""}${block.link ? ` ${styles.link}` : ""}`;
+        const style = {
+          left: block.x,
+          top: BOOK_TOP + block.y,
+          width: block.width,
+          textAlign: block.align ?? "left",
+        } as const;
+        const content = block.content.map((fragment, index) =>
+          typeof fragment === "string" ? (
+            fragment
+          ) : (
+            <em key={index} className={styles.emphasis}>
+              {fragment.emphasis}
+            </em>
+          ),
+        );
+
+        return block.link ? (
+          <button
+            key={block.id}
+            type="button"
+            className={className}
+            style={style}
+            data-book-link={block.link}
+            onClick={() => onLink(block.link!)}
+          >
+            {content}
+          </button>
+        ) : (
+          <p key={block.id} className={className} style={style}>
+            {content}
+          </p>
+        );
+      })}
     </div>
   );
 }

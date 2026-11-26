@@ -14,7 +14,7 @@ import type { BookTextBlock } from "./bookText";
 import { PREPARATION_DESCRIPTIONS, getPreparationUse } from "./preparations";
 import { DIAGNOSIS_SYMPTOMS } from "../patients/diagnosis";
 import { PATIENT_IDS_BY_CHAPTER } from "../patients/chapterPatients";
-import { PREPARATION_CATEGORY, PREPARATION_CATEGORY_NAMES, preparationCategoryRank } from "./preparationCategories";
+import { PREPARATION_CATEGORY, PREPARATION_CATEGORY_NAMES, preparationCategoryRank, type PreparationCategory } from "./preparationCategories";
 
 // The PACIENTES and PREPARADOS pages are not fixed content: they are drawn from
 // the patient cases, the inventory and the recipes the Doctor knows. Nothing
@@ -189,6 +189,16 @@ export function buildPatientSpreads(context: BookContext): BookSpread[] {
 // description overlapped the title: everything under the title sits a bit lower on their pages (and only theirs).
 const LONG_TITLE_DROP: Readonly<Record<string, number>> = { "crushed-herb": 16, "crushed-coal": 16 };
 
+// How many lines a text takes in a column of a preparation's leaf (Patrick Hand: about 41 characters a line at 14 px,
+// 48 at 12 px). An estimate on the safe side, only used to stack the texts.
+function estimateLines(content: string, role: "preparationBody" | "preparationNote"): number {
+  const perLine = role === "preparationBody" ? 40 : 47;
+  return Math.max(1, Math.ceil(content.length / perLine));
+}
+
+// Where the texts of a leaf must end (the lower edge of the written area of the page).
+const PAGE_TEXT_BOTTOM = 358;
+
 // One known preparation per physical leaf, two per opening.
 export function buildPreparationSpreads(context: BookContext): BookSpread[] {
   const { language, knownRecipeIds } = context;
@@ -204,7 +214,7 @@ export function buildPreparationSpreads(context: BookContext): BookSpread[] {
     return [emptySpread("preparations-empty", copy.noRecipes.title, copy.noRecipes.note)];
   }
 
-  const spreads: BookSpread[] = [];
+  const spreads: BookSpread[] = [buildPreparationIndex(known.map((recipe) => recipe.output.itemId), language)];
   for (let start = 0; start < known.length; start += 2) {
     const texts: BookTextBlock[] = [];
     const layers: BookSpread["layers"] = [PLAIN_BASE_LAYER];
@@ -230,32 +240,85 @@ export function buildPreparationSpreads(context: BookContext): BookSpread[] {
         blend: "multiply",
         alt: getItemName(recipe.output.itemId, language),
       });
+      if (side === 0) {
+        texts.push({ ...text(`${recipe.id}-to-index`, "preparationNote", { x: LEFT.x - 14, width: 70 }, 17,
+          language === "es" ? "← Índice" : "← Index"), link: PREPARATION_INDEX_ID });
+      }
       const category = PREPARATION_CATEGORY[recipe.output.itemId];
       if (category) {
         texts.push(text(`${recipe.id}-category`, "preparationNote", column, 17,
           PREPARATION_CATEGORY_NAMES[category][language].toUpperCase(), "center"));
       }
+      // 2026-11-27: the texts under the title FLOW (each one below the last, by its estimated number of lines) instead
+      // of sitting at fixed heights, so a long description never runs over the next line (Carbón triturado did).
+      const description = PREPARATION_DESCRIPTIONS[recipe.output.itemId]?.[language] ?? "";
+      const use = getPreparationUse(recipe.output.itemId, language);
+      const steps = intermediates.length
+        ? `${language === "es" ? "Preparar antes" : "Prepare first"}: ${intermediates.map(input => getItemName(input.itemId, language)).join(", ")}.`
+        : null;
+      const parts: [string, "preparationBody" | "preparationNote", string, number][] = [
+        ["description", "preparationBody", description, 6],
+        ["use", "preparationBody", use, 8],
+        ["inputs", "preparationNote", ingredients, steps ? 4 : 8],
+        ...(steps ? [["steps", "preparationNote", steps, 4] as [string, "preparationNote", string, number]] : []),
+        ["station", "preparationNote", `${copy.station}: ${copy.stations[recipe.station]}`, 2],
+        ["availability", "preparationNote", ingredientsReady
+          ? (language === "es" ? "Ingredientes disponibles en el maletín." : "Ingredients available in your bag.")
+          : (language === "es" ? "Faltan ingredientes en el maletín." : "Some ingredients are missing from your bag."), 0],
+      ];
+      const height = (role: "preparationBody" | "preparationNote", content: string) =>
+        estimateLines(content, role) * (role === "preparationBody" ? 16 : 14);
+      const total = parts.reduce((sum, [, role, content, gap]) => sum + height(role, content) + gap, 0);
+      // a long leaf starts a little higher (never more than 20 units) so it still ends on the page
+      let y = 190 + drop - Math.min(20, Math.max(0, 190 + drop + total - PAGE_TEXT_BOTTOM));
       texts.push(
         text(`${recipe.id}-name`, "preparationTitle", column, 144,
           getItemName(recipe.output.itemId, language).toUpperCase(), "center"),
-        text(`${recipe.id}-description`, "preparationBody", column, 190 + drop,
-          PREPARATION_DESCRIPTIONS[recipe.output.itemId]?.[language] ?? ""),
-        text(`${recipe.id}-use`, "preparationBody", column, 228 + drop,
-          getPreparationUse(recipe.output.itemId, language)),
-        text(`${recipe.id}-inputs`, "preparationNote", column, 266 + drop, ingredients),
-        text(`${recipe.id}-station`, "preparationNote", column, 316 + drop,
-          `${copy.station}: ${copy.stations[recipe.station]}`),
-        text(`${recipe.id}-availability`, "preparationNote", column, 334 + Math.min(drop, 10),
-          ingredientsReady
-            ? (language === "es" ? "Ingredientes disponibles en el maletín." : "Ingredients available in your bag.")
-            : (language === "es" ? "Faltan ingredientes en el maletín." : "Some ingredients are missing from your bag.")),
       );
-      if (intermediates.length) {
-        texts.push(text(`${recipe.id}-steps`, "preparationNote", column, 298 + drop,
-          `${language === "es" ? "Preparar antes" : "Prepare first"}: ${intermediates.map(input => getItemName(input.itemId, language)).join(", ")}.`));
+      for (const [id, role, content, gap] of parts) {
+        texts.push(text(`${recipe.id}-${id}`, role, column, y, content));
+        y += height(role, content) + gap;
       }
     });
     spreads.push({ id: `preparations-${start / 2 + 1}`, layers, texts });
   }
   return spreads;
+}
+
+// THE INDEX OF PREPARADOS (2026-11-27, Kilian): the first spread of the section lists the four groups and, under each,
+// the remedies the Doctor knows; a click on one turns to its page (two remedies per spread, after the index).
+export const PREPARATION_INDEX_ID = "preparations-index";
+const INDEX_LINE = 17;
+
+function buildPreparationIndex(knownOutputs: readonly string[], language: Language): BookSpread {
+  const texts: BookTextBlock[] = [
+    text("index-title", "heading", LEFT, 22, language === "es" ? "ÍNDICE" : "INDEX", "center"),
+  ];
+  // left page: herbs, then spices and naturals; right page: liquids, then the others
+  const pages: [PreparationCategory[], { x: number; width: number }, number][] = [
+    [["herbs", "naturals"], LEFT, 56],
+    [["liquids", "others"], RIGHT, 56],
+  ];
+  for (const [groups, column, top] of pages) {
+    let y = top;
+    for (const group of groups) {
+      texts.push(text(`index-${group}`, "preparationTitle", column, y, PREPARATION_CATEGORY_NAMES[group][language].toUpperCase()));
+      y += 24;
+      const outputs = knownOutputs.filter((itemId) => PREPARATION_CATEGORY[itemId] === group);
+      if (outputs.length === 0) {
+        texts.push(text(`index-${group}-none`, "preparationNote", column, y, language === "es" ? "Aún ninguno." : "None yet."));
+        y += INDEX_LINE;
+      }
+      for (const itemId of outputs) {
+        const position = knownOutputs.indexOf(itemId);
+        texts.push({
+          ...text(`index-${itemId}`, "preparationBody", column, y, `· ${getItemName(itemId, language)}`),
+          link: `preparations-${Math.floor(position / 2) + 1}`,
+        });
+        y += INDEX_LINE;
+      }
+      y += 14;
+    }
+  }
+  return { id: PREPARATION_INDEX_ID, layers: [PLAIN_BASE_LAYER], texts };
 }

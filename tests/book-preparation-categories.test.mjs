@@ -56,8 +56,55 @@ test("the leaves are grouped by category, in the order of the categories", () =>
 
 test("a leaf says its category in English too", () => {
   const ctx = { language: "en", patients: {}, inventory: inv.createEmptyInventory(), knownRecipeIds: new Set(["fire.mint-infusion"]) };
-  const label = buildPreparationSpreads(ctx)[0].texts.find((t) => t.id === "fire.mint-infusion-category").content[0];
-  assert.equal(label, "INFUSIONS");
+  const label = buildPreparationSpreads(ctx)[1].texts.find((t) => t.id === "fire.mint-infusion-category").content[0];
+  assert.equal(label, "HERBS AND VEGETABLES");
+});
+
+test("the first spread is the index: the four groups and the known remedies, each a link to its own page", () => {
+  const known = new Set(RECIPES.map((r) => r.id));
+  const ctx = { language: "es", patients: {}, inventory: inv.createEmptyInventory(), knownRecipeIds: known };
+  const spreads = buildPreparationSpreads(ctx);
+  const index = spreads[0];
+  assert.equal(index.id, "preparations-index");
+  for (const group of cats.PREPARATION_CATEGORY_ORDER) assert.ok(index.texts.some((t) => t.id === `index-${group}`), group);
+  const links = index.texts.filter((t) => t.link);
+  assert.equal(links.length, RECIPES.length, "one link per known remedy");
+  for (const link of links) {
+    const itemId = link.id.replace("index-", "");
+    const target = spreads.find((s) => s.id === link.link);
+    assert.ok(target, link.link);
+    assert.ok(target.layers.some((l) => l.src.endsWith(`/${itemId}.png`)), `${itemId} is on ${link.link}`);
+  }
+  // every page leads back to the index
+  for (const spread of spreads.slice(1)) assert.ok(spread.texts.some((t) => t.link === "preparations-index"), spread.id);
+});
+
+test("only what is known is listed; an empty group says so", () => {
+  const ctx = { language: "en", patients: {}, inventory: inv.createEmptyInventory(), knownRecipeIds: new Set(["fire.mint-infusion"]) };
+  const index = buildPreparationSpreads(ctx)[0];
+  assert.deepEqual(index.texts.filter((t) => t.link).map((t) => t.id), ["index-mint-infusion"]);
+  assert.ok(index.texts.some((t) => t.id === "index-liquids-none" && t.content[0] === "None yet."));
+});
+
+test("the book turns to a link's page when it is clicked", () => {
+  const overlay = fs.readFileSync(path.join(root, "src/game/book/BookOverlay.tsx"), "utf8");
+  assert.ok(overlay.includes("data-book-link") && overlay.includes("onLink("));
+});
+
+test("the texts of a leaf never overlap and never run off the page, in both languages", () => {
+  for (const language of ["es", "en"]) {
+    const ctx = { language, patients: {}, inventory: inv.createEmptyInventory(), knownRecipeIds: new Set(RECIPES.map((r) => r.id)) };
+    for (const spread of buildPreparationSpreads(ctx).slice(1)) {
+      for (const recipe of RECIPES) {
+        const order = ["description", "use", "inputs", "steps", "station", "availability"]
+          .map((part) => spread.texts.find((t) => t.id === `${recipe.id}-${part}`))
+          .filter(Boolean);
+        if (order.length === 0) continue;
+        for (let i = 1; i < order.length; i++) assert.ok(order[i].y > order[i - 1].y, `${language} ${recipe.id}: ${order[i].id}`);
+        assert.ok(order.at(-1).y + 14 <= 358, `${language} ${recipe.id} ends at ${order.at(-1).y + 14}`);
+      }
+    }
+  }
 });
 
 console.log(`\n${passed} tests passed`);

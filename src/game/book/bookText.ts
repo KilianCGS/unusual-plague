@@ -22,5 +22,7 @@ export type BookTextBlock = {
   align?: "left" | "center";
   // "good": drawn in green (a treated patient, an ingredient the Doctor has); "bad": in red (none of it).
   tone?: "good" | "bad";
+  // A link: clicking the text turns to the spread with this id in the same section (the index of PREPARADOS).
+  link?: string;
   content: RichText;
 };
