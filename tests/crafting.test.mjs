@@ -896,7 +896,7 @@ test("Book recipe availability tracks carried stock without deleting learned rec
     assert.match(availability(context),language==='es'?/disponibles/:/available/);
     const spent={...context,inventory:stock([])};
     assert.match(availability(spent),language==='es'?/Faltan/:/missing/);
-    assert.equal(buildPreparationSpreads(spent)[0].texts[0].id,'fire.mint-infusion-name');
+    assert.ok(buildPreparationSpreads(spent)[0].texts.some(t=>t.id==='fire.mint-infusion-name'));
     assert.ok(at('src/game/i18n/recipeDiscovery.ts').recipeDiscoveryCopy[language].includes('(Q)'));
   }
 });

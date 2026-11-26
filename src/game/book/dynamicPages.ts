@@ -14,6 +14,7 @@ import type { BookTextBlock } from "./bookText";
 import { PREPARATION_DESCRIPTIONS, getPreparationUse } from "./preparations";
 import { DIAGNOSIS_SYMPTOMS } from "../patients/diagnosis";
 import { PATIENT_IDS_BY_CHAPTER } from "../patients/chapterPatients";
+import { PREPARATION_CATEGORY, PREPARATION_CATEGORY_NAMES, preparationCategoryRank } from "./preparationCategories";
 
 // The PACIENTES and PREPARADOS pages are not fixed content: they are drawn from
 // the patient cases, the inventory and the recipes the Doctor knows. Nothing
@@ -193,7 +194,11 @@ export function buildPreparationSpreads(context: BookContext): BookSpread[] {
   const { language, knownRecipeIds } = context;
   const copy = bookCopy[language];
   const expanded = expandKnownRecipeIds(knownRecipeIds);
-  const known = RECIPES.filter(recipe => expanded.has(recipe.id));
+  // 2026-11-27 (Kilian): grouped by category (preparationCategories.ts), in the recipes' own order inside each.
+  const known = RECIPES.filter(recipe => expanded.has(recipe.id))
+    .map((recipe, order) => ({ recipe, order }))
+    .sort((a, b) => preparationCategoryRank(a.recipe.output.itemId) - preparationCategoryRank(b.recipe.output.itemId) || a.order - b.order)
+    .map(({ recipe }) => recipe);
 
   if (known.length === 0) {
     return [emptySpread("preparations-empty", copy.noRecipes.title, copy.noRecipes.note)];
@@ -225,6 +230,11 @@ export function buildPreparationSpreads(context: BookContext): BookSpread[] {
         blend: "multiply",
         alt: getItemName(recipe.output.itemId, language),
       });
+      const category = PREPARATION_CATEGORY[recipe.output.itemId];
+      if (category) {
+        texts.push(text(`${recipe.id}-category`, "preparationNote", column, 17,
+          PREPARATION_CATEGORY_NAMES[category][language].toUpperCase(), "center"));
+      }
       texts.push(
         text(`${recipe.id}-name`, "preparationTitle", column, 144,
           getItemName(recipe.output.itemId, language).toUpperCase(), "center"),
@@ -237,8 +247,8 @@ export function buildPreparationSpreads(context: BookContext): BookSpread[] {
           `${copy.station}: ${copy.stations[recipe.station]}`),
         text(`${recipe.id}-availability`, "preparationNote", column, 334 + Math.min(drop, 10),
           ingredientsReady
-            ? (language === "es" ? "Ingredientes disponibles en la bolsa." : "Ingredients available in your bag.")
-            : (language === "es" ? "Faltan ingredientes en la bolsa." : "Some ingredients are missing from your bag.")),
+            ? (language === "es" ? "Ingredientes disponibles en el maletín." : "Ingredients available in your bag.")
+            : (language === "es" ? "Faltan ingredientes en el maletín." : "Some ingredients are missing from your bag.")),
       );
       if (intermediates.length) {
         texts.push(text(`${recipe.id}-steps`, "preparationNote", column, 298 + drop,

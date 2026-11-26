@@ -246,11 +246,16 @@ test("the tutorial Book is untouched: it still opens on INGREDIENTES, which keep
 test("all twenty-three preparations occupy one localized leaf each, two per opening", () => {
   const { RECIPES } = at("src/game/crafting/recipes.ts");
   const known = RECIPES.map(recipe => recipe.id);
+  // 2026-11-27: the leaves follow the categories (preparationCategories.ts), the recipes' order inside each
+  const { preparationCategoryRank } = at("src/game/book/preparationCategories.ts");
+  const ordered = RECIPES.map((recipe, order) => ({ recipe, order }))
+    .sort((a, b) => preparationCategoryRank(a.recipe.output.itemId) - preparationCategoryRank(b.recipe.output.itemId) || a.order - b.order)
+    .map(({ recipe }) => recipe);
   for (const language of ["es", "en"]) {
     const preparations = buildBookSections(context(language, {}, known)).find((s) => s.id === "preparations");
     assert.equal(preparations.spreads.length, 12);
     preparations.spreads.forEach((spread, index) => {
-      const recipes = RECIPES.slice(index * 2, index * 2 + 2);
+      const recipes = ordered.slice(index * 2, index * 2 + 2);
       assert.equal(spread.layers.length, 1 + recipes.length);
       recipes.forEach((recipe, side) => {
         const illustration = spread.layers[side + 1];
